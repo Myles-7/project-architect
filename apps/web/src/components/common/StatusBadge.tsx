@@ -1,0 +1,151 @@
+import React from 'react';
+import { Lock } from 'lucide-react';
+import type { DecisionStatus, SectionMaturity, ReadinessStatus, ProjectStage } from '@project-architect/contracts';
+
+export interface StatusBadgeProps {
+  status: DecisionStatus | 'assumption' | 'unresolved' | 'warning' | 'candidate';
+  size?: 'sm' | 'md';
+}
+
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' }) => {
+  const sizeClasses = size === 'md' ? 'text-xs px-2 py-0.5' : 'text-[11px] px-1.5 py-0.5';
+
+  switch (status) {
+    case 'confirmed':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+          <span>Confirmed 已确认</span>
+        </span>
+      );
+    case 'candidate':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+          <span>Candidate 候选</span>
+        </span>
+      );
+    case 'assumption':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shrink-0" />
+          <span>Assumption 假设</span>
+        </span>
+      );
+    case 'unresolved':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+          <span>Unresolved 待决</span>
+        </span>
+      );
+    case 'warning':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+          <span>Warning 风险</span>
+        </span>
+      );
+    case 'locked':
+      return (
+        <span className={`inline-flex items-center gap-1 rounded font-mono font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 ${sizeClasses}`}>
+          <Lock className="w-3 h-3 text-zinc-500 shrink-0" />
+          <span>Locked 已锁定</span>
+        </span>
+      );
+    default:
+      return null;
+  }
+};
+
+export const MaturityBadge: React.FC<{ maturity: SectionMaturity; size?: 'sm' | 'md' }> = ({ maturity, size = 'sm' }) => {
+  const sizeClasses = size === 'md' ? 'text-xs px-2 py-0.5' : 'text-[11px] px-1.5 py-0.5';
+
+  switch (maturity) {
+    case 'locked':
+      return (
+        <span className={`inline-flex items-center gap-1 rounded font-mono font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 ${sizeClasses}`}>
+          <Lock className="w-3 h-3 text-zinc-500 shrink-0" />
+          <span>Locked 锁定</span>
+        </span>
+      );
+    case 'clear':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+          <span>Clear 清晰</span>
+        </span>
+      );
+    case 'mostly-clear':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+          <span>Mostly Clear 基本清晰</span>
+        </span>
+      );
+    case 'needs-clarification':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+          <span>Needs Clarification 待澄清</span>
+        </span>
+      );
+    case 'unexplored':
+    default:
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 shrink-0" />
+          <span>Unexplored 未探索</span>
+        </span>
+      );
+  }
+};
+
+export const ReadinessBadge: React.FC<{ status: ReadinessStatus; size?: 'sm' | 'md' }> = ({ status, size = 'sm' }) => {
+  const sizeClasses = size === 'md' ? 'text-xs px-2 py-0.5' : 'text-[11px] px-1.5 py-0.5';
+
+  switch (status) {
+    case 'ready':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+          <span>Ready 就绪</span>
+        </span>
+      );
+    case 'ready-with-warnings':
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+          <span>Ready w/ Warnings 有风险就绪</span>
+        </span>
+      );
+    case 'not-ready':
+    default:
+      return (
+        <span className={`inline-flex items-center gap-1.5 rounded font-mono font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 ${sizeClasses}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+          <span>Not Ready 未就绪</span>
+        </span>
+      );
+  }
+};
+
+export const StageBadge: React.FC<{ stage: ProjectStage; size?: 'sm' | 'md' }> = ({ stage, size = 'sm' }) => {
+  const sizeClasses = size === 'md' ? 'text-xs px-2 py-0.5' : 'text-[11px] px-1.5 py-0.5';
+
+  const labels: Record<ProjectStage, string> = {
+    'created': '初始化',
+    'initial-analysis': '首次分析',
+    'broad-pass': '广泛澄清',
+    'deep-dive': '深度推演',
+    'readiness-review': '完备度审阅',
+    'approved': '已获准',
+    'documents-generated': '已生成文档',
+  };
+
+  return (
+    <span className={`inline-flex items-center gap-1 rounded font-mono font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 ${sizeClasses}`}>
+      <span>{labels[stage] || stage}</span>
+    </span>
+  );
+};

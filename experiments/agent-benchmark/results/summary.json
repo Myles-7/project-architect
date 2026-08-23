@@ -1,0 +1,2815 @@
+{
+  "benchmark": "Project Architect Agent Benchmark v1",
+  "run_id": "smoke-2-fixed",
+  "mode": "partial-smoke",
+  "planned_case_count": 3,
+  "started_case_count": 2,
+  "stopped_early": true,
+  "stop_reason": "Stopped before Case 05 because Case 03 Variant C accumulated 247,719 total tokens and its Question Composition call returned CLI status ERROR (exit code 1) after 119,781 ms. Full matrix was not authorized by the cost guardrail.",
+  "cli": {
+    "command": "agy.exe"
+  },
+  "records": [
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "A",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "output": {
+        "assumptions": [
+          "目标用户为使用个人电脑（Windows/macOS）的普通用户或半专业用户。",
+          "软件主要在本地运行，出于隐私与速度考虑，不依赖云端处理。",
+          "用户更倾向于使用图形用户界面（GUI）而非命令行界面（CLI）。"
+        ],
+        "candidates": [
+          "使用 Tauri (Rust + Web 前端) 开发轻量化、高性能的跨平台桌面应用。",
+          "使用 C# WPF 或 WinForms 开发仅针对 Windows 系统的原生高效工具。",
+          "使用 Electron 开发快速迭代的桌面应用（需权衡软件体积占用较长的问题）。"
+        ],
+        "confirmed": [
+          "项目的核心目标是开发一款能够释放计算机存储空间的实用工具软件。",
+          "用户的主要痛点是磁盘空间不足以及由此引起的系统运行卡顿。"
+        ],
+        "conflicts": [
+          "极致清理空间 vs. 系统安全（清理越彻底，误删关键文件的风险越大）。",
+          "开发效率（大框架如 Electron） vs. 软件自身的磁盘/内存占用（清理软件本身若过大会显得不合理）。"
+        ],
+        "gaps": [
+          {
+            "area": "安全机制 (Safety Mechanisms)",
+            "dependency": "文件删除引擎与过滤规则",
+            "impact": "可能误删系统文件或正在使用的应用数据，导致系统崩溃或重要数据丢失。",
+            "reason": "当前的构想没有提及排除列表、白名单或防误删的安全保护机制。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "应用缓存数据库 (App Cache Database)",
+            "dependency": "各主流应用（如微信、浏览器）的路径规范匹配",
+            "impact": "若没有规则库，将无法识别并清理非系统自带软件（如第三方软件残留）产生的海量缓存。",
+            "reason": "项目前期未定义如何收集和维护第三方软件的路径规则。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "系统权限管理 (Permissions & Security)",
+            "dependency": "操作系统安全策略与管理员权限提升",
+            "impact": "在普通用户权限下运行可能会导致大量受保护的临时文件夹无法清理，报错率高。",
+            "reason": "软件在不同运行级别（普通用户 vs 管理员）的清理边界未定。",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "专注于 Windows 临时目录、注册表、预取文件及系统更新备份清理，可使用 C#/WPF 或 C++。",
+                "label": "仅针对 Windows 系统"
+              },
+              {
+                "impact": "专注于 Mac 系统特定路径（~/Library/Caches）及 Xcode 缓存等清理，需遵循 App Store 沙箱权限限制。",
+                "label": "仅针对 macOS 系统"
+              },
+              {
+                "impact": "需使用 Tauri 或 Electron 等跨平台框架，并在代码中抽象各系统路径规则。",
+                "label": "跨平台（Windows & macOS）"
+              }
+            ],
+            "question": "您希望这款清理软件优先支持哪个操作系统？",
+            "reason": "不同操作系统的文件系统结构、缓存目录和权限模型大相径庭，这决定了技术栈和开发范围。",
+            "recommendation": "(推荐) 仅针对 Windows 系统",
+            "recommendation_reason": "Windows 用户的磁盘空间不足（尤其是 C 盘）问题最为普遍，且积累垃圾文件的场景最丰富。首发 Windows 能够快速获取用户并验证产品可行性。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "界面极简，用户只需点击一个按钮即可自动安全清理，开发难度低但用户控制度少。",
+                "label": "桌面 GUI - 一键傻瓜式清理"
+              },
+              {
+                "impact": "提供分类勾选项、文件树状图，列出每一个可清理项的详情，给用户充分选择权。",
+                "label": "桌面 GUI - 专业高级自定义清理"
+              },
+              {
+                "impact": "免去图形界面，仅通过命令行运行，适合程序员和系统管理员，打包体积极小。",
+                "label": "CLI 命令行工具"
+              }
+            ],
+            "question": "您倾向于哪种软件交互界面（UI/UX）？",
+            "reason": "界面风格决定了产品的前端选型（Tauri 还是原生）、交互复杂度以及目标受众群。",
+            "recommendation": "(推荐) 桌面 GUI - 一键傻瓜式清理",
+            "recommendation_reason": "普通用户是空间不足的主力群体，简洁的“一键清理”能极大提升用户安全感与易用性。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "极低风险，仅清理 Temp 目录、日志、回收站等，但释放出的空间可能有限。",
+                "label": "仅清理基础安全目录（临时文件、回收站）"
+              },
+              {
+                "impact": "中等风险，包括浏览器缓存、微信/QQ 缓存、系统旧更新文件等，空间释放明显，但需细化路径规则。",
+                "label": "深度清理（应用缓存、残留包、大型文件分析）"
+              },
+              {
+                "impact": "极高风险，包含注册表冗余清理、系统备份删除等，需要防崩溃和备份机制。",
+                "label": "超级清理（包含注册表与系统敏感备份）"
+              }
+            ],
+            "question": "您计划让软件清理到什么深度？",
+            "reason": "清理深度与安全风险直接挂钩，定义深度能够防范系统崩溃与数据误删风险。",
+            "recommendation": "(推荐) 基础安全清理 + 大文件可视化定位",
+            "recommendation_reason": "基础清理保证系统绝对安全，而大文件分析器（找出占用空间最多的非系统文件）能让用户自主删除，从而既有显著的清理效果，又规避了自动误删的风险。"
+          }
+        ],
+        "risks": [
+          "误删系统关键文件（如 system32/动态链接库）或正在写入的应用文件，导致系统蓝屏或软件损坏。",
+          "被主流杀毒软件（如 Windows Defender, 360, 腾讯电脑管家等）误报为 PUP（潜在不受欢迎程序）或木马病毒。",
+          "未考虑微信、浏览器等复杂缓存中用户可能保留的重要数据（如未读图片、账号信息），引起用户投诉。"
+        ],
+        "unknowns": [
+          "目标操作系统与技术栈偏好（Windows vs macOS vs 跨平台）。",
+          "核心交互模式（一键傻瓜式清理 vs 专业版大文件分析）。",
+          "缓存数据库的获取和维护方案。",
+          "盈利或分发模式（开源、免费、还是商业收费）。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "baseline",
+          "success": true,
+          "duration_ms": 35308,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__A__01__baseline.json",
+          "output": {
+            "assumptions": [
+              "目标用户为使用个人电脑（Windows/macOS）的普通用户或半专业用户。",
+              "软件主要在本地运行，出于隐私与速度考虑，不依赖云端处理。",
+              "用户更倾向于使用图形用户界面（GUI）而非命令行界面（CLI）。"
+            ],
+            "candidates": [
+              "使用 Tauri (Rust + Web 前端) 开发轻量化、高性能的跨平台桌面应用。",
+              "使用 C# WPF 或 WinForms 开发仅针对 Windows 系统的原生高效工具。",
+              "使用 Electron 开发快速迭代的桌面应用（需权衡软件体积占用较长的问题）。"
+            ],
+            "confirmed": [
+              "项目的核心目标是开发一款能够释放计算机存储空间的实用工具软件。",
+              "用户的主要痛点是磁盘空间不足以及由此引起的系统运行卡顿。"
+            ],
+            "conflicts": [
+              "极致清理空间 vs. 系统安全（清理越彻底，误删关键文件的风险越大）。",
+              "开发效率（大框架如 Electron） vs. 软件自身的磁盘/内存占用（清理软件本身若过大会显得不合理）。"
+            ],
+            "gaps": [
+              {
+                "area": "安全机制 (Safety Mechanisms)",
+                "dependency": "文件删除引擎与过滤规则",
+                "impact": "可能误删系统文件或正在使用的应用数据，导致系统崩溃或重要数据丢失。",
+                "reason": "当前的构想没有提及排除列表、白名单或防误删的安全保护机制。",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "应用缓存数据库 (App Cache Database)",
+                "dependency": "各主流应用（如微信、浏览器）的路径规范匹配",
+                "impact": "若没有规则库，将无法识别并清理非系统自带软件（如第三方软件残留）产生的海量缓存。",
+                "reason": "项目前期未定义如何收集和维护第三方软件的路径规则。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "系统权限管理 (Permissions & Security)",
+                "dependency": "操作系统安全策略与管理员权限提升",
+                "impact": "在普通用户权限下运行可能会导致大量受保护的临时文件夹无法清理，报错率高。",
+                "reason": "软件在不同运行级别（普通用户 vs 管理员）的清理边界未定。",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "专注于 Windows 临时目录、注册表、预取文件及系统更新备份清理，可使用 C#/WPF 或 C++。",
+                    "label": "仅针对 Windows 系统"
+                  },
+                  {
+                    "impact": "专注于 Mac 系统特定路径（~/Library/Caches）及 Xcode 缓存等清理，需遵循 App Store 沙箱权限限制。",
+                    "label": "仅针对 macOS 系统"
+                  },
+                  {
+                    "impact": "需使用 Tauri 或 Electron 等跨平台框架，并在代码中抽象各系统路径规则。",
+                    "label": "跨平台（Windows & macOS）"
+                  }
+                ],
+                "question": "您希望这款清理软件优先支持哪个操作系统？",
+                "reason": "不同操作系统的文件系统结构、缓存目录和权限模型大相径庭，这决定了技术栈和开发范围。",
+                "recommendation": "(推荐) 仅针对 Windows 系统",
+                "recommendation_reason": "Windows 用户的磁盘空间不足（尤其是 C 盘）问题最为普遍，且积累垃圾文件的场景最丰富。首发 Windows 能够快速获取用户并验证产品可行性。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "界面极简，用户只需点击一个按钮即可自动安全清理，开发难度低但用户控制度少。",
+                    "label": "桌面 GUI - 一键傻瓜式清理"
+                  },
+                  {
+                    "impact": "提供分类勾选项、文件树状图，列出每一个可清理项的详情，给用户充分选择权。",
+                    "label": "桌面 GUI - 专业高级自定义清理"
+                  },
+                  {
+                    "impact": "免去图形界面，仅通过命令行运行，适合程序员和系统管理员，打包体积极小。",
+                    "label": "CLI 命令行工具"
+                  }
+                ],
+                "question": "您倾向于哪种软件交互界面（UI/UX）？",
+                "reason": "界面风格决定了产品的前端选型（Tauri 还是原生）、交互复杂度以及目标受众群。",
+                "recommendation": "(推荐) 桌面 GUI - 一键傻瓜式清理",
+                "recommendation_reason": "普通用户是空间不足的主力群体，简洁的“一键清理”能极大提升用户安全感与易用性。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "极低风险，仅清理 Temp 目录、日志、回收站等，但释放出的空间可能有限。",
+                    "label": "仅清理基础安全目录（临时文件、回收站）"
+                  },
+                  {
+                    "impact": "中等风险，包括浏览器缓存、微信/QQ 缓存、系统旧更新文件等，空间释放明显，但需细化路径规则。",
+                    "label": "深度清理（应用缓存、残留包、大型文件分析）"
+                  },
+                  {
+                    "impact": "极高风险，包含注册表冗余清理、系统备份删除等，需要防崩溃和备份机制。",
+                    "label": "超级清理（包含注册表与系统敏感备份）"
+                  }
+                ],
+                "question": "您计划让软件清理到什么深度？",
+                "reason": "清理深度与安全风险直接挂钩，定义深度能够防范系统崩溃与数据误删风险。",
+                "recommendation": "(推荐) 基础安全清理 + 大文件可视化定位",
+                "recommendation_reason": "基础清理保证系统绝对安全，而大文件分析器（找出占用空间最多的非系统文件）能让用户自主删除，从而既有显著的清理效果，又规避了自动误删的风险。"
+              }
+            ],
+            "risks": [
+              "误删系统关键文件（如 system32/动态链接库）或正在写入的应用文件，导致系统蓝屏或软件损坏。",
+              "被主流杀毒软件（如 Windows Defender, 360, 腾讯电脑管家等）误报为 PUP（潜在不受欢迎程序）或木马病毒。",
+              "未考虑微信、浏览器等复杂缓存中用户可能保留的重要数据（如未读图片、账号信息），引起用户投诉。"
+            ],
+            "unknowns": [
+              "目标操作系统与技术栈偏好（Windows vs macOS vs 跨平台）。",
+              "核心交互模式（一键傻瓜式清理 vs 专业版大文件分析）。",
+              "缓存数据库的获取和维护方案。",
+              "盈利或分发模式（开源、免费、还是商业收费）。"
+            ]
+          },
+          "input_tokens": 30411,
+          "output_tokens": 10654,
+          "thinking_tokens": 7624,
+          "total_tokens": 41065,
+          "raw_usage": {
+            "input_tokens": 30411,
+            "output_tokens": 10654,
+            "thinking_tokens": 7624,
+            "cache_read_tokens": 16312,
+            "total_tokens": 41065
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 35308,
+        "input_tokens": 30411,
+        "output_tokens": 10654,
+        "thinking_tokens": 7624,
+        "total_tokens": 41065
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:17:23.859Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.875,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "B",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "output": {
+        "assumptions": [
+          "The primary target operating system is Windows, as the developer is using Windows.",
+          "The application will have a Graphical User Interface (GUI) rather than being just a command-line tool.",
+          "The software is intended for personal desktop computers rather than server environments.",
+          "The initial release will target individual consumer users looking for a simple, fast cleanup utility."
+        ],
+        "candidates": [
+          "File scanner for standard cache, temporary files, and log files.",
+          "Visual disk analyzer (e.g. Treemap/Sunburst chart) for large files and folders.",
+          "Duplicate file finder.",
+          "App uninstaller/cleaner.",
+          "Registry cleaner (Windows-specific)."
+        ],
+        "confirmed": [
+          "The core purpose of the software is to scan and clean up disk space on a computer (磁盘清理/空间释放)."
+        ],
+        "conflicts": [
+          "Automated One-Click Cleanup vs. Granular Control: General users prefer a single button that 'just works' safely, while advanced users demand to see and approve every file before deletion.",
+          "Deep/Thorough Scan vs. Speed: Scanning deep directories or calculating file hashes (for duplicates) takes significant time, conflicting with the expectation of a lightweight and fast utility."
+        ],
+        "gaps": [
+          {
+            "area": "System Safety & Whitelisting",
+            "dependency": "Core cleaning logic",
+            "impact": "High risk of bricking the user's OS or deleting irrecoverable personal files.",
+            "reason": "No mechanism has been defined to prevent the software from deleting critical system files or user-sensitive documents.",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "Target Platform Scope",
+            "dependency": "Tech stack selection",
+            "impact": "Significantly changes the tech stack choices and system APIs used (e.g. Win32 vs. POSIX).",
+            "reason": "The specific target operating systems (Windows only vs. multi-platform) are undefined.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "UI/UX & User Persona",
+            "dependency": "Front-end design",
+            "impact": "Affects UI layout, page count, and scanning architecture.",
+            "reason": "We do not know whether the user wants a simple, automated one-click cleanup or an advanced explorer of large files.",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Simpler API integration, faster development, and easier debugging.",
+                "label": "Windows only for the MVP to prioritize speed and reliability."
+              },
+              {
+                "impact": "Broader target audience, but increases development and testing overhead.",
+                "label": "Cross-platform support (Windows & macOS) right from the start."
+              }
+            ],
+            "question": "Which operating systems should the cleanup software support?",
+            "reason": "The target platform dictates the GUI framework and how we access system folders (like Temp, AppData, etc.).",
+            "recommendation": "(Recommended) Windows-only for the MVP.",
+            "recommendation_reason": "Since you are on Windows, starting with a Windows-focused app allows us to target specific system APIs and folders directly, reducing complexity before expanding."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Very safe; allows users to recover files if needed, minimizing data loss risks.",
+                "label": "Move files to Recycle Bin / Trash and apply a strict system directory whitelist."
+              },
+              {
+                "impact": "Recovers space instantly, but any accidental deletion is permanent and catastrophic.",
+                "label": "Permanently delete files directly for maximum space recovery."
+              }
+            ],
+            "question": "How should the app handle file deletion to ensure user safety?",
+            "reason": "Deleting the wrong files can corrupt the operating system or delete precious user data, leading to severe complaints or data loss.",
+            "recommendation": "(Recommended) Send files to the Recycle Bin and use a strict whitelist.",
+            "recommendation_reason": "Moving files to the Recycle Bin provides an easy safety net for users to restore files, and a strict system-path whitelist prevents the app from touching crucial Windows files."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Standard, clean user experience; easy to implement and understand.",
+                "label": "Simple dashboard UI (Scan & Clean) with checkboxes for file categories."
+              },
+              {
+                "impact": "Excellent for manually finding space-hogging folders, but more complex to build.",
+                "label": "Visual disk analyzer (like WinDirStat) showing directory tree maps."
+              }
+            ],
+            "question": "What UI layout and core user flow would you prefer?",
+            "reason": "The user experience determines whether we build a simple dashboard or an interactive disk explorer.",
+            "recommendation": "(Recommended) Dashboard with a simple 'Scan' and 'Clean' flow, plus category checkboxes.",
+            "recommendation_reason": "This is intuitive for all users, letting them see what categories (temp files, browser cache, etc.) are being cleaned without overwhelming them."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Tiny application size, high performance, and modern web UI styling.",
+                "label": "Tauri (Rust + Web frontend) for a lightweight, secure app."
+              },
+              {
+                "impact": "Easy to write and prototype, but results in a larger packaged file (~50-100MB).",
+                "label": "Python (PySide/PyQt) for fast development and rich GUI library."
+              },
+              {
+                "impact": "Deep integration with Windows APIs and native performance, but Windows-locked.",
+                "label": "C# (WPF) for native Windows-only integration."
+              }
+            ],
+            "question": "Do you have a preferred technology stack for the desktop application?",
+            "reason": "The choice of framework impacts build size, UI performance, and ease of packaging/distribution.",
+            "recommendation": "(Recommended) Tauri (Rust backend + HTML/JS/CSS frontend).",
+            "recommendation_reason": "Tauri produces extremely lightweight executable files (~5MB compared to Electron's ~100MB) and offers high performance and strong security."
+          }
+        ],
+        "risks": [
+          "Data Loss: Accidental deletion of critical system files, active user files, or browser/app credentials.",
+          "System Instability: Cleaning system caches or registry entries can lead to operating system failures or application crashes.",
+          "Privilege Elevation: Scanning and deleting files in certain directories requires administrator rights, raising security concerns.",
+          "Performance degradation: Inefficient scanning of huge drives can consume 100% CPU/Disk I/O, freezing the computer."
+        ],
+        "unknowns": [
+          "The specific operating systems to support (Windows only vs. cross-platform).",
+          "The preferred GUI design style (minimalist automated vs. power-user detailed control).",
+          "The deletion mechanism (direct deletion vs. recycling bin recycle vs. backup-before-deletion).",
+          "The technology stack preference (Tauri, Python, C#, Electron)."
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "success": true,
+          "duration_ms": 24146,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__B__01__single-custom.json",
+          "output": {
+            "assumptions": [
+              "The primary target operating system is Windows, as the developer is using Windows.",
+              "The application will have a Graphical User Interface (GUI) rather than being just a command-line tool.",
+              "The software is intended for personal desktop computers rather than server environments.",
+              "The initial release will target individual consumer users looking for a simple, fast cleanup utility."
+            ],
+            "candidates": [
+              "File scanner for standard cache, temporary files, and log files.",
+              "Visual disk analyzer (e.g. Treemap/Sunburst chart) for large files and folders.",
+              "Duplicate file finder.",
+              "App uninstaller/cleaner.",
+              "Registry cleaner (Windows-specific)."
+            ],
+            "confirmed": [
+              "The core purpose of the software is to scan and clean up disk space on a computer (磁盘清理/空间释放)."
+            ],
+            "conflicts": [
+              "Automated One-Click Cleanup vs. Granular Control: General users prefer a single button that 'just works' safely, while advanced users demand to see and approve every file before deletion.",
+              "Deep/Thorough Scan vs. Speed: Scanning deep directories or calculating file hashes (for duplicates) takes significant time, conflicting with the expectation of a lightweight and fast utility."
+            ],
+            "gaps": [
+              {
+                "area": "System Safety & Whitelisting",
+                "dependency": "Core cleaning logic",
+                "impact": "High risk of bricking the user's OS or deleting irrecoverable personal files.",
+                "reason": "No mechanism has been defined to prevent the software from deleting critical system files or user-sensitive documents.",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "Target Platform Scope",
+                "dependency": "Tech stack selection",
+                "impact": "Significantly changes the tech stack choices and system APIs used (e.g. Win32 vs. POSIX).",
+                "reason": "The specific target operating systems (Windows only vs. multi-platform) are undefined.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "UI/UX & User Persona",
+                "dependency": "Front-end design",
+                "impact": "Affects UI layout, page count, and scanning architecture.",
+                "reason": "We do not know whether the user wants a simple, automated one-click cleanup or an advanced explorer of large files.",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Simpler API integration, faster development, and easier debugging.",
+                    "label": "Windows only for the MVP to prioritize speed and reliability."
+                  },
+                  {
+                    "impact": "Broader target audience, but increases development and testing overhead.",
+                    "label": "Cross-platform support (Windows & macOS) right from the start."
+                  }
+                ],
+                "question": "Which operating systems should the cleanup software support?",
+                "reason": "The target platform dictates the GUI framework and how we access system folders (like Temp, AppData, etc.).",
+                "recommendation": "(Recommended) Windows-only for the MVP.",
+                "recommendation_reason": "Since you are on Windows, starting with a Windows-focused app allows us to target specific system APIs and folders directly, reducing complexity before expanding."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "Very safe; allows users to recover files if needed, minimizing data loss risks.",
+                    "label": "Move files to Recycle Bin / Trash and apply a strict system directory whitelist."
+                  },
+                  {
+                    "impact": "Recovers space instantly, but any accidental deletion is permanent and catastrophic.",
+                    "label": "Permanently delete files directly for maximum space recovery."
+                  }
+                ],
+                "question": "How should the app handle file deletion to ensure user safety?",
+                "reason": "Deleting the wrong files can corrupt the operating system or delete precious user data, leading to severe complaints or data loss.",
+                "recommendation": "(Recommended) Send files to the Recycle Bin and use a strict whitelist.",
+                "recommendation_reason": "Moving files to the Recycle Bin provides an easy safety net for users to restore files, and a strict system-path whitelist prevents the app from touching crucial Windows files."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Standard, clean user experience; easy to implement and understand.",
+                    "label": "Simple dashboard UI (Scan & Clean) with checkboxes for file categories."
+                  },
+                  {
+                    "impact": "Excellent for manually finding space-hogging folders, but more complex to build.",
+                    "label": "Visual disk analyzer (like WinDirStat) showing directory tree maps."
+                  }
+                ],
+                "question": "What UI layout and core user flow would you prefer?",
+                "reason": "The user experience determines whether we build a simple dashboard or an interactive disk explorer.",
+                "recommendation": "(Recommended) Dashboard with a simple 'Scan' and 'Clean' flow, plus category checkboxes.",
+                "recommendation_reason": "This is intuitive for all users, letting them see what categories (temp files, browser cache, etc.) are being cleaned without overwhelming them."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Tiny application size, high performance, and modern web UI styling.",
+                    "label": "Tauri (Rust + Web frontend) for a lightweight, secure app."
+                  },
+                  {
+                    "impact": "Easy to write and prototype, but results in a larger packaged file (~50-100MB).",
+                    "label": "Python (PySide/PyQt) for fast development and rich GUI library."
+                  },
+                  {
+                    "impact": "Deep integration with Windows APIs and native performance, but Windows-locked.",
+                    "label": "C# (WPF) for native Windows-only integration."
+                  }
+                ],
+                "question": "Do you have a preferred technology stack for the desktop application?",
+                "reason": "The choice of framework impacts build size, UI performance, and ease of packaging/distribution.",
+                "recommendation": "(Recommended) Tauri (Rust backend + HTML/JS/CSS frontend).",
+                "recommendation_reason": "Tauri produces extremely lightweight executable files (~5MB compared to Electron's ~100MB) and offers high performance and strong security."
+              }
+            ],
+            "risks": [
+              "Data Loss: Accidental deletion of critical system files, active user files, or browser/app credentials.",
+              "System Instability: Cleaning system caches or registry entries can lead to operating system failures or application crashes.",
+              "Privilege Elevation: Scanning and deleting files in certain directories requires administrator rights, raising security concerns.",
+              "Performance degradation: Inefficient scanning of huge drives can consume 100% CPU/Disk I/O, freezing the computer."
+            ],
+            "unknowns": [
+              "The specific operating systems to support (Windows only vs. cross-platform).",
+              "The preferred GUI design style (minimalist automated vs. power-user detailed control).",
+              "The deletion mechanism (direct deletion vs. recycling bin recycle vs. backup-before-deletion).",
+              "The technology stack preference (Tauri, Python, C#, Electron)."
+            ]
+          },
+          "input_tokens": 19880,
+          "output_tokens": 6737,
+          "thinking_tokens": 5210,
+          "total_tokens": 26617,
+          "raw_usage": {
+            "input_tokens": 19880,
+            "output_tokens": 6737,
+            "thinking_tokens": 5210,
+            "cache_read_tokens": 0,
+            "total_tokens": 26617
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 24146,
+        "input_tokens": 19880,
+        "output_tokens": 6737,
+        "thinking_tokens": 5210,
+        "total_tokens": 26617
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:17:48.010Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.875,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "C",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "output": {
+        "confirmed": [
+          "用户希望开发一款用于清理电脑空间的软件。"
+        ],
+        "candidates": [
+          "一键式快速扫描与清理（包括临时文件、系统缓存、回收站等）",
+          "大文件与极少使用文件检测与可视化展示（如饼图或矩形树图）",
+          "重复文件扫描与去重建议",
+          "应用卸载器（查找残留注册表和关联文件夹）",
+          "采用本地桌面应用架构，数据完全保留在本地"
+        ],
+        "assumptions": [
+          "目标用户主要为普通个人电脑用户，而非企业或专业系统管理员",
+          "软件界面首选中文",
+          "软件为单机运行，无需网络账户注册与云端同步"
+        ],
+        "unknowns": [
+          "目标运行平台是否仅限 Windows，还是需要支持 macOS/Linux 等跨平台运行？",
+          "技术栈偏好是什么（如 C#/.NET, Python, Electron, Rust/Tauri 等）？",
+          "清理的深度边界在哪里（是否涉及敏感的注册表清理、系统组件精简等高风险操作）？",
+          "UI/UX 风格偏好是极简一键式，还是专业仪表盘式？"
+        ],
+        "risks": [
+          "误删系统关键文件或用户核心数据，导致系统无法启动或数据丢失",
+          "权限不足（缺乏管理员权限/UAC限制）导致无法访问和清理特定系统目录",
+          "全盘扫描算法效率低下，在机械硬盘或超大容量固态硬盘上出现卡顿或高内存占用",
+          "被杀毒软件（如 Windows Defender）或安全防护软件误拦截或报毒"
+        ],
+        "project_tags": [
+          "desktop-app",
+          "system-utility",
+          "disk-cleaner",
+          "windows-utility",
+          "mvp-planning"
+        ],
+        "gaps": [
+          {
+            "area": "Target User Definition",
+            "dependency": "Clarification of the target user profile and their technical literacy.",
+            "impact": "Without a defined user persona, UI/UX design may become overly complex or too technical, causing user anxiety or accidental damage during critical cleaning actions.",
+            "reason": "The target user is assumed to be 'ordinary PC users', which is too broad and does not specify their technical competency or threshold for managing risky system cleanup decisions.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "MVP Scope Definition",
+            "dependency": "Prioritization of candidates to define the scope for the first release (Phase 1).",
+            "impact": "Including all candidates (such as deep registry tracing, visual disk mapping, and duplicate deduplication) in the initial release increases development complexity and delays delivery.",
+            "reason": "The candidate features cover multiple highly complex utilities (disk visualization, deduplication, uninstaller with registry trace) that go beyond a simple, quick-to-deliver MVP.",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Deletion Safety & Recovery",
+            "dependency": "Defining deletion boundaries and recovery mechanisms (such as backups, system restore points, or staging zones).",
+            "impact": "High risk of permanent user data loss or system corruption, leading to system failure and negative software adoption.",
+            "reason": "There is a high risk of deleting system files or user data, but no recovery mechanism (e.g., dry-runs, backups, or restore points) is specified before permanent deletion.",
+            "severity": "critical",
+            "should_ask_user": true
+          }
+        ],
+        "conflicts": [
+          "The assumption of targeting 'ordinary PC users' conflicts with the inclusion of advanced, high-risk features like registry cleaning/tracing in the app uninstaller candidate, which can easily cause system instability if misused by non-technical users.",
+          "The assumption of a completely offline, standalone application conflicts with the need to keep uninstaller definitions (residual files/registry detection rules) up-to-date, which typically requires a cloud database or online synchronization."
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "在保障系统安全和数据可恢复性的前提下，开发成本适中，对普通用户最友好。",
+                "label": "优先将清理文件移至系统回收站，配合严格的系统关键目录/白名单过滤，保障基础安全与开发效率"
+              },
+              {
+                "impact": "安全等级最高，但自动创建系统还原点耗时较长，且列出所有待删文件会增加普通用户的认知负担。",
+                "label": "清理前强制自动创建系统还原点，并在界面中列出所有文件，由用户手动确认后才执行永久删除"
+              },
+              {
+                "impact": "开发最简单，但完全没有反悔机制，一旦白名单有遗漏，将面临严重的用户数据丢失风险。",
+                "label": "仅依赖硬编码的白名单进行过滤保护，扫描后直接物理永久删除文件，不放入回收站"
+              }
+            ],
+            "question": "在执行清理操作时，应如何确保用户数据安全与系统稳定性？",
+            "reason": "清理软件最核心的风险在于误删系统关键文件或用户核心数据，导致不可逆的系统崩溃或数据丢失。必须在设计初期确立明确的安全防护与恢复机制。",
+            "recommendation": "默认将清理文件移至系统回收站，并对系统核心目录及受保护文件设置强白名单过滤；对于高风险项，要求用户手动预览确认后才可操作。",
+            "recommendation_reason": "移至回收站为用户提供了低成本的“反悔机制”，白名单能从源头杜绝破坏系统组件的可能。相比于强制创建系统还原点，该方案开发成本低且对普通用户最友好。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "用户基数大，UI/UX设计以极简为主，默认清理策略需极度保守。",
+                "label": "普通个人电脑用户：界面极简、一键清理、安全第一（屏蔽高风险项，提示语通俗易懂）"
+              },
+              {
+                "impact": "界面信息量较大，需要平衡操作灵活性与安全性，开发成本略微增加。",
+                "label": "有一定电脑基础的进阶用户：提供分类仪表盘、文件大小与路径展示、允许自定义清理项"
+              },
+              {
+                "impact": "界面高度专业化，功能强大但受众窄，需要处理极高难度的系统残留分析。",
+                "label": "专业系统管理员或极客：提供高度自定义规则、深度注册表残留追踪、命令行支持"
+              }
+            ],
+            "question": "该电脑清理软件的主要目标用户群体是谁？这决定了界面的交互风格和安全提示策略。",
+            "reason": "目标用户的技术背景决定了界面的复杂度、默认安全策略以及提示语的专业程度。若定位不准，会导致普通用户因界面太复杂而不敢使用，或专业用户因功能太简陋而放弃。",
+            "recommendation": "普通个人电脑用户（技术非专业人员，如办公人员、学生等）。",
+            "recommendation_reason": "普通用户对电脑卡顿和空间不足的感知最明显，且缺乏手动清理的技能，因此对一键式清理软件的需求最迫切。定位为此群体有利于设计极简的UI，并采用最保守的安全清理策略。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "开发周期最短，风险最低，但功能相对单一。",
+                "label": "仅包含基础扫描与清理（临时文件、垃圾缓存），确保核心闭环快速上线"
+              },
+              {
+                "impact": "提升了界面的视觉冲击力，能帮助用户发现空间占用大户，但会增加前端图表库的集成与交互工作量。",
+                "label": "包含基础清理和大文件可视化展示（饼图/矩形树图）"
+              },
+              {
+                "impact": "功能最完善，但卸载器和残留追踪的技术复杂度极高，会极大延缓MVP上线时间。",
+                "label": "包含基础清理、重复文件扫描以及带残留检测的应用卸载器"
+              }
+            ],
+            "question": "为了快速交付首个版本（MVP），您希望首期聚焦在哪些清理功能上？",
+            "reason": "当前候选功能包含了大文件可视化、重复文件去重、深度卸载残留分析等，若全部在首版开发，会使项目变得庞大、开发周期拉长，偏离了MVP快速验证的初衷。",
+            "recommendation": "首期MVP仅包含基础的扫描与清理（如临时文件、浏览器缓存、系统缓存及回收站清理），暂不引入复杂的图表可视化与卸载分析。",
+            "recommendation_reason": "基础清理功能可以快速搭建起完整的“扫描-展示-清理-完成”核心闭环，技术实现简单且风险可控，便于快速上线收集反馈。"
+          }
+        ]
+      },
+      "calls": [
+        {
+          "task": "idea-analysis",
+          "success": true,
+          "duration_ms": 21554,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__C__01__idea-analysis.json",
+          "output": {
+            "assumptions": [
+              "目标用户主要为普通个人电脑用户，而非企业或专业系统管理员",
+              "软件界面首选中文",
+              "软件为单机运行，无需网络账户注册与云端同步"
+            ],
+            "candidates": [
+              "一键式快速扫描与清理（包括临时文件、系统缓存、回收站等）",
+              "大文件与极少使用文件检测与可视化展示（如饼图或矩形树图）",
+              "重复文件扫描与去重建议",
+              "应用卸载器（查找残留注册表和关联文件夹）",
+              "采用本地桌面应用架构，数据完全保留在本地"
+            ],
+            "confirmed": [
+              "用户希望开发一款用于清理电脑空间的软件。"
+            ],
+            "project_tags": [
+              "desktop-app",
+              "system-utility",
+              "disk-cleaner",
+              "windows-utility",
+              "mvp-planning"
+            ],
+            "risks": [
+              "误删系统关键文件或用户核心数据，导致系统无法启动或数据丢失",
+              "权限不足（缺乏管理员权限/UAC限制）导致无法访问和清理特定系统目录",
+              "全盘扫描算法效率低下，在机械硬盘或超大容量固态硬盘上出现卡顿或高内存占用",
+              "被杀毒软件（如 Windows Defender）或安全防护软件误拦截或报毒"
+            ],
+            "unknowns": [
+              "目标运行平台是否仅限 Windows，还是需要支持 macOS/Linux 等跨平台运行？",
+              "技术栈偏好是什么（如 C#/.NET, Python, Electron, Rust/Tauri 等）？",
+              "清理的深度边界在哪里（是否涉及敏感的注册表清理、系统组件精简等高风险操作）？",
+              "UI/UX 风格偏好是极简一键式，还是专业仪表盘式？"
+            ]
+          },
+          "input_tokens": 19626,
+          "output_tokens": 3092,
+          "thinking_tokens": 2681,
+          "total_tokens": 22718,
+          "raw_usage": {
+            "input_tokens": 19626,
+            "output_tokens": 3092,
+            "thinking_tokens": 2681,
+            "cache_read_tokens": 0,
+            "total_tokens": 22718
+          }
+        },
+        {
+          "task": "gap-analysis",
+          "success": true,
+          "duration_ms": 19005,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__C__02__gap-analysis.json",
+          "output": {
+            "conflicts": [
+              "The assumption of targeting 'ordinary PC users' conflicts with the inclusion of advanced, high-risk features like registry cleaning/tracing in the app uninstaller candidate, which can easily cause system instability if misused by non-technical users.",
+              "The assumption of a completely offline, standalone application conflicts with the need to keep uninstaller definitions (residual files/registry detection rules) up-to-date, which typically requires a cloud database or online synchronization."
+            ],
+            "gaps": [
+              {
+                "area": "Target User Definition",
+                "dependency": "Clarification of the target user profile and their technical literacy.",
+                "impact": "Without a defined user persona, UI/UX design may become overly complex or too technical, causing user anxiety or accidental damage during critical cleaning actions.",
+                "reason": "The target user is assumed to be 'ordinary PC users', which is too broad and does not specify their technical competency or threshold for managing risky system cleanup decisions.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "MVP Scope Definition",
+                "dependency": "Prioritization of candidates to define the scope for the first release (Phase 1).",
+                "impact": "Including all candidates (such as deep registry tracing, visual disk mapping, and duplicate deduplication) in the initial release increases development complexity and delays delivery.",
+                "reason": "The candidate features cover multiple highly complex utilities (disk visualization, deduplication, uninstaller with registry trace) that go beyond a simple, quick-to-deliver MVP.",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "Deletion Safety & Recovery",
+                "dependency": "Defining deletion boundaries and recovery mechanisms (such as backups, system restore points, or staging zones).",
+                "impact": "High risk of permanent user data loss or system corruption, leading to system failure and negative software adoption.",
+                "reason": "There is a high risk of deleting system files or user data, but no recovery mechanism (e.g., dry-runs, backups, or restore points) is specified before permanent deletion.",
+                "severity": "critical",
+                "should_ask_user": true
+              }
+            ]
+          },
+          "input_tokens": 20160,
+          "output_tokens": 3965,
+          "thinking_tokens": 3492,
+          "total_tokens": 24125,
+          "raw_usage": {
+            "input_tokens": 20160,
+            "output_tokens": 3965,
+            "thinking_tokens": 3492,
+            "cache_read_tokens": 0,
+            "total_tokens": 24125
+          }
+        },
+        {
+          "task": "question-compose",
+          "success": true,
+          "duration_ms": 25608,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__C__03__question-compose.json",
+          "output": {
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "在保障系统安全和数据可恢复性的前提下，开发成本适中，对普通用户最友好。",
+                    "label": "优先将清理文件移至系统回收站，配合严格的系统关键目录/白名单过滤，保障基础安全与开发效率"
+                  },
+                  {
+                    "impact": "安全等级最高，但自动创建系统还原点耗时较长，且列出所有待删文件会增加普通用户的认知负担。",
+                    "label": "清理前强制自动创建系统还原点，并在界面中列出所有文件，由用户手动确认后才执行永久删除"
+                  },
+                  {
+                    "impact": "开发最简单，但完全没有反悔机制，一旦白名单有遗漏，将面临严重的用户数据丢失风险。",
+                    "label": "仅依赖硬编码的白名单进行过滤保护，扫描后直接物理永久删除文件，不放入回收站"
+                  }
+                ],
+                "question": "在执行清理操作时，应如何确保用户数据安全与系统稳定性？",
+                "reason": "清理软件最核心的风险在于误删系统关键文件或用户核心数据，导致不可逆的系统崩溃或数据丢失。必须在设计初期确立明确的安全防护与恢复机制。",
+                "recommendation": "默认将清理文件移至系统回收站，并对系统核心目录及受保护文件设置强白名单过滤；对于高风险项，要求用户手动预览确认后才可操作。",
+                "recommendation_reason": "移至回收站为用户提供了低成本的“反悔机制”，白名单能从源头杜绝破坏系统组件的可能。相比于强制创建系统还原点，该方案开发成本低且对普通用户最友好。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "用户基数大，UI/UX设计以极简为主，默认清理策略需极度保守。",
+                    "label": "普通个人电脑用户：界面极简、一键清理、安全第一（屏蔽高风险项，提示语通俗易懂）"
+                  },
+                  {
+                    "impact": "界面信息量较大，需要平衡操作灵活性与安全性，开发成本略微增加。",
+                    "label": "有一定电脑基础的进阶用户：提供分类仪表盘、文件大小与路径展示、允许自定义清理项"
+                  },
+                  {
+                    "impact": "界面高度专业化，功能强大但受众窄，需要处理极高难度的系统残留分析。",
+                    "label": "专业系统管理员或极客：提供高度自定义规则、深度注册表残留追踪、命令行支持"
+                  }
+                ],
+                "question": "该电脑清理软件的主要目标用户群体是谁？这决定了界面的交互风格和安全提示策略。",
+                "reason": "目标用户的技术背景决定了界面的复杂度、默认安全策略以及提示语的专业程度。若定位不准，会导致普通用户因界面太复杂而不敢使用，或专业用户因功能太简陋而放弃。",
+                "recommendation": "普通个人电脑用户（技术非专业人员，如办公人员、学生等）。",
+                "recommendation_reason": "普通用户对电脑卡顿和空间不足的感知最明显，且缺乏手动清理的技能，因此对一键式清理软件的需求最迫切。定位为此群体有利于设计极简的UI，并采用最保守的安全清理策略。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "开发周期最短，风险最低，但功能相对单一。",
+                    "label": "仅包含基础扫描与清理（临时文件、垃圾缓存），确保核心闭环快速上线"
+                  },
+                  {
+                    "impact": "提升了界面的视觉冲击力，能帮助用户发现空间占用大户，但会增加前端图表库的集成与交互工作量。",
+                    "label": "包含基础清理和大文件可视化展示（饼图/矩形树图）"
+                  },
+                  {
+                    "impact": "功能最完善，但卸载器和残留追踪的技术复杂度极高，会极大延缓MVP上线时间。",
+                    "label": "包含基础清理、重复文件扫描以及带残留检测的应用卸载器"
+                  }
+                ],
+                "question": "为了快速交付首个版本（MVP），您希望首期聚焦在哪些清理功能上？",
+                "reason": "当前候选功能包含了大文件可视化、重复文件去重、深度卸载残留分析等，若全部在首版开发，会使项目变得庞大、开发周期拉长，偏离了MVP快速验证的初衷。",
+                "recommendation": "首期MVP仅包含基础的扫描与清理（如临时文件、浏览器缓存、系统缓存及回收站清理），暂不引入复杂的图表可视化与卸载分析。",
+                "recommendation_reason": "基础清理功能可以快速搭建起完整的“扫描-展示-清理-完成”核心闭环，技术实现简单且风险可控，便于快速上线收集反馈。"
+              }
+            ]
+          },
+          "input_tokens": 20703,
+          "output_tokens": 8286,
+          "thinking_tokens": 7212,
+          "total_tokens": 28989,
+          "raw_usage": {
+            "input_tokens": 20703,
+            "output_tokens": 8286,
+            "thinking_tokens": 7212,
+            "cache_read_tokens": 0,
+            "total_tokens": 28989
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 3,
+        "duration_ms": 66167,
+        "input_tokens": 60489,
+        "output_tokens": 15343,
+        "thinking_tokens": 13385,
+        "total_tokens": 75832
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:18:54.183Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.875,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "D",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "output": {
+        "confirmed": [
+          "目标是开发一款用于清理电脑存储空间的软件。"
+        ],
+        "candidates": [
+          "目标平台：Windows、macOS 或跨平台",
+          "核心功能：清理临时文件、系统缓存、浏览器历史记录、大文件、重复文件以及卸载残留",
+          "界面类型：图形用户界面（GUI）或命令行界面（CLI）",
+          "清理模式：一键快速清理、自定义深度扫描或定时自动化清理"
+        ],
+        "assumptions": [
+          "软件界面首选语言为中文",
+          "软件主要在本地运行，不需要复杂的云端存储或多端同步功能",
+          "软件主要面向个人电脑用户（非企业级服务器或大规模集群管理）"
+        ],
+        "unknowns": [
+          "具体的支持系统（仅限 Windows，还是需要跨平台支持）？",
+          "目标用户群体是谁（普通电脑用户还是开发者等技术人员）？",
+          "是否有偏好的开发技术栈（如 Electron, Qt, Python, Rust, Go 等）？",
+          "是否需要清理特定类型的文件（例如开发缓存 node_modules、设计临时文件等）？",
+          "对于清理深度和安全性的要求是什么（是否需要清理系统级文件，需要管理员权限）？"
+        ],
+        "risks": [
+          "误删风险：误删系统关键文件或用户重要数据，导致系统崩溃或数据丢失",
+          "安全杀毒软件误报：由于涉及大量文件删除和系统扫描，可能会被 Windows Defender 或其他杀毒软件误报为恶意软件",
+          "扫描性能瓶颈：如果磁盘文件极多，扫描可能会占用极高的 CPU 和 I/O 资源，导致电脑卡顿"
+        ],
+        "project_tags": [
+          "desktop-app",
+          "system-utility",
+          "disk-cleanup",
+          "file-management"
+        ],
+        "gaps": [
+          {
+            "area": "Feasibility & OS Compatibility",
+            "dependency": "None (this is the foundational technical decision)",
+            "impact": "This directly dictates the programming language, framework/tech stack (e.g., Win32 API vs Electron/Qt), system API access patterns, and delivery timeline.",
+            "reason": "It is unresolved whether the application should support only Windows or be cross-platform (macOS, Linux).",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "User Flow & UX/UI",
+            "dependency": "Product Vision",
+            "impact": "Determines user interface complexity (one-click clean vs. customizable scan paths/filters), default safety boundaries, and the degree of transparency needed during scanning/cleaning.",
+            "reason": "The target user persona (ordinary PC users vs. developers/technical personnel) is unresolved.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "MVP Scope & Cleanup Targets",
+            "dependency": "User Persona",
+            "impact": "Determines the complexity of scanning algorithms, risks of file locking, and the extent of user-customizable options in the MVP.",
+            "reason": "The types of files to be cleaned (system junk, browser caches, node_modules, design temp files) are unresolved.",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Privacy/Security & Permission Model",
+            "dependency": "OS Compatibility & Cleanup Targets",
+            "impact": "If administrator privileges are required (e.g., to clean system-level logs or installer caches), it increases the risk of system instability, security auditing issues, and antivirus/Windows Defender false positives.",
+            "reason": "The cleaning depth and permission requirements (User vs. Administrator) are unresolved.",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "Feasibility & Tech Stack Selection",
+            "dependency": "OS Compatibility & User Persona",
+            "impact": "Affects scanner performance (I/O and CPU bottlenecks), executable size (crucial for a disk-saving utility), UI responsiveness, and compatibility with the target OS.",
+            "reason": "There is no preferred technology stack (Electron, Qt, Python, Rust, Go, etc.) selected.",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "conflicts": [
+          "Targeting ordinary PC users (Assumption) potentially conflicts with cleaning specialized files like developer caches/node_modules (Unresolved Cleanup Targets), which are irrelevant and confusing for non-technical users.",
+          "The risk of system crash/data loss (Risk) conflicts with the lack of definition regarding safety rules or user permission boundaries (Unresolved Cleanup Depth/Security requirements)."
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Enables deep integration with Windows APIs (like Registry, Volume Shadow Copy, WinSxS) and allows using native, fast UI technologies (like WPF/WinUI or lightweight Rust/C++).",
+                "label": "(Recommended) Windows only (highly integrated, lightweight native app)"
+              },
+              {
+                "impact": "Requires a cross-platform framework (e.g., Electron, Tauri, or Qt) and restricts deep system-level cleaning to common user-space directories, unless extensive platform-specific code is written for each OS.",
+                "label": "Cross-platform (Windows, macOS, Linux)"
+              }
+            ],
+            "question": "Which operating systems should the storage cleaning software support?",
+            "reason": "The choice between a Windows-only tool and a cross-platform tool directly dictates the UI framework (e.g., native Win32/WPF vs. Electron/Tauri), access to low-level system APIs, and development velocity.",
+            "recommendation": "Windows only (highly integrated, lightweight native app)",
+            "recommendation_reason": "Since your current environment is Windows and Windows has very specific/complex system storage locations, starting with a Windows-native focus allows us to write a lightweight, highly effective tool with deep integration before worrying about cross-platform abstractions."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Zero risk of breaking the OS. No annoying Windows UAC prompts. Easiest to distribute and run safely.",
+                "label": "(Recommended) Standard User permissions (safest, cleans user-space caches and temp files)"
+              },
+              {
+                "impact": "Allows reclaiming more space (like WinSxS or system logs), but carries high risk of system instability and will trigger Windows User Account Control (UAC) prompts.",
+                "label": "Administrator permissions (deepest, cleans system logs, Windows updates, and driver backups)"
+              }
+            ],
+            "question": "What level of system permissions and cleaning depth should the software target?",
+            "reason": "Requiring Administrator privileges enables cleaning system-wide logs, driver backups, and installer caches, but increases the risk of system instability, security warnings, and antivirus false positives.",
+            "recommendation": "Standard User permissions (safest, cleans user-space caches and temp files)",
+            "recommendation_reason": "Starting with user-space directories (e.g., user temp folders, browser caches, developer package caches) is safer, prevents accidental OS damage, avoids UAC prompts on startup, and doesn't trigger security/antivirus warnings."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "The UI will focus on transparency, scan rules, and lists of specific dev caches. Safe defaults are still key, but users get full visibility and control.",
+                "label": "(Recommended) Developers and technical users (custom paths, regex filters, package manager/build cache cleaning)"
+              },
+              {
+                "impact": "UI will be extremely simple, focusing on a single 'Scan & Clean' button with minimal configuration, hiding technical details behind simple categories (e.g., 'Temporary Files', 'Browser Data').",
+                "label": "Ordinary PC users (one-click scan, simple cleanup categories)"
+              }
+            ],
+            "question": "Who is the primary target audience for this space-cleaning software?",
+            "reason": "Ordinary PC users need a simple, foolproof one-click cleaning experience, while developers and technical users need fine-grained control and targeted cleanup of huge developer directories (e.g., node_modules, Docker layers, build caches).",
+            "recommendation": "Developers and technical users (custom paths, regex filters, package manager/build cache cleaning)",
+            "recommendation_reason": "Standard PC users are already well-served by built-in tools like Windows Storage Sense. Developers, however, suffer from massive, hidden space hogs (like duplicate node_modules folders) that general-purpose cleaners ignore. Targeting technical users provides a clear, high-value niche."
+          }
+        ]
+      },
+      "calls": [
+        {
+          "task": "idea-analysis",
+          "success": true,
+          "duration_ms": 16979,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__D__01__idea-analysis.json",
+          "output": {
+            "assumptions": [
+              "软件界面首选语言为中文",
+              "软件主要在本地运行，不需要复杂的云端存储或多端同步功能",
+              "软件主要面向个人电脑用户（非企业级服务器或大规模集群管理）"
+            ],
+            "candidates": [
+              "目标平台：Windows、macOS 或跨平台",
+              "核心功能：清理临时文件、系统缓存、浏览器历史记录、大文件、重复文件以及卸载残留",
+              "界面类型：图形用户界面（GUI）或命令行界面（CLI）",
+              "清理模式：一键快速清理、自定义深度扫描或定时自动化清理"
+            ],
+            "confirmed": [
+              "目标是开发一款用于清理电脑存储空间的软件。"
+            ],
+            "project_tags": [
+              "desktop-app",
+              "system-utility",
+              "disk-cleanup",
+              "file-management"
+            ],
+            "risks": [
+              "误删风险：误删系统关键文件或用户重要数据，导致系统崩溃或数据丢失",
+              "安全杀毒软件误报：由于涉及大量文件删除和系统扫描，可能会被 Windows Defender 或其他杀毒软件误报为恶意软件",
+              "扫描性能瓶颈：如果磁盘文件极多，扫描可能会占用极高的 CPU 和 I/O 资源，导致电脑卡顿"
+            ],
+            "unknowns": [
+              "具体的支持系统（仅限 Windows，还是需要跨平台支持）？",
+              "目标用户群体是谁（普通电脑用户还是开发者等技术人员）？",
+              "是否有偏好的开发技术栈（如 Electron, Qt, Python, Rust, Go 等）？",
+              "是否需要清理特定类型的文件（例如开发缓存 node_modules、设计临时文件等）？",
+              "对于清理深度和安全性的要求是什么（是否需要清理系统级文件，需要管理员权限）？"
+            ]
+          },
+          "input_tokens": 19633,
+          "output_tokens": 2473,
+          "thinking_tokens": 2068,
+          "total_tokens": 22106,
+          "raw_usage": {
+            "input_tokens": 19633,
+            "output_tokens": 2473,
+            "thinking_tokens": 2068,
+            "cache_read_tokens": 0,
+            "total_tokens": 22106
+          }
+        },
+        {
+          "task": "gap-analysis",
+          "success": true,
+          "duration_ms": 17462,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__D__02__gap-analysis.json",
+          "output": {
+            "conflicts": [
+              "Targeting ordinary PC users (Assumption) potentially conflicts with cleaning specialized files like developer caches/node_modules (Unresolved Cleanup Targets), which are irrelevant and confusing for non-technical users.",
+              "The risk of system crash/data loss (Risk) conflicts with the lack of definition regarding safety rules or user permission boundaries (Unresolved Cleanup Depth/Security requirements)."
+            ],
+            "gaps": [
+              {
+                "area": "Feasibility & OS Compatibility",
+                "dependency": "None (this is the foundational technical decision)",
+                "impact": "This directly dictates the programming language, framework/tech stack (e.g., Win32 API vs Electron/Qt), system API access patterns, and delivery timeline.",
+                "reason": "It is unresolved whether the application should support only Windows or be cross-platform (macOS, Linux).",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "User Flow & UX/UI",
+                "dependency": "Product Vision",
+                "impact": "Determines user interface complexity (one-click clean vs. customizable scan paths/filters), default safety boundaries, and the degree of transparency needed during scanning/cleaning.",
+                "reason": "The target user persona (ordinary PC users vs. developers/technical personnel) is unresolved.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "MVP Scope & Cleanup Targets",
+                "dependency": "User Persona",
+                "impact": "Determines the complexity of scanning algorithms, risks of file locking, and the extent of user-customizable options in the MVP.",
+                "reason": "The types of files to be cleaned (system junk, browser caches, node_modules, design temp files) are unresolved.",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "Privacy/Security & Permission Model",
+                "dependency": "OS Compatibility & Cleanup Targets",
+                "impact": "If administrator privileges are required (e.g., to clean system-level logs or installer caches), it increases the risk of system instability, security auditing issues, and antivirus/Windows Defender false positives.",
+                "reason": "The cleaning depth and permission requirements (User vs. Administrator) are unresolved.",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "Feasibility & Tech Stack Selection",
+                "dependency": "OS Compatibility & User Persona",
+                "impact": "Affects scanner performance (I/O and CPU bottlenecks), executable size (crucial for a disk-saving utility), UI responsiveness, and compatibility with the target OS.",
+                "reason": "There is no preferred technology stack (Electron, Qt, Python, Rust, Go, etc.) selected.",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ]
+          },
+          "input_tokens": 19987,
+          "output_tokens": 3633,
+          "thinking_tokens": 3034,
+          "total_tokens": 23620,
+          "raw_usage": {
+            "input_tokens": 19987,
+            "output_tokens": 3633,
+            "thinking_tokens": 3034,
+            "cache_read_tokens": 0,
+            "total_tokens": 23620
+          }
+        },
+        {
+          "task": "question-compose",
+          "success": true,
+          "duration_ms": 24252,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-01__D__03__question-compose.json",
+          "output": {
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "Enables deep integration with Windows APIs (like Registry, Volume Shadow Copy, WinSxS) and allows using native, fast UI technologies (like WPF/WinUI or lightweight Rust/C++).",
+                    "label": "(Recommended) Windows only (highly integrated, lightweight native app)"
+                  },
+                  {
+                    "impact": "Requires a cross-platform framework (e.g., Electron, Tauri, or Qt) and restricts deep system-level cleaning to common user-space directories, unless extensive platform-specific code is written for each OS.",
+                    "label": "Cross-platform (Windows, macOS, Linux)"
+                  }
+                ],
+                "question": "Which operating systems should the storage cleaning software support?",
+                "reason": "The choice between a Windows-only tool and a cross-platform tool directly dictates the UI framework (e.g., native Win32/WPF vs. Electron/Tauri), access to low-level system APIs, and development velocity.",
+                "recommendation": "Windows only (highly integrated, lightweight native app)",
+                "recommendation_reason": "Since your current environment is Windows and Windows has very specific/complex system storage locations, starting with a Windows-native focus allows us to write a lightweight, highly effective tool with deep integration before worrying about cross-platform abstractions."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "Zero risk of breaking the OS. No annoying Windows UAC prompts. Easiest to distribute and run safely.",
+                    "label": "(Recommended) Standard User permissions (safest, cleans user-space caches and temp files)"
+                  },
+                  {
+                    "impact": "Allows reclaiming more space (like WinSxS or system logs), but carries high risk of system instability and will trigger Windows User Account Control (UAC) prompts.",
+                    "label": "Administrator permissions (deepest, cleans system logs, Windows updates, and driver backups)"
+                  }
+                ],
+                "question": "What level of system permissions and cleaning depth should the software target?",
+                "reason": "Requiring Administrator privileges enables cleaning system-wide logs, driver backups, and installer caches, but increases the risk of system instability, security warnings, and antivirus false positives.",
+                "recommendation": "Standard User permissions (safest, cleans user-space caches and temp files)",
+                "recommendation_reason": "Starting with user-space directories (e.g., user temp folders, browser caches, developer package caches) is safer, prevents accidental OS damage, avoids UAC prompts on startup, and doesn't trigger security/antivirus warnings."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "The UI will focus on transparency, scan rules, and lists of specific dev caches. Safe defaults are still key, but users get full visibility and control.",
+                    "label": "(Recommended) Developers and technical users (custom paths, regex filters, package manager/build cache cleaning)"
+                  },
+                  {
+                    "impact": "UI will be extremely simple, focusing on a single 'Scan & Clean' button with minimal configuration, hiding technical details behind simple categories (e.g., 'Temporary Files', 'Browser Data').",
+                    "label": "Ordinary PC users (one-click scan, simple cleanup categories)"
+                  }
+                ],
+                "question": "Who is the primary target audience for this space-cleaning software?",
+                "reason": "Ordinary PC users need a simple, foolproof one-click cleaning experience, while developers and technical users need fine-grained control and targeted cleanup of huge developer directories (e.g., node_modules, Docker layers, build caches).",
+                "recommendation": "Developers and technical users (custom paths, regex filters, package manager/build cache cleaning)",
+                "recommendation_reason": "Standard PC users are already well-served by built-in tools like Windows Storage Sense. Developers, however, suffer from massive, hidden space hogs (like duplicate node_modules folders) that general-purpose cleaners ignore. Targeting technical users provides a clear, high-value niche."
+              }
+            ]
+          },
+          "input_tokens": 25861,
+          "output_tokens": 6857,
+          "thinking_tokens": 5932,
+          "total_tokens": 32718,
+          "raw_usage": {
+            "input_tokens": 25861,
+            "output_tokens": 6857,
+            "thinking_tokens": 5932,
+            "cache_read_tokens": 16296,
+            "total_tokens": 32718
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 3,
+        "duration_ms": 58693,
+        "input_tokens": 65481,
+        "output_tokens": 12963,
+        "thinking_tokens": 11034,
+        "total_tokens": 78444
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:19:52.881Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.875,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "A",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "output": {
+        "assumptions": [
+          "Users will use desktop browsers to configure their plans and track daily progress.",
+          "Users have a clear understanding of their 'current foundation' level (e.g., mock exam score ranges, English word count, or self-assessed level).",
+          "A database of standard 考研 (KaoYan) subjects and standard study timelines can be curated or modeled easily for the MVP.",
+          "Email is an acceptable and functional registration method for the target demographic of Chinese college students.",
+          "A desktop-only interface will not prevent students from updating task completion status regularly during library study sessions."
+        ],
+        "candidates": [
+          "Implement the frontend using Vue.js or React with Tailwind CSS and UI component libraries (like shadcn/ui or Ant Design) optimized for clean, quiet aesthetics.",
+          "Use Supabase or LeanCloud/Laf for backend, database, and auth to avoid domestic infrastructure setup overhead for the MVP.",
+          "Limit the planning engine to standard public subjects (English, Math, Politics) with pre-defined schedules, and offer a manual entry slot for professional subjects (专业课).",
+          "Use a responsive layout (Tailwind CSS) to allow mobile browser access for marking tasks, even though the primary interface is designed for desktop."
+        ],
+        "confirmed": [
+          "Target audience is Chinese university students preparing for 考研 (Postgraduate Entrance Exam).",
+          "First version is desktop browser only and Chinese language only.",
+          "Onboarding inputs: Exam date, subjects, weekly available study hours, current foundation.",
+          "Core output: System-generated, weekly adjustable study plan.",
+          "Home page features: This week's tasks, progress bar, exam countdown.",
+          "Task actions: Complete, postpone, split.",
+          "Tech details: Email registration, cloud database, multi-device synchronization.",
+          "Visual style: Quiet, calendar + todo hybrid, encouraging but not childish.",
+          "Explicit exclusions: No social, no course market, no AI, no mobile app.",
+          "Validation metric: 20-student pilot, success defined by consecutive 2-week task completion rate."
+        ],
+        "conflicts": [
+          "'Desktop-only tool' vs 'Validation metric of 2-week consecutive task completion': Students study in libraries/classrooms where laptops might not be open at all times. The friction of opening a desktop browser just to mark a task done will lower the completion data quality and skew the validation metric.",
+          "'Email registration' vs 'Chinese college student user habits': Chinese students heavily rely on WeChat/SMS for auth and notifications; email registrations suffer from high friction and delivery issues (spam filters in QQ/NetEase mail).",
+          "'System-generated personalized plans' vs 'No AI or course database in MVP': Generating realistic study plans for custom or complex subjects without a structured syllabus database is extremely difficult to automate without manual curation or rule engines."
+        ],
+        "gaps": [
+          {
+            "area": "Backend / Planning Logic",
+            "dependency": "Syllabus/Content database",
+            "impact": "Without a database of chapters, books, or study milestones, the system cannot generate any meaningful task plans automatically.",
+            "reason": "The prompt states that the system generates a plan based on subjects and foundation, but does not define where the study tasks or syllabus database comes from.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "User Authentication & UX",
+            "dependency": "Auth/Verification Service",
+            "impact": "High drop-off rate during onboarding and verification code delivery issues.",
+            "reason": "Email signups are inconvenient for Chinese students and often get flagged by domestic email spam filters (QQ, 163).",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Cross-Platform Accessibility (Mobile Web)",
+            "dependency": "UI Design & Layout",
+            "impact": "Under-reporting of task completion on the go, leading to false negatives in the validation phase.",
+            "reason": "Students need to mark tasks completed throughout the day (in libraries/classrooms) without necessarily opening a laptop.",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Significantly simplifies the planning database and rules engine for MVP.",
+                "label": "Limit automatic generation to public subjects (English, Math, Politics) and allow users to manually define tasks for professional subjects."
+              },
+              {
+                "impact": "Requires building a dynamic onboarding questionnaire where users input their own chapters and timelines.",
+                "label": "Let users input their own syllabus/chapters during onboarding, removing the need for a backend subject database."
+              },
+              {
+                "impact": "Extremely high data curation effort, likely delaying the MVP launch.",
+                "label": "Manually curate a database for the top 50 professional subjects."
+              }
+            ],
+            "question": "How should the system generate weekly plans for subjects, especially non-standardized Professional Subjects (专业课)?",
+            "reason": "Standardized public subjects have clear syllabi, but professional subjects vary by university, making automated plan generation highly complex.",
+            "recommendation": "(Recommended) Limit automatic generation to public subjects (English, Math, Politics) and allow users to manually define tasks for professional subjects.",
+            "recommendation_reason": "This satisfies the core MVP requirement for the majority of study time while bypassing the complexity of curating hundreds of university-specific syllabi."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Enables quick marking on mobile browsers with zero extra code for separate mobile apps.",
+                "label": "Design the web app to be fully responsive, allowing students to log in and mark tasks on mobile browsers."
+              },
+              {
+                "impact": "Saves frontend design time but risks low engagement during library study sessions.",
+                "label": "Keep the layout desktop-only (displaying a warning screen on mobile screens)."
+              }
+            ],
+            "question": "Should the MVP support a responsive layout for mobile browsers, specifically for marking tasks as complete on-the-go?",
+            "reason": "Students track and complete study tasks while at their library desks or on breaks where opening a laptop is high friction.",
+            "recommendation": "(Recommended) Design the web app to be fully responsive, allowing students to log in and mark tasks on mobile browsers.",
+            "recommendation_reason": "It reduces friction for task completion updates, ensuring the 2-week validation metric remains accurate and is not negatively skewed by accessibility constraints."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Eliminates verification delivery issues and costs, but allows potential duplicate registrations.",
+                "label": "Use Username/Email + Password registration without sending verification emails."
+              },
+              {
+                "impact": "Ensures high-quality accounts but runs the risk of emails landing in spam folders or delayed verification codes.",
+                "label": "Keep Email + Password signup with verification code email delivery."
+              },
+              {
+                "impact": "Best UX for Chinese students, but requires official WeChat registration and developer verification costs.",
+                "label": "Integrate WeChat Scan-to-Login or WeChat OAuth."
+              }
+            ],
+            "question": "Which authentication method should be prioritized to reduce registration friction for the target audience?",
+            "reason": "Email verification is prone to delivery failures and high friction in the Chinese higher education context.",
+            "recommendation": "(Recommended) Use Username/Email + Password registration without sending verification emails.",
+            "recommendation_reason": "It provides a frictionless sign-up experience and saves implementation cost/complexity for a pilot of 20 students."
+          }
+        ],
+        "risks": [
+          "ICP Filing (备案) Delay: Launching a web application with cloud database storage in mainland China requires an ICP filing, which can take 2-3 weeks and require domain/cloud registration. This could delay testing with the 20-student pilot group.",
+          "Validation Metric Skew: The validation metric (2-week consecutive completion rate) relies heavily on low-friction tracking. If the desktop UI or login process is slightly inconvenient, students might study but forget to mark tasks, leading to false validation results.",
+          "Planning Engine Complexity: Designing an algorithm that automatically schedules, splits, and shifts weekly tasks without overwhelming the student or breaking the calendar can quickly become a bottleneck during development."
+        ],
+        "unknowns": [
+          "Syllabus and Task Database: The specific source or content logic used to generate weekly study plans.",
+          "Metric Success Threshold: The target percentage of the 20-student pilot group that must achieve the 2-week completion goal to proceed.",
+          "Definition of 'Current Foundation': How the system quantifies a student's starting point and maps it to a study speed multiplier.",
+          "Database Schema for Split Tasks: How task splitting is modeled (as subtasks or independent tasks) handled in the database and displayed in terms of task hierarchy and calendar representation (e.g., parent-child relationships, tag structures of parent-child tasks or sibling tasks are represented (e.g., subtasks vs. separate standalone tasks vs subtasks) in the database."
+        ]
+      },
+      "calls": [
+        {
+          "task": "baseline",
+          "success": true,
+          "duration_ms": 31254,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__A__01__baseline.json",
+          "output": {
+            "assumptions": [
+              "Users will use desktop browsers to configure their plans and track daily progress.",
+              "Users have a clear understanding of their 'current foundation' level (e.g., mock exam score ranges, English word count, or self-assessed level).",
+              "A database of standard 考研 (KaoYan) subjects and standard study timelines can be curated or modeled easily for the MVP.",
+              "Email is an acceptable and functional registration method for the target demographic of Chinese college students.",
+              "A desktop-only interface will not prevent students from updating task completion status regularly during library study sessions."
+            ],
+            "candidates": [
+              "Implement the frontend using Vue.js or React with Tailwind CSS and UI component libraries (like shadcn/ui or Ant Design) optimized for clean, quiet aesthetics.",
+              "Use Supabase or LeanCloud/Laf for backend, database, and auth to avoid domestic infrastructure setup overhead for the MVP.",
+              "Limit the planning engine to standard public subjects (English, Math, Politics) with pre-defined schedules, and offer a manual entry slot for professional subjects (专业课).",
+              "Use a responsive layout (Tailwind CSS) to allow mobile browser access for marking tasks, even though the primary interface is designed for desktop."
+            ],
+            "confirmed": [
+              "Target audience is Chinese university students preparing for 考研 (Postgraduate Entrance Exam).",
+              "First version is desktop browser only and Chinese language only.",
+              "Onboarding inputs: Exam date, subjects, weekly available study hours, current foundation.",
+              "Core output: System-generated, weekly adjustable study plan.",
+              "Home page features: This week's tasks, progress bar, exam countdown.",
+              "Task actions: Complete, postpone, split.",
+              "Tech details: Email registration, cloud database, multi-device synchronization.",
+              "Visual style: Quiet, calendar + todo hybrid, encouraging but not childish.",
+              "Explicit exclusions: No social, no course market, no AI, no mobile app.",
+              "Validation metric: 20-student pilot, success defined by consecutive 2-week task completion rate."
+            ],
+            "conflicts": [
+              "'Desktop-only tool' vs 'Validation metric of 2-week consecutive task completion': Students study in libraries/classrooms where laptops might not be open at all times. The friction of opening a desktop browser just to mark a task done will lower the completion data quality and skew the validation metric.",
+              "'Email registration' vs 'Chinese college student user habits': Chinese students heavily rely on WeChat/SMS for auth and notifications; email registrations suffer from high friction and delivery issues (spam filters in QQ/NetEase mail).",
+              "'System-generated personalized plans' vs 'No AI or course database in MVP': Generating realistic study plans for custom or complex subjects without a structured syllabus database is extremely difficult to automate without manual curation or rule engines."
+            ],
+            "gaps": [
+              {
+                "area": "Backend / Planning Logic",
+                "dependency": "Syllabus/Content database",
+                "impact": "Without a database of chapters, books, or study milestones, the system cannot generate any meaningful task plans automatically.",
+                "reason": "The prompt states that the system generates a plan based on subjects and foundation, but does not define where the study tasks or syllabus database comes from.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "User Authentication & UX",
+                "dependency": "Auth/Verification Service",
+                "impact": "High drop-off rate during onboarding and verification code delivery issues.",
+                "reason": "Email signups are inconvenient for Chinese students and often get flagged by domestic email spam filters (QQ, 163).",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "Cross-Platform Accessibility (Mobile Web)",
+                "dependency": "UI Design & Layout",
+                "impact": "Under-reporting of task completion on the go, leading to false negatives in the validation phase.",
+                "reason": "Students need to mark tasks completed throughout the day (in libraries/classrooms) without necessarily opening a laptop.",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "Significantly simplifies the planning database and rules engine for MVP.",
+                    "label": "Limit automatic generation to public subjects (English, Math, Politics) and allow users to manually define tasks for professional subjects."
+                  },
+                  {
+                    "impact": "Requires building a dynamic onboarding questionnaire where users input their own chapters and timelines.",
+                    "label": "Let users input their own syllabus/chapters during onboarding, removing the need for a backend subject database."
+                  },
+                  {
+                    "impact": "Extremely high data curation effort, likely delaying the MVP launch.",
+                    "label": "Manually curate a database for the top 50 professional subjects."
+                  }
+                ],
+                "question": "How should the system generate weekly plans for subjects, especially non-standardized Professional Subjects (专业课)?",
+                "reason": "Standardized public subjects have clear syllabi, but professional subjects vary by university, making automated plan generation highly complex.",
+                "recommendation": "(Recommended) Limit automatic generation to public subjects (English, Math, Politics) and allow users to manually define tasks for professional subjects.",
+                "recommendation_reason": "This satisfies the core MVP requirement for the majority of study time while bypassing the complexity of curating hundreds of university-specific syllabi."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Enables quick marking on mobile browsers with zero extra code for separate mobile apps.",
+                    "label": "Design the web app to be fully responsive, allowing students to log in and mark tasks on mobile browsers."
+                  },
+                  {
+                    "impact": "Saves frontend design time but risks low engagement during library study sessions.",
+                    "label": "Keep the layout desktop-only (displaying a warning screen on mobile screens)."
+                  }
+                ],
+                "question": "Should the MVP support a responsive layout for mobile browsers, specifically for marking tasks as complete on-the-go?",
+                "reason": "Students track and complete study tasks while at their library desks or on breaks where opening a laptop is high friction.",
+                "recommendation": "(Recommended) Design the web app to be fully responsive, allowing students to log in and mark tasks on mobile browsers.",
+                "recommendation_reason": "It reduces friction for task completion updates, ensuring the 2-week validation metric remains accurate and is not negatively skewed by accessibility constraints."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Eliminates verification delivery issues and costs, but allows potential duplicate registrations.",
+                    "label": "Use Username/Email + Password registration without sending verification emails."
+                  },
+                  {
+                    "impact": "Ensures high-quality accounts but runs the risk of emails landing in spam folders or delayed verification codes.",
+                    "label": "Keep Email + Password signup with verification code email delivery."
+                  },
+                  {
+                    "impact": "Best UX for Chinese students, but requires official WeChat registration and developer verification costs.",
+                    "label": "Integrate WeChat Scan-to-Login or WeChat OAuth."
+                  }
+                ],
+                "question": "Which authentication method should be prioritized to reduce registration friction for the target audience?",
+                "reason": "Email verification is prone to delivery failures and high friction in the Chinese higher education context.",
+                "recommendation": "(Recommended) Use Username/Email + Password registration without sending verification emails.",
+                "recommendation_reason": "It provides a frictionless sign-up experience and saves implementation cost/complexity for a pilot of 20 students."
+              }
+            ],
+            "risks": [
+              "ICP Filing (备案) Delay: Launching a web application with cloud database storage in mainland China requires an ICP filing, which can take 2-3 weeks and require domain/cloud registration. This could delay testing with the 20-student pilot group.",
+              "Validation Metric Skew: The validation metric (2-week consecutive completion rate) relies heavily on low-friction tracking. If the desktop UI or login process is slightly inconvenient, students might study but forget to mark tasks, leading to false validation results.",
+              "Planning Engine Complexity: Designing an algorithm that automatically schedules, splits, and shifts weekly tasks without overwhelming the student or breaking the calendar can quickly become a bottleneck during development."
+            ],
+            "unknowns": [
+              "Syllabus and Task Database: The specific source or content logic used to generate weekly study plans.",
+              "Metric Success Threshold: The target percentage of the 20-student pilot group that must achieve the 2-week completion goal to proceed.",
+              "Definition of 'Current Foundation': How the system quantifies a student's starting point and maps it to a study speed multiplier.",
+              "Database Schema for Split Tasks: How task splitting is modeled (as subtasks or independent tasks) handled in the database and displayed in terms of task hierarchy and calendar representation (e.g., parent-child relationships, tag structures of parent-child tasks or sibling tasks are represented (e.g., subtasks vs. separate standalone tasks vs subtasks) in the database."
+            ]
+          },
+          "input_tokens": 19873,
+          "output_tokens": 6061,
+          "thinking_tokens": 4120,
+          "total_tokens": 25934,
+          "raw_usage": {
+            "input_tokens": 19873,
+            "output_tokens": 6061,
+            "thinking_tokens": 4120,
+            "cache_read_tokens": 0,
+            "total_tokens": 25934
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 31254,
+        "input_tokens": 19873,
+        "output_tokens": 6061,
+        "thinking_tokens": 4120,
+        "total_tokens": 25934
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:20:24.137Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 2,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.5,
+        "matchedSignals": 1,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "B",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "output": {
+        "assumptions": [
+          "数据存储将采用轻量级的云数据库（如PostgreSQL/MongoDB）以实现跨电脑登录",
+          "系统的每周计划按自然周（周一至周日）进行计算，默认为自然周",
+          "试用阶段的20名同学将通过激活码或受邀邮箱的形式进行限额注册，以防超出MVP承载能力",
+          "安静、鼓励但不幼稚的UI设计采用极简扁平风格，使用冷色调搭配低饱和度的进度反馈，无卡通动效",
+          "专业课的复习大纲由用户自己输入，系统不提供专业课知识点拆解模板"
+        ],
+        "candidates": [
+          "科目数据库候选：内置考研数学（一/二/三）、英语（一/二）、政治大纲，专业课提供自定义输入",
+          "当前基础选项候选：零基础阶段、强化阶段、真题冲刺阶段",
+          "任务拆分方式候选：支持将任务拆分为子任务，或分配到具体的一天/时间段",
+          "调整计划方式候选：手动拖拽任务调整日期，或整体顺延/重新分摊"
+        ],
+        "confirmed": [
+          "目标用户：准备考研的中国大学生",
+          "平台与语言：首版仅支持桌面浏览器和中文界面",
+          "首次进入流程：用户选择考试日期、科目、每周可学习时长和当前基础",
+          "核心功能：系统按周生成可调整的复习计划，主页显示本周任务、完成进度和考试倒计时，任务详情页支持标记完成、延后或拆分",
+          "账号系统：支持邮箱注册，数据保存在云端并支持多端登录同步",
+          "UI/UX风格：类似日历与待办结合，安静、鼓励但不幼稚",
+          "MVP排除范围：不包含社交、课程市场、AI聊天或移动端功能",
+          "验证指标：通过20名试用同学连续两周完成任务的比例来判断产品价值"
+        ],
+        "conflicts": [
+          "系统按周自动生成计划与MVP不包含AI或海量课程内容的矛盾：在没有AI和海量结构化科目大纲的情况下，系统无法针对各种科目（尤其是专业课）生成精确计划。必须限制科目范围或采用预设静态模板。",
+          "高复习压力与安静、鼓励但不幼稚的UI风格之间的矛盾：考研过程枯燥且压力大，若UI过于安静，可能缺乏足够的正向反馈和激励；但若加入勋章、打卡等机制，又容易走向“幼稚”。需要精细权衡进度条和微交互的设计。"
+        ],
+        "gaps": [
+          {
+            "area": "复习计划生成算法",
+            "dependency": "需要明确科目大纲的数据源以及不同基础的复习路线图设计。",
+            "impact": "如果无法自动生成有价值的复习任务，核心功能将沦为普通的待办清单，失去产品特色。",
+            "reason": "用户希望系统能自动生成计划，但未说明计划生成是基于标准的考研大纲数据库，还是仅根据总时长做简单的任务均分。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "任务延后与调整逻辑",
+            "dependency": "需要确立计划调整的规则和算法限制。",
+            "impact": "不合理的重排算法会导致用户每天的任务量剧增或陷入混乱，直接影响“连续两周完成率”的验证结果。",
+            "reason": "当用户将任务标记为延后或拆分时，没有定义系统该如何重新平衡未来的复习总量（是自动平摊，还是放入下周缓冲区）。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "当前基础的定义与量化",
+            "dependency": "需要设计用户首次进入时的基础评估问卷或阶段选择器。",
+            "impact": "如果评估不准确，生成的计划可能过难或过易，导致用户两周内放弃，干扰MVP价值验证。",
+            "reason": "“当前基础”作为生成计划的输入之一，目前缺乏具体的衡量标准（是主观打分还是客观阶段）。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "大幅降低首版开发与数据整理工作量，同时能覆盖95%以上考研学生的核心需求",
+                "label": "仅内置公共课（数、英、政）的官方标准复习计划，专业课提供自定义大纲模板由用户自行填写任务"
+              },
+              {
+                "impact": "开发最简单，但失去了“系统自动生成计划”的卖点，产品退化为普通的待办日历",
+                "label": "系统不内置任何科目大纲，仅作为一个智能日程框架，由用户自行输入复习科目的所有章节和任务"
+              },
+              {
+                "impact": "能提供更完整的体验，但会导致MVP准备期大幅延长，面临数据准确性风险",
+                "label": "尝试收集并内置绝大多数热门专业课（如408计算机、311教育学等）的复习计划大纲"
+              }
+            ],
+            "question": "系统在自动生成复习计划时，科目大纲和生成逻辑是怎样的？",
+            "reason": "科目大纲是计划生成的基础。考研专业课千差万别，公共课大纲也每年微调。MVP必须明确计划生成的数据来源。",
+            "recommendation": "(Recommended) MVP阶段仅内置公共课（数学、英语、政治）的标准化复习大纲和三阶段（基础、强化、冲刺）计划模板，专业课则由用户自行导入或手动制定大纲。",
+            "recommendation_reason": "这样能快速上线，既保证了公共课计划的权威性与实用性，又通过自定义解决了专业课繁杂的问题，避免MVP数据量过大。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "开发相对简单，能强化用户的复习责任感，避免系统自动重排带来的每日任务剧增压力",
+                "label": "延后任务放入下周的“待办缓冲池”，在周初由用户手动重新分配，不自动平摊到每天"
+              },
+              {
+                "impact": "算法复杂度高，且会导致用户每天的复习时间微增，容易产生“滚雪球”效应导致最终放弃",
+                "label": "系统自动重新计算剩余所有周的计划，将延后的工作量均摊到未来复习的每一天"
+              },
+              {
+                "impact": "最严苛，能最大程度保证原计划的严肃性，但可能会挫伤部分基础薄弱用户的积极性",
+                "label": "不允许延后，只能标记为“未完成”，未完成的任务作为历史负债展示，需手动在计划外补上"
+              }
+            ],
+            "question": "当用户将任务标记为“延后”或“拆分”时，系统应该如何处理未完成的工作量？",
+            "reason": "考研是总量固定的复习，任务拖延如果只是简单往后推，会导致后期任务累积并最终导致计划崩溃。",
+            "recommendation": "(Recommended) 延后的任务自动放入下周的“待办缓冲池”，由用户在每周一计划调整时手动分配，且系统会发出“计划积压”警告，限制无限延后。",
+            "recommendation_reason": "这样既能保留计划的灵活性，又给用户施加了一定的时间压力（感知到拖延的代价），防止计划流于形式，有利于提高两周完成率。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "用户选择直观无歧义，系统可直接关联到对应大纲模板的阶段，生成逻辑简单有效",
+                "label": "采用客观复习进度阶段（如零基础、强化期、真题期）来决定计划的起始点"
+              },
+              {
+                "impact": "维度较多，但学校考试与考研难度脱节，难以转化为精确的计划生成算法",
+                "label": "提供多维度自我评估（如：英语四六级成绩、数学期末成绩等分数段）"
+              },
+              {
+                "impact": "丧失了该输入的实际功能价值，使得针对“当前基础”的提问流于形式",
+                "label": "仅作为展示标签，不实际参与复习计划的生成算法"
+              }
+            ],
+            "question": "如何定义和评估用户的“当前基础”？它将如何影响计划的生成？",
+            "reason": "“当前基础”会直接影响复习起点的规划。需要简单且不易产生偏差的评估方式。",
+            "recommendation": "(Recommended) 采用客观复习进度阶段（如“零基础开始”、“课本已过一遍”、“已进入真题阶段”）进行选择，并据此决定计划生成的起点阶段。",
+            "recommendation_reason": "这种基于“复习进度”而非“主观能力”的划分非常明确，可以直接映射到内置大纲的对应章节，算法实现也更直接。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "指标合理且具有挑战性，代表工具确实起到了辅助规划和促进行动的作用",
+                "label": "连续两周完成率在80%以上的用户比例达到 60%（至少12人）"
+              },
+              {
+                "impact": "指标偏低，只能证明用户有登录意愿，无法证明工具对“完成任务”有实质性帮助",
+                "label": "只要有 50% 的用户（10人）连续两周登录并有任意标记行为即可"
+              },
+              {
+                "impact": "在MVP缺乏社交激励和精细催促机制下，该目标过高，容易导致误判产品价值",
+                "label": "要求连续两周完成率在90%以上的用户比例达到 80%"
+              }
+            ],
+            "question": "判断MVP有价值的“连续两周完成任务比例”的目标阈值是多少？",
+            "reason": "需要明确试用期20名用户的成功指标，以决定是否进行下一步开发。",
+            "recommendation": "(Recommended) 连续两周完成率（每周任务完成度在80%以上）的用户比例达到 60%（即至少12人）。",
+            "recommendation_reason": "考研复习任务重，在没有外部社群强制监督的情况下，60%的忠实高执行度用户已足以证明该计划工具极具价值。"
+          }
+        ],
+        "risks": [
+          "大纲缺失风险：若系统缺乏内置的公共课复习大纲/知识点数据库，将无法真正“生成”计划，只能由用户手动添加，这与“系统生成计划”的核心卖点矛盾。",
+          "任务雪崩风险：允许用户随意“延后”和“拆分”任务，若无总量限制或警告机制，容易导致后期任务堆积，计划迅速崩溃，导致用户放弃使用。",
+          "验证周期过短风险：考研复习周期长达数月至一年，仅用两周的完成率验证，可能会因为“新鲜感效应”（Novelty Effect）导致数据偏高，无法反映真实长期留存和价值。",
+          "专业课多而杂风险：专业课科目千差万别，如果MVP尝试支持所有科目的计划生成，会导致数据整理工作量过大，延误上线。"
+        ],
+        "unknowns": [
+          "如何定义和量化用户的“当前基础”以指导计划生成",
+          "系统生成复习计划的具体算法和数据来源（是否有标准公共课大纲）",
+          "计划被“调整”（如任务延后或拆分）后，后续任务的重排和分摊规则",
+          "判断“有价值”的连续两周完成任务比例的具体及格线阈值"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "success": true,
+          "duration_ms": 42870,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__B__01__single-custom.json",
+          "output": {
+            "assumptions": [
+              "数据存储将采用轻量级的云数据库（如PostgreSQL/MongoDB）以实现跨电脑登录",
+              "系统的每周计划按自然周（周一至周日）进行计算，默认为自然周",
+              "试用阶段的20名同学将通过激活码或受邀邮箱的形式进行限额注册，以防超出MVP承载能力",
+              "安静、鼓励但不幼稚的UI设计采用极简扁平风格，使用冷色调搭配低饱和度的进度反馈，无卡通动效",
+              "专业课的复习大纲由用户自己输入，系统不提供专业课知识点拆解模板"
+            ],
+            "candidates": [
+              "科目数据库候选：内置考研数学（一/二/三）、英语（一/二）、政治大纲，专业课提供自定义输入",
+              "当前基础选项候选：零基础阶段、强化阶段、真题冲刺阶段",
+              "任务拆分方式候选：支持将任务拆分为子任务，或分配到具体的一天/时间段",
+              "调整计划方式候选：手动拖拽任务调整日期，或整体顺延/重新分摊"
+            ],
+            "confirmed": [
+              "目标用户：准备考研的中国大学生",
+              "平台与语言：首版仅支持桌面浏览器和中文界面",
+              "首次进入流程：用户选择考试日期、科目、每周可学习时长和当前基础",
+              "核心功能：系统按周生成可调整的复习计划，主页显示本周任务、完成进度和考试倒计时，任务详情页支持标记完成、延后或拆分",
+              "账号系统：支持邮箱注册，数据保存在云端并支持多端登录同步",
+              "UI/UX风格：类似日历与待办结合，安静、鼓励但不幼稚",
+              "MVP排除范围：不包含社交、课程市场、AI聊天或移动端功能",
+              "验证指标：通过20名试用同学连续两周完成任务的比例来判断产品价值"
+            ],
+            "conflicts": [
+              "系统按周自动生成计划与MVP不包含AI或海量课程内容的矛盾：在没有AI和海量结构化科目大纲的情况下，系统无法针对各种科目（尤其是专业课）生成精确计划。必须限制科目范围或采用预设静态模板。",
+              "高复习压力与安静、鼓励但不幼稚的UI风格之间的矛盾：考研过程枯燥且压力大，若UI过于安静，可能缺乏足够的正向反馈和激励；但若加入勋章、打卡等机制，又容易走向“幼稚”。需要精细权衡进度条和微交互的设计。"
+            ],
+            "gaps": [
+              {
+                "area": "复习计划生成算法",
+                "dependency": "需要明确科目大纲的数据源以及不同基础的复习路线图设计。",
+                "impact": "如果无法自动生成有价值的复习任务，核心功能将沦为普通的待办清单，失去产品特色。",
+                "reason": "用户希望系统能自动生成计划，但未说明计划生成是基于标准的考研大纲数据库，还是仅根据总时长做简单的任务均分。",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "任务延后与调整逻辑",
+                "dependency": "需要确立计划调整的规则和算法限制。",
+                "impact": "不合理的重排算法会导致用户每天的任务量剧增或陷入混乱，直接影响“连续两周完成率”的验证结果。",
+                "reason": "当用户将任务标记为延后或拆分时，没有定义系统该如何重新平衡未来的复习总量（是自动平摊，还是放入下周缓冲区）。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "当前基础的定义与量化",
+                "dependency": "需要设计用户首次进入时的基础评估问卷或阶段选择器。",
+                "impact": "如果评估不准确，生成的计划可能过难或过易，导致用户两周内放弃，干扰MVP价值验证。",
+                "reason": "“当前基础”作为生成计划的输入之一，目前缺乏具体的衡量标准（是主观打分还是客观阶段）。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "大幅降低首版开发与数据整理工作量，同时能覆盖95%以上考研学生的核心需求",
+                    "label": "仅内置公共课（数、英、政）的官方标准复习计划，专业课提供自定义大纲模板由用户自行填写任务"
+                  },
+                  {
+                    "impact": "开发最简单，但失去了“系统自动生成计划”的卖点，产品退化为普通的待办日历",
+                    "label": "系统不内置任何科目大纲，仅作为一个智能日程框架，由用户自行输入复习科目的所有章节和任务"
+                  },
+                  {
+                    "impact": "能提供更完整的体验，但会导致MVP准备期大幅延长，面临数据准确性风险",
+                    "label": "尝试收集并内置绝大多数热门专业课（如408计算机、311教育学等）的复习计划大纲"
+                  }
+                ],
+                "question": "系统在自动生成复习计划时，科目大纲和生成逻辑是怎样的？",
+                "reason": "科目大纲是计划生成的基础。考研专业课千差万别，公共课大纲也每年微调。MVP必须明确计划生成的数据来源。",
+                "recommendation": "(Recommended) MVP阶段仅内置公共课（数学、英语、政治）的标准化复习大纲和三阶段（基础、强化、冲刺）计划模板，专业课则由用户自行导入或手动制定大纲。",
+                "recommendation_reason": "这样能快速上线，既保证了公共课计划的权威性与实用性，又通过自定义解决了专业课繁杂的问题，避免MVP数据量过大。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "开发相对简单，能强化用户的复习责任感，避免系统自动重排带来的每日任务剧增压力",
+                    "label": "延后任务放入下周的“待办缓冲池”，在周初由用户手动重新分配，不自动平摊到每天"
+                  },
+                  {
+                    "impact": "算法复杂度高，且会导致用户每天的复习时间微增，容易产生“滚雪球”效应导致最终放弃",
+                    "label": "系统自动重新计算剩余所有周的计划，将延后的工作量均摊到未来复习的每一天"
+                  },
+                  {
+                    "impact": "最严苛，能最大程度保证原计划的严肃性，但可能会挫伤部分基础薄弱用户的积极性",
+                    "label": "不允许延后，只能标记为“未完成”，未完成的任务作为历史负债展示，需手动在计划外补上"
+                  }
+                ],
+                "question": "当用户将任务标记为“延后”或“拆分”时，系统应该如何处理未完成的工作量？",
+                "reason": "考研是总量固定的复习，任务拖延如果只是简单往后推，会导致后期任务累积并最终导致计划崩溃。",
+                "recommendation": "(Recommended) 延后的任务自动放入下周的“待办缓冲池”，由用户在每周一计划调整时手动分配，且系统会发出“计划积压”警告，限制无限延后。",
+                "recommendation_reason": "这样既能保留计划的灵活性，又给用户施加了一定的时间压力（感知到拖延的代价），防止计划流于形式，有利于提高两周完成率。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "用户选择直观无歧义，系统可直接关联到对应大纲模板的阶段，生成逻辑简单有效",
+                    "label": "采用客观复习进度阶段（如零基础、强化期、真题期）来决定计划的起始点"
+                  },
+                  {
+                    "impact": "维度较多，但学校考试与考研难度脱节，难以转化为精确的计划生成算法",
+                    "label": "提供多维度自我评估（如：英语四六级成绩、数学期末成绩等分数段）"
+                  },
+                  {
+                    "impact": "丧失了该输入的实际功能价值，使得针对“当前基础”的提问流于形式",
+                    "label": "仅作为展示标签，不实际参与复习计划的生成算法"
+                  }
+                ],
+                "question": "如何定义和评估用户的“当前基础”？它将如何影响计划的生成？",
+                "reason": "“当前基础”会直接影响复习起点的规划。需要简单且不易产生偏差的评估方式。",
+                "recommendation": "(Recommended) 采用客观复习进度阶段（如“零基础开始”、“课本已过一遍”、“已进入真题阶段”）进行选择，并据此决定计划生成的起点阶段。",
+                "recommendation_reason": "这种基于“复习进度”而非“主观能力”的划分非常明确，可以直接映射到内置大纲的对应章节，算法实现也更直接。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "指标合理且具有挑战性，代表工具确实起到了辅助规划和促进行动的作用",
+                    "label": "连续两周完成率在80%以上的用户比例达到 60%（至少12人）"
+                  },
+                  {
+                    "impact": "指标偏低，只能证明用户有登录意愿，无法证明工具对“完成任务”有实质性帮助",
+                    "label": "只要有 50% 的用户（10人）连续两周登录并有任意标记行为即可"
+                  },
+                  {
+                    "impact": "在MVP缺乏社交激励和精细催促机制下，该目标过高，容易导致误判产品价值",
+                    "label": "要求连续两周完成率在90%以上的用户比例达到 80%"
+                  }
+                ],
+                "question": "判断MVP有价值的“连续两周完成任务比例”的目标阈值是多少？",
+                "reason": "需要明确试用期20名用户的成功指标，以决定是否进行下一步开发。",
+                "recommendation": "(Recommended) 连续两周完成率（每周任务完成度在80%以上）的用户比例达到 60%（即至少12人）。",
+                "recommendation_reason": "考研复习任务重，在没有外部社群强制监督的情况下，60%的忠实高执行度用户已足以证明该计划工具极具价值。"
+              }
+            ],
+            "risks": [
+              "大纲缺失风险：若系统缺乏内置的公共课复习大纲/知识点数据库，将无法真正“生成”计划，只能由用户手动添加，这与“系统生成计划”的核心卖点矛盾。",
+              "任务雪崩风险：允许用户随意“延后”和“拆分”任务，若无总量限制或警告机制，容易导致后期任务堆积，计划迅速崩溃，导致用户放弃使用。",
+              "验证周期过短风险：考研复习周期长达数月至一年，仅用两周的完成率验证，可能会因为“新鲜感效应”（Novelty Effect）导致数据偏高，无法反映真实长期留存和价值。",
+              "专业课多而杂风险：专业课科目千差万别，如果MVP尝试支持所有科目的计划生成，会导致数据整理工作量过大，延误上线。"
+            ],
+            "unknowns": [
+              "如何定义和量化用户的“当前基础”以指导计划生成",
+              "系统生成复习计划的具体算法和数据来源（是否有标准公共课大纲）",
+              "计划被“调整”（如任务延后或拆分）后，后续任务的重排和分摊规则",
+              "判断“有价值”的连续两周完成任务比例的具体及格线阈值"
+            ]
+          },
+          "input_tokens": 17371,
+          "output_tokens": 15368,
+          "thinking_tokens": 12753,
+          "total_tokens": 32739,
+          "raw_usage": {
+            "input_tokens": 17371,
+            "output_tokens": 15368,
+            "thinking_tokens": 12753,
+            "cache_read_tokens": 24443,
+            "total_tokens": 32739
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 42870,
+        "input_tokens": 17371,
+        "output_tokens": 15368,
+        "thinking_tokens": 12753,
+        "total_tokens": 32739
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:21:07.008Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.875,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "C",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "output": {
+        "confirmed": [
+          "目标用户为准备中国研究生入学考试（考研）的大学生。",
+          "第一版仅支持中文，且仅支持桌面浏览器（无移动端/移动网页适配）。",
+          "新用户首次进入需录入考试日期、科目、每周可学习时长和当前基础。",
+          "系统以“周”为单位生成可调整的复习计划。",
+          "主页核心展示内容：本周任务、完成进度、考研倒计时。",
+          "任务详情页核心操作：标记完成、延后、拆分。",
+          "用户使用邮箱注册，数据存云端以支持多台电脑登录。",
+          "UI/UX风格定位为安静、鼓励但不幼稚，类似日历和待办（To-Do）的结合体。",
+          "MVP明确排除社交、课程市场、AI聊天或移动端。",
+          "MVP验证指标：寻找20名同学试用，以连续两周完成任务的比例评估产品价值。"
+        ],
+        "candidates": [
+          "计划生成方式候选：采用预设模板匹配生成（按科目/基础匹配固定任务） vs 动态算法排程。",
+          "任务调整机制候选：手动拖拽重新排程 vs 系统自动瀑布式推迟后续任务。",
+          "云端存储技术候选：Supabase/Firebase/LeanCloud 等 BaaS 服务，或自建轻量级 API。"
+        ],
+        "assumptions": [
+          "考试日期默认设为当年12月的倒数第二个周末（中国考研标准时间）。",
+          "用户在复习期间拥有稳定的网络连接（因数据需同步至云端）。",
+          "系统内置中国考研主流科目（政治、英语一/二、数学一/二/三）的通用基础模版。",
+          "界面视觉采用低饱和度、温暖、专注的设计色彩体系，以传达安静鼓励的氛围。",
+          "邮箱注册通过验证码或激活链接进行防刷保护。"
+        ],
+        "unknowns": [
+          "考研专业课数量极其庞大且大纲各异，系统如何为非统考专业课生成复习计划？",
+          "“当前基础”的定义与评估标准是什么，如何转化为具体的计划差异？",
+          "计划被调整时（如拆分/延后），任务重排的底层业务逻辑和冲突处理规则是什么？",
+          "验证指标的具体成功阈值是多少（例如，连续两周任务完成率达到多少比例才算通过验证）？"
+        ],
+        "risks": [
+          "专业课内容缺失风险：考研专业课因学校而异，若系统无法提供高质量的自动生成计划，仅靠通用科目可能难以吸引并留住试用学生。",
+          "设备局限性影响留存风险：在考研备考场景下，学生常在图书馆等移动场景学习。第一版仅支持桌面端，可能会因为使用不便导致试用流失，从而扭曲“连续两周完成任务比例”的验证结果。",
+          "注册流失风险：国内大学生更习惯微信/手机号一键登录，邮箱登录可能存在收件慢、被误判垃圾邮件等体验问题，增加试用门槛。",
+          "日程重排算法复杂度失控风险：频繁的延后和拆分可能引发复杂的日历排程冲突，若系统自动调整逻辑过于复杂，会严重拖慢MVP的开发进度。"
+        ],
+        "project_tags": [
+          "Web-App",
+          "Study-Planner",
+          "Postgraduate-Exam-CN",
+          "Desktop-Only",
+          "Calendar-Todo-Hybrid",
+          "Cloud-Sync",
+          "MVP-Validation"
+        ],
+        "gaps": [
+          {
+            "area": "User Retention Hooks",
+            "dependency": "Validation Metric and Onboarding Flow",
+            "impact": "Users may forget to log in and update their progress, leading to artificially low completion rates and a false negative validation of the product value.",
+            "reason": "The MVP validation metric relies on the proportion of students who complete tasks for two consecutive weeks. However, the system lacks any proactive retention hooks, such as daily study reminders or email notifications, to bring users back to the app.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Study-Plan Adaptation",
+            "dependency": "Task Rescheduling Logic",
+            "impact": "Task accumulation will cause cognitive overload and demotivation, leading to plan abandonment and failure to meet the 2-week completion metric.",
+            "reason": "While users can postpone or split tasks, there is no mechanism specified for how the weekly study plan adapts to these changes. Without dynamic rescheduling or pacing adjustments, postponed tasks will quickly pile up.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Professional Course (专业课) Plan Generation",
+            "dependency": "Plan Database / Core Generation Flow",
+            "impact": "Students whose specific professional courses are unsupported will receive incomplete plans, increasing friction and potential dropouts from the 20-student trial cohort.",
+            "reason": "Chinese postgraduate exams include highly fragmented, university-specific professional courses (专业课) that do not share a unified syllabus. The system lacks a plan generation strategy for these non-unified subjects.",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Validation Success Criteria Definition",
+            "dependency": "MVP Validation Plan",
+            "impact": "The team will lack an objective, data-driven criterion to decide whether to pivot, iterate, or proceed with the full product after the trial.",
+            "reason": "The pilot test defines the metric (proportion of students completing tasks for two consecutive weeks) but does not define the target threshold required to declare the product concept validated.",
+            "severity": "low",
+            "should_ask_user": true
+          }
+        ],
+        "conflicts": [
+          "Validation Metric vs. Absence of Retention Hooks: The success of the MVP is measured by a 2-week continuous completion rate, yet there is no mechanism to prompt or remind students to return to the app daily.",
+          "Postpone/Split Operations vs. Static Plan Generation: Allowing users to postpone or split tasks without an adaptive rescheduling mechanism conflicts with the goal of keeping the plan realistic and manageable.",
+          "Automated Plan Generation vs. Non-Unified Professional Courses (专业课): The requirement to automatically generate review plans on entry conflicts with the highly fragmented, school-specific nature of postgraduate professional courses."
+        ],
+        "questions": []
+      },
+      "calls": [
+        {
+          "task": "idea-analysis",
+          "success": true,
+          "duration_ms": 27053,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__C__01__idea-analysis.json",
+          "output": {
+            "assumptions": [
+              "考试日期默认设为当年12月的倒数第二个周末（中国考研标准时间）。",
+              "用户在复习期间拥有稳定的网络连接（因数据需同步至云端）。",
+              "系统内置中国考研主流科目（政治、英语一/二、数学一/二/三）的通用基础模版。",
+              "界面视觉采用低饱和度、温暖、专注的设计色彩体系，以传达安静鼓励的氛围。",
+              "邮箱注册通过验证码或激活链接进行防刷保护。"
+            ],
+            "candidates": [
+              "计划生成方式候选：采用预设模板匹配生成（按科目/基础匹配固定任务） vs 动态算法排程。",
+              "任务调整机制候选：手动拖拽重新排程 vs 系统自动瀑布式推迟后续任务。",
+              "云端存储技术候选：Supabase/Firebase/LeanCloud 等 BaaS 服务，或自建轻量级 API。"
+            ],
+            "confirmed": [
+              "目标用户为准备中国研究生入学考试（考研）的大学生。",
+              "第一版仅支持中文，且仅支持桌面浏览器（无移动端/移动网页适配）。",
+              "新用户首次进入需录入考试日期、科目、每周可学习时长和当前基础。",
+              "系统以“周”为单位生成可调整的复习计划。",
+              "主页核心展示内容：本周任务、完成进度、考研倒计时。",
+              "任务详情页核心操作：标记完成、延后、拆分。",
+              "用户使用邮箱注册，数据存云端以支持多台电脑登录。",
+              "UI/UX风格定位为安静、鼓励但不幼稚，类似日历和待办（To-Do）的结合体。",
+              "MVP明确排除社交、课程市场、AI聊天或移动端。",
+              "MVP验证指标：寻找20名同学试用，以连续两周完成任务的比例评估产品价值。"
+            ],
+            "project_tags": [
+              "Web-App",
+              "Study-Planner",
+              "Postgraduate-Exam-CN",
+              "Desktop-Only",
+              "Calendar-Todo-Hybrid",
+              "Cloud-Sync",
+              "MVP-Validation"
+            ],
+            "risks": [
+              "专业课内容缺失风险：考研专业课因学校而异，若系统无法提供高质量的自动生成计划，仅靠通用科目可能难以吸引并留住试用学生。",
+              "设备局限性影响留存风险：在考研备考场景下，学生常在图书馆等移动场景学习。第一版仅支持桌面端，可能会因为使用不便导致试用流失，从而扭曲“连续两周完成任务比例”的验证结果。",
+              "注册流失风险：国内大学生更习惯微信/手机号一键登录，邮箱登录可能存在收件慢、被误判垃圾邮件等体验问题，增加试用门槛。",
+              "日程重排算法复杂度失控风险：频繁的延后和拆分可能引发复杂的日历排程冲突，若系统自动调整逻辑过于复杂，会严重拖慢MVP的开发进度。"
+            ],
+            "unknowns": [
+              "考研专业课数量极其庞大且大纲各异，系统如何为非统考专业课生成复习计划？",
+              "“当前基础”的定义与评估标准是什么，如何转化为具体的计划差异？",
+              "计划被调整时（如拆分/延后），任务重排的底层业务逻辑和冲突处理规则是什么？",
+              "验证指标的具体成功阈值是多少（例如，连续两周任务完成率达到多少比例才算通过验证）？"
+            ]
+          },
+          "input_tokens": 19775,
+          "output_tokens": 3689,
+          "thinking_tokens": 2879,
+          "total_tokens": 23464,
+          "raw_usage": {
+            "input_tokens": 19775,
+            "output_tokens": 3689,
+            "thinking_tokens": 2879,
+            "cache_read_tokens": 0,
+            "total_tokens": 23464
+          }
+        },
+        {
+          "task": "gap-analysis",
+          "success": true,
+          "duration_ms": 54771,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__C__02__gap-analysis.json",
+          "output": {
+            "conflicts": [
+              "Validation Metric vs. Absence of Retention Hooks: The success of the MVP is measured by a 2-week continuous completion rate, yet there is no mechanism to prompt or remind students to return to the app daily.",
+              "Postpone/Split Operations vs. Static Plan Generation: Allowing users to postpone or split tasks without an adaptive rescheduling mechanism conflicts with the goal of keeping the plan realistic and manageable.",
+              "Automated Plan Generation vs. Non-Unified Professional Courses (专业课): The requirement to automatically generate review plans on entry conflicts with the highly fragmented, school-specific nature of postgraduate professional courses."
+            ],
+            "gaps": [
+              {
+                "area": "User Retention Hooks",
+                "dependency": "Validation Metric and Onboarding Flow",
+                "impact": "Users may forget to log in and update their progress, leading to artificially low completion rates and a false negative validation of the product value.",
+                "reason": "The MVP validation metric relies on the proportion of students who complete tasks for two consecutive weeks. However, the system lacks any proactive retention hooks, such as daily study reminders or email notifications, to bring users back to the app.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Study-Plan Adaptation",
+                "dependency": "Task Rescheduling Logic",
+                "impact": "Task accumulation will cause cognitive overload and demotivation, leading to plan abandonment and failure to meet the 2-week completion metric.",
+                "reason": "While users can postpone or split tasks, there is no mechanism specified for how the weekly study plan adapts to these changes. Without dynamic rescheduling or pacing adjustments, postponed tasks will quickly pile up.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Professional Course (专业课) Plan Generation",
+                "dependency": "Plan Database / Core Generation Flow",
+                "impact": "Students whose specific professional courses are unsupported will receive incomplete plans, increasing friction and potential dropouts from the 20-student trial cohort.",
+                "reason": "Chinese postgraduate exams include highly fragmented, university-specific professional courses (专业课) that do not share a unified syllabus. The system lacks a plan generation strategy for these non-unified subjects.",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "Validation Success Criteria Definition",
+                "dependency": "MVP Validation Plan",
+                "impact": "The team will lack an objective, data-driven criterion to decide whether to pivot, iterate, or proceed with the full product after the trial.",
+                "reason": "The pilot test defines the metric (proportion of students completing tasks for two consecutive weeks) but does not define the target threshold required to declare the product concept validated.",
+                "severity": "low",
+                "should_ask_user": true
+              }
+            ]
+          },
+          "input_tokens": 61497,
+          "output_tokens": 10609,
+          "thinking_tokens": 9269,
+          "total_tokens": 72106,
+          "raw_usage": {
+            "input_tokens": 61497,
+            "output_tokens": 10609,
+            "thinking_tokens": 9269,
+            "cache_read_tokens": 268728,
+            "total_tokens": 72106
+          }
+        },
+        {
+          "task": "question-compose",
+          "success": false,
+          "duration_ms": 119781,
+          "exit_code": 1,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__C__03__question-compose.json",
+          "output": null,
+          "input_tokens": 140433,
+          "output_tokens": 11716,
+          "thinking_tokens": 9638,
+          "total_tokens": 152149,
+          "raw_usage": {
+            "input_tokens": 140433,
+            "output_tokens": 11716,
+            "thinking_tokens": 9638,
+            "cache_read_tokens": 696186,
+            "total_tokens": 152149
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 3,
+        "duration_ms": 201605,
+        "input_tokens": 221705,
+        "output_tokens": 26014,
+        "thinking_tokens": 21786,
+        "total_tokens": 247719
+      },
+      "success": false,
+      "timestamp": "2026-08-22T05:24:28.617Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 0,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 1,
+          "structured_output_reliability": 0,
+          "conciseness": 5
+        },
+        "heuristicQuality": 3.25,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    },
+    {
+      "run_id": "smoke-2-fixed",
+      "variant": "D",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "output": {
+        "confirmed": [
+          "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+          "Platform: Desktop web browsers only for the first version.",
+          "Language support: Chinese only.",
+          "Onboarding parameters: Exam date, subjects, weekly study hours, and current foundation.",
+          "Core engine: System-generated weekly review plan that users can adjust.",
+          "Homepage features: Weekly tasks, completion progress, and exam countdown.",
+          "Task details features: Mark as completed, postpone, and split.",
+          "Account system: Email registration, cloud storage, and multi-device sync across different PCs.",
+          "UI/UX design: Quiet, encouraging, calendar/to-do hybrid, non-childish.",
+          "MVP exclusions: No social features, course marketplace, AI chat, or mobile applications.",
+          "Success validation: A trial of 20 students, measured by the proportion of users completing tasks for two consecutive weeks."
+        ],
+        "candidates": [
+          "Standardized syllabus database for common subjects (e.g., Politics, English, Math) vs. completely user-defined custom subjects.",
+          "Fixed template scheduling algorithm vs. dynamic velocity-based pacing adjustment.",
+          "Self-reported task completion check vs. study timer/session verification.",
+          "Target success percentage threshold for the 20-student trial (e.g., 60%+ completion rate)."
+        ],
+        "assumptions": [
+          "Users have persistent internet connectivity during planning and check-in sessions.",
+          "Modern desktop web browsers (Chrome, Edge, Safari, Firefox) are targeted.",
+          "Exam countdown is based on Beijing Time (UTC+8) and client-side clock synchronization.",
+          "Basic email-based transactional messages (registration, password reset) are sufficient for MVP account management."
+        ],
+        "unknowns": [
+          "Syllabus content source: Will the system supply predefined weekly syllabus tasks, or must the user input their own tasks manually?",
+          "Foundation evaluation: How is the 'current foundation' (当前基础) measured and how does it mathematically alter the planning algorithm?",
+          "Rescheduling rules: What exact logic governs task shifting when a user postpones or splits a task? (e.g., push subsequent weeks, dump into a backlog, or recalculate)?",
+          "Success threshold: What specific target percentage of the 20 students completing tasks for two consecutive weeks constitutes validation?"
+        ],
+        "risks": [
+          "Syllabus Database Overhead: Generating specific tasks (e.g., chapter-level) requires a detailed syllabus database for multiple subjects, which increases MVP scope and risk. Generic tasks (e.g., 'Study Math') may feel useless.",
+          "Rigidity & Abandonment: If the study plan is too rigid or hard to adjust when real-life events disrupt it, students will quickly get discouraged, leading to trial dropouts.",
+          "Lack of Mobile Access: Students study in libraries or classrooms without constant desktop access. Lacking a mobile check-in option might lead to unrecorded progress and falsely lower the target success metric.",
+          "Postponement Debt: Unconstrained postponement or splitting of tasks can accumulate a massive backlog, leading to user overwhelm and eventual abandonment.",
+          "Onboarding Friction: Requiring detailed inputs (exam date, subjects, hours, level) upfront without showing immediate value can trigger high drop-off before the plan is even generated."
+        ],
+        "project_tags": [
+          "study-planner",
+          "desktop-web",
+          "mvp",
+          "edtech",
+          "chinese-market",
+          "kaoyan"
+        ],
+        "gaps": [
+          {
+            "area": "MVP Scope / Feasibility",
+            "dependency": "Unresolved: Syllabus content source",
+            "impact": "Directly impacts MVP timeline, feasibility, and onboarding user experience.",
+            "reason": "Syllabus content source is unresolved. Creating a pre-defined database for multiple exam subjects introduces significant overhead, whereas manual input degrades the value of system-generated weekly plans.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "User Flow / UX",
+            "dependency": "Unresolved: Rescheduling rules",
+            "impact": "Could lead to 'postponement debt', user discouragement, and plan rigidity, violating the core value of an adjustable calendar/todo hybrid.",
+            "reason": "Rescheduling rules are unresolved. There is no clear logic for how tasks are postponed or split (e.g., recalculating the timeline, shifting subsequent weeks, or moving to a backlog).",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Algorithm / Feasibility",
+            "dependency": "Unresolved: Foundation evaluation",
+            "impact": "Inability to implement a predictable planning algorithm, potential discrepancy in generated tasks.",
+            "reason": "Measurement and application of the 'current foundation' (当前基础) is unresolved, making it unclear how the planning algorithm scales study task difficulty/intensity.",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Delivery / Metrics",
+            "dependency": "Unresolved: Success threshold",
+            "impact": "Impossible to quantitatively determine whether the MVP has enough value to transition into subsequent stages.",
+            "reason": "The target validation metric/percentage for the 20-student pilot (continuous two-week completion rate) is unresolved.",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "conflicts": [
+          "Desktop-only platform constraint vs. Student study habits: The MVP is restricted to desktop browsers only, but students typically study in libraries or classrooms where they lack constant desktop access. This creates a high risk of unrecorded progress, resulting in artificially lower validation metrics.",
+          "System-generated plan expectation vs. Lack of syllabus content source: The product vision promises a system-generated plan, but if the syllabus source is not predefined, users must manually input tasks, contradicting the automated generation onboarding experience."
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "大幅降低首版开发难度，同时保留核心公共课的一键生成体验。",
+                "label": "(Recommended) 只预置政治、英语、数学等核心公共课大纲，专业课由我手动输入书籍和复习进度。"
+              },
+              {
+                "impact": "实现最简单，但用户初始使用成本极高，容易导致流失。",
+                "label": "系统不需要预置任何大纲，完全由我手动录入复习书籍、章节和里程碑。"
+              },
+              {
+                "impact": "复习体验最完美，但收集整理全国各大高校自命题大纲的难度极大，会严重延误上线。",
+                "label": "必须覆盖全部科目的考研大纲数据库（包括自命题专业课），实现所有科目的全自动生成。"
+              }
+            ],
+            "question": "系统自动生成复习计划需要考研大纲数据源。在MVP版本中，我们该如何获取或处理这些科目的内容数据？",
+            "reason": "大纲内容的来源直接决定了MVP的开发周期和用户初次使用的价值。如果完全预置所有专业课大纲，工作量巨大且不切实际；若完全让用户手动录入，又会失去“系统自动生成”的核心体验。",
+            "recommendation": "预置最热门的全国统考科目（如数学、英语、政治），而其他非统考专业课提供通用模板或允许用户手动规划里程碑。",
+            "recommendation_reason": "这样既能让绝大多数考研学生在最耗时的公共课上体验到一键生成计划的便利，又避免了MVP阶段去搜集和维护成百上千门专业课大纲的巨大开发成本。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "符合复习总量固定的特征，能动态平摊压力并给予客观警告，避免计划崩溃。",
+                "label": "(Recommended) 未完成任务自动平摊到后续所有周，如果每周工时超出我的设定上限则给予红色警示。"
+              },
+              {
+                "impact": "开发成本最低，但下周任务容易翻倍堆积，极易打击复习积极性。",
+                "label": "直接将本周未完成的任务塞进下周的待办列表里。"
+              },
+              {
+                "impact": "自由度最高，但削弱了系统智能规划和时间管理的属性。",
+                "label": "未完成任务不自动排期，而是放入备忘收件箱，由我自己手动重新规划。"
+              }
+            ],
+            "question": "当用户选择将本周未完成的任务“延后”或“拆分”时，系统应该如何重新排期？",
+            "reason": "考研复习具有极强的时效性和总量固定性（考试日期不可变）。如果任由任务无限制向后堆积，会导致“延期债务”越攒越多，最终让计划崩溃，这违背了日历和待办结合的设计初衷。",
+            "recommendation": "采用“本周任务顺延，后续周任务自动微调，并显示进度预警”的动态平摊机制，而非简单推迟到下周。",
+            "recommendation_reason": "考研总时间固定。如果只是简单把任务塞给下周，下周任务量会直接翻倍导致崩溃。通过平摊或给出红色预警（例如提示“按当前进度，你需要每天多学0.5小时或推移目标”），能温和地施加紧迫感，鼓励用户调整节奏。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "设计和开发简单，用户选择成本低，同时提供了差异化的复习节奏。",
+                "label": "(Recommended) 提供粗颗粒度的科目自评（如跨考/本专业），仅用于微调第一轮基础复习的推荐时间比例。"
+              },
+              {
+                "impact": "测试更客观专业，但题库维护成本高，且会显著增加首次上手的流失率。",
+                "label": "提供一套简短的在线测试题，根据我的答题得分来计算初始复习强度。"
+              },
+              {
+                "impact": "开发成本为零，但属于虚假功能，会降低对产品“个性化生成”的信任度。",
+                "label": "仅作为我个人资料的背景记录展示，不实际干预系统生成的复习计划。"
+              }
+            ],
+            "question": "初次设置时收集的“当前基础”，应该如何影响系统生成的复习计划？",
+            "reason": "“当前基础”的定义如果不清晰，系统就无法将其转化为具体的算法参数（例如是调整总复习轮数、调整第一轮的耗时比例，还是调整每日推荐的学习量）。",
+            "recommendation": "通过选择题或自评（如跨考/本专业、已过六级/未过、数学基础好/差）将基础粗略分为三档，并据此微调前期的基础巩固阶段时长比例。",
+            "recommendation_reason": "MVP阶段不宜引入复杂的学术能力测试。通过粗颗粒度的自评来调整基础阶段（第一轮）和强化阶段（第二轮）的时间比例，实现起来最为可行，且能让用户感受到个性化定制。"
+          }
+        ]
+      },
+      "calls": [
+        {
+          "task": "idea-analysis",
+          "success": true,
+          "duration_ms": 24946,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__D__01__idea-analysis.json",
+          "output": {
+            "assumptions": [
+              "Users have persistent internet connectivity during planning and check-in sessions.",
+              "Modern desktop web browsers (Chrome, Edge, Safari, Firefox) are targeted.",
+              "Exam countdown is based on Beijing Time (UTC+8) and client-side clock synchronization.",
+              "Basic email-based transactional messages (registration, password reset) are sufficient for MVP account management."
+            ],
+            "candidates": [
+              "Standardized syllabus database for common subjects (e.g., Politics, English, Math) vs. completely user-defined custom subjects.",
+              "Fixed template scheduling algorithm vs. dynamic velocity-based pacing adjustment.",
+              "Self-reported task completion check vs. study timer/session verification.",
+              "Target success percentage threshold for the 20-student trial (e.g., 60%+ completion rate)."
+            ],
+            "confirmed": [
+              "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+              "Platform: Desktop web browsers only for the first version.",
+              "Language support: Chinese only.",
+              "Onboarding parameters: Exam date, subjects, weekly study hours, and current foundation.",
+              "Core engine: System-generated weekly review plan that users can adjust.",
+              "Homepage features: Weekly tasks, completion progress, and exam countdown.",
+              "Task details features: Mark as completed, postpone, and split.",
+              "Account system: Email registration, cloud storage, and multi-device sync across different PCs.",
+              "UI/UX design: Quiet, encouraging, calendar/to-do hybrid, non-childish.",
+              "MVP exclusions: No social features, course marketplace, AI chat, or mobile applications.",
+              "Success validation: A trial of 20 students, measured by the proportion of users completing tasks for two consecutive weeks."
+            ],
+            "project_tags": [
+              "study-planner",
+              "desktop-web",
+              "mvp",
+              "edtech",
+              "chinese-market",
+              "kaoyan"
+            ],
+            "risks": [
+              "Syllabus Database Overhead: Generating specific tasks (e.g., chapter-level) requires a detailed syllabus database for multiple subjects, which increases MVP scope and risk. Generic tasks (e.g., 'Study Math') may feel useless.",
+              "Rigidity & Abandonment: If the study plan is too rigid or hard to adjust when real-life events disrupt it, students will quickly get discouraged, leading to trial dropouts.",
+              "Lack of Mobile Access: Students study in libraries or classrooms without constant desktop access. Lacking a mobile check-in option might lead to unrecorded progress and falsely lower the target success metric.",
+              "Postponement Debt: Unconstrained postponement or splitting of tasks can accumulate a massive backlog, leading to user overwhelm and eventual abandonment.",
+              "Onboarding Friction: Requiring detailed inputs (exam date, subjects, hours, level) upfront without showing immediate value can trigger high drop-off before the plan is even generated."
+            ],
+            "unknowns": [
+              "Syllabus content source: Will the system supply predefined weekly syllabus tasks, or must the user input their own tasks manually?",
+              "Foundation evaluation: How is the 'current foundation' (当前基础) measured and how does it mathematically alter the planning algorithm?",
+              "Rescheduling rules: What exact logic governs task shifting when a user postpones or splits a task? (e.g., push subsequent weeks, dump into a backlog, or recalculate)?",
+              "Success threshold: What specific target percentage of the 20 students completing tasks for two consecutive weeks constitutes validation?"
+            ]
+          },
+          "input_tokens": 19781,
+          "output_tokens": 4581,
+          "thinking_tokens": 3805,
+          "total_tokens": 24362,
+          "raw_usage": {
+            "input_tokens": 19781,
+            "output_tokens": 4581,
+            "thinking_tokens": 3805,
+            "cache_read_tokens": 0,
+            "total_tokens": 24362
+          }
+        },
+        {
+          "task": "gap-analysis",
+          "success": true,
+          "duration_ms": 21742,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__D__02__gap-analysis.json",
+          "output": {
+            "conflicts": [
+              "Desktop-only platform constraint vs. Student study habits: The MVP is restricted to desktop browsers only, but students typically study in libraries or classrooms where they lack constant desktop access. This creates a high risk of unrecorded progress, resulting in artificially lower validation metrics.",
+              "System-generated plan expectation vs. Lack of syllabus content source: The product vision promises a system-generated plan, but if the syllabus source is not predefined, users must manually input tasks, contradicting the automated generation onboarding experience."
+            ],
+            "gaps": [
+              {
+                "area": "MVP Scope / Feasibility",
+                "dependency": "Unresolved: Syllabus content source",
+                "impact": "Directly impacts MVP timeline, feasibility, and onboarding user experience.",
+                "reason": "Syllabus content source is unresolved. Creating a pre-defined database for multiple exam subjects introduces significant overhead, whereas manual input degrades the value of system-generated weekly plans.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "User Flow / UX",
+                "dependency": "Unresolved: Rescheduling rules",
+                "impact": "Could lead to 'postponement debt', user discouragement, and plan rigidity, violating the core value of an adjustable calendar/todo hybrid.",
+                "reason": "Rescheduling rules are unresolved. There is no clear logic for how tasks are postponed or split (e.g., recalculating the timeline, shifting subsequent weeks, or moving to a backlog).",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Algorithm / Feasibility",
+                "dependency": "Unresolved: Foundation evaluation",
+                "impact": "Inability to implement a predictable planning algorithm, potential discrepancy in generated tasks.",
+                "reason": "Measurement and application of the 'current foundation' (当前基础) is unresolved, making it unclear how the planning algorithm scales study task difficulty/intensity.",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "Delivery / Metrics",
+                "dependency": "Unresolved: Success threshold",
+                "impact": "Impossible to quantitatively determine whether the MVP has enough value to transition into subsequent stages.",
+                "reason": "The target validation metric/percentage for the 20-student pilot (continuous two-week completion rate) is unresolved.",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ]
+          },
+          "input_tokens": 20407,
+          "output_tokens": 5062,
+          "thinking_tokens": 4547,
+          "total_tokens": 25469,
+          "raw_usage": {
+            "input_tokens": 20407,
+            "output_tokens": 5062,
+            "thinking_tokens": 4547,
+            "cache_read_tokens": 0,
+            "total_tokens": 25469
+          }
+        },
+        {
+          "task": "question-compose",
+          "success": true,
+          "duration_ms": 23850,
+          "exit_code": 0,
+          "timed_out": false,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__D__03__question-compose.json",
+          "output": {
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "大幅降低首版开发难度，同时保留核心公共课的一键生成体验。",
+                    "label": "(Recommended) 只预置政治、英语、数学等核心公共课大纲，专业课由我手动输入书籍和复习进度。"
+                  },
+                  {
+                    "impact": "实现最简单，但用户初始使用成本极高，容易导致流失。",
+                    "label": "系统不需要预置任何大纲，完全由我手动录入复习书籍、章节和里程碑。"
+                  },
+                  {
+                    "impact": "复习体验最完美，但收集整理全国各大高校自命题大纲的难度极大，会严重延误上线。",
+                    "label": "必须覆盖全部科目的考研大纲数据库（包括自命题专业课），实现所有科目的全自动生成。"
+                  }
+                ],
+                "question": "系统自动生成复习计划需要考研大纲数据源。在MVP版本中，我们该如何获取或处理这些科目的内容数据？",
+                "reason": "大纲内容的来源直接决定了MVP的开发周期和用户初次使用的价值。如果完全预置所有专业课大纲，工作量巨大且不切实际；若完全让用户手动录入，又会失去“系统自动生成”的核心体验。",
+                "recommendation": "预置最热门的全国统考科目（如数学、英语、政治），而其他非统考专业课提供通用模板或允许用户手动规划里程碑。",
+                "recommendation_reason": "这样既能让绝大多数考研学生在最耗时的公共课上体验到一键生成计划的便利，又避免了MVP阶段去搜集和维护成百上千门专业课大纲的巨大开发成本。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "符合复习总量固定的特征，能动态平摊压力并给予客观警告，避免计划崩溃。",
+                    "label": "(Recommended) 未完成任务自动平摊到后续所有周，如果每周工时超出我的设定上限则给予红色警示。"
+                  },
+                  {
+                    "impact": "开发成本最低，但下周任务容易翻倍堆积，极易打击复习积极性。",
+                    "label": "直接将本周未完成的任务塞进下周的待办列表里。"
+                  },
+                  {
+                    "impact": "自由度最高，但削弱了系统智能规划和时间管理的属性。",
+                    "label": "未完成任务不自动排期，而是放入备忘收件箱，由我自己手动重新规划。"
+                  }
+                ],
+                "question": "当用户选择将本周未完成的任务“延后”或“拆分”时，系统应该如何重新排期？",
+                "reason": "考研复习具有极强的时效性和总量固定性（考试日期不可变）。如果任由任务无限制向后堆积，会导致“延期债务”越攒越多，最终让计划崩溃，这违背了日历和待办结合的设计初衷。",
+                "recommendation": "采用“本周任务顺延，后续周任务自动微调，并显示进度预警”的动态平摊机制，而非简单推迟到下周。",
+                "recommendation_reason": "考研总时间固定。如果只是简单把任务塞给下周，下周任务量会直接翻倍导致崩溃。通过平摊或给出红色预警（例如提示“按当前进度，你需要每天多学0.5小时或推移目标”），能温和地施加紧迫感，鼓励用户调整节奏。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "设计和开发简单，用户选择成本低，同时提供了差异化的复习节奏。",
+                    "label": "(Recommended) 提供粗颗粒度的科目自评（如跨考/本专业），仅用于微调第一轮基础复习的推荐时间比例。"
+                  },
+                  {
+                    "impact": "测试更客观专业，但题库维护成本高，且会显著增加首次上手的流失率。",
+                    "label": "提供一套简短的在线测试题，根据我的答题得分来计算初始复习强度。"
+                  },
+                  {
+                    "impact": "开发成本为零，但属于虚假功能，会降低对产品“个性化生成”的信任度。",
+                    "label": "仅作为我个人资料的背景记录展示，不实际干预系统生成的复习计划。"
+                  }
+                ],
+                "question": "初次设置时收集的“当前基础”，应该如何影响系统生成的复习计划？",
+                "reason": "“当前基础”的定义如果不清晰，系统就无法将其转化为具体的算法参数（例如是调整总复习轮数、调整第一轮的耗时比例，还是调整每日推荐的学习量）。",
+                "recommendation": "通过选择题或自评（如跨考/本专业、已过六级/未过、数学基础好/差）将基础粗略分为三档，并据此微调前期的基础巩固阶段时长比例。",
+                "recommendation_reason": "MVP阶段不宜引入复杂的学术能力测试。通过粗颗粒度的自评来调整基础阶段（第一轮）和强化阶段（第二轮）的时间比例，实现起来最为可行，且能让用户感受到个性化定制。"
+              }
+            ]
+          },
+          "input_tokens": 20424,
+          "output_tokens": 6700,
+          "thinking_tokens": 5530,
+          "total_tokens": 27124,
+          "raw_usage": {
+            "input_tokens": 20424,
+            "output_tokens": 6700,
+            "thinking_tokens": 5530,
+            "cache_read_tokens": 0,
+            "total_tokens": 27124
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 3,
+        "duration_ms": 70538,
+        "input_tokens": 60612,
+        "output_tokens": 16343,
+        "thinking_tokens": 13882,
+        "total_tokens": 76955
+      },
+      "success": true,
+      "timestamp": "2026-08-22T05:25:39.159Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 3,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5
+        },
+        "heuristicQuality": 4.625,
+        "matchedSignals": 2,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals"
+        }
+      }
+    }
+  ],
+  "variants": {
+    "A": {
+      "cases": 2,
+      "successful_cases": 2,
+      "average_input_tokens_per_case": 25142,
+      "average_total_tokens_per_case": 33499.5,
+      "average_calls_per_case": 1,
+      "average_heuristic_quality_out_of_5": 4.6875,
+      "quality_per_10k_tokens": 0.2798549232078091,
+      "structured_output_success_rate": 1
+    },
+    "B": {
+      "cases": 2,
+      "successful_cases": 2,
+      "average_input_tokens_per_case": 18625.5,
+      "average_total_tokens_per_case": 29678,
+      "average_calls_per_case": 1,
+      "average_heuristic_quality_out_of_5": 4.875,
+      "quality_per_10k_tokens": 0.328526181009502,
+      "structured_output_success_rate": 1
+    },
+    "C": {
+      "cases": 2,
+      "successful_cases": 1,
+      "average_input_tokens_per_case": 141097,
+      "average_total_tokens_per_case": 161775.5,
+      "average_calls_per_case": 3,
+      "average_heuristic_quality_out_of_5": 4.0625,
+      "quality_per_10k_tokens": 0.05022392142197057,
+      "structured_output_success_rate": 0.5
+    },
+    "D": {
+      "cases": 2,
+      "successful_cases": 2,
+      "average_input_tokens_per_case": 63046.5,
+      "average_total_tokens_per_case": 77699.5,
+      "average_calls_per_case": 3,
+      "average_heuristic_quality_out_of_5": 4.75,
+      "quality_per_10k_tokens": 0.12226590904703376,
+      "structured_output_success_rate": 1
+    }
+  },
+  "generated_at": "2026-08-22T05:29:37.122Z"
+}

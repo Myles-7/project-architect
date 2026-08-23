@@ -1,0 +1,44 @@
+export enum ErrorCode {
+  // Provider errors
+  PROVIDER_NOT_AVAILABLE = 'PROVIDER_NOT_AVAILABLE',
+  PROVIDER_TIMEOUT = 'PROVIDER_TIMEOUT',
+  PROVIDER_PROCESS_FAILED = 'PROVIDER_PROCESS_FAILED',
+  STRUCTURED_OUTPUT_MISSING = 'STRUCTURED_OUTPUT_MISSING',
+  SCHEMA_VALIDATION_FAILED = 'SCHEMA_VALIDATION_FAILED',
+
+  // Core / State errors
+  PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND',
+  STATE_REVISION_CONFLICT = 'STATE_REVISION_CONFLICT',
+  STATE_VALIDATION_FAILED = 'STATE_VALIDATION_FAILED',
+  STATE_COMMIT_FAILED = 'STATE_COMMIT_FAILED',
+  STATE_RECOVERY_REQUIRED = 'STATE_RECOVERY_REQUIRED',
+  DECISION_LOCKED = 'DECISION_LOCKED',
+  INVALID_TYPED_REF = 'INVALID_TYPED_REF',
+
+  // Inputs errors
+  INPUT_TOO_LARGE = 'INPUT_TOO_LARGE',
+  INPUT_UNSUPPORTED = 'INPUT_UNSUPPORTED',
+  INPUT_EXTRACTION_FAILED = 'INPUT_EXTRACTION_FAILED',
+
+  // Documents errors
+  DOCUMENT_GENERATION_FAILED = 'DOCUMENT_GENERATION_FAILED',
+  READINESS_NOT_APPROVED = 'READINESS_NOT_APPROVED',
+
+  // Security / Authorization errors
+  ACCESS_DENIED = 'ACCESS_DENIED',
+}
+
+export interface ApiErrorPayload {
+  code: ErrorCode;
+  message: string;
+  recoverable: boolean;
+  details?: Record<string, unknown>;
+  requestId?: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  stateRevision?: number;
+  error?: ApiErrorPayload;
+}

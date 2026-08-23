@@ -1,0 +1,409 @@
+{
+  "run_id": "smoke-2-fixed",
+  "variant": "D",
+  "case": "case-03",
+  "name": "complete-study-planner",
+  "output": {
+    "confirmed": [
+      "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+      "Platform: Desktop web browsers only for the first version.",
+      "Language support: Chinese only.",
+      "Onboarding parameters: Exam date, subjects, weekly study hours, and current foundation.",
+      "Core engine: System-generated weekly review plan that users can adjust.",
+      "Homepage features: Weekly tasks, completion progress, and exam countdown.",
+      "Task details features: Mark as completed, postpone, and split.",
+      "Account system: Email registration, cloud storage, and multi-device sync across different PCs.",
+      "UI/UX design: Quiet, encouraging, calendar/to-do hybrid, non-childish.",
+      "MVP exclusions: No social features, course marketplace, AI chat, or mobile applications.",
+      "Success validation: A trial of 20 students, measured by the proportion of users completing tasks for two consecutive weeks."
+    ],
+    "candidates": [
+      "Standardized syllabus database for common subjects (e.g., Politics, English, Math) vs. completely user-defined custom subjects.",
+      "Fixed template scheduling algorithm vs. dynamic velocity-based pacing adjustment.",
+      "Self-reported task completion check vs. study timer/session verification.",
+      "Target success percentage threshold for the 20-student trial (e.g., 60%+ completion rate)."
+    ],
+    "assumptions": [
+      "Users have persistent internet connectivity during planning and check-in sessions.",
+      "Modern desktop web browsers (Chrome, Edge, Safari, Firefox) are targeted.",
+      "Exam countdown is based on Beijing Time (UTC+8) and client-side clock synchronization.",
+      "Basic email-based transactional messages (registration, password reset) are sufficient for MVP account management."
+    ],
+    "unknowns": [
+      "Syllabus content source: Will the system supply predefined weekly syllabus tasks, or must the user input their own tasks manually?",
+      "Foundation evaluation: How is the 'current foundation' (当前基础) measured and how does it mathematically alter the planning algorithm?",
+      "Rescheduling rules: What exact logic governs task shifting when a user postpones or splits a task? (e.g., push subsequent weeks, dump into a backlog, or recalculate)?",
+      "Success threshold: What specific target percentage of the 20 students completing tasks for two consecutive weeks constitutes validation?"
+    ],
+    "risks": [
+      "Syllabus Database Overhead: Generating specific tasks (e.g., chapter-level) requires a detailed syllabus database for multiple subjects, which increases MVP scope and risk. Generic tasks (e.g., 'Study Math') may feel useless.",
+      "Rigidity & Abandonment: If the study plan is too rigid or hard to adjust when real-life events disrupt it, students will quickly get discouraged, leading to trial dropouts.",
+      "Lack of Mobile Access: Students study in libraries or classrooms without constant desktop access. Lacking a mobile check-in option might lead to unrecorded progress and falsely lower the target success metric.",
+      "Postponement Debt: Unconstrained postponement or splitting of tasks can accumulate a massive backlog, leading to user overwhelm and eventual abandonment.",
+      "Onboarding Friction: Requiring detailed inputs (exam date, subjects, hours, level) upfront without showing immediate value can trigger high drop-off before the plan is even generated."
+    ],
+    "project_tags": [
+      "study-planner",
+      "desktop-web",
+      "mvp",
+      "edtech",
+      "chinese-market",
+      "kaoyan"
+    ],
+    "gaps": [
+      {
+        "area": "MVP Scope / Feasibility",
+        "dependency": "Unresolved: Syllabus content source",
+        "impact": "Directly impacts MVP timeline, feasibility, and onboarding user experience.",
+        "reason": "Syllabus content source is unresolved. Creating a pre-defined database for multiple exam subjects introduces significant overhead, whereas manual input degrades the value of system-generated weekly plans.",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "User Flow / UX",
+        "dependency": "Unresolved: Rescheduling rules",
+        "impact": "Could lead to 'postponement debt', user discouragement, and plan rigidity, violating the core value of an adjustable calendar/todo hybrid.",
+        "reason": "Rescheduling rules are unresolved. There is no clear logic for how tasks are postponed or split (e.g., recalculating the timeline, shifting subsequent weeks, or moving to a backlog).",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "Algorithm / Feasibility",
+        "dependency": "Unresolved: Foundation evaluation",
+        "impact": "Inability to implement a predictable planning algorithm, potential discrepancy in generated tasks.",
+        "reason": "Measurement and application of the 'current foundation' (当前基础) is unresolved, making it unclear how the planning algorithm scales study task difficulty/intensity.",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "Delivery / Metrics",
+        "dependency": "Unresolved: Success threshold",
+        "impact": "Impossible to quantitatively determine whether the MVP has enough value to transition into subsequent stages.",
+        "reason": "The target validation metric/percentage for the 20-student pilot (continuous two-week completion rate) is unresolved.",
+        "severity": "medium",
+        "should_ask_user": true
+      }
+    ],
+    "conflicts": [
+      "Desktop-only platform constraint vs. Student study habits: The MVP is restricted to desktop browsers only, but students typically study in libraries or classrooms where they lack constant desktop access. This creates a high risk of unrecorded progress, resulting in artificially lower validation metrics.",
+      "System-generated plan expectation vs. Lack of syllabus content source: The product vision promises a system-generated plan, but if the syllabus source is not predefined, users must manually input tasks, contradicting the automated generation onboarding experience."
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "大幅降低首版开发难度，同时保留核心公共课的一键生成体验。",
+            "label": "(Recommended) 只预置政治、英语、数学等核心公共课大纲，专业课由我手动输入书籍和复习进度。"
+          },
+          {
+            "impact": "实现最简单，但用户初始使用成本极高，容易导致流失。",
+            "label": "系统不需要预置任何大纲，完全由我手动录入复习书籍、章节和里程碑。"
+          },
+          {
+            "impact": "复习体验最完美，但收集整理全国各大高校自命题大纲的难度极大，会严重延误上线。",
+            "label": "必须覆盖全部科目的考研大纲数据库（包括自命题专业课），实现所有科目的全自动生成。"
+          }
+        ],
+        "question": "系统自动生成复习计划需要考研大纲数据源。在MVP版本中，我们该如何获取或处理这些科目的内容数据？",
+        "reason": "大纲内容的来源直接决定了MVP的开发周期和用户初次使用的价值。如果完全预置所有专业课大纲，工作量巨大且不切实际；若完全让用户手动录入，又会失去“系统自动生成”的核心体验。",
+        "recommendation": "预置最热门的全国统考科目（如数学、英语、政治），而其他非统考专业课提供通用模板或允许用户手动规划里程碑。",
+        "recommendation_reason": "这样既能让绝大多数考研学生在最耗时的公共课上体验到一键生成计划的便利，又避免了MVP阶段去搜集和维护成百上千门专业课大纲的巨大开发成本。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "符合复习总量固定的特征，能动态平摊压力并给予客观警告，避免计划崩溃。",
+            "label": "(Recommended) 未完成任务自动平摊到后续所有周，如果每周工时超出我的设定上限则给予红色警示。"
+          },
+          {
+            "impact": "开发成本最低，但下周任务容易翻倍堆积，极易打击复习积极性。",
+            "label": "直接将本周未完成的任务塞进下周的待办列表里。"
+          },
+          {
+            "impact": "自由度最高，但削弱了系统智能规划和时间管理的属性。",
+            "label": "未完成任务不自动排期，而是放入备忘收件箱，由我自己手动重新规划。"
+          }
+        ],
+        "question": "当用户选择将本周未完成的任务“延后”或“拆分”时，系统应该如何重新排期？",
+        "reason": "考研复习具有极强的时效性和总量固定性（考试日期不可变）。如果任由任务无限制向后堆积，会导致“延期债务”越攒越多，最终让计划崩溃，这违背了日历和待办结合的设计初衷。",
+        "recommendation": "采用“本周任务顺延，后续周任务自动微调，并显示进度预警”的动态平摊机制，而非简单推迟到下周。",
+        "recommendation_reason": "考研总时间固定。如果只是简单把任务塞给下周，下周任务量会直接翻倍导致崩溃。通过平摊或给出红色预警（例如提示“按当前进度，你需要每天多学0.5小时或推移目标”），能温和地施加紧迫感，鼓励用户调整节奏。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "设计和开发简单，用户选择成本低，同时提供了差异化的复习节奏。",
+            "label": "(Recommended) 提供粗颗粒度的科目自评（如跨考/本专业），仅用于微调第一轮基础复习的推荐时间比例。"
+          },
+          {
+            "impact": "测试更客观专业，但题库维护成本高，且会显著增加首次上手的流失率。",
+            "label": "提供一套简短的在线测试题，根据我的答题得分来计算初始复习强度。"
+          },
+          {
+            "impact": "开发成本为零，但属于虚假功能，会降低对产品“个性化生成”的信任度。",
+            "label": "仅作为我个人资料的背景记录展示，不实际干预系统生成的复习计划。"
+          }
+        ],
+        "question": "初次设置时收集的“当前基础”，应该如何影响系统生成的复习计划？",
+        "reason": "“当前基础”的定义如果不清晰，系统就无法将其转化为具体的算法参数（例如是调整总复习轮数、调整第一轮的耗时比例，还是调整每日推荐的学习量）。",
+        "recommendation": "通过选择题或自评（如跨考/本专业、已过六级/未过、数学基础好/差）将基础粗略分为三档，并据此微调前期的基础巩固阶段时长比例。",
+        "recommendation_reason": "MVP阶段不宜引入复杂的学术能力测试。通过粗颗粒度的自评来调整基础阶段（第一轮）和强化阶段（第二轮）的时间比例，实现起来最为可行，且能让用户感受到个性化定制。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "task": "idea-analysis",
+      "success": true,
+      "duration_ms": 24946,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__D__01__idea-analysis.json",
+      "output": {
+        "assumptions": [
+          "Users have persistent internet connectivity during planning and check-in sessions.",
+          "Modern desktop web browsers (Chrome, Edge, Safari, Firefox) are targeted.",
+          "Exam countdown is based on Beijing Time (UTC+8) and client-side clock synchronization.",
+          "Basic email-based transactional messages (registration, password reset) are sufficient for MVP account management."
+        ],
+        "candidates": [
+          "Standardized syllabus database for common subjects (e.g., Politics, English, Math) vs. completely user-defined custom subjects.",
+          "Fixed template scheduling algorithm vs. dynamic velocity-based pacing adjustment.",
+          "Self-reported task completion check vs. study timer/session verification.",
+          "Target success percentage threshold for the 20-student trial (e.g., 60%+ completion rate)."
+        ],
+        "confirmed": [
+          "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+          "Platform: Desktop web browsers only for the first version.",
+          "Language support: Chinese only.",
+          "Onboarding parameters: Exam date, subjects, weekly study hours, and current foundation.",
+          "Core engine: System-generated weekly review plan that users can adjust.",
+          "Homepage features: Weekly tasks, completion progress, and exam countdown.",
+          "Task details features: Mark as completed, postpone, and split.",
+          "Account system: Email registration, cloud storage, and multi-device sync across different PCs.",
+          "UI/UX design: Quiet, encouraging, calendar/to-do hybrid, non-childish.",
+          "MVP exclusions: No social features, course marketplace, AI chat, or mobile applications.",
+          "Success validation: A trial of 20 students, measured by the proportion of users completing tasks for two consecutive weeks."
+        ],
+        "project_tags": [
+          "study-planner",
+          "desktop-web",
+          "mvp",
+          "edtech",
+          "chinese-market",
+          "kaoyan"
+        ],
+        "risks": [
+          "Syllabus Database Overhead: Generating specific tasks (e.g., chapter-level) requires a detailed syllabus database for multiple subjects, which increases MVP scope and risk. Generic tasks (e.g., 'Study Math') may feel useless.",
+          "Rigidity & Abandonment: If the study plan is too rigid or hard to adjust when real-life events disrupt it, students will quickly get discouraged, leading to trial dropouts.",
+          "Lack of Mobile Access: Students study in libraries or classrooms without constant desktop access. Lacking a mobile check-in option might lead to unrecorded progress and falsely lower the target success metric.",
+          "Postponement Debt: Unconstrained postponement or splitting of tasks can accumulate a massive backlog, leading to user overwhelm and eventual abandonment.",
+          "Onboarding Friction: Requiring detailed inputs (exam date, subjects, hours, level) upfront without showing immediate value can trigger high drop-off before the plan is even generated."
+        ],
+        "unknowns": [
+          "Syllabus content source: Will the system supply predefined weekly syllabus tasks, or must the user input their own tasks manually?",
+          "Foundation evaluation: How is the 'current foundation' (当前基础) measured and how does it mathematically alter the planning algorithm?",
+          "Rescheduling rules: What exact logic governs task shifting when a user postpones or splits a task? (e.g., push subsequent weeks, dump into a backlog, or recalculate)?",
+          "Success threshold: What specific target percentage of the 20 students completing tasks for two consecutive weeks constitutes validation?"
+        ]
+      },
+      "input_tokens": 19781,
+      "output_tokens": 4581,
+      "thinking_tokens": 3805,
+      "total_tokens": 24362,
+      "raw_usage": {
+        "input_tokens": 19781,
+        "output_tokens": 4581,
+        "thinking_tokens": 3805,
+        "cache_read_tokens": 0,
+        "total_tokens": 24362
+      }
+    },
+    {
+      "task": "gap-analysis",
+      "success": true,
+      "duration_ms": 21742,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__D__02__gap-analysis.json",
+      "output": {
+        "conflicts": [
+          "Desktop-only platform constraint vs. Student study habits: The MVP is restricted to desktop browsers only, but students typically study in libraries or classrooms where they lack constant desktop access. This creates a high risk of unrecorded progress, resulting in artificially lower validation metrics.",
+          "System-generated plan expectation vs. Lack of syllabus content source: The product vision promises a system-generated plan, but if the syllabus source is not predefined, users must manually input tasks, contradicting the automated generation onboarding experience."
+        ],
+        "gaps": [
+          {
+            "area": "MVP Scope / Feasibility",
+            "dependency": "Unresolved: Syllabus content source",
+            "impact": "Directly impacts MVP timeline, feasibility, and onboarding user experience.",
+            "reason": "Syllabus content source is unresolved. Creating a pre-defined database for multiple exam subjects introduces significant overhead, whereas manual input degrades the value of system-generated weekly plans.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "User Flow / UX",
+            "dependency": "Unresolved: Rescheduling rules",
+            "impact": "Could lead to 'postponement debt', user discouragement, and plan rigidity, violating the core value of an adjustable calendar/todo hybrid.",
+            "reason": "Rescheduling rules are unresolved. There is no clear logic for how tasks are postponed or split (e.g., recalculating the timeline, shifting subsequent weeks, or moving to a backlog).",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Algorithm / Feasibility",
+            "dependency": "Unresolved: Foundation evaluation",
+            "impact": "Inability to implement a predictable planning algorithm, potential discrepancy in generated tasks.",
+            "reason": "Measurement and application of the 'current foundation' (当前基础) is unresolved, making it unclear how the planning algorithm scales study task difficulty/intensity.",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Delivery / Metrics",
+            "dependency": "Unresolved: Success threshold",
+            "impact": "Impossible to quantitatively determine whether the MVP has enough value to transition into subsequent stages.",
+            "reason": "The target validation metric/percentage for the 20-student pilot (continuous two-week completion rate) is unresolved.",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ]
+      },
+      "input_tokens": 20407,
+      "output_tokens": 5062,
+      "thinking_tokens": 4547,
+      "total_tokens": 25469,
+      "raw_usage": {
+        "input_tokens": 20407,
+        "output_tokens": 5062,
+        "thinking_tokens": 4547,
+        "cache_read_tokens": 0,
+        "total_tokens": 25469
+      }
+    },
+    {
+      "task": "question-compose",
+      "success": true,
+      "duration_ms": 23850,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__D__03__question-compose.json",
+      "output": {
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "大幅降低首版开发难度，同时保留核心公共课的一键生成体验。",
+                "label": "(Recommended) 只预置政治、英语、数学等核心公共课大纲，专业课由我手动输入书籍和复习进度。"
+              },
+              {
+                "impact": "实现最简单，但用户初始使用成本极高，容易导致流失。",
+                "label": "系统不需要预置任何大纲，完全由我手动录入复习书籍、章节和里程碑。"
+              },
+              {
+                "impact": "复习体验最完美，但收集整理全国各大高校自命题大纲的难度极大，会严重延误上线。",
+                "label": "必须覆盖全部科目的考研大纲数据库（包括自命题专业课），实现所有科目的全自动生成。"
+              }
+            ],
+            "question": "系统自动生成复习计划需要考研大纲数据源。在MVP版本中，我们该如何获取或处理这些科目的内容数据？",
+            "reason": "大纲内容的来源直接决定了MVP的开发周期和用户初次使用的价值。如果完全预置所有专业课大纲，工作量巨大且不切实际；若完全让用户手动录入，又会失去“系统自动生成”的核心体验。",
+            "recommendation": "预置最热门的全国统考科目（如数学、英语、政治），而其他非统考专业课提供通用模板或允许用户手动规划里程碑。",
+            "recommendation_reason": "这样既能让绝大多数考研学生在最耗时的公共课上体验到一键生成计划的便利，又避免了MVP阶段去搜集和维护成百上千门专业课大纲的巨大开发成本。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "符合复习总量固定的特征，能动态平摊压力并给予客观警告，避免计划崩溃。",
+                "label": "(Recommended) 未完成任务自动平摊到后续所有周，如果每周工时超出我的设定上限则给予红色警示。"
+              },
+              {
+                "impact": "开发成本最低，但下周任务容易翻倍堆积，极易打击复习积极性。",
+                "label": "直接将本周未完成的任务塞进下周的待办列表里。"
+              },
+              {
+                "impact": "自由度最高，但削弱了系统智能规划和时间管理的属性。",
+                "label": "未完成任务不自动排期，而是放入备忘收件箱，由我自己手动重新规划。"
+              }
+            ],
+            "question": "当用户选择将本周未完成的任务“延后”或“拆分”时，系统应该如何重新排期？",
+            "reason": "考研复习具有极强的时效性和总量固定性（考试日期不可变）。如果任由任务无限制向后堆积，会导致“延期债务”越攒越多，最终让计划崩溃，这违背了日历和待办结合的设计初衷。",
+            "recommendation": "采用“本周任务顺延，后续周任务自动微调，并显示进度预警”的动态平摊机制，而非简单推迟到下周。",
+            "recommendation_reason": "考研总时间固定。如果只是简单把任务塞给下周，下周任务量会直接翻倍导致崩溃。通过平摊或给出红色预警（例如提示“按当前进度，你需要每天多学0.5小时或推移目标”），能温和地施加紧迫感，鼓励用户调整节奏。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "设计和开发简单，用户选择成本低，同时提供了差异化的复习节奏。",
+                "label": "(Recommended) 提供粗颗粒度的科目自评（如跨考/本专业），仅用于微调第一轮基础复习的推荐时间比例。"
+              },
+              {
+                "impact": "测试更客观专业，但题库维护成本高，且会显著增加首次上手的流失率。",
+                "label": "提供一套简短的在线测试题，根据我的答题得分来计算初始复习强度。"
+              },
+              {
+                "impact": "开发成本为零，但属于虚假功能，会降低对产品“个性化生成”的信任度。",
+                "label": "仅作为我个人资料的背景记录展示，不实际干预系统生成的复习计划。"
+              }
+            ],
+            "question": "初次设置时收集的“当前基础”，应该如何影响系统生成的复习计划？",
+            "reason": "“当前基础”的定义如果不清晰，系统就无法将其转化为具体的算法参数（例如是调整总复习轮数、调整第一轮的耗时比例，还是调整每日推荐的学习量）。",
+            "recommendation": "通过选择题或自评（如跨考/本专业、已过六级/未过、数学基础好/差）将基础粗略分为三档，并据此微调前期的基础巩固阶段时长比例。",
+            "recommendation_reason": "MVP阶段不宜引入复杂的学术能力测试。通过粗颗粒度的自评来调整基础阶段（第一轮）和强化阶段（第二轮）的时间比例，实现起来最为可行，且能让用户感受到个性化定制。"
+          }
+        ]
+      },
+      "input_tokens": 20424,
+      "output_tokens": 6700,
+      "thinking_tokens": 5530,
+      "total_tokens": 27124,
+      "raw_usage": {
+        "input_tokens": 20424,
+        "output_tokens": 6700,
+        "thinking_tokens": 5530,
+        "cache_read_tokens": 0,
+        "total_tokens": 27124
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 3,
+    "duration_ms": 70538,
+    "input_tokens": 60612,
+    "output_tokens": 16343,
+    "thinking_tokens": 13882,
+    "total_tokens": 76955
+  },
+  "success": true,
+  "timestamp": "2026-08-22T05:25:39.159Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 3,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5
+    },
+    "heuristicQuality": 4.625,
+    "matchedSignals": 2,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals"
+    }
+  }
+}

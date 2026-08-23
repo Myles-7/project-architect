@@ -1,0 +1,318 @@
+{
+  "run_id": "b-vs-b2-targeted-1",
+  "variant": "B2",
+  "case": "case-08",
+  "name": "local-first-notes",
+  "success": true,
+  "output": {
+    "assumptions": [
+      "Meeting notes primarily consist of rich text, headers, lists, and basic structural formatting.",
+      "The application is targeted at desktop and web platforms where users typically take meeting notes.",
+      "A single meeting note will typically have a small-to-medium number of concurrent editors (e.g., 2 to 10 users)."
+    ],
+    "candidates": [
+      "Block-based document structure to isolate user edits to specific paragraphs or sections.",
+      "Visual difference (diff) viewer to highlight merged or conflicting changes made by different team members.",
+      "Local version history/changelog interface to inspect, compare, and revert to previous states of the document.",
+      "Direct device-to-device synchronization over local area networks to share updates without public internet access."
+    ],
+    "confirmed": [
+      "The product is a team meeting notes application.",
+      "Notes are stored locally on the device by default (local-first).",
+      "Notes can be edited without an active network connection.",
+      "When connection is restored, team members must see the merged content.",
+      "The merging process must not easily overwrite other users' modifications."
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "User Identity Attribution",
+        "dependency": "Requires deciding on the offline identity model (e.g., pre-linked accounts vs local profiles).",
+        "impact": "Without verified identity, we cannot accurately attribute edits or enforce permissions, violating the 'not easily overwrite' requirement.",
+        "reason": "We need a way to identify users and attribute their edits during offline sessions.",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "Initial Note Sharing Flow",
+        "dependency": "Requires deciding on the initial note sharing mechanism (online team space vs offline file transfer).",
+        "impact": "Users cannot start collaborating on a note local-first unless there is a mechanism to establish the initial secure sync link between devices.",
+        "reason": "The initial connection and sharing flow between team members' devices is unspecified.",
+        "severity": "high",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "Low friction, keeps document flow intact, but leaves the user to clean up duplicate sections manually.",
+            "label": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing."
+          },
+          {
+            "impact": "Guarantees immediate cleanup, but interrupts the user's workflow during a live meeting.",
+            "label": "Show a blocking conflict-resolution popup screen requiring the user to choose or merge changes before editing can continue."
+          },
+          {
+            "impact": "Zero workflow interruption, but users might not realize their offline changes were moved to history.",
+            "label": "Automatically choose the latest edit based on local device timestamps, but save the overridden version in an easily accessible page history."
+          }
+        ],
+        "question": "When offline edits to the exact same text block conflict, how should the application present and resolve them upon reconnection?",
+        "reason": "This defines the core user experience for collaboration and directly shapes how the system prevents overwriting others' work.",
+        "recommendation": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing.",
+        "recommendation_reason": "This prevents any data loss or immediate popup friction, keeping the meeting note editable while making the conflicting edits transparent."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "Ensures strong security and consistent user profiles, but introduces a dependency on an initial internet connection.",
+            "label": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing."
+          },
+          {
+            "impact": "Fully offline from the start, but lacks verification, allowing anyone to claim another user's identity.",
+            "label": "Allow users to set a local display name and avatar directly on their device without any online login requirement."
+          }
+        ],
+        "question": "How should the application establish user identity to attribute edits, especially when working offline?",
+        "reason": "Establishing identity is necessary to label who wrote what and prevent unauthorized edits, but requiring online auth conflicts with the offline-first goal.",
+        "recommendation": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing.",
+        "recommendation_reason": "This ensures secure edit attribution and access control, while still allowing full offline editing capability once set up."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "Highly convenient and automated, but requires a brief online phase before the meeting starts.",
+            "label": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices."
+          },
+          {
+            "impact": "Enables 100% offline note distribution, but increases manual file management effort for the users.",
+            "label": "Allow exporting and importing note files (e.g., via local file transfer or messaging apps) completely offline."
+          }
+        ],
+        "question": "How should team members initially share and link a new meeting note before they go offline?",
+        "reason": "We need to define how devices discover each other or how the note metadata is distributed to enable subsequent offline syncing.",
+        "recommendation": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices.",
+        "recommendation_reason": "This matches typical meeting workflows where agendas are set up beforehand, ensuring seamless transition to offline note-taking."
+      }
+    ],
+    "risks": [
+      "Simultaneous edits to the exact same sentence or word by offline users may result in confusing auto-merges that degrade readability.",
+      "Data sync latency or loss if a user edits offline and closes the application or device before reconnecting and syncing changes.",
+      "Privacy risk if sensitive meeting notes are synced over insecure local network channels without end-to-end encryption."
+    ],
+    "tensions": [
+      {
+        "description": "Automatic seamless merging vs. manual review overhead.",
+        "reason": "Fully automatic merges minimize user effort but risk creating grammatically or logically confused text. Requiring manual reviews preserves accuracy but increases friction for note-takers."
+      },
+      {
+        "description": "Local-first autonomy vs. real-time collaborative awareness.",
+        "reason": "Working completely offline gives users freedom and resilience, but prevents them from knowing who is currently modifying the same sections, increasing the likelihood of conflict."
+      }
+    ],
+    "unknowns": [
+      "How the system should identify users and verify edit permissions, especially while offline.",
+      "How notes are initially shared or linked between team members before they begin editing offline.",
+      "Whether non-text media attachments (such as audio recordings, images, or PDF slides) need to be stored and synchronized offline."
+    ]
+  },
+  "calls": [
+    {
+      "task": "single-custom",
+      "variant": "B2",
+      "case": "case-08",
+      "duration_ms": 27904,
+      "exit_code": 0,
+      "timed_out": false,
+      "structured_success": true,
+      "success": true,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-08__B2__01__single-call.json",
+      "output": {
+        "assumptions": [
+          "Meeting notes primarily consist of rich text, headers, lists, and basic structural formatting.",
+          "The application is targeted at desktop and web platforms where users typically take meeting notes.",
+          "A single meeting note will typically have a small-to-medium number of concurrent editors (e.g., 2 to 10 users)."
+        ],
+        "candidates": [
+          "Block-based document structure to isolate user edits to specific paragraphs or sections.",
+          "Visual difference (diff) viewer to highlight merged or conflicting changes made by different team members.",
+          "Local version history/changelog interface to inspect, compare, and revert to previous states of the document.",
+          "Direct device-to-device synchronization over local area networks to share updates without public internet access."
+        ],
+        "confirmed": [
+          "The product is a team meeting notes application.",
+          "Notes are stored locally on the device by default (local-first).",
+          "Notes can be edited without an active network connection.",
+          "When connection is restored, team members must see the merged content.",
+          "The merging process must not easily overwrite other users' modifications."
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "User Identity Attribution",
+            "dependency": "Requires deciding on the offline identity model (e.g., pre-linked accounts vs local profiles).",
+            "impact": "Without verified identity, we cannot accurately attribute edits or enforce permissions, violating the 'not easily overwrite' requirement.",
+            "reason": "We need a way to identify users and attribute their edits during offline sessions.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Initial Note Sharing Flow",
+            "dependency": "Requires deciding on the initial note sharing mechanism (online team space vs offline file transfer).",
+            "impact": "Users cannot start collaborating on a note local-first unless there is a mechanism to establish the initial secure sync link between devices.",
+            "reason": "The initial connection and sharing flow between team members' devices is unspecified.",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Low friction, keeps document flow intact, but leaves the user to clean up duplicate sections manually.",
+                "label": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing."
+              },
+              {
+                "impact": "Guarantees immediate cleanup, but interrupts the user's workflow during a live meeting.",
+                "label": "Show a blocking conflict-resolution popup screen requiring the user to choose or merge changes before editing can continue."
+              },
+              {
+                "impact": "Zero workflow interruption, but users might not realize their offline changes were moved to history.",
+                "label": "Automatically choose the latest edit based on local device timestamps, but save the overridden version in an easily accessible page history."
+              }
+            ],
+            "question": "When offline edits to the exact same text block conflict, how should the application present and resolve them upon reconnection?",
+            "reason": "This defines the core user experience for collaboration and directly shapes how the system prevents overwriting others' work.",
+            "recommendation": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing.",
+            "recommendation_reason": "This prevents any data loss or immediate popup friction, keeping the meeting note editable while making the conflicting edits transparent."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Ensures strong security and consistent user profiles, but introduces a dependency on an initial internet connection.",
+                "label": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing."
+              },
+              {
+                "impact": "Fully offline from the start, but lacks verification, allowing anyone to claim another user's identity.",
+                "label": "Allow users to set a local display name and avatar directly on their device without any online login requirement."
+              }
+            ],
+            "question": "How should the application establish user identity to attribute edits, especially when working offline?",
+            "reason": "Establishing identity is necessary to label who wrote what and prevent unauthorized edits, but requiring online auth conflicts with the offline-first goal.",
+            "recommendation": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing.",
+            "recommendation_reason": "This ensures secure edit attribution and access control, while still allowing full offline editing capability once set up."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Highly convenient and automated, but requires a brief online phase before the meeting starts.",
+                "label": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices."
+              },
+              {
+                "impact": "Enables 100% offline note distribution, but increases manual file management effort for the users.",
+                "label": "Allow exporting and importing note files (e.g., via local file transfer or messaging apps) completely offline."
+              }
+            ],
+            "question": "How should team members initially share and link a new meeting note before they go offline?",
+            "reason": "We need to define how devices discover each other or how the note metadata is distributed to enable subsequent offline syncing.",
+            "recommendation": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices.",
+            "recommendation_reason": "This matches typical meeting workflows where agendas are set up beforehand, ensuring seamless transition to offline note-taking."
+          }
+        ],
+        "risks": [
+          "Simultaneous edits to the exact same sentence or word by offline users may result in confusing auto-merges that degrade readability.",
+          "Data sync latency or loss if a user edits offline and closes the application or device before reconnecting and syncing changes.",
+          "Privacy risk if sensitive meeting notes are synced over insecure local network channels without end-to-end encryption."
+        ],
+        "tensions": [
+          {
+            "description": "Automatic seamless merging vs. manual review overhead.",
+            "reason": "Fully automatic merges minimize user effort but risk creating grammatically or logically confused text. Requiring manual reviews preserves accuracy but increases friction for note-takers."
+          },
+          {
+            "description": "Local-first autonomy vs. real-time collaborative awareness.",
+            "reason": "Working completely offline gives users freedom and resilience, but prevents them from knowing who is currently modifying the same sections, increasing the likelihood of conflict."
+          }
+        ],
+        "unknowns": [
+          "How the system should identify users and verify edit permissions, especially while offline.",
+          "How notes are initially shared or linked between team members before they begin editing offline.",
+          "Whether non-text media attachments (such as audio recordings, images, or PDF slides) need to be stored and synchronized offline."
+        ]
+      },
+      "prompt_chars": 3813,
+      "context_chars": 88,
+      "user_input_chars": 77,
+      "input_tokens": 21234,
+      "output_tokens": 10939,
+      "thinking_tokens": 8163,
+      "total_tokens": 32173,
+      "cache_read_tokens": 28546,
+      "raw_usage": {
+        "input_tokens": 21234,
+        "output_tokens": 10939,
+        "thinking_tokens": 8163,
+        "cache_read_tokens": 28546,
+        "total_tokens": 32173
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 1,
+    "duration_ms": 27904,
+    "input_tokens": 21234,
+    "output_tokens": 10939,
+    "thinking_tokens": 8163,
+    "total_tokens": 32173,
+    "cache_read_tokens": 28546,
+    "prompt_chars": 3813,
+    "context_chars": 88,
+    "user_input_chars": 77
+  },
+  "technology_warnings": [
+    {
+      "type": "possible-premature-tech",
+      "term": "E2EE",
+      "scope": "all-user-visible-fields",
+      "manual_review_needed": true
+    }
+  ],
+  "timestamp": "2026-08-22T08:07:47.612Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 5,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5,
+      "assumption_over_specification": 5,
+      "conflict_precision": 5
+    },
+    "heuristicQuality": 4.9,
+    "matchedSignals": 3,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals",
+      "assumption_over_specification": "heuristic/manual-review-needed",
+      "conflict_precision": "heuristic/manual-review-needed"
+    }
+  }
+}

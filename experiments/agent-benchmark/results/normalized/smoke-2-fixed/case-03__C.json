@@ -1,0 +1,273 @@
+{
+  "run_id": "smoke-2-fixed",
+  "variant": "C",
+  "case": "case-03",
+  "name": "complete-study-planner",
+  "output": {
+    "confirmed": [
+      "目标用户为准备中国研究生入学考试（考研）的大学生。",
+      "第一版仅支持中文，且仅支持桌面浏览器（无移动端/移动网页适配）。",
+      "新用户首次进入需录入考试日期、科目、每周可学习时长和当前基础。",
+      "系统以“周”为单位生成可调整的复习计划。",
+      "主页核心展示内容：本周任务、完成进度、考研倒计时。",
+      "任务详情页核心操作：标记完成、延后、拆分。",
+      "用户使用邮箱注册，数据存云端以支持多台电脑登录。",
+      "UI/UX风格定位为安静、鼓励但不幼稚，类似日历和待办（To-Do）的结合体。",
+      "MVP明确排除社交、课程市场、AI聊天或移动端。",
+      "MVP验证指标：寻找20名同学试用，以连续两周完成任务的比例评估产品价值。"
+    ],
+    "candidates": [
+      "计划生成方式候选：采用预设模板匹配生成（按科目/基础匹配固定任务） vs 动态算法排程。",
+      "任务调整机制候选：手动拖拽重新排程 vs 系统自动瀑布式推迟后续任务。",
+      "云端存储技术候选：Supabase/Firebase/LeanCloud 等 BaaS 服务，或自建轻量级 API。"
+    ],
+    "assumptions": [
+      "考试日期默认设为当年12月的倒数第二个周末（中国考研标准时间）。",
+      "用户在复习期间拥有稳定的网络连接（因数据需同步至云端）。",
+      "系统内置中国考研主流科目（政治、英语一/二、数学一/二/三）的通用基础模版。",
+      "界面视觉采用低饱和度、温暖、专注的设计色彩体系，以传达安静鼓励的氛围。",
+      "邮箱注册通过验证码或激活链接进行防刷保护。"
+    ],
+    "unknowns": [
+      "考研专业课数量极其庞大且大纲各异，系统如何为非统考专业课生成复习计划？",
+      "“当前基础”的定义与评估标准是什么，如何转化为具体的计划差异？",
+      "计划被调整时（如拆分/延后），任务重排的底层业务逻辑和冲突处理规则是什么？",
+      "验证指标的具体成功阈值是多少（例如，连续两周任务完成率达到多少比例才算通过验证）？"
+    ],
+    "risks": [
+      "专业课内容缺失风险：考研专业课因学校而异，若系统无法提供高质量的自动生成计划，仅靠通用科目可能难以吸引并留住试用学生。",
+      "设备局限性影响留存风险：在考研备考场景下，学生常在图书馆等移动场景学习。第一版仅支持桌面端，可能会因为使用不便导致试用流失，从而扭曲“连续两周完成任务比例”的验证结果。",
+      "注册流失风险：国内大学生更习惯微信/手机号一键登录，邮箱登录可能存在收件慢、被误判垃圾邮件等体验问题，增加试用门槛。",
+      "日程重排算法复杂度失控风险：频繁的延后和拆分可能引发复杂的日历排程冲突，若系统自动调整逻辑过于复杂，会严重拖慢MVP的开发进度。"
+    ],
+    "project_tags": [
+      "Web-App",
+      "Study-Planner",
+      "Postgraduate-Exam-CN",
+      "Desktop-Only",
+      "Calendar-Todo-Hybrid",
+      "Cloud-Sync",
+      "MVP-Validation"
+    ],
+    "gaps": [
+      {
+        "area": "User Retention Hooks",
+        "dependency": "Validation Metric and Onboarding Flow",
+        "impact": "Users may forget to log in and update their progress, leading to artificially low completion rates and a false negative validation of the product value.",
+        "reason": "The MVP validation metric relies on the proportion of students who complete tasks for two consecutive weeks. However, the system lacks any proactive retention hooks, such as daily study reminders or email notifications, to bring users back to the app.",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "Study-Plan Adaptation",
+        "dependency": "Task Rescheduling Logic",
+        "impact": "Task accumulation will cause cognitive overload and demotivation, leading to plan abandonment and failure to meet the 2-week completion metric.",
+        "reason": "While users can postpone or split tasks, there is no mechanism specified for how the weekly study plan adapts to these changes. Without dynamic rescheduling or pacing adjustments, postponed tasks will quickly pile up.",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "Professional Course (专业课) Plan Generation",
+        "dependency": "Plan Database / Core Generation Flow",
+        "impact": "Students whose specific professional courses are unsupported will receive incomplete plans, increasing friction and potential dropouts from the 20-student trial cohort.",
+        "reason": "Chinese postgraduate exams include highly fragmented, university-specific professional courses (专业课) that do not share a unified syllabus. The system lacks a plan generation strategy for these non-unified subjects.",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "Validation Success Criteria Definition",
+        "dependency": "MVP Validation Plan",
+        "impact": "The team will lack an objective, data-driven criterion to decide whether to pivot, iterate, or proceed with the full product after the trial.",
+        "reason": "The pilot test defines the metric (proportion of students completing tasks for two consecutive weeks) but does not define the target threshold required to declare the product concept validated.",
+        "severity": "low",
+        "should_ask_user": true
+      }
+    ],
+    "conflicts": [
+      "Validation Metric vs. Absence of Retention Hooks: The success of the MVP is measured by a 2-week continuous completion rate, yet there is no mechanism to prompt or remind students to return to the app daily.",
+      "Postpone/Split Operations vs. Static Plan Generation: Allowing users to postpone or split tasks without an adaptive rescheduling mechanism conflicts with the goal of keeping the plan realistic and manageable.",
+      "Automated Plan Generation vs. Non-Unified Professional Courses (专业课): The requirement to automatically generate review plans on entry conflicts with the highly fragmented, school-specific nature of postgraduate professional courses."
+    ],
+    "questions": []
+  },
+  "calls": [
+    {
+      "task": "idea-analysis",
+      "success": true,
+      "duration_ms": 27053,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__C__01__idea-analysis.json",
+      "output": {
+        "assumptions": [
+          "考试日期默认设为当年12月的倒数第二个周末（中国考研标准时间）。",
+          "用户在复习期间拥有稳定的网络连接（因数据需同步至云端）。",
+          "系统内置中国考研主流科目（政治、英语一/二、数学一/二/三）的通用基础模版。",
+          "界面视觉采用低饱和度、温暖、专注的设计色彩体系，以传达安静鼓励的氛围。",
+          "邮箱注册通过验证码或激活链接进行防刷保护。"
+        ],
+        "candidates": [
+          "计划生成方式候选：采用预设模板匹配生成（按科目/基础匹配固定任务） vs 动态算法排程。",
+          "任务调整机制候选：手动拖拽重新排程 vs 系统自动瀑布式推迟后续任务。",
+          "云端存储技术候选：Supabase/Firebase/LeanCloud 等 BaaS 服务，或自建轻量级 API。"
+        ],
+        "confirmed": [
+          "目标用户为准备中国研究生入学考试（考研）的大学生。",
+          "第一版仅支持中文，且仅支持桌面浏览器（无移动端/移动网页适配）。",
+          "新用户首次进入需录入考试日期、科目、每周可学习时长和当前基础。",
+          "系统以“周”为单位生成可调整的复习计划。",
+          "主页核心展示内容：本周任务、完成进度、考研倒计时。",
+          "任务详情页核心操作：标记完成、延后、拆分。",
+          "用户使用邮箱注册，数据存云端以支持多台电脑登录。",
+          "UI/UX风格定位为安静、鼓励但不幼稚，类似日历和待办（To-Do）的结合体。",
+          "MVP明确排除社交、课程市场、AI聊天或移动端。",
+          "MVP验证指标：寻找20名同学试用，以连续两周完成任务的比例评估产品价值。"
+        ],
+        "project_tags": [
+          "Web-App",
+          "Study-Planner",
+          "Postgraduate-Exam-CN",
+          "Desktop-Only",
+          "Calendar-Todo-Hybrid",
+          "Cloud-Sync",
+          "MVP-Validation"
+        ],
+        "risks": [
+          "专业课内容缺失风险：考研专业课因学校而异，若系统无法提供高质量的自动生成计划，仅靠通用科目可能难以吸引并留住试用学生。",
+          "设备局限性影响留存风险：在考研备考场景下，学生常在图书馆等移动场景学习。第一版仅支持桌面端，可能会因为使用不便导致试用流失，从而扭曲“连续两周完成任务比例”的验证结果。",
+          "注册流失风险：国内大学生更习惯微信/手机号一键登录，邮箱登录可能存在收件慢、被误判垃圾邮件等体验问题，增加试用门槛。",
+          "日程重排算法复杂度失控风险：频繁的延后和拆分可能引发复杂的日历排程冲突，若系统自动调整逻辑过于复杂，会严重拖慢MVP的开发进度。"
+        ],
+        "unknowns": [
+          "考研专业课数量极其庞大且大纲各异，系统如何为非统考专业课生成复习计划？",
+          "“当前基础”的定义与评估标准是什么，如何转化为具体的计划差异？",
+          "计划被调整时（如拆分/延后），任务重排的底层业务逻辑和冲突处理规则是什么？",
+          "验证指标的具体成功阈值是多少（例如，连续两周任务完成率达到多少比例才算通过验证）？"
+        ]
+      },
+      "input_tokens": 19775,
+      "output_tokens": 3689,
+      "thinking_tokens": 2879,
+      "total_tokens": 23464,
+      "raw_usage": {
+        "input_tokens": 19775,
+        "output_tokens": 3689,
+        "thinking_tokens": 2879,
+        "cache_read_tokens": 0,
+        "total_tokens": 23464
+      }
+    },
+    {
+      "task": "gap-analysis",
+      "success": true,
+      "duration_ms": 54771,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__C__02__gap-analysis.json",
+      "output": {
+        "conflicts": [
+          "Validation Metric vs. Absence of Retention Hooks: The success of the MVP is measured by a 2-week continuous completion rate, yet there is no mechanism to prompt or remind students to return to the app daily.",
+          "Postpone/Split Operations vs. Static Plan Generation: Allowing users to postpone or split tasks without an adaptive rescheduling mechanism conflicts with the goal of keeping the plan realistic and manageable.",
+          "Automated Plan Generation vs. Non-Unified Professional Courses (专业课): The requirement to automatically generate review plans on entry conflicts with the highly fragmented, school-specific nature of postgraduate professional courses."
+        ],
+        "gaps": [
+          {
+            "area": "User Retention Hooks",
+            "dependency": "Validation Metric and Onboarding Flow",
+            "impact": "Users may forget to log in and update their progress, leading to artificially low completion rates and a false negative validation of the product value.",
+            "reason": "The MVP validation metric relies on the proportion of students who complete tasks for two consecutive weeks. However, the system lacks any proactive retention hooks, such as daily study reminders or email notifications, to bring users back to the app.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Study-Plan Adaptation",
+            "dependency": "Task Rescheduling Logic",
+            "impact": "Task accumulation will cause cognitive overload and demotivation, leading to plan abandonment and failure to meet the 2-week completion metric.",
+            "reason": "While users can postpone or split tasks, there is no mechanism specified for how the weekly study plan adapts to these changes. Without dynamic rescheduling or pacing adjustments, postponed tasks will quickly pile up.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Professional Course (专业课) Plan Generation",
+            "dependency": "Plan Database / Core Generation Flow",
+            "impact": "Students whose specific professional courses are unsupported will receive incomplete plans, increasing friction and potential dropouts from the 20-student trial cohort.",
+            "reason": "Chinese postgraduate exams include highly fragmented, university-specific professional courses (专业课) that do not share a unified syllabus. The system lacks a plan generation strategy for these non-unified subjects.",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Validation Success Criteria Definition",
+            "dependency": "MVP Validation Plan",
+            "impact": "The team will lack an objective, data-driven criterion to decide whether to pivot, iterate, or proceed with the full product after the trial.",
+            "reason": "The pilot test defines the metric (proportion of students completing tasks for two consecutive weeks) but does not define the target threshold required to declare the product concept validated.",
+            "severity": "low",
+            "should_ask_user": true
+          }
+        ]
+      },
+      "input_tokens": 61497,
+      "output_tokens": 10609,
+      "thinking_tokens": 9269,
+      "total_tokens": 72106,
+      "raw_usage": {
+        "input_tokens": 61497,
+        "output_tokens": 10609,
+        "thinking_tokens": 9269,
+        "cache_read_tokens": 268728,
+        "total_tokens": 72106
+      }
+    },
+    {
+      "task": "question-compose",
+      "success": false,
+      "duration_ms": 119781,
+      "exit_code": 1,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-2-fixed\\case-03__C__03__question-compose.json",
+      "output": null,
+      "input_tokens": 140433,
+      "output_tokens": 11716,
+      "thinking_tokens": 9638,
+      "total_tokens": 152149,
+      "raw_usage": {
+        "input_tokens": 140433,
+        "output_tokens": 11716,
+        "thinking_tokens": 9638,
+        "cache_read_tokens": 696186,
+        "total_tokens": 152149
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 3,
+    "duration_ms": 201605,
+    "input_tokens": 221705,
+    "output_tokens": 26014,
+    "thinking_tokens": 21786,
+    "total_tokens": 247719
+  },
+  "success": false,
+  "timestamp": "2026-08-22T05:24:28.617Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 5,
+      "question_relevance": 0,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 1,
+      "structured_output_reliability": 0,
+      "conciseness": 5
+    },
+    "heuristicQuality": 3.25,
+    "matchedSignals": 3,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals"
+    }
+  }
+}

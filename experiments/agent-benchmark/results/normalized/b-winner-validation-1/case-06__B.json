@@ -1,0 +1,374 @@
+{
+  "run_id": "b-winner-validation-1",
+  "variant": "B",
+  "case": "case-06",
+  "name": "windows-desktop-inventory",
+  "success": true,
+  "output": {
+    "assumptions": [
+      "运行环境：目标 Windows 系统为 Windows 10 或 Windows 11，不兼容 XP/7 等老旧系统 (Target Windows 10/11)",
+      "数据规模：小型维修店日均维修单量小于 50 笔，库存配件小于 5000 种，本地数据库性能无压力 (Small data volume, under 50 orders/day, under 5000 parts)",
+      "并发访问：首期仅有一台电脑，不存在多用户并发读写数据库的冲突问题 (Single-user execution in Phase 1, no concurrency issues)",
+      "数据敏感性：店员无需查看进货价格或总收入，财务明细仅老板可接触 (Clerks don't need access to cost price or total revenue)"
+    ],
+    "candidates": [
+      "本地数据库：采用 SQLite 作为主数据库，单文件、零配置，非常适合单机离线应用 (SQLite for local offline storage)",
+      "开发框架：使用 C# WPF (.NET 8) 或 Electron/Tauri (React/Vue/HTML) 编写桌面客户端 (WPF or Electron/Tauri for Windows app)",
+      "架构设计：采用三层架构或 MVVM 模式，将数据访问层（Repository）抽象，方便未来升级局域网或云端 (Abstracted Data Access Layer for future scalability)",
+      "报表生成：使用 EPPlus 或 ClosedXML 库在本地快速生成标准的 Excel (.xlsx) 报表 (Local Excel generation library like EPPlus)"
+    ],
+    "confirmed": [
+      "目标平台为 Windows 桌面应用 (Windows Desktop Application)",
+      "支持完全离线运行，日常录入无需网络连接 (Fully offline operation support)",
+      "包含配件库存管理、客户管理、维修单管理三大核心模块 (Core modules: Inventory, Customers, Repair Orders)",
+      "老板需每日导出包含库存和收入数据的 Excel 报表 (Daily Excel export for inventory and revenue)",
+      "首期部署为前台单机版，但需预留局域网共享的设计空间 (Single PC initially, with extensibility for LAN sharing)"
+    ],
+    "conflicts": [
+      "『完全离线/单机版 SQLite』与『未来局域网共享』的冲突：SQLite 并不擅长处理跨网络文件的多客户端并发写入。如果未来需要多台电脑同时录入，必须将架构重构为 C/S 模式（如一台电脑跑 PostgreSQL/SQL Server，或跑一个本地 Web API 服务），这会增加前期的设计复杂度或后期的迁移成本。 ('Offline Single-User SQLite' vs 'Concurrent LAN Sharing' conflict)"
+    ],
+    "gaps": [
+      {
+        "area": "数据备份与防灾 (Data Backup & Disaster Recovery)",
+        "dependency": "None",
+        "impact": "一旦电脑故障，维修店可能丢失所有客户资料、未结维修单及历史账目，业务瞬间停摆。 (Complete operational stop and financial loss if PC breaks)",
+        "reason": "用户想法中未提及任何数据备份机制。 (No backup mechanism mentioned in original idea)",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "权限与数据安全 (Permissions & Data Security)",
+        "dependency": "None",
+        "impact": "店员可以随意查看、修改老板的营业收入、配件进货价和利润，甚至篡改订单金额。 (Potential internal fraud and exposure of business secrets)",
+        "reason": "店员与老板共享同一台电脑操作，没有提及账户隔离与权限限制。 (Single shared computer with no user/role isolation mentioned)",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "单据流转与物理打印 (Receipt Printing & Barcode Scanning)",
+        "dependency": "None",
+        "impact": "如果实际需要打印接机凭证或条码，页面和后台逻辑需要对接打印机驱动，增加开发工作量。 (Late integration of printer drivers could delay launch and complicate UI)",
+        "reason": "维修行业通常需要给客户提供实体接机单，并在修好后打印结算小票。 (Normal repair shops require physical receipts/tags)",
+        "severity": "low",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "前期开发增加约 10% 的架构抽象工作，但未来升级时平滑且数据最安全。",
+            "label": "方案 A（推荐）：单机版使用 SQLite 并做架构抽象，未来通过在一台电脑上跑本地 Web 服务升级为 C/S 架构。"
+          },
+          {
+            "impact": "单机版安装包会变大，安装步骤变复杂（需要配置数据库服务），但随时可以加新电脑连入。",
+            "label": "方案 B：首期即采用 C/S 架构（如本地安装 PostgreSQL 数据库），单机部署时也运行数据库服务。"
+          },
+          {
+            "impact": "开发最简单，但多台电脑并发写入时极易导致数据库损坏，且网络不稳定时软件会卡顿。",
+            "label": "方案 C：仅通过局域网文件共享（如共享 SQLite 数据库文件），不进行架构升级。"
+          }
+        ],
+        "question": "关于未来『局域网共享』，您希望以哪种方式实现多台电脑协同？",
+        "reason": "SQLite 局限于单机运行，跨局域网直接共享文件极易损坏。了解您的预期有助于我们在前期设计中预留合适的接口抽象，避免未来推倒重来。",
+        "recommendation": "(Recommended) 方案 A：首期使用单机 SQLite，但代码架构上对数据访问层进行抽象，未来只需在局域网主电脑上运行一个轻量级 API 服务进程，其他客户端通过网络访问该服务。",
+        "recommendation_reason": "该方案开发成本低，单机版部署极简，未来升级时无需重写界面和业务逻辑，数据库安全性好。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "开发工作量小，有效防范硬件物理损坏，用户体验好。",
+            "label": "方案 A（推荐）：系统关闭时自动备份到本地其他分区或外接 U 盘，支持手动导出/导入备份文件。"
+          },
+          {
+            "impact": "开发成本为零，但极度依赖人的习惯，极易遗忘导致备份失效。",
+            "label": "方案 B：人工手动定期复制整个软件目录到其他介质，软件不提供备份功能。"
+          },
+          {
+            "impact": "数据最安全，即便整台电脑丢失也能找回，但需要微弱的网络接入支持。",
+            "label": "方案 C：如果电脑能偶尔连网，支持一键加密备份到指定的云端（如邮箱或网盘）。"
+          }
+        ],
+        "question": "系统完全离线运行，一旦电脑损坏数据将无法恢复。您希望采用什么样的数据备份方案？",
+        "reason": "本地单机系统的最大痛点是硬件故障导致的数据丢失。提供自动化的本地/半离线备份可以大幅降低风险。",
+        "recommendation": "(Recommended) 方案 A：软件在每日首次启动或关闭时，自动将数据库备份到另一个本地盘符或检测到的外接 U 盘中。",
+        "recommendation_reason": "不依赖网络，操作无感，能有效防范单块硬盘损坏的风险。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "增加登录界面与基础角色判断逻辑，安全性好，账目权责清晰。",
+            "label": "方案 A（推荐）：设计简易本地登录，区分店员（录入）与老板（管理与报表导出）权限。"
+          },
+          {
+            "impact": "省去每次登录的麻烦，老板需要看报表时输入密码即可，开发极极简。",
+            "label": "方案 B：不设登录，全员共享界面，但对『敏感报表』或『导出 Excel』功能设置独立的访问密码。"
+          },
+          {
+            "impact": "开发最快，但数据安全风险极高，适合店主亲自前台操作的夫妻店。",
+            "label": "方案 C：完全开放，不作任何权限限制，所有人均可查看所有数据和导出报表。"
+          }
+        ],
+        "question": "前台电脑由店员和老板共同使用，是否需要实现登录账号与权限隔离？",
+        "reason": "店员日常录入配件和维修单，老板需要看收入。如果不做限制，店员可以直接查看或修改敏感的财务报表和配件进价。",
+        "recommendation": "(Recommended) 方案 A：设立简单的本地用户登录系统，区分『店员』与『老板/管理员』角色。店员只能看日常业务，老板才能看营业报表和导出 Excel。",
+        "recommendation_reason": "保障财务数据安全和库存盘点的真实性，防止内部飞单或数据篡改。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "开发工作量适中，用户可以用现有设备打印，检索配件效率也足够高。",
+            "label": "方案 A（推荐）：仅支持打印 A4/A5 PDF 维修单（适用普通家用/办公打印机），配件靠拼音简码/拼音首字母检索。"
+          },
+          {
+            "impact": "开发最简单，完全无硬件依赖。",
+            "label": "方案 B：完全不需要物理打印和扫码，纯软件数字化操作，给顾客发短信或口头通知。"
+          },
+          {
+            "impact": "用户体验最好，录入极快，但开发时需处理硬件驱动兼容性，且增加了硬件购置成本。",
+            "label": "方案 C：需要深度集成热敏小票/标签打印机，以及支持配件条形码/二维码扫码枪录入。"
+          }
+        ],
+        "question": "维修单业务流程中，是否需要打印实体单据（如给顾客的接机凭证）或使用扫码枪？",
+        "reason": "许多维修店需要打印接机单让客户签字，修好后打印结算单；配件出入库也可能用到扫码枪。这决定了是否需要集成外设驱动和特定的页面版式。",
+        "recommendation": "(Recommended) 方案 A：支持导出/打印 A4 或 A5 规格的标准 PDF 格式维修单（使用普通激光打印机），暂不支持扫码枪。",
+        "recommendation_reason": "兼容性最好，不绑定特定硬件，满足基本单据留底需求，且不会引入复杂的硬件开发难题。"
+      }
+    ],
+    "risks": [
+      "单点故障与数据丢失风险：若前台电脑硬盘损坏或中病毒，由于是完全离线单机版，所有客户和维修历史将永久丢失 (Single point of failure: complete data loss on hardware crash)",
+      "共享升级时的技术债务：若前期直接通过局域网共享 SQLite file，极易在未来多机并发写入时造成数据库损坏和锁冲突 (SQLite corruption risk under multi-user LAN file sharing)",
+      "财务数据泄露：若无本地登录权限控制，店员可直接查看或篡改老板的收入报表以及配件成本 (Financial data manipulation/leak without local access control)",
+      "人工对账错误：若 Excel 导出模板没有严格定义，老板在多店或跨天手动对账时可能出现数据不一致 (Manual accounting errors due to loose Excel report schema)"
+    ],
+    "unknowns": [
+      "局域网共享的具体形态：未来是多台前台同时录入（需要并发控制），还是老板仅在后台电脑看数据？ (Specific LAN sharing requirements: multi-user write or read-only?)",
+      "打印与扫码需求：是否需要连接物理打印机打印接机单、小票，或使用扫码枪录入配件？ (Need for ticket/label printers or barcode scanners?)",
+      "配件盘点机制：是否需要支持库存预警、配件出入库明细记录以及损耗盘点？ (Inventory alert, detailed stock-in/out logging, or stocktaking?)",
+      "数据备份策略：在完全离线的情况下，如何保障数据库的安全与防丢失？ (Local backup strategy for offline environment?)"
+    ]
+  },
+  "calls": [
+    {
+      "task": "single-custom",
+      "variant": "B",
+      "case": "case-06",
+      "duration_ms": 32712,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "structured_success": true,
+      "success": true,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-winner-validation-1\\case-06__B__01__single-custom.json",
+      "output": {
+        "assumptions": [
+          "运行环境：目标 Windows 系统为 Windows 10 或 Windows 11，不兼容 XP/7 等老旧系统 (Target Windows 10/11)",
+          "数据规模：小型维修店日均维修单量小于 50 笔，库存配件小于 5000 种，本地数据库性能无压力 (Small data volume, under 50 orders/day, under 5000 parts)",
+          "并发访问：首期仅有一台电脑，不存在多用户并发读写数据库的冲突问题 (Single-user execution in Phase 1, no concurrency issues)",
+          "数据敏感性：店员无需查看进货价格或总收入，财务明细仅老板可接触 (Clerks don't need access to cost price or total revenue)"
+        ],
+        "candidates": [
+          "本地数据库：采用 SQLite 作为主数据库，单文件、零配置，非常适合单机离线应用 (SQLite for local offline storage)",
+          "开发框架：使用 C# WPF (.NET 8) 或 Electron/Tauri (React/Vue/HTML) 编写桌面客户端 (WPF or Electron/Tauri for Windows app)",
+          "架构设计：采用三层架构或 MVVM 模式，将数据访问层（Repository）抽象，方便未来升级局域网或云端 (Abstracted Data Access Layer for future scalability)",
+          "报表生成：使用 EPPlus 或 ClosedXML 库在本地快速生成标准的 Excel (.xlsx) 报表 (Local Excel generation library like EPPlus)"
+        ],
+        "confirmed": [
+          "目标平台为 Windows 桌面应用 (Windows Desktop Application)",
+          "支持完全离线运行，日常录入无需网络连接 (Fully offline operation support)",
+          "包含配件库存管理、客户管理、维修单管理三大核心模块 (Core modules: Inventory, Customers, Repair Orders)",
+          "老板需每日导出包含库存和收入数据的 Excel 报表 (Daily Excel export for inventory and revenue)",
+          "首期部署为前台单机版，但需预留局域网共享的设计空间 (Single PC initially, with extensibility for LAN sharing)"
+        ],
+        "conflicts": [
+          "『完全离线/单机版 SQLite』与『未来局域网共享』的冲突：SQLite 并不擅长处理跨网络文件的多客户端并发写入。如果未来需要多台电脑同时录入，必须将架构重构为 C/S 模式（如一台电脑跑 PostgreSQL/SQL Server，或跑一个本地 Web API 服务），这会增加前期的设计复杂度或后期的迁移成本。 ('Offline Single-User SQLite' vs 'Concurrent LAN Sharing' conflict)"
+        ],
+        "gaps": [
+          {
+            "area": "数据备份与防灾 (Data Backup & Disaster Recovery)",
+            "dependency": "None",
+            "impact": "一旦电脑故障，维修店可能丢失所有客户资料、未结维修单及历史账目，业务瞬间停摆。 (Complete operational stop and financial loss if PC breaks)",
+            "reason": "用户想法中未提及任何数据备份机制。 (No backup mechanism mentioned in original idea)",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "权限与数据安全 (Permissions & Data Security)",
+            "dependency": "None",
+            "impact": "店员可以随意查看、修改老板的营业收入、配件进货价和利润，甚至篡改订单金额。 (Potential internal fraud and exposure of business secrets)",
+            "reason": "店员与老板共享同一台电脑操作，没有提及账户隔离与权限限制。 (Single shared computer with no user/role isolation mentioned)",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "单据流转与物理打印 (Receipt Printing & Barcode Scanning)",
+            "dependency": "None",
+            "impact": "如果实际需要打印接机凭证或条码，页面和后台逻辑需要对接打印机驱动，增加开发工作量。 (Late integration of printer drivers could delay launch and complicate UI)",
+            "reason": "维修行业通常需要给客户提供实体接机单，并在修好后打印结算小票。 (Normal repair shops require physical receipts/tags)",
+            "severity": "low",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "前期开发增加约 10% 的架构抽象工作，但未来升级时平滑且数据最安全。",
+                "label": "方案 A（推荐）：单机版使用 SQLite 并做架构抽象，未来通过在一台电脑上跑本地 Web 服务升级为 C/S 架构。"
+              },
+              {
+                "impact": "单机版安装包会变大，安装步骤变复杂（需要配置数据库服务），但随时可以加新电脑连入。",
+                "label": "方案 B：首期即采用 C/S 架构（如本地安装 PostgreSQL 数据库），单机部署时也运行数据库服务。"
+              },
+              {
+                "impact": "开发最简单，但多台电脑并发写入时极易导致数据库损坏，且网络不稳定时软件会卡顿。",
+                "label": "方案 C：仅通过局域网文件共享（如共享 SQLite 数据库文件），不进行架构升级。"
+              }
+            ],
+            "question": "关于未来『局域网共享』，您希望以哪种方式实现多台电脑协同？",
+            "reason": "SQLite 局限于单机运行，跨局域网直接共享文件极易损坏。了解您的预期有助于我们在前期设计中预留合适的接口抽象，避免未来推倒重来。",
+            "recommendation": "(Recommended) 方案 A：首期使用单机 SQLite，但代码架构上对数据访问层进行抽象，未来只需在局域网主电脑上运行一个轻量级 API 服务进程，其他客户端通过网络访问该服务。",
+            "recommendation_reason": "该方案开发成本低，单机版部署极简，未来升级时无需重写界面和业务逻辑，数据库安全性好。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "开发工作量小，有效防范硬件物理损坏，用户体验好。",
+                "label": "方案 A（推荐）：系统关闭时自动备份到本地其他分区或外接 U 盘，支持手动导出/导入备份文件。"
+              },
+              {
+                "impact": "开发成本为零，但极度依赖人的习惯，极易遗忘导致备份失效。",
+                "label": "方案 B：人工手动定期复制整个软件目录到其他介质，软件不提供备份功能。"
+              },
+              {
+                "impact": "数据最安全，即便整台电脑丢失也能找回，但需要微弱的网络接入支持。",
+                "label": "方案 C：如果电脑能偶尔连网，支持一键加密备份到指定的云端（如邮箱或网盘）。"
+              }
+            ],
+            "question": "系统完全离线运行，一旦电脑损坏数据将无法恢复。您希望采用什么样的数据备份方案？",
+            "reason": "本地单机系统的最大痛点是硬件故障导致的数据丢失。提供自动化的本地/半离线备份可以大幅降低风险。",
+            "recommendation": "(Recommended) 方案 A：软件在每日首次启动或关闭时，自动将数据库备份到另一个本地盘符或检测到的外接 U 盘中。",
+            "recommendation_reason": "不依赖网络，操作无感，能有效防范单块硬盘损坏的风险。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "增加登录界面与基础角色判断逻辑，安全性好，账目权责清晰。",
+                "label": "方案 A（推荐）：设计简易本地登录，区分店员（录入）与老板（管理与报表导出）权限。"
+              },
+              {
+                "impact": "省去每次登录的麻烦，老板需要看报表时输入密码即可，开发极极简。",
+                "label": "方案 B：不设登录，全员共享界面，但对『敏感报表』或『导出 Excel』功能设置独立的访问密码。"
+              },
+              {
+                "impact": "开发最快，但数据安全风险极高，适合店主亲自前台操作的夫妻店。",
+                "label": "方案 C：完全开放，不作任何权限限制，所有人均可查看所有数据和导出报表。"
+              }
+            ],
+            "question": "前台电脑由店员和老板共同使用，是否需要实现登录账号与权限隔离？",
+            "reason": "店员日常录入配件和维修单，老板需要看收入。如果不做限制，店员可以直接查看或修改敏感的财务报表和配件进价。",
+            "recommendation": "(Recommended) 方案 A：设立简单的本地用户登录系统，区分『店员』与『老板/管理员』角色。店员只能看日常业务，老板才能看营业报表和导出 Excel。",
+            "recommendation_reason": "保障财务数据安全和库存盘点的真实性，防止内部飞单或数据篡改。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "开发工作量适中，用户可以用现有设备打印，检索配件效率也足够高。",
+                "label": "方案 A（推荐）：仅支持打印 A4/A5 PDF 维修单（适用普通家用/办公打印机），配件靠拼音简码/拼音首字母检索。"
+              },
+              {
+                "impact": "开发最简单，完全无硬件依赖。",
+                "label": "方案 B：完全不需要物理打印和扫码，纯软件数字化操作，给顾客发短信或口头通知。"
+              },
+              {
+                "impact": "用户体验最好，录入极快，但开发时需处理硬件驱动兼容性，且增加了硬件购置成本。",
+                "label": "方案 C：需要深度集成热敏小票/标签打印机，以及支持配件条形码/二维码扫码枪录入。"
+              }
+            ],
+            "question": "维修单业务流程中，是否需要打印实体单据（如给顾客的接机凭证）或使用扫码枪？",
+            "reason": "许多维修店需要打印接机单让客户签字，修好后打印结算单；配件出入库也可能用到扫码枪。这决定了是否需要集成外设驱动和特定的页面版式。",
+            "recommendation": "(Recommended) 方案 A：支持导出/打印 A4 或 A5 规格的标准 PDF 格式维修单（使用普通激光打印机），暂不支持扫码枪。",
+            "recommendation_reason": "兼容性最好，不绑定特定硬件，满足基本单据留底需求，且不会引入复杂的硬件开发难题。"
+          }
+        ],
+        "risks": [
+          "单点故障与数据丢失风险：若前台电脑硬盘损坏或中病毒，由于是完全离线单机版，所有客户和维修历史将永久丢失 (Single point of failure: complete data loss on hardware crash)",
+          "共享升级时的技术债务：若前期直接通过局域网共享 SQLite file，极易在未来多机并发写入时造成数据库损坏和锁冲突 (SQLite corruption risk under multi-user LAN file sharing)",
+          "财务数据泄露：若无本地登录权限控制，店员可直接查看或篡改老板的收入报表以及配件成本 (Financial data manipulation/leak without local access control)",
+          "人工对账错误：若 Excel 导出模板没有严格定义，老板在多店或跨天手动对账时可能出现数据不一致 (Manual accounting errors due to loose Excel report schema)"
+        ],
+        "unknowns": [
+          "局域网共享的具体形态：未来是多台前台同时录入（需要并发控制），还是老板仅在后台电脑看数据？ (Specific LAN sharing requirements: multi-user write or read-only?)",
+          "打印与扫码需求：是否需要连接物理打印机打印接机单、小票，或使用扫码枪录入配件？ (Need for ticket/label printers or barcode scanners?)",
+          "配件盘点机制：是否需要支持库存预警、配件出入库明细记录以及损耗盘点？ (Inventory alert, detailed stock-in/out logging, or stocktaking?)",
+          "数据备份策略：在完全离线的情况下，如何保障数据库的安全与防丢失？ (Local backup strategy for offline environment?)"
+        ]
+      },
+      "prompt_chars": 1085,
+      "user_input_chars": 85,
+      "input_tokens": 19876,
+      "output_tokens": 13675,
+      "thinking_tokens": 11012,
+      "total_tokens": 33551,
+      "cache_read_tokens": 0,
+      "raw_usage": {
+        "input_tokens": 19876,
+        "output_tokens": 13675,
+        "thinking_tokens": 11012,
+        "cache_read_tokens": 0,
+        "total_tokens": 33551
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 1,
+    "duration_ms": 32712,
+    "input_tokens": 19876,
+    "output_tokens": 13675,
+    "thinking_tokens": 11012,
+    "total_tokens": 33551,
+    "cache_read_tokens": 0,
+    "prompt_chars": 1085,
+    "user_input_chars": 85
+  },
+  "timestamp": "2026-08-22T06:44:38.641Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 5,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5,
+      "assumption_over_specification": 1,
+      "conflict_precision": 5
+    },
+    "heuristicQuality": 4.5,
+    "matchedSignals": 3,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals",
+      "assumption_over_specification": "heuristic/manual-review-needed",
+      "conflict_precision": "heuristic/manual-review-needed"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+# {{PROJECT_NAME}} — Coding Agent Guidelines
+
+> **Target Audience**: AI Coding Agents (e.g. Antigravity, Claude Code, Cursor) and Human Developers implementing this software.  
+> **Source of Truth**: Compiled from Project Architect Specification (Source Revision: {{SOURCE_REVISION}}).  
+> **Generated At**: {{GENERATED_AT}}
+
+---
+
+## 1. Project Identity & Mission
+
+- **Project Name**: {{PROJECT_NAME}}
+- **Vision**: {{PROJECT_VISION}}
+- **Target User**: {{TARGET_USER}}
+- **Platform / Technical Boundary**: {{TECHNICAL_BOUNDARY}}
+
+---
+
+## 2. Immutable Architecture & Locked Bounds (Strictly Protected)
+
+The following decisions have been **LOCKED** by the user. Coding agents must NOT modify, weaken, or deviate from these bounds without explicit user instruction:
+
+{{LOCKED_DECISIONS_LIST}}
+
+---
+
+## 3. Explicit Active Assumptions (Bounded Defaults)
+
+The following defaults are actively assumed for implementation. If you discover a reason to change them, notify the user before proceeding:
+
+{{ACTIVE_ASSUMPTIONS_LIST}}
+
+---
+
+## 4. Coding Agent Implementation Rules
+
+1. **Capability Before Mechanism**: Focus on fulfilling confirmed functional capabilities before introducing complex extra dependencies.
+2. **Local Data First**: Preserve user data ownership and file-based state integrity.
+3. **No Phantom Scope**: Strictly stick to the MVP Scope defined in `docs/PRODUCT.md`. Do NOT add unapproved features.
+4. **Verification Requirement**: All newly added code must be verified with automated unit or integration tests.

@@ -1,0 +1,3887 @@
+{
+  "benchmark": "Project Architect Agent Benchmark v1 B vs B2 Targeted Regression",
+  "run_id": "b-vs-b2-targeted-1",
+  "cases_requested": [
+    "case-01",
+    "case-03",
+    "case-05",
+    "case-06",
+    "case-08",
+    "case-09"
+  ],
+  "cases_completed": [
+    "case-01",
+    "case-03",
+    "case-05",
+    "case-06",
+    "case-08",
+    "case-09"
+  ],
+  "stopped_early": false,
+  "stop_reason": null,
+  "guardrail": {
+    "max_input_tokens": 60000,
+    "max_total_tokens": 75000,
+    "max_duration_ms": 90000
+  },
+  "records": [
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "默认运行在 Windows 操作系统上 (基于用户当前 OS 为 Windows)",
+          "作为本地独立运行的桌面软件，无需云端服务器或用户账户系统",
+          "界面设计以简洁易用为主，主要面向普通 PC 用户",
+          "清理的目录将从绝对安全的临时文件目录（如 %TEMP%）开始，逐步扩展"
+        ],
+        "candidates": [
+          "目标操作系统：Windows (首选)、macOS 或跨平台",
+          "开发技术栈：Python (Tkinter/PyQt)、C# (.NET/WPF)、Rust (Tauri + Frontend) 或 Electron",
+          "界面类型：GUI (图形用户界面) 或 CLI (命令行界面)",
+          "清理范围：仅系统临时文件、浏览器缓存，或者包含大文件分析、重复文件清理、应用卸载"
+        ],
+        "confirmed": [
+          "用户希望开发一款电脑空间清理软件。"
+        ],
+        "conflicts": [
+          "安全删除 vs 彻底清理：越是深度的清理（如清理系统补丁备份、临时注册表），越容易引发系统不稳定性。",
+          "全盘深度扫描 vs 界面响应速度：进行全盘文件扫描以寻找大文件或重复文件时，会占用大量 I/O 资源，可能导致 UI 界面失去响应。"
+        ],
+        "gaps": [
+          {
+            "area": "Safety & Data Protection",
+            "dependency": "需要明确安全白名单机制、回收站暂存机制或扫描预览确认流程。",
+            "impact": "可能导致用户数据丢失，或者系统无法启动，造成严重的信任危机。",
+            "reason": "清理工具的核心操作是删除文件。如果清理逻辑存在漏洞（如路径解析错误或通配符范围过大），可能会误删用户数据或系统文件。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "Target OS & Technology Stack",
+            "dependency": "需要用户确认目标系统及偏好的开发语言。",
+            "impact": "直接影响项目的底层系统 API 调用（如 Windows 的 Registry/Disk cleanup API）以及后续的代码编写。",
+            "reason": "尚未明确目标操作系统（Windows/macOS）以及对应的界面技术开发栈。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "MVP Feature Scope",
+            "dependency": "需要定义第一阶段的核心功能范围。",
+            "impact": "延长开发周期，增加首个版本的 bug 率和复杂度。",
+            "reason": "清理空间可以包含很多功能（垃圾清理、大文件分析、重复文件、软件卸载、启动项管理等），如果一次性开发全部功能，MVP 范围过大。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "使用 Windows 专有 API 和路径（如 Temp, Prefetch），可用 C# WPF/WinForms 或 Python + CustomTkinter 快速开发。",
+                "label": "Windows (仅针对 Windows 系统优化)"
+              },
+              {
+                "impact": "需要使用 Tauri (Rust) 或 Electron (JS) 等跨平台技术，且清理逻辑需要分操作系统适配，开发工作量增加。",
+                "label": "跨平台 (支持 Windows 和 macOS)"
+              }
+            ],
+            "question": "软件的目标运行系统是什么？",
+            "reason": "操作系统决定了底层清理 API 的调用方式和系统目录结构。",
+            "recommendation": "(Recommended) Windows 操作系统",
+            "recommendation_reason": "基于您目前使用的是 Windows 系统，针对 Windows 系统的清理需求最为普遍，且便于您在本地直接进行测试和体验。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "开发周期适中，核心清理效果显著，且大文件手动确认能规避绝大部分误删风险。",
+                "label": "一键清理系统垃圾 + 大文件/微信缓存扫描预览"
+              },
+              {
+                "impact": "开发最快（几天内即可完成），但清理效果受限，无法清理用户个人大文件。",
+                "label": "极简版：仅一键清理绝对安全的临时目录 (无预览)"
+              },
+              {
+                "impact": "功能丰富，但开发周期长，不建议作为 MVP 的第一步。",
+                "label": "全功能版：垃圾清理 + 重复文件分析 + 软件卸载管理"
+              }
+            ],
+            "question": "核心功能范围（MVP）如何规划？",
+            "reason": "明确首个版本要解决的最核心痛点，避免项目范围无限膨胀。",
+            "recommendation": "(Recommended) 核心垃圾清理 + 大文件扫描预览",
+            "recommendation_reason": "先实现安全的系统/浏览器缓存一键清理，辅以大文件扫描（由用户手动确认删除），能最快交付且满足 80% 的清理需求。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "开发速度极快，生态丰富，打包后稍大，但非常适合快速原型开发。",
+                "label": "Python (CustomTkinter / PyQt)"
+              },
+              {
+                "impact": "Windows 原生体验最佳，性能高，软件体积小，但只适用于 Windows 系统。",
+                "label": "C# (.NET / WPF)"
+              },
+              {
+                "impact": "界面美观，性能极佳，软件体积非常小，适合有 Web 前端基础的开发者。",
+                "label": "Tauri (Rust + HTML/JS)"
+              }
+            ],
+            "question": "您偏好的开发语言或技术栈是什么？",
+            "reason": "为了保证后续开发代理能够准确编写出符合您期望和背景的代码。",
+            "recommendation": "(Recommended) Python (使用 PyInstaller 打包成单文件 exe)",
+            "recommendation_reason": "Python 拥有强大的文件系统操作库，且使用 CustomTkinter 或 PyQt 可以快速做出好看的 GUI，适合快速验证想法。"
+          }
+        ],
+        "risks": [
+          "误删系统关键文件或用户个人重要数据，导致系统崩溃或数据丢失",
+          "杀毒软件 (Windows Defender 等) 误报/拦截，因为清理软件需要频繁读写和删除系统敏感目录的文件",
+          "权限不足：部分垃圾文件（如 Windows Update 缓存）需要管理员权限才能删除，可能导致清理失败或频繁弹出 UAC 提示",
+          "扫描大文件或全盘扫描时导致 CPU/磁盘占满，造成电脑卡顿"
+        ],
+        "unknowns": [
+          "用户具体的清理需求：是只想清理临时文件，还是需要查找大文件/重复文件等高级功能？",
+          "用户对技术栈或编程语言的偏好（例如，希望用 Python、C# 还是 JavaScript 开发）？",
+          "软件的使用场景：是个人日常自用，还是打算公开发布/商业化？"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B",
+          "case": "case-01",
+          "duration_ms": 23599,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-01__B__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "默认运行在 Windows 操作系统上 (基于用户当前 OS 为 Windows)",
+              "作为本地独立运行的桌面软件，无需云端服务器或用户账户系统",
+              "界面设计以简洁易用为主，主要面向普通 PC 用户",
+              "清理的目录将从绝对安全的临时文件目录（如 %TEMP%）开始，逐步扩展"
+            ],
+            "candidates": [
+              "目标操作系统：Windows (首选)、macOS 或跨平台",
+              "开发技术栈：Python (Tkinter/PyQt)、C# (.NET/WPF)、Rust (Tauri + Frontend) 或 Electron",
+              "界面类型：GUI (图形用户界面) 或 CLI (命令行界面)",
+              "清理范围：仅系统临时文件、浏览器缓存，或者包含大文件分析、重复文件清理、应用卸载"
+            ],
+            "confirmed": [
+              "用户希望开发一款电脑空间清理软件。"
+            ],
+            "conflicts": [
+              "安全删除 vs 彻底清理：越是深度的清理（如清理系统补丁备份、临时注册表），越容易引发系统不稳定性。",
+              "全盘深度扫描 vs 界面响应速度：进行全盘文件扫描以寻找大文件或重复文件时，会占用大量 I/O 资源，可能导致 UI 界面失去响应。"
+            ],
+            "gaps": [
+              {
+                "area": "Safety & Data Protection",
+                "dependency": "需要明确安全白名单机制、回收站暂存机制或扫描预览确认流程。",
+                "impact": "可能导致用户数据丢失，或者系统无法启动，造成严重的信任危机。",
+                "reason": "清理工具的核心操作是删除文件。如果清理逻辑存在漏洞（如路径解析错误或通配符范围过大），可能会误删用户数据或系统文件。",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "Target OS & Technology Stack",
+                "dependency": "需要用户确认目标系统及偏好的开发语言。",
+                "impact": "直接影响项目的底层系统 API 调用（如 Windows 的 Registry/Disk cleanup API）以及后续的代码编写。",
+                "reason": "尚未明确目标操作系统（Windows/macOS）以及对应的界面技术开发栈。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "MVP Feature Scope",
+                "dependency": "需要定义第一阶段的核心功能范围。",
+                "impact": "延长开发周期，增加首个版本的 bug 率和复杂度。",
+                "reason": "清理空间可以包含很多功能（垃圾清理、大文件分析、重复文件、软件卸载、启动项管理等），如果一次性开发全部功能，MVP 范围过大。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "使用 Windows 专有 API 和路径（如 Temp, Prefetch），可用 C# WPF/WinForms 或 Python + CustomTkinter 快速开发。",
+                    "label": "Windows (仅针对 Windows 系统优化)"
+                  },
+                  {
+                    "impact": "需要使用 Tauri (Rust) 或 Electron (JS) 等跨平台技术，且清理逻辑需要分操作系统适配，开发工作量增加。",
+                    "label": "跨平台 (支持 Windows 和 macOS)"
+                  }
+                ],
+                "question": "软件的目标运行系统是什么？",
+                "reason": "操作系统决定了底层清理 API 的调用方式和系统目录结构。",
+                "recommendation": "(Recommended) Windows 操作系统",
+                "recommendation_reason": "基于您目前使用的是 Windows 系统，针对 Windows 系统的清理需求最为普遍，且便于您在本地直接进行测试和体验。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "开发周期适中，核心清理效果显著，且大文件手动确认能规避绝大部分误删风险。",
+                    "label": "一键清理系统垃圾 + 大文件/微信缓存扫描预览"
+                  },
+                  {
+                    "impact": "开发最快（几天内即可完成），但清理效果受限，无法清理用户个人大文件。",
+                    "label": "极简版：仅一键清理绝对安全的临时目录 (无预览)"
+                  },
+                  {
+                    "impact": "功能丰富，但开发周期长，不建议作为 MVP 的第一步。",
+                    "label": "全功能版：垃圾清理 + 重复文件分析 + 软件卸载管理"
+                  }
+                ],
+                "question": "核心功能范围（MVP）如何规划？",
+                "reason": "明确首个版本要解决的最核心痛点，避免项目范围无限膨胀。",
+                "recommendation": "(Recommended) 核心垃圾清理 + 大文件扫描预览",
+                "recommendation_reason": "先实现安全的系统/浏览器缓存一键清理，辅以大文件扫描（由用户手动确认删除），能最快交付且满足 80% 的清理需求。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "开发速度极快，生态丰富，打包后稍大，但非常适合快速原型开发。",
+                    "label": "Python (CustomTkinter / PyQt)"
+                  },
+                  {
+                    "impact": "Windows 原生体验最佳，性能高，软件体积小，但只适用于 Windows 系统。",
+                    "label": "C# (.NET / WPF)"
+                  },
+                  {
+                    "impact": "界面美观，性能极佳，软件体积非常小，适合有 Web 前端基础的开发者。",
+                    "label": "Tauri (Rust + HTML/JS)"
+                  }
+                ],
+                "question": "您偏好的开发语言或技术栈是什么？",
+                "reason": "为了保证后续开发代理能够准确编写出符合您期望和背景的代码。",
+                "recommendation": "(Recommended) Python (使用 PyInstaller 打包成单文件 exe)",
+                "recommendation_reason": "Python 拥有强大的文件系统操作库，且使用 CustomTkinter 或 PyQt 可以快速做出好看的 GUI，适合快速验证想法。"
+              }
+            ],
+            "risks": [
+              "误删系统关键文件或用户个人重要数据，导致系统崩溃或数据丢失",
+              "杀毒软件 (Windows Defender 等) 误报/拦截，因为清理软件需要频繁读写和删除系统敏感目录的文件",
+              "权限不足：部分垃圾文件（如 Windows Update 缓存）需要管理员权限才能删除，可能导致清理失败或频繁弹出 UAC 提示",
+              "扫描大文件或全盘扫描时导致 CPU/磁盘占满，造成电脑卡顿"
+            ],
+            "unknowns": [
+              "用户具体的清理需求：是只想清理临时文件，还是需要查找大文件/重复文件等高级功能？",
+              "用户对技术栈或编程语言的偏好（例如，希望用 Python、C# 还是 JavaScript 开发）？",
+              "软件的使用场景：是个人日常自用，还是打算公开发布/商业化？"
+            ]
+          },
+          "prompt_chars": 1015,
+          "context_chars": 26,
+          "user_input_chars": 15,
+          "input_tokens": 19833,
+          "output_tokens": 5810,
+          "thinking_tokens": 4350,
+          "total_tokens": 25643,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 19833,
+            "output_tokens": 5810,
+            "thinking_tokens": 4350,
+            "cache_read_tokens": 0,
+            "total_tokens": 25643
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 23599,
+        "input_tokens": 19833,
+        "output_tokens": 5810,
+        "thinking_tokens": 4350,
+        "total_tokens": 25643,
+        "cache_read_tokens": 0,
+        "prompt_chars": 1015,
+        "context_chars": 26,
+        "user_input_chars": 15
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "Tauri",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Electron",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Python",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:01:39.495Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.9,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B2",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "假设该软件主要作为桌面端应用程序运行在个人电脑操作系统上（而非移动端或云端）。",
+          "假设该软件的功能以清理本地存储空间（如临时文件、缓存、日志等）为主，暂不涉及复杂的磁盘碎片整理或底层硬件调优。"
+        ],
+        "candidates": [
+          "提供直观的存储空间占用可视化图表，帮助用户直观了解各类文件占用比例。",
+          "设计极简的“一键扫描与清理”核心流程，降低非技术用户的上手门槛。",
+          "扫描与清理逻辑完全在本地运行，不上传任何用户文件，以确保用户隐私与数据安全。"
+        ],
+        "confirmed": [
+          "用户希望开发一款用于清理电脑存储空间的软件。"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "操作系统平台定位",
+            "dependency": "无",
+            "impact": "不同操作系统的文件系统结构、权限管理和清理API差异极大，如果不明确平台，将无法设计具体的扫描规则与技术方案。",
+            "reason": "尚未明确该清理软件首发版本将运行在哪个操作系统（如Windows、macOS或Linux）上。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "数据清理边界与安全机制",
+            "dependency": "无",
+            "impact": "直接删除文件存在不可逆的数据丢失风险，如果不明确安全边界，无法设计扫描结果的分类展示以及默认勾选逻辑。",
+            "reason": "尚未明确哪些文件属于可以自动清理的“垃圾”，哪些属于必须由用户确认的敏感数据。",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "聚焦于清理系统临时目录、浏览器缓存和回收站，界面设计以一键扫描和一键清理为主，最大程度降低开发成本和用户上手门槛。",
+                "label": "优先支持 Windows 系统，面向普通用户（一键清理，注重简单与安全）"
+              },
+              {
+                "impact": "需要设计复杂的扫描结果列表、过滤和多选界面，允许用户逐项确认，开发重点在于规则引擎的灵活性与深度。",
+                "label": "优先支持 Windows 系统，面向专业/极客用户（提供详细文件过滤和自定义规则）"
+              },
+              {
+                "impact": "针对 macOS 的沙盒机制和文件结构进行设计，界面设计需遵循 macOS 原生设计规范。",
+                "label": "优先支持 macOS 系统，面向普通用户"
+              }
+            ],
+            "question": "该清理软件首发版本（MVP）主要针对哪个操作系统平台，以及您设定的目标用户群体是谁？",
+            "reason": "操作系统的选择决定了我们需要针对哪个系统的文件架构进行适配，而用户群体决定了界面的简易程度与交互深度。",
+            "recommendation": "(Recommended) 优先针对 Windows 系统，面向普通用户提供极简的一键清理功能。",
+            "recommendation_reason": "Windows 系统的用户基数庞大且极易产生垃圾文件，普通用户对一键清理的需求最迫切。这样可以快速验证产品核心价值，降低初期开发复杂度。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "系统只自动勾选临时缓存和日志，把下载文件夹和回收站等区域列为“建议手动检查”项目，最大化保证安全。",
+                "label": "保守策略：默认仅勾选绝对安全的系统垃圾，敏感区域需用户手动确认"
+              },
+              {
+                "impact": "通过大字警告和二次弹窗让用户知晓风险，默认勾选更多分类以展示明显的空间释放效果。",
+                "label": "效果优先：默认勾选更多清理项，但通过明显的警告和二次确认提示用户"
+              }
+            ],
+            "question": "在执行清理操作时，您希望如何平衡「清理效果（释放更多空间）」与「数据安全（防止误删用户重要文件）」？",
+            "reason": "清理软件最核心的风险是误删用户需要的文件（例如下载文件夹中的文档或浏览器的登录凭证）。定义清楚安全边界有助于设计合理的默认清理勾选逻辑。",
+            "recommendation": "(Recommended) 采用保守的安全策略，默认只勾选绝对安全的临时缓存文件，敏感区域仅扫描提示而不默认勾选。",
+            "recommendation_reason": "安全是清理类软件的生命线。任何一次误删对用户而言都是灾难性的，保守策略能最大限度降低误删风险，建立用户信任。"
+          }
+        ],
+        "risks": [
+          "误删系统核心文件或用户重要数据，导致系统不稳定、软件崩溃或用户数据丢失。",
+          "本地扫描与删除行为可能被第三方杀毒软件或系统防火墙拦截、误报，从而损害产品信任度。"
+        ],
+        "tensions": [
+          {
+            "description": "极致的一键清理体验与复杂的文件确认流程之间的矛盾。",
+            "reason": "普通用户希望操作越简单越好（最好一键完成），但为了避免误删，必须让用户确认某些敏感文件，这会增加操作步骤和认知负荷。"
+          },
+          {
+            "description": "深度清理（释放更多空间）与系统稳定性（避免损坏系统）之间的矛盾。",
+            "reason": "清理越彻底，越容易触及一些系统或应用的缓存/日志，这些文件虽然占用空间，但在特定情况下仍被系统需要，删除可能导致短暂的卡顿或配置丢失。"
+          }
+        ],
+        "unknowns": [
+          "具体的垃圾文件扫描规则与判定标准（哪些文件可以被定义为垃圾并安全删除）。",
+          "是否有特定的增值功能规划（例如大文件查找、重复文件检测、软件卸载残留清理等）。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2",
+          "case": "case-01",
+          "duration_ms": 27933,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-01__B2__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "假设该软件主要作为桌面端应用程序运行在个人电脑操作系统上（而非移动端或云端）。",
+              "假设该软件的功能以清理本地存储空间（如临时文件、缓存、日志等）为主，暂不涉及复杂的磁盘碎片整理或底层硬件调优。"
+            ],
+            "candidates": [
+              "提供直观的存储空间占用可视化图表，帮助用户直观了解各类文件占用比例。",
+              "设计极简的“一键扫描与清理”核心流程，降低非技术用户的上手门槛。",
+              "扫描与清理逻辑完全在本地运行，不上传任何用户文件，以确保用户隐私与数据安全。"
+            ],
+            "confirmed": [
+              "用户希望开发一款用于清理电脑存储空间的软件。"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "操作系统平台定位",
+                "dependency": "无",
+                "impact": "不同操作系统的文件系统结构、权限管理和清理API差异极大，如果不明确平台，将无法设计具体的扫描规则与技术方案。",
+                "reason": "尚未明确该清理软件首发版本将运行在哪个操作系统（如Windows、macOS或Linux）上。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "数据清理边界与安全机制",
+                "dependency": "无",
+                "impact": "直接删除文件存在不可逆的数据丢失风险，如果不明确安全边界，无法设计扫描结果的分类展示以及默认勾选逻辑。",
+                "reason": "尚未明确哪些文件属于可以自动清理的“垃圾”，哪些属于必须由用户确认的敏感数据。",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "聚焦于清理系统临时目录、浏览器缓存和回收站，界面设计以一键扫描和一键清理为主，最大程度降低开发成本和用户上手门槛。",
+                    "label": "优先支持 Windows 系统，面向普通用户（一键清理，注重简单与安全）"
+                  },
+                  {
+                    "impact": "需要设计复杂的扫描结果列表、过滤和多选界面，允许用户逐项确认，开发重点在于规则引擎的灵活性与深度。",
+                    "label": "优先支持 Windows 系统，面向专业/极客用户（提供详细文件过滤和自定义规则）"
+                  },
+                  {
+                    "impact": "针对 macOS 的沙盒机制和文件结构进行设计，界面设计需遵循 macOS 原生设计规范。",
+                    "label": "优先支持 macOS 系统，面向普通用户"
+                  }
+                ],
+                "question": "该清理软件首发版本（MVP）主要针对哪个操作系统平台，以及您设定的目标用户群体是谁？",
+                "reason": "操作系统的选择决定了我们需要针对哪个系统的文件架构进行适配，而用户群体决定了界面的简易程度与交互深度。",
+                "recommendation": "(Recommended) 优先针对 Windows 系统，面向普通用户提供极简的一键清理功能。",
+                "recommendation_reason": "Windows 系统的用户基数庞大且极易产生垃圾文件，普通用户对一键清理的需求最迫切。这样可以快速验证产品核心价值，降低初期开发复杂度。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "系统只自动勾选临时缓存和日志，把下载文件夹和回收站等区域列为“建议手动检查”项目，最大化保证安全。",
+                    "label": "保守策略：默认仅勾选绝对安全的系统垃圾，敏感区域需用户手动确认"
+                  },
+                  {
+                    "impact": "通过大字警告和二次弹窗让用户知晓风险，默认勾选更多分类以展示明显的空间释放效果。",
+                    "label": "效果优先：默认勾选更多清理项，但通过明显的警告和二次确认提示用户"
+                  }
+                ],
+                "question": "在执行清理操作时，您希望如何平衡「清理效果（释放更多空间）」与「数据安全（防止误删用户重要文件）」？",
+                "reason": "清理软件最核心的风险是误删用户需要的文件（例如下载文件夹中的文档或浏览器的登录凭证）。定义清楚安全边界有助于设计合理的默认清理勾选逻辑。",
+                "recommendation": "(Recommended) 采用保守的安全策略，默认只勾选绝对安全的临时缓存文件，敏感区域仅扫描提示而不默认勾选。",
+                "recommendation_reason": "安全是清理类软件的生命线。任何一次误删对用户而言都是灾难性的，保守策略能最大限度降低误删风险，建立用户信任。"
+              }
+            ],
+            "risks": [
+              "误删系统核心文件或用户重要数据，导致系统不稳定、软件崩溃或用户数据丢失。",
+              "本地扫描与删除行为可能被第三方杀毒软件或系统防火墙拦截、误报，从而损害产品信任度。"
+            ],
+            "tensions": [
+              {
+                "description": "极致的一键清理体验与复杂的文件确认流程之间的矛盾。",
+                "reason": "普通用户希望操作越简单越好（最好一键完成），但为了避免误删，必须让用户确认某些敏感文件，这会增加操作步骤和认知负荷。"
+              },
+              {
+                "description": "深度清理（释放更多空间）与系统稳定性（避免损坏系统）之间的矛盾。",
+                "reason": "清理越彻底，越容易触及一些系统或应用的缓存/日志，这些文件虽然占用空间，但在特定情况下仍被系统需要，删除可能导致短暂的卡顿或配置丢失。"
+              }
+            ],
+            "unknowns": [
+              "具体的垃圾文件扫描规则与判定标准（哪些文件可以被定义为垃圾并安全删除）。",
+              "是否有特定的增值功能规划（例如大文件查找、重复文件检测、软件卸载残留清理等）。"
+            ]
+          },
+          "prompt_chars": 3751,
+          "context_chars": 26,
+          "user_input_chars": 15,
+          "input_tokens": 20456,
+          "output_tokens": 8630,
+          "thinking_tokens": 7403,
+          "total_tokens": 29086,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20456,
+            "output_tokens": 8630,
+            "thinking_tokens": 7403,
+            "cache_read_tokens": 0,
+            "total_tokens": 29086
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 27933,
+        "input_tokens": 20456,
+        "output_tokens": 8630,
+        "thinking_tokens": 7403,
+        "total_tokens": 29086,
+        "cache_read_tokens": 0,
+        "prompt_chars": 3751,
+        "context_chars": 26,
+        "user_input_chars": 15
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T08:02:07.430Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 4,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.7,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "系统内置了考研公共课（政治、英语、数学）的标准复习大纲，以此作为按周计划生成的基础。",
+          "用户的“当前基础”可以通过简单的主观分级（如：零基础、有一定基础、已复习过一轮）进行多级单选，系统据此映射不同的时间分配比例。",
+          "20名试用用户的招募与连续两周完成率的数据收集不依赖复杂的后台管理，可直接通过云端数据库查询进行统计。",
+          "用户注册时间距离考试日期有足够的周期（例如至少 1-2 个月以上），以允许系统生成合理的复习节奏。"
+        ],
+        "candidates": [
+          "基于拖拽（Drag & Drop）或一键微调按钮的快捷任务重排与日期变更交互。",
+          "任务详情页中提供子任务（Sub-task）清单，支持灵活的标题拆分与子任务独立管理。",
+          "以进度环、燃尽图或甘特图形式展现周任务与总计划的推进状态，帮助用户建立可视化的备考掌控感。",
+          "每日傍晚自动向注册邮箱发送“今日/明日任务摘要”，并附带极简的免登录打卡链接。"
+        ],
+        "confirmed": [
+          "目标用户：准备研究生入学考试的中国大学生。",
+          "首版范围：仅支持中文，仅适配桌面端浏览器。",
+          "首次进入流程：用户输入考试日期、报考科目、每周可学习时长、当前基础。",
+          "核心功能：系统按周生成可手动调整的复习计划。",
+          "主页展示：展示本周任务、完成进度和距离考试的倒计时。",
+          "任务操作：详情页支持标记完成、延后或拆分。",
+          "用户系统：支持邮箱注册/登录，数据保存在云端并支持多台电脑登录。",
+          "UI 风格：安静、鼓励但不幼稚，融合日历与待办（Todo）的视觉表现形式。",
+          "明确排除范围：排除社交、课程市场、AI 聊天和移动端原生应用。",
+          "验证指标：20 名同学试用，以连续两周完成任务的比例判断是否有价值。"
+        ],
+        "conflicts": [
+          "【标准化计划生成 vs 专业课极度碎片化】：系统按周自动生成计划需要标准化的复习大纲数据库，而全国考研专业课（自命题）极其碎片化，系统无法内置所有大纲，两者存在天然冲突。",
+          "【仅限桌面端 MVP vs 考研学生自习室随时打卡习惯】：备考核心场景（图书馆/自习室）极度依赖手机/平板等便携设备，限制仅在桌面浏览器操作，与学生随时查看与标记进度的日常习惯相冲突。"
+        ],
+        "gaps": [
+          {
+            "area": "Data Architecture & Scope",
+            "dependency": "专业课计划生成大纲数据模型",
+            "impact": "若不支持专业课或只能让用户纯手写录入，用户体验和核心卖点将大打折扣，导致 MVP 验证失败。",
+            "reason": "MVP 规划中未提及如何解决考研专业课（尤其是自命题科目）的计划生成策略。专业课分值巨大，若不支持，则该工具无法成为完整的“考研计划工具”。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "UX & Channel",
+            "dependency": "移动端极简页面适配或自动化提醒渠道",
+            "impact": "可能导致用户流失率虚高，收集到的数据无法真实反映产品对用户的价值。",
+            "reason": "缺乏自习室移动打卡场景的闭环设计，且无任何主动唤醒机制。考研学生多在自习室复习，仅靠桌面浏览器登录极易导致遗忘打卡。",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Feature Logic",
+            "dependency": "计划重排负载均衡算法",
+            "impact": "可能引发后续任务量呈几何级数增长，导致最终生成的计划完全失去指导意义，挫败用户信心。",
+            "reason": "任务延后和拆分后对未来复习负荷的影响没有界定（总量守恒 vs 时间上限）。考研时间固定，延后任务必然导致后续周任务压力增加。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "既避免了收集海量专业课大纲的巨大成本，又保留了系统自动拆分生成的核心体验，用户只需微调具体标题。",
+                "label": "(Recommended) 系统提供公共课（数/英/政）细化标准计划，对专业课提供“通用教材页数/章节数拆分模板”，由用户输入总章节后等分生成框架。"
+              },
+              {
+                "impact": "极大缩小 MVP 范围，但会排除不考数学或高度依赖专业课规划的文科/艺术类考生。",
+                "label": "第一版仅支持公共课（数学、英语、政治），暂不支持专业课的计划生成。"
+              },
+              {
+                "impact": "用户首次进入的输入成本极高，容易在初始阶段流失。",
+                "label": "允许用户完全手动录入专业课的每周任务，不进行任何自动拆分与建议。"
+              }
+            ],
+            "question": "对于全国各高校极具碎片的“专业课”自命题科目，系统应该如何帮助用户生成复习计划？",
+            "reason": "考研科目中专业课往往是复习的重头戏，但专业课自命题极度碎片化，系统难以标准化所有科目内容。",
+            "recommendation": "系统提供公共课（数/英/政）细化标准计划，对专业课提供“通用教材页数/章节数拆分模板”，由用户输入总章节后等分生成框架。",
+            "recommendation_reason": "这种混合方案开发成本低，能让专业课复习计划具备可操作性，避免冷启动流失。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "几乎不增加后端架构复杂度，只需做前端样式适配，就能极大提高用户在自习室等场景下的使用频次和打卡率。",
+                "label": "(Recommended) 核心以桌面端为主，但提供适配移动端浏览器的极简打卡/任务查看页面（Responsive Web Design）。"
+              },
+              {
+                "impact": "可以通过邮件唤醒用户，但用户仍然需要回到电脑端或使用桌面排版页面操作，可能存在打卡延迟。",
+                "label": "坚守仅桌面端浏览器，不提供任何移动端适配，但每天晚上通过邮件发送任务摘要和提醒。"
+              },
+              {
+                "impact": "开发最简单，但由于备考场景限制，用户流失和忘记打卡的风险极高，容易导致 MVP 指标失真。",
+                "label": "不做任何移动端适配和主动提醒，完全依赖用户主动在电脑上登录桌面端使用。"
+              }
+            ],
+            "question": "由于考研学生大部分时间在自习室/图书馆备考，桌面浏览器并不方便随时查看和打卡。MVP 阶段您倾向于如何解决这个备考场景痛点？",
+            "reason": "若打卡不便，用户很容易因遗忘或懒于开电脑而放弃记录，导致“连续两周完成率”这一核心指标极难达成。",
+            "recommendation": "核心以桌面端为主，但提供适配移动端浏览器的极简打卡/任务查看页面（Responsive Web Design）。",
+            "recommendation_reason": "移动端浏览器自适应成本很低（同一套前端代码），但能完美覆盖学生在自习室“拿出手机看一眼、随手划掉已完成任务”的日常使用场景。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "保证了复习总量不丢失，并能客观反映备考压力，符合“安静、鼓励”的心理调性。",
+                "label": "(Recommended) 自动将延后任务平摊到后续所有周，当某周总时长超过用户设定的“每周可学习时长”时，在主页给出温和的进度赤字预警（如提示“建议本周额外学习3小时”）。"
+              },
+              {
+                "impact": "实现最简单，但容易导致后续某一周压力突然暴增，破坏计划的指导性。",
+                "label": "仅将延后任务无脑推迟到下一周，由下一周用户自己再次决定是否延后（滚动累积）。"
+              },
+              {
+                "impact": "将控制权完全交给用户，但交互步骤增多，且用户可能不知道如何科学分配。",
+                "label": "不进行自动分摊，当用户点击“延后”或“拆分”时，弹出二次弹窗引导用户手动选择重新分配到哪一周。"
+              }
+            ],
+            "question": "当用户将某项任务“延后”或“拆分”时，您希望后续的复习计划进行怎样的自动重排？",
+            "reason": "考研复习具有明确的截止日期（总量固定）。延后任务必须妥善重排，否则会导致后续计划脱节。",
+            "recommendation": "自动将延后任务平摊到后续所有周，当某周总时长超过用户设定的“每周可学习时长”时，在主页给出温和的进度赤字预警（如提示“建议本周额外学习3小时”）。",
+            "recommendation_reason": "这种平摊预警机制既有计划指导性，又不会给用户造成立即的压迫感，鼓励用户逐步追赶进度。"
+          }
+        ],
+        "risks": [
+          "【专业课黑洞风险】由于自命题专业课大纲无法标准化，若强制由用户手动录入大纲，初始化成本过高会导致用户在第一步流失；若不支持专业课，则失去“一站式考研计划”核心卖点。",
+          "【移动场景缺失风险】考研学生核心场景（自习室）多使用移动端，纯桌面端极易导致遗忘打卡、更新不及时，从而使 MVP 连续两周完成率验证指标失真。",
+          "【过度延后崩盘风险】如果没有对“延后”任务的总上限或警示约束，用户频繁延后任务会导致后期计划雪崩式堆积，失去使用信心。",
+          "【缺少触达唤醒风险】缺乏邮件/短信等主动通知渠道，若用户忘记登录桌面网页，将直接导致连续两周打卡失败，无法验证 MVP 价值。"
+        ],
+        "unknowns": [
+          "针对成百上千种专业课（尤其是自命题）科目，系统该如何获取大纲并科学生成计划？",
+          "任务被“延后”或“拆分”后，后续周的复习量与可学习时长上限发生冲突时，系统重新分摊的数学模型是什么？",
+          "MVP 验证指标中“连续两周完成任务”的具体完成百分比阈值（如需达到本周任务的 80% 还是 100% 才算完成）尚未定义。",
+          "备考核心场景（自习室/图书馆）下，仅有桌面浏览器版是否会导致用户打卡记录极其滞后或流失？"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B",
+          "case": "case-03",
+          "duration_ms": 34470,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-03__B__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "系统内置了考研公共课（政治、英语、数学）的标准复习大纲，以此作为按周计划生成的基础。",
+              "用户的“当前基础”可以通过简单的主观分级（如：零基础、有一定基础、已复习过一轮）进行多级单选，系统据此映射不同的时间分配比例。",
+              "20名试用用户的招募与连续两周完成率的数据收集不依赖复杂的后台管理，可直接通过云端数据库查询进行统计。",
+              "用户注册时间距离考试日期有足够的周期（例如至少 1-2 个月以上），以允许系统生成合理的复习节奏。"
+            ],
+            "candidates": [
+              "基于拖拽（Drag & Drop）或一键微调按钮的快捷任务重排与日期变更交互。",
+              "任务详情页中提供子任务（Sub-task）清单，支持灵活的标题拆分与子任务独立管理。",
+              "以进度环、燃尽图或甘特图形式展现周任务与总计划的推进状态，帮助用户建立可视化的备考掌控感。",
+              "每日傍晚自动向注册邮箱发送“今日/明日任务摘要”，并附带极简的免登录打卡链接。"
+            ],
+            "confirmed": [
+              "目标用户：准备研究生入学考试的中国大学生。",
+              "首版范围：仅支持中文，仅适配桌面端浏览器。",
+              "首次进入流程：用户输入考试日期、报考科目、每周可学习时长、当前基础。",
+              "核心功能：系统按周生成可手动调整的复习计划。",
+              "主页展示：展示本周任务、完成进度和距离考试的倒计时。",
+              "任务操作：详情页支持标记完成、延后或拆分。",
+              "用户系统：支持邮箱注册/登录，数据保存在云端并支持多台电脑登录。",
+              "UI 风格：安静、鼓励但不幼稚，融合日历与待办（Todo）的视觉表现形式。",
+              "明确排除范围：排除社交、课程市场、AI 聊天和移动端原生应用。",
+              "验证指标：20 名同学试用，以连续两周完成任务的比例判断是否有价值。"
+            ],
+            "conflicts": [
+              "【标准化计划生成 vs 专业课极度碎片化】：系统按周自动生成计划需要标准化的复习大纲数据库，而全国考研专业课（自命题）极其碎片化，系统无法内置所有大纲，两者存在天然冲突。",
+              "【仅限桌面端 MVP vs 考研学生自习室随时打卡习惯】：备考核心场景（图书馆/自习室）极度依赖手机/平板等便携设备，限制仅在桌面浏览器操作，与学生随时查看与标记进度的日常习惯相冲突。"
+            ],
+            "gaps": [
+              {
+                "area": "Data Architecture & Scope",
+                "dependency": "专业课计划生成大纲数据模型",
+                "impact": "若不支持专业课或只能让用户纯手写录入，用户体验和核心卖点将大打折扣，导致 MVP 验证失败。",
+                "reason": "MVP 规划中未提及如何解决考研专业课（尤其是自命题科目）的计划生成策略。专业课分值巨大，若不支持，则该工具无法成为完整的“考研计划工具”。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "UX & Channel",
+                "dependency": "移动端极简页面适配或自动化提醒渠道",
+                "impact": "可能导致用户流失率虚高，收集到的数据无法真实反映产品对用户的价值。",
+                "reason": "缺乏自习室移动打卡场景的闭环设计，且无任何主动唤醒机制。考研学生多在自习室复习，仅靠桌面浏览器登录极易导致遗忘打卡。",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "Feature Logic",
+                "dependency": "计划重排负载均衡算法",
+                "impact": "可能引发后续任务量呈几何级数增长，导致最终生成的计划完全失去指导意义，挫败用户信心。",
+                "reason": "任务延后和拆分后对未来复习负荷的影响没有界定（总量守恒 vs 时间上限）。考研时间固定，延后任务必然导致后续周任务压力增加。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "既避免了收集海量专业课大纲的巨大成本，又保留了系统自动拆分生成的核心体验，用户只需微调具体标题。",
+                    "label": "(Recommended) 系统提供公共课（数/英/政）细化标准计划，对专业课提供“通用教材页数/章节数拆分模板”，由用户输入总章节后等分生成框架。"
+                  },
+                  {
+                    "impact": "极大缩小 MVP 范围，但会排除不考数学或高度依赖专业课规划的文科/艺术类考生。",
+                    "label": "第一版仅支持公共课（数学、英语、政治），暂不支持专业课的计划生成。"
+                  },
+                  {
+                    "impact": "用户首次进入的输入成本极高，容易在初始阶段流失。",
+                    "label": "允许用户完全手动录入专业课的每周任务，不进行任何自动拆分与建议。"
+                  }
+                ],
+                "question": "对于全国各高校极具碎片的“专业课”自命题科目，系统应该如何帮助用户生成复习计划？",
+                "reason": "考研科目中专业课往往是复习的重头戏，但专业课自命题极度碎片化，系统难以标准化所有科目内容。",
+                "recommendation": "系统提供公共课（数/英/政）细化标准计划，对专业课提供“通用教材页数/章节数拆分模板”，由用户输入总章节后等分生成框架。",
+                "recommendation_reason": "这种混合方案开发成本低，能让专业课复习计划具备可操作性，避免冷启动流失。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "几乎不增加后端架构复杂度，只需做前端样式适配，就能极大提高用户在自习室等场景下的使用频次和打卡率。",
+                    "label": "(Recommended) 核心以桌面端为主，但提供适配移动端浏览器的极简打卡/任务查看页面（Responsive Web Design）。"
+                  },
+                  {
+                    "impact": "可以通过邮件唤醒用户，但用户仍然需要回到电脑端或使用桌面排版页面操作，可能存在打卡延迟。",
+                    "label": "坚守仅桌面端浏览器，不提供任何移动端适配，但每天晚上通过邮件发送任务摘要和提醒。"
+                  },
+                  {
+                    "impact": "开发最简单，但由于备考场景限制，用户流失和忘记打卡的风险极高，容易导致 MVP 指标失真。",
+                    "label": "不做任何移动端适配和主动提醒，完全依赖用户主动在电脑上登录桌面端使用。"
+                  }
+                ],
+                "question": "由于考研学生大部分时间在自习室/图书馆备考，桌面浏览器并不方便随时查看和打卡。MVP 阶段您倾向于如何解决这个备考场景痛点？",
+                "reason": "若打卡不便，用户很容易因遗忘或懒于开电脑而放弃记录，导致“连续两周完成率”这一核心指标极难达成。",
+                "recommendation": "核心以桌面端为主，但提供适配移动端浏览器的极简打卡/任务查看页面（Responsive Web Design）。",
+                "recommendation_reason": "移动端浏览器自适应成本很低（同一套前端代码），但能完美覆盖学生在自习室“拿出手机看一眼、随手划掉已完成任务”的日常使用场景。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "保证了复习总量不丢失，并能客观反映备考压力，符合“安静、鼓励”的心理调性。",
+                    "label": "(Recommended) 自动将延后任务平摊到后续所有周，当某周总时长超过用户设定的“每周可学习时长”时，在主页给出温和的进度赤字预警（如提示“建议本周额外学习3小时”）。"
+                  },
+                  {
+                    "impact": "实现最简单，但容易导致后续某一周压力突然暴增，破坏计划的指导性。",
+                    "label": "仅将延后任务无脑推迟到下一周，由下一周用户自己再次决定是否延后（滚动累积）。"
+                  },
+                  {
+                    "impact": "将控制权完全交给用户，但交互步骤增多，且用户可能不知道如何科学分配。",
+                    "label": "不进行自动分摊，当用户点击“延后”或“拆分”时，弹出二次弹窗引导用户手动选择重新分配到哪一周。"
+                  }
+                ],
+                "question": "当用户将某项任务“延后”或“拆分”时，您希望后续的复习计划进行怎样的自动重排？",
+                "reason": "考研复习具有明确的截止日期（总量固定）。延后任务必须妥善重排，否则会导致后续计划脱节。",
+                "recommendation": "自动将延后任务平摊到后续所有周，当某周总时长超过用户设定的“每周可学习时长”时，在主页给出温和的进度赤字预警（如提示“建议本周额外学习3小时”）。",
+                "recommendation_reason": "这种平摊预警机制既有计划指导性，又不会给用户造成立即的压迫感，鼓励用户逐步追赶进度。"
+              }
+            ],
+            "risks": [
+              "【专业课黑洞风险】由于自命题专业课大纲无法标准化，若强制由用户手动录入大纲，初始化成本过高会导致用户在第一步流失；若不支持专业课，则失去“一站式考研计划”核心卖点。",
+              "【移动场景缺失风险】考研学生核心场景（自习室）多使用移动端，纯桌面端极易导致遗忘打卡、更新不及时，从而使 MVP 连续两周完成率验证指标失真。",
+              "【过度延后崩盘风险】如果没有对“延后”任务的总上限或警示约束，用户频繁延后任务会导致后期计划雪崩式堆积，失去使用信心。",
+              "【缺少触达唤醒风险】缺乏邮件/短信等主动通知渠道，若用户忘记登录桌面网页，将直接导致连续两周打卡失败，无法验证 MVP 价值。"
+            ],
+            "unknowns": [
+              "针对成百上千种专业课（尤其是自命题）科目，系统该如何获取大纲并科学生成计划？",
+              "任务被“延后”或“拆分”后，后续周的复习量与可学习时长上限发生冲突时，系统重新分摊的数学模型是什么？",
+              "MVP 验证指标中“连续两周完成任务”的具体完成百分比阈值（如需达到本周任务的 80% 还是 100% 才算完成）尚未定义。",
+              "备考核心场景（自习室/图书馆）下，仅有桌面浏览器版是否会导致用户打卡记录极其滞后或流失？"
+            ]
+          },
+          "prompt_chars": 1239,
+          "context_chars": 250,
+          "user_input_chars": 239,
+          "input_tokens": 11825,
+          "output_tokens": 11620,
+          "thinking_tokens": 9133,
+          "total_tokens": 23445,
+          "cache_read_tokens": 8147,
+          "raw_usage": {
+            "input_tokens": 11825,
+            "output_tokens": 11620,
+            "thinking_tokens": 9133,
+            "cache_read_tokens": 8147,
+            "total_tokens": 23445
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 34470,
+        "input_tokens": 11825,
+        "output_tokens": 11620,
+        "thinking_tokens": 9133,
+        "total_tokens": 23445,
+        "cache_read_tokens": 8147,
+        "prompt_chars": 1239,
+        "context_chars": 250,
+        "user_input_chars": 239
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T08:03:42.005Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 3,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.7,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B2",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "Students have reliable internet access on their desktop/laptop computers during their dedicated study review times.",
+          "The postgraduate exam date is a fixed target in the future and does not change once entered by the user.",
+          "Weekly study hour budgets remain relatively stable week-to-week unless manually adjusted by the student."
+        ],
+        "candidates": [
+          "Pre-loaded postgraduate syllabus templates for standard subjects (Politics, English, Math, common majors) to simplify onboarding.",
+          "A structured weekly review/re-planning prompt (e.g., every Sunday) to help students reflect and adjust the next week's load.",
+          "A graceful buffer mechanism that visually groups deferred tasks separately to avoid cluttering the active week's dashboard."
+        ],
+        "confirmed": [
+          "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+          "Supported language: Chinese only for the first version.",
+          "Supported platform: Desktop browsers only for the first version.",
+          "Onboarding inputs: Exam date, subjects, weekly study hours, and current foundation.",
+          "Core feature: Generation of a week-by-week adjustable review plan.",
+          "Homepage elements: Current week's tasks, completion progress, and countdown to the exam.",
+          "Task detail actions: Mark as complete, defer, or split.",
+          "Identity/Storage: Email registration, cloud data storage, and cross-device login capability.",
+          "UX/UI style: Quiet, encouraging, mature (not childish), combining calendar and to-do list concepts.",
+          "MVP exclusions: Social features, course marketplace, AI chat, and native mobile apps.",
+          "Validation cohort: 20 students for the initial trial.",
+          "Validation success metric: The percentage of students who complete their tasks for two consecutive weeks."
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "Task rescheduling flow",
+            "dependency": "Task detail actions (defer/split)",
+            "impact": "If deferred tasks are simply dumped into the next week without redistribution rules, the student will experience compounding planning debt, leading to abandonment.",
+            "reason": "No flow is defined for how the system recalculates or redistributes tasks when they are deferred or split.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Syllabus and Task Generation Source",
+            "dependency": "Plan generation logic",
+            "impact": "If users must enter every study task manually, onboarding friction will be extremely high. If templates are pre-defined, the tool must manage syllabus accuracy.",
+            "reason": "It is not specified whether task lists are generated from a pre-defined subject syllabus template or if they are entirely user-inputted.",
+            "severity": "medium",
+            "should_ask_user": false
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Maintains a realistic and achievable schedule, preventing the feeling of accumulated debt while keeping the student in control.",
+                "label": "(Recommended) Weekly Re-planning Checkpoint: Prompt the student at the end of the week to manually adjust their weekly study hours, shift the target scope, or extend the review duration to absorb the deferred tasks."
+              },
+              {
+                "impact": "Simplifies application logic but heavily risks demotivating the student as their weekly task load compounds.",
+                "label": "Automatic Rollover: Push all incomplete tasks to the next week automatically, increasing that week's daily workload."
+              },
+              {
+                "impact": "Keeps the daily schedule constant but might result in the student failing to cover all exam material before the fixed exam date.",
+                "label": "Deadline Warning: Keep the weekly workload constant but warn the user that they will not finish the syllabus before the exam unless they manually adjust their pace."
+              }
+            ],
+            "question": "How should the tool handle plan recalculation when a student consistently falls behind, defers, or splits tasks?",
+            "reason": "If the system simply rolls over unfinished tasks without a clear renegotiation flow, it will create 'planning debt' that demotivates students. This directly threatens your primary success metric (consecutive 2-week task completion).",
+            "recommendation": "Implement a weekly re-planning checkpoint that prompts the user to re-negotiate their plan (e.g., adjust weekly hours, extend timelines, or downscope sub-topics) rather than letting tasks pile up.",
+            "recommendation_reason": "This keeps the plan realistic and respects user autonomy without childish gamification."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Minimizes onboarding drop-off, but provides less precise plan calibration.",
+                "label": "(Recommended) Phase-based Self-assessment Checklist: Select from broad stages for each subject (e.g., 'Zero foundation', 'First-round review finished', 'Doing mock tests')."
+              },
+              {
+                "impact": "More objective, but requires students to have taken a recent mock exam or practice set prior to using the tool.",
+                "label": "Target Score Gap Entry: Input target score vs. current estimated/mock score."
+              },
+              {
+                "impact": "Gives total control to the user but introduces extreme onboarding friction, risking drop-off before the plan is generated.",
+                "label": "Manual Syllabus Configuration: The user manually inputs their own chapters and starting points."
+              }
+            ],
+            "question": "How should the student's 'current foundation' (当前基础) be assessed during onboarding to bootstrap the initial plan?",
+            "reason": "This assessment directly dictates the baseline intensity and starting point of the generated plan; if it is too complex, onboarding friction will be too high; if it is too vague, the generated plan will be inaccurate.",
+            "recommendation": "Use a simple self-assessment checklist of broad phases (e.g., 'Zero foundation', 'Finished first round of review', 'Doing mock exams') for each selected subject.",
+            "recommendation_reason": "This provides a fast onboarding experience while offering enough calibration to scale the first month's study intensity."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Significantly improves completion tracking accuracy because students can check off tasks in real-time in libraries/classrooms. Minimal scope creep if plan generation and settings remain desktop-only.",
+                "label": "(Recommended) Responsive Mobile-web Checklist: Optimize the task listing and check-off screens for mobile web browsers, keeping all onboarding and plan configuration desktop-only."
+              },
+              {
+                "impact": "Keeps the initial build strictly within the defined scope, but risks low user engagement and inaccurate metrics because students must wait to log progress on their computers.",
+                "label": "Strictly Desktop-only Layout: Rely on students logging into a computer at the end of their study day to update their progress."
+              }
+            ],
+            "question": "Since students often study in classrooms/libraries without convenient desktop access, should the MVP support a mobile-responsive view solely for checking off tasks?",
+            "reason": "A strict desktop-only limitation makes real-time logging inconvenient for students studying on the go. This could lead to delayed or forgotten updates, directly impacting the accuracy of your 2-week consecutive completion validation metric.",
+            "recommendation": "Design a responsive mobile view limited strictly to viewing the daily checklist and marking tasks as complete, while keeping onboarding and planning desktop-only.",
+            "recommendation_reason": "This fits the user's physical study habits without expanding the MVP to a full mobile planning tool."
+          }
+        ],
+        "risks": [
+          "Accumulated task debt ('planning debt') causing students to feel overwhelmed and abandon the tool.",
+          "High onboarding drop-off if the process of specifying subjects and foundation levels is too tedious or ambiguous.",
+          "Under-logging or inaccurate completion metrics due to the friction of only being able to check off tasks when on a desktop browser."
+        ],
+        "tensions": [
+          {
+            "description": "Quiet, mature UI style vs. Completion nudging",
+            "reason": "A quiet and non-intrusive calendar/to-do design may lack the visual urgency or notifications needed to prompt students to complete tasks, which is critical for validating the 2-week consecutive completion metric."
+          },
+          {
+            "description": "Desktop-only MVP vs. Physical study environments",
+            "reason": "Postgraduate students study heavily in university libraries, study rooms, or classrooms where laptops may not always be open or convenient for checking off quick daily tasks."
+          }
+        ],
+        "unknowns": [
+          "The level of task granularity (e.g., hourly schedules, daily study topics, or weekly chapter-level milestones) that the planning engine will generate.",
+          "Whether the syllabus content and task generation logic will cover all possible major/professional subjects or focus initially on common public subjects (Politics, English, Math)."
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2",
+          "case": "case-03",
+          "duration_ms": 26325,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-03__B2__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "Students have reliable internet access on their desktop/laptop computers during their dedicated study review times.",
+              "The postgraduate exam date is a fixed target in the future and does not change once entered by the user.",
+              "Weekly study hour budgets remain relatively stable week-to-week unless manually adjusted by the student."
+            ],
+            "candidates": [
+              "Pre-loaded postgraduate syllabus templates for standard subjects (Politics, English, Math, common majors) to simplify onboarding.",
+              "A structured weekly review/re-planning prompt (e.g., every Sunday) to help students reflect and adjust the next week's load.",
+              "A graceful buffer mechanism that visually groups deferred tasks separately to avoid cluttering the active week's dashboard."
+            ],
+            "confirmed": [
+              "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+              "Supported language: Chinese only for the first version.",
+              "Supported platform: Desktop browsers only for the first version.",
+              "Onboarding inputs: Exam date, subjects, weekly study hours, and current foundation.",
+              "Core feature: Generation of a week-by-week adjustable review plan.",
+              "Homepage elements: Current week's tasks, completion progress, and countdown to the exam.",
+              "Task detail actions: Mark as complete, defer, or split.",
+              "Identity/Storage: Email registration, cloud data storage, and cross-device login capability.",
+              "UX/UI style: Quiet, encouraging, mature (not childish), combining calendar and to-do list concepts.",
+              "MVP exclusions: Social features, course marketplace, AI chat, and native mobile apps.",
+              "Validation cohort: 20 students for the initial trial.",
+              "Validation success metric: The percentage of students who complete their tasks for two consecutive weeks."
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "Task rescheduling flow",
+                "dependency": "Task detail actions (defer/split)",
+                "impact": "If deferred tasks are simply dumped into the next week without redistribution rules, the student will experience compounding planning debt, leading to abandonment.",
+                "reason": "No flow is defined for how the system recalculates or redistributes tasks when they are deferred or split.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Syllabus and Task Generation Source",
+                "dependency": "Plan generation logic",
+                "impact": "If users must enter every study task manually, onboarding friction will be extremely high. If templates are pre-defined, the tool must manage syllabus accuracy.",
+                "reason": "It is not specified whether task lists are generated from a pre-defined subject syllabus template or if they are entirely user-inputted.",
+                "severity": "medium",
+                "should_ask_user": false
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "Maintains a realistic and achievable schedule, preventing the feeling of accumulated debt while keeping the student in control.",
+                    "label": "(Recommended) Weekly Re-planning Checkpoint: Prompt the student at the end of the week to manually adjust their weekly study hours, shift the target scope, or extend the review duration to absorb the deferred tasks."
+                  },
+                  {
+                    "impact": "Simplifies application logic but heavily risks demotivating the student as their weekly task load compounds.",
+                    "label": "Automatic Rollover: Push all incomplete tasks to the next week automatically, increasing that week's daily workload."
+                  },
+                  {
+                    "impact": "Keeps the daily schedule constant but might result in the student failing to cover all exam material before the fixed exam date.",
+                    "label": "Deadline Warning: Keep the weekly workload constant but warn the user that they will not finish the syllabus before the exam unless they manually adjust their pace."
+                  }
+                ],
+                "question": "How should the tool handle plan recalculation when a student consistently falls behind, defers, or splits tasks?",
+                "reason": "If the system simply rolls over unfinished tasks without a clear renegotiation flow, it will create 'planning debt' that demotivates students. This directly threatens your primary success metric (consecutive 2-week task completion).",
+                "recommendation": "Implement a weekly re-planning checkpoint that prompts the user to re-negotiate their plan (e.g., adjust weekly hours, extend timelines, or downscope sub-topics) rather than letting tasks pile up.",
+                "recommendation_reason": "This keeps the plan realistic and respects user autonomy without childish gamification."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Minimizes onboarding drop-off, but provides less precise plan calibration.",
+                    "label": "(Recommended) Phase-based Self-assessment Checklist: Select from broad stages for each subject (e.g., 'Zero foundation', 'First-round review finished', 'Doing mock tests')."
+                  },
+                  {
+                    "impact": "More objective, but requires students to have taken a recent mock exam or practice set prior to using the tool.",
+                    "label": "Target Score Gap Entry: Input target score vs. current estimated/mock score."
+                  },
+                  {
+                    "impact": "Gives total control to the user but introduces extreme onboarding friction, risking drop-off before the plan is generated.",
+                    "label": "Manual Syllabus Configuration: The user manually inputs their own chapters and starting points."
+                  }
+                ],
+                "question": "How should the student's 'current foundation' (当前基础) be assessed during onboarding to bootstrap the initial plan?",
+                "reason": "This assessment directly dictates the baseline intensity and starting point of the generated plan; if it is too complex, onboarding friction will be too high; if it is too vague, the generated plan will be inaccurate.",
+                "recommendation": "Use a simple self-assessment checklist of broad phases (e.g., 'Zero foundation', 'Finished first round of review', 'Doing mock exams') for each selected subject.",
+                "recommendation_reason": "This provides a fast onboarding experience while offering enough calibration to scale the first month's study intensity."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Significantly improves completion tracking accuracy because students can check off tasks in real-time in libraries/classrooms. Minimal scope creep if plan generation and settings remain desktop-only.",
+                    "label": "(Recommended) Responsive Mobile-web Checklist: Optimize the task listing and check-off screens for mobile web browsers, keeping all onboarding and plan configuration desktop-only."
+                  },
+                  {
+                    "impact": "Keeps the initial build strictly within the defined scope, but risks low user engagement and inaccurate metrics because students must wait to log progress on their computers.",
+                    "label": "Strictly Desktop-only Layout: Rely on students logging into a computer at the end of their study day to update their progress."
+                  }
+                ],
+                "question": "Since students often study in classrooms/libraries without convenient desktop access, should the MVP support a mobile-responsive view solely for checking off tasks?",
+                "reason": "A strict desktop-only limitation makes real-time logging inconvenient for students studying on the go. This could lead to delayed or forgotten updates, directly impacting the accuracy of your 2-week consecutive completion validation metric.",
+                "recommendation": "Design a responsive mobile view limited strictly to viewing the daily checklist and marking tasks as complete, while keeping onboarding and planning desktop-only.",
+                "recommendation_reason": "This fits the user's physical study habits without expanding the MVP to a full mobile planning tool."
+              }
+            ],
+            "risks": [
+              "Accumulated task debt ('planning debt') causing students to feel overwhelmed and abandon the tool.",
+              "High onboarding drop-off if the process of specifying subjects and foundation levels is too tedious or ambiguous.",
+              "Under-logging or inaccurate completion metrics due to the friction of only being able to check off tasks when on a desktop browser."
+            ],
+            "tensions": [
+              {
+                "description": "Quiet, mature UI style vs. Completion nudging",
+                "reason": "A quiet and non-intrusive calendar/to-do design may lack the visual urgency or notifications needed to prompt students to complete tasks, which is critical for validating the 2-week consecutive completion metric."
+              },
+              {
+                "description": "Desktop-only MVP vs. Physical study environments",
+                "reason": "Postgraduate students study heavily in university libraries, study rooms, or classrooms where laptops may not always be open or convenient for checking off quick daily tasks."
+              }
+            ],
+            "unknowns": [
+              "The level of task granularity (e.g., hourly schedules, daily study topics, or weekly chapter-level milestones) that the planning engine will generate.",
+              "Whether the syllabus content and task generation logic will cover all possible major/professional subjects or focus initially on common public subjects (Politics, English, Math)."
+            ]
+          },
+          "prompt_chars": 3975,
+          "context_chars": 250,
+          "user_input_chars": 239,
+          "input_tokens": 20608,
+          "output_tokens": 7287,
+          "thinking_tokens": 5429,
+          "total_tokens": 27895,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20608,
+            "output_tokens": 7287,
+            "thinking_tokens": 5429,
+            "cache_read_tokens": 0,
+            "total_tokens": 27895
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 26325,
+        "input_tokens": 20608,
+        "output_tokens": 7287,
+        "thinking_tokens": 5429,
+        "total_tokens": 27895,
+        "cache_read_tokens": 0,
+        "prompt_chars": 3975,
+        "context_chars": 250,
+        "user_input_chars": 239
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T08:04:08.334Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 2,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.6,
+        "matchedSignals": 1,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B",
+      "case": "case-05",
+      "name": "offline-sync-conflict",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "假设“内容不能离开用户电脑”的实际意图是：不使用由应用开发者运营的中央服务器存储明文数据，避免隐私泄露，而非绝对禁止任何网络传输。",
+          "假设“不用用户做任何设置”的实际意图是：尽可能降低用户的配置成本，例如利用操作系统已有的登录状态（如 iCloud、OneDrive）或极简的一次性配对（如扫码）。",
+          "假设知识库主要以文本（Markdown）、图片和常用文档为主，单用户的数据总量通常在 GB 级别以下，适合进行基于文件的同步。"
+        ],
+        "candidates": [
+          "方案一：基于本地局域网（LAN）P2P 自动同步（类似 Syncthing）。设备在同一局域网下自动发现并加密传输，数据完全不经过任何云端服务器，但换电脑时两台设备必须同时开机联网。",
+          "方案二：基于操作系统原生云盘（如 iCloud / OneDrive）自动同步。将应用数据目录设在系统默认同步文件夹内，配合本地端到端加密（E2EE）确保云端数据不可读。",
+          "方案三：基于第三方云存储（如 WebDAV / Object Storage）端到端加密同步。用户在应用内输入自己的云盘密钥，应用自动在后台加密同步。"
+        ],
+        "confirmed": [
+          "开发一个个人知识库应用。",
+          "应用必须支持完全离线使用，核心功能不依赖网络。",
+          "在用户更换电脑时，数据能够自动同步到新电脑。",
+          "同步过程对用户而言应当是零配置/免设置的。"
+        ],
+        "conflicts": [
+          "“完全离线且数据不出电脑”与“自动同步到新电脑”存在物理实现冲突。为了同步，数据必须通过某种介质（网络或物理设备）传输到新电脑，不可能完全不离开原电脑。",
+          "“零配置/免设置”与“数据安全与身份校验”存在安全逻辑冲突。如果在新电脑上不需要任何设置或验证（如登录或配对），应用将无法识别用户身份，任何人都可以轻易获取或冒领该用户的加密数据。"
+        ],
+        "gaps": [
+          {
+            "area": "数据同步传输介质与边界",
+            "dependency": "同步方案技术选型",
+            "impact": "决定系统是纯局域网 P2P 架构，还是依赖系统原生云盘，抑或是需要中继服务器。",
+            "reason": "完全离线与换电脑自动同步之间存在根本性的传输矛盾，必须明确“数据不出电脑”的严格定义（是绝对不联网，还是不上传开发者服务器）。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "身份验证与安全加密机制",
+            "dependency": "无感同步体验设计",
+            "impact": "影响同步的安全性。如果追求极端的免设置，可能会牺牲数据安全性；如果要安全，则需要某种首次配对设置。",
+            "reason": "无设置的自动同步难以在多台设备间安全地建立信任关系和解密数据。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "目标运行平台与跨平台范围",
+            "dependency": "开发技术栈选型",
+            "impact": "如果需要跨平台（如 Win 和 Mac 互通），则无法简单依赖 iCloud 等单一平台的免设置同步机制。",
+            "reason": "不同操作系统的免配置同步机制差异巨大，同平台和跨平台的设计难度完全不同。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "数据完全不经过云端，但换电脑时需要两台电脑同时开机且在同一局域网，且首次需要扫码配对。",
+                "label": "使用局域网（LAN）内设备直接 P2P 同步（类似 Syncthing），数据绝不上云。"
+              },
+              {
+                "impact": "只要系统登录了云盘账号就能自动同步，且在本地进行端到端加密（E2EE），云端也无法解密，兼顾零设置与隐私。",
+                "label": "(Recommended) 利用我已登录的系统云盘（如 iCloud / OneDrive）进行本地端到端加密同步。"
+              },
+              {
+                "impact": "虽然需要手动配置一次账号信息，但对同步媒介和数据存储有完全的掌控力。",
+                "label": "允许手动配置一次我的私有云（如 WebDAV 或私人云存储）来同步加密数据。"
+              }
+            ],
+            "question": "关于“数据不能离开电脑”与“换电脑自动同步”的冲突，您倾向于采用哪种折中方案？",
+            "reason": "完全离线且数据不出电脑意味着新电脑无法获取数据。必须在数据传输介质上做出折中。",
+            "recommendation": "(Recommended) 利用我已登录的系统云盘（如 iCloud / OneDrive）进行本地端到端加密同步。",
+            "recommendation_reason": "这样数据虽然离开了物理电脑，但存储在用户自己信任的云盘中，且因为是端到端加密，第三方云服务商和应用开发者都无法读取内容，既实现了换电脑后的“免设置自动同步”，又保证了数据隐私和安全性。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "安全性极高，能有效防止他人冒领或窃取数据，且只需在首次绑定时操作一次。",
+                "label": "(Recommended) 接受一次性的极简安全验证（如两台电脑扫码，或输入一次性安全钥匙），此后完全自动同步。"
+              },
+              {
+                "impact": "必须限制在支持统一钥匙串/账户体系的生态内（例如完全在苹果生态内），否则无法做到跨平台无感安全同步。",
+                "label": "完全不能接受任何手动操作，必须依赖操作系统底层的账户状态（如系统钥匙串）实现完全的无感登录与解密。"
+              }
+            ],
+            "question": "为了保障数据安全，您能接受在新旧电脑同步时进行一次性的极简安全验证（如扫码或输入验证码）吗？",
+            "reason": "如果完全没有任何设置或验证，任何新安装此应用的人都可能同步获取到您的知识库，存在极大的安全风险。",
+            "recommendation": "(Recommended) 接受一次性的极简安全验证（如两台电脑扫码，或输入一次性安全钥匙），此后完全自动同步。",
+            "recommendation_reason": "这能在保障数据绝对安全（防止他人冒领）的前提下，将用户的操作负担降到最低。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "可以极大复用系统级同步机制（如 macOS 的 iCloud Drive + Keychain），最容易做到真正的“零配置”。",
+                "label": "(Recommended) 同一操作系统家族内（如 Mac 到 Mac，或 Windows 到 Windows）。"
+              },
+              {
+                "impact": "同步和加密方案会复杂很多，需要设计通用的 P2P 协议或跨平台的云盘同步机制。",
+                "label": "跨越不同的操作系统（如在 Windows 电脑和 Mac 电脑之间进行同步）。"
+              }
+            ],
+            "question": "您的个人知识库主要需要在哪些操作系统之间进行同步？",
+            "reason": "跨平台的零配置同步比同平台困难得多，直接影响技术方案选择。",
+            "recommendation": "(Recommended) 同一操作系统家族内（如 Mac 到 Mac，或 Windows 到 Windows）。",
+            "recommendation_reason": "同系统可以极好地复用系统级同步机制（如 Mac 上的 iCloud Drive + CloudKit / Keychain），最容易做到真正的“零配置”。"
+          }
+        ],
+        "risks": [
+          "数据永久丢失风险：如果采用完全不依赖云端的本地 P2P 同步，一旦旧电脑突然损坏且未来得及与新电脑同步，所有数据将永久丢失。",
+          "隐私泄露与越权访问风险：如果为了追求“零配置”而完全省去身份验证与密钥交换，局域网内的其他设备或恶意攻击者可能会轻易窃取或篡改用户的知识库数据。",
+          "跨平台同步受限风险：若高度依赖系统原生云盘（如 iCloud）实现免设置，在跨系统（如 Windows 与 Mac 之间）迁移时将无法做到真正的“零设置”。"
+        ],
+        "unknowns": [
+          "用户的目标运行操作系统平台（是单一平台还是跨平台）。",
+          "用户对“数据离开电脑”的容忍边界（是否接受端到端加密后上传至个人拥有的云盘）。",
+          "换电脑时旧电脑是否能保持可用状态。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B",
+          "case": "case-05",
+          "duration_ms": 28973,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-05__B__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "假设“内容不能离开用户电脑”的实际意图是：不使用由应用开发者运营的中央服务器存储明文数据，避免隐私泄露，而非绝对禁止任何网络传输。",
+              "假设“不用用户做任何设置”的实际意图是：尽可能降低用户的配置成本，例如利用操作系统已有的登录状态（如 iCloud、OneDrive）或极简的一次性配对（如扫码）。",
+              "假设知识库主要以文本（Markdown）、图片和常用文档为主，单用户的数据总量通常在 GB 级别以下，适合进行基于文件的同步。"
+            ],
+            "candidates": [
+              "方案一：基于本地局域网（LAN）P2P 自动同步（类似 Syncthing）。设备在同一局域网下自动发现并加密传输，数据完全不经过任何云端服务器，但换电脑时两台设备必须同时开机联网。",
+              "方案二：基于操作系统原生云盘（如 iCloud / OneDrive）自动同步。将应用数据目录设在系统默认同步文件夹内，配合本地端到端加密（E2EE）确保云端数据不可读。",
+              "方案三：基于第三方云存储（如 WebDAV / Object Storage）端到端加密同步。用户在应用内输入自己的云盘密钥，应用自动在后台加密同步。"
+            ],
+            "confirmed": [
+              "开发一个个人知识库应用。",
+              "应用必须支持完全离线使用，核心功能不依赖网络。",
+              "在用户更换电脑时，数据能够自动同步到新电脑。",
+              "同步过程对用户而言应当是零配置/免设置的。"
+            ],
+            "conflicts": [
+              "“完全离线且数据不出电脑”与“自动同步到新电脑”存在物理实现冲突。为了同步，数据必须通过某种介质（网络或物理设备）传输到新电脑，不可能完全不离开原电脑。",
+              "“零配置/免设置”与“数据安全与身份校验”存在安全逻辑冲突。如果在新电脑上不需要任何设置或验证（如登录或配对），应用将无法识别用户身份，任何人都可以轻易获取或冒领该用户的加密数据。"
+            ],
+            "gaps": [
+              {
+                "area": "数据同步传输介质与边界",
+                "dependency": "同步方案技术选型",
+                "impact": "决定系统是纯局域网 P2P 架构，还是依赖系统原生云盘，抑或是需要中继服务器。",
+                "reason": "完全离线与换电脑自动同步之间存在根本性的传输矛盾，必须明确“数据不出电脑”的严格定义（是绝对不联网，还是不上传开发者服务器）。",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "身份验证与安全加密机制",
+                "dependency": "无感同步体验设计",
+                "impact": "影响同步的安全性。如果追求极端的免设置，可能会牺牲数据安全性；如果要安全，则需要某种首次配对设置。",
+                "reason": "无设置的自动同步难以在多台设备间安全地建立信任关系和解密数据。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "目标运行平台与跨平台范围",
+                "dependency": "开发技术栈选型",
+                "impact": "如果需要跨平台（如 Win 和 Mac 互通），则无法简单依赖 iCloud 等单一平台的免设置同步机制。",
+                "reason": "不同操作系统的免配置同步机制差异巨大，同平台和跨平台的设计难度完全不同。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "数据完全不经过云端，但换电脑时需要两台电脑同时开机且在同一局域网，且首次需要扫码配对。",
+                    "label": "使用局域网（LAN）内设备直接 P2P 同步（类似 Syncthing），数据绝不上云。"
+                  },
+                  {
+                    "impact": "只要系统登录了云盘账号就能自动同步，且在本地进行端到端加密（E2EE），云端也无法解密，兼顾零设置与隐私。",
+                    "label": "(Recommended) 利用我已登录的系统云盘（如 iCloud / OneDrive）进行本地端到端加密同步。"
+                  },
+                  {
+                    "impact": "虽然需要手动配置一次账号信息，但对同步媒介和数据存储有完全的掌控力。",
+                    "label": "允许手动配置一次我的私有云（如 WebDAV 或私人云存储）来同步加密数据。"
+                  }
+                ],
+                "question": "关于“数据不能离开电脑”与“换电脑自动同步”的冲突，您倾向于采用哪种折中方案？",
+                "reason": "完全离线且数据不出电脑意味着新电脑无法获取数据。必须在数据传输介质上做出折中。",
+                "recommendation": "(Recommended) 利用我已登录的系统云盘（如 iCloud / OneDrive）进行本地端到端加密同步。",
+                "recommendation_reason": "这样数据虽然离开了物理电脑，但存储在用户自己信任的云盘中，且因为是端到端加密，第三方云服务商和应用开发者都无法读取内容，既实现了换电脑后的“免设置自动同步”，又保证了数据隐私和安全性。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "安全性极高，能有效防止他人冒领或窃取数据，且只需在首次绑定时操作一次。",
+                    "label": "(Recommended) 接受一次性的极简安全验证（如两台电脑扫码，或输入一次性安全钥匙），此后完全自动同步。"
+                  },
+                  {
+                    "impact": "必须限制在支持统一钥匙串/账户体系的生态内（例如完全在苹果生态内），否则无法做到跨平台无感安全同步。",
+                    "label": "完全不能接受任何手动操作，必须依赖操作系统底层的账户状态（如系统钥匙串）实现完全的无感登录与解密。"
+                  }
+                ],
+                "question": "为了保障数据安全，您能接受在新旧电脑同步时进行一次性的极简安全验证（如扫码或输入验证码）吗？",
+                "reason": "如果完全没有任何设置或验证，任何新安装此应用的人都可能同步获取到您的知识库，存在极大的安全风险。",
+                "recommendation": "(Recommended) 接受一次性的极简安全验证（如两台电脑扫码，或输入一次性安全钥匙），此后完全自动同步。",
+                "recommendation_reason": "这能在保障数据绝对安全（防止他人冒领）的前提下，将用户的操作负担降到最低。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "可以极大复用系统级同步机制（如 macOS 的 iCloud Drive + Keychain），最容易做到真正的“零配置”。",
+                    "label": "(Recommended) 同一操作系统家族内（如 Mac 到 Mac，或 Windows 到 Windows）。"
+                  },
+                  {
+                    "impact": "同步和加密方案会复杂很多，需要设计通用的 P2P 协议或跨平台的云盘同步机制。",
+                    "label": "跨越不同的操作系统（如在 Windows 电脑和 Mac 电脑之间进行同步）。"
+                  }
+                ],
+                "question": "您的个人知识库主要需要在哪些操作系统之间进行同步？",
+                "reason": "跨平台的零配置同步比同平台困难得多，直接影响技术方案选择。",
+                "recommendation": "(Recommended) 同一操作系统家族内（如 Mac 到 Mac，或 Windows 到 Windows）。",
+                "recommendation_reason": "同系统可以极好地复用系统级同步机制（如 Mac 上的 iCloud Drive + CloudKit / Keychain），最容易做到真正的“零配置”。"
+              }
+            ],
+            "risks": [
+              "数据永久丢失风险：如果采用完全不依赖云端的本地 P2P 同步，一旦旧电脑突然损坏且未来得及与新电脑同步，所有数据将永久丢失。",
+              "隐私泄露与越权访问风险：如果为了追求“零配置”而完全省去身份验证与密钥交换，局域网内的其他设备或恶意攻击者可能会轻易窃取或篡改用户的知识库数据。",
+              "跨平台同步受限风险：若高度依赖系统原生云盘（如 iCloud）实现免设置，在跨系统（如 Windows 与 Mac 之间）迁移时将无法做到真正的“零设置”。"
+            ],
+            "unknowns": [
+              "用户的目标运行操作系统平台（是单一平台还是跨平台）。",
+              "用户对“数据离开电脑”的容忍边界（是否接受端到端加密后上传至个人拥有的云盘）。",
+              "换电脑时旧电脑是否能保持可用状态。"
+            ]
+          },
+          "prompt_chars": 1059,
+          "context_chars": 70,
+          "user_input_chars": 59,
+          "input_tokens": 19863,
+          "output_tokens": 8960,
+          "thinking_tokens": 7069,
+          "total_tokens": 28823,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 19863,
+            "output_tokens": 8960,
+            "thinking_tokens": 7069,
+            "cache_read_tokens": 0,
+            "total_tokens": 28823
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 28973,
+        "input_tokens": 19863,
+        "output_tokens": 8960,
+        "thinking_tokens": 7069,
+        "total_tokens": 28823,
+        "cache_read_tokens": 0,
+        "prompt_chars": 1059,
+        "context_chars": 70,
+        "user_input_chars": 59
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "E2EE",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:04:37.310Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.9,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B2",
+      "case": "case-05",
+      "name": "offline-sync-conflict",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "用户在换电脑进行数据同步时，新旧两台电脑在某一时刻是可以同时开机并处于可连接状态的",
+          "知识库的数据总体积在局域网内直接传输的合理范围内，不需要海量公网带宽支持"
+        ],
+        "candidates": [
+          "局域网内设备直连的安全发现与双向加密数据同步功能",
+          "设备所有权绑定采用首次接触时的极简配对交互（例如通过临时二维码扫描确认）"
+        ],
+        "confirmed": [
+          "产品定位为个人知识库",
+          "隐私与离线约束：任何内容均不能离开用户电脑",
+          "多设备体验诉求：用户更换电脑后数据自动同步，且无需进行任何繁琐设置"
+        ],
+        "conflicts": [
+          "‘任何内容不能离开用户电脑（绝对物理离线）’与‘换电脑后数据自动同步（数据必须跨设备流转）’存在逻辑冲突。若严格遵守数据绝不离开原物理设备，则新电脑无法获取任何数据；若要在新电脑上自动展现，数据就必须通过某种介质（网络或物理硬件）离开原电脑。同时，在完全没有中心化账户和用户主动设置的前提下，自动发现并同步数据极易导致在共享网络环境中将数据错误同步给他人设备的严重安全冲突。"
+        ],
+        "gaps": [
+          {
+            "area": "设备安全身份确认机制",
+            "dependency": "多设备数据安全流转边界的定义",
+            "impact": "若缺少必要的安全防范，自动同步可能导致局域网内其他无关设备恶意或无意中获取用户敏感知识库内容。",
+            "reason": "‘无需任何设置’使得系统无法自动区分新电脑是否真正属于该用户，必须引入一种极简的物理或局域网所有权确认闭环。",
+            "severity": "critical",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "数据绝不通过任何外部网络，确保物理级隐私；但要求同步时新旧电脑必须处于同一局域网内且同时开机。",
+                "label": "局域网设备直连加密流转（数据不下网，仅需在新旧设备首次靠近时进行一次性扫码配对确认）"
+              },
+              {
+                "impact": "提供最便捷的跨网络自动同步体验；但数据需要以强加密状态存储在外部服务器上，且用户需要配置或登录第三方存储空间。",
+                "label": "端到端加密云端中转同步（数据本地加密后上云，换电脑登录账号即可自动解密同步）"
+              },
+              {
+                "impact": "确保数据绝对不出物理设备，且不需要任何网络传输；但完全牺牲了自动同步的便利性，换电脑时必须手动备份并拷贝文件。",
+                "label": "纯物理介质手动备份与迁移（数据绝对不出设备，不通过网络传输，完全由用户手动导入导出）"
+              }
+            ],
+            "question": "在坚持‘数据不流向任何外部服务器’的前提下，要实现新旧电脑间的数据同步，数据必须离开原电脑进行传输。您倾向于哪种同步与迁移的产品方案？",
+            "reason": "此决策是解决‘绝对离线隐私’与‘多设备自动同步’冲突的核心设计分水岭，直接决定后续产品流转机制的定义。",
+            "recommendation": "(Recommended) 局域网设备直连加密流转（数据不下网，仅需在新旧设备首次靠近时进行一次性扫码配对确认）",
+            "recommendation_reason": "该方案在保留绝对隐私（数据不上网、不离开用户物理掌控）的前提下，通过仅一次且极简的安全确认，实现了新旧设备间局域网内接近自动的加密流转，取得了隐私与便利的最佳平衡。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "能有效防止设备硬件损坏或丢失带来的毁灭性数据丢失，但需要用户偶尔手动导出备份包并妥善保管。",
+                "label": "接受。产品提供简单的一键本地加密导出备份功能，由用户自行保管备份包。"
+              },
+              {
+                "impact": "维持极致的免操作体验，但一旦旧电脑不可用，新电脑将完全无法恢复或找回任何历史数据。",
+                "label": "不接受。完全无需用户操作备份，宁可承担因设备损坏导致数据彻底丢失的风险。"
+              }
+            ],
+            "question": "如果新旧电脑无法同时在线（例如旧电脑意外损坏、丢失或已格式化），您是否接受通过手动备份文件（如定期导出到安全的物理介质）作为灾难恢复的兜底手段？",
+            "reason": "在不借助第三方云端且设备无法直连的前提下，若无备份，硬件损坏将导致数据永久丢失。需要明确您对该场景的容忍度。",
+            "recommendation": "(Recommended) 接受。提供一键本地加密导出备份功能，并在日常使用中温和引导用户将其存至安全介质。",
+            "recommendation_reason": "在不牺牲离线隐私的前提下，为用户提供对抗硬件故障的唯一可靠防线，且不增加日常使用的配置负担。"
+          }
+        ],
+        "risks": [
+          "若在网络中进行无配对的自动发现与同步，可能导致共享局域网（如公共Wi-Fi）内其他设备非法读取或写入个人知识库的安全风险。",
+          "若旧设备永久损坏且无任何外部介质备份，将面临数据彻底丢失且无法恢复的风险。"
+        ],
+        "tensions": [
+          {
+            "description": "极致隐私与同步便利性的折衷",
+            "reason": "为了维持最高级别的隐私（数据不下网），必须牺牲跨越地理位置或不同网络环境的即时同步便利，同步范围被限制在相同局域网或物理空间下。"
+          },
+          {
+            "description": "零设置体验与数据安全防范的权衡",
+            "reason": "完全零设置意味着设备自动信任局域网内的对端，这会降低防范恶意设备接入的安全性；而提高安全性则需要用户进行配对设置。"
+          }
+        ],
+        "unknowns": [
+          "当旧电脑意外损坏无法开机时，用户对数据恢复的具体期望与容忍度。",
+          "用户所期望的‘不用任何设置’是否绝对排除了首次使用新设备时的安全配对确认操作。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2",
+          "case": "case-05",
+          "duration_ms": 31592,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-05__B2__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "用户在换电脑进行数据同步时，新旧两台电脑在某一时刻是可以同时开机并处于可连接状态的",
+              "知识库的数据总体积在局域网内直接传输的合理范围内，不需要海量公网带宽支持"
+            ],
+            "candidates": [
+              "局域网内设备直连的安全发现与双向加密数据同步功能",
+              "设备所有权绑定采用首次接触时的极简配对交互（例如通过临时二维码扫描确认）"
+            ],
+            "confirmed": [
+              "产品定位为个人知识库",
+              "隐私与离线约束：任何内容均不能离开用户电脑",
+              "多设备体验诉求：用户更换电脑后数据自动同步，且无需进行任何繁琐设置"
+            ],
+            "conflicts": [
+              "‘任何内容不能离开用户电脑（绝对物理离线）’与‘换电脑后数据自动同步（数据必须跨设备流转）’存在逻辑冲突。若严格遵守数据绝不离开原物理设备，则新电脑无法获取任何数据；若要在新电脑上自动展现，数据就必须通过某种介质（网络或物理硬件）离开原电脑。同时，在完全没有中心化账户和用户主动设置的前提下，自动发现并同步数据极易导致在共享网络环境中将数据错误同步给他人设备的严重安全冲突。"
+            ],
+            "gaps": [
+              {
+                "area": "设备安全身份确认机制",
+                "dependency": "多设备数据安全流转边界的定义",
+                "impact": "若缺少必要的安全防范，自动同步可能导致局域网内其他无关设备恶意或无意中获取用户敏感知识库内容。",
+                "reason": "‘无需任何设置’使得系统无法自动区分新电脑是否真正属于该用户，必须引入一种极简的物理或局域网所有权确认闭环。",
+                "severity": "critical",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "数据绝不通过任何外部网络，确保物理级隐私；但要求同步时新旧电脑必须处于同一局域网内且同时开机。",
+                    "label": "局域网设备直连加密流转（数据不下网，仅需在新旧设备首次靠近时进行一次性扫码配对确认）"
+                  },
+                  {
+                    "impact": "提供最便捷的跨网络自动同步体验；但数据需要以强加密状态存储在外部服务器上，且用户需要配置或登录第三方存储空间。",
+                    "label": "端到端加密云端中转同步（数据本地加密后上云，换电脑登录账号即可自动解密同步）"
+                  },
+                  {
+                    "impact": "确保数据绝对不出物理设备，且不需要任何网络传输；但完全牺牲了自动同步的便利性，换电脑时必须手动备份并拷贝文件。",
+                    "label": "纯物理介质手动备份与迁移（数据绝对不出设备，不通过网络传输，完全由用户手动导入导出）"
+                  }
+                ],
+                "question": "在坚持‘数据不流向任何外部服务器’的前提下，要实现新旧电脑间的数据同步，数据必须离开原电脑进行传输。您倾向于哪种同步与迁移的产品方案？",
+                "reason": "此决策是解决‘绝对离线隐私’与‘多设备自动同步’冲突的核心设计分水岭，直接决定后续产品流转机制的定义。",
+                "recommendation": "(Recommended) 局域网设备直连加密流转（数据不下网，仅需在新旧设备首次靠近时进行一次性扫码配对确认）",
+                "recommendation_reason": "该方案在保留绝对隐私（数据不上网、不离开用户物理掌控）的前提下，通过仅一次且极简的安全确认，实现了新旧设备间局域网内接近自动的加密流转，取得了隐私与便利的最佳平衡。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "能有效防止设备硬件损坏或丢失带来的毁灭性数据丢失，但需要用户偶尔手动导出备份包并妥善保管。",
+                    "label": "接受。产品提供简单的一键本地加密导出备份功能，由用户自行保管备份包。"
+                  },
+                  {
+                    "impact": "维持极致的免操作体验，但一旦旧电脑不可用，新电脑将完全无法恢复或找回任何历史数据。",
+                    "label": "不接受。完全无需用户操作备份，宁可承担因设备损坏导致数据彻底丢失的风险。"
+                  }
+                ],
+                "question": "如果新旧电脑无法同时在线（例如旧电脑意外损坏、丢失或已格式化），您是否接受通过手动备份文件（如定期导出到安全的物理介质）作为灾难恢复的兜底手段？",
+                "reason": "在不借助第三方云端且设备无法直连的前提下，若无备份，硬件损坏将导致数据永久丢失。需要明确您对该场景的容忍度。",
+                "recommendation": "(Recommended) 接受。提供一键本地加密导出备份功能，并在日常使用中温和引导用户将其存至安全介质。",
+                "recommendation_reason": "在不牺牲离线隐私的前提下，为用户提供对抗硬件故障的唯一可靠防线，且不增加日常使用的配置负担。"
+              }
+            ],
+            "risks": [
+              "若在网络中进行无配对的自动发现与同步，可能导致共享局域网（如公共Wi-Fi）内其他设备非法读取或写入个人知识库的安全风险。",
+              "若旧设备永久损坏且无任何外部介质备份，将面临数据彻底丢失且无法恢复的风险。"
+            ],
+            "tensions": [
+              {
+                "description": "极致隐私与同步便利性的折衷",
+                "reason": "为了维持最高级别的隐私（数据不下网），必须牺牲跨越地理位置或不同网络环境的即时同步便利，同步范围被限制在相同局域网或物理空间下。"
+              },
+              {
+                "description": "零设置体验与数据安全防范的权衡",
+                "reason": "完全零设置意味着设备自动信任局域网内的对端，这会降低防范恶意设备接入的安全性；而提高安全性则需要用户进行配对设置。"
+              }
+            ],
+            "unknowns": [
+              "当旧电脑意外损坏无法开机时，用户对数据恢复的具体期望与容忍度。",
+              "用户所期望的‘不用任何设置’是否绝对排除了首次使用新设备时的安全配对确认操作。"
+            ]
+          },
+          "prompt_chars": 3795,
+          "context_chars": 70,
+          "user_input_chars": 59,
+          "input_tokens": 20487,
+          "output_tokens": 8314,
+          "thinking_tokens": 6925,
+          "total_tokens": 28801,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20487,
+            "output_tokens": 8314,
+            "thinking_tokens": 6925,
+            "cache_read_tokens": 0,
+            "total_tokens": 28801
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 31592,
+        "input_tokens": 20487,
+        "output_tokens": 8314,
+        "thinking_tokens": 6925,
+        "total_tokens": 28801,
+        "cache_read_tokens": 0,
+        "prompt_chars": 3795,
+        "context_chars": 70,
+        "user_input_chars": 59
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "E2EE",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:05:08.904Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 4,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.7,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B",
+      "case": "case-06",
+      "name": "windows-desktop-inventory",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "单机数据备份由用户手动复制数据库文件或导出到外部U盘完成",
+          "老板与店员共用同一台前台电脑进行操作和导出报表",
+          "初期不需要支持复杂的单据打印，仅支持标准系统默认打印或暂不打印",
+          "配件库存扣减在维修单完成或领料时自动进行"
+        ],
+        "candidates": [
+          "使用 WPF (.NET 9) + SQLite 开发，保证原生的 Windows 体验、高性能与轻量级部署",
+          "使用 Tauri + React/Vue + SQLite 开发，易于未来向 Web/局域网架构进行迁移和跨平台适配",
+          "使用 WinForms + SQLite 开发，适合极速开发与老旧 Windows 机器的极致兼容"
+        ],
+        "confirmed": [
+          "平台为 Windows 桌面端应用",
+          "初始运行环境为完全离线单机运行",
+          "核心业务模块包括配件管理、客户管理、维修单管理以及报表导出",
+          "主要用户角色为前台店员（录入数据）与老板（查看报表）",
+          "未来有升级为局域网共享的规划"
+        ],
+        "conflicts": [
+          "“完全离线单机”与“未来局域网共享”在数据库选型上存在潜在冲突：SQLite 适合单机极简运行，但无法安全支撑局域网多端并发写入，直接共享数据库文件极易损坏。"
+        ],
+        "gaps": [
+          {
+            "area": "数据库架构与网络演进",
+            "dependency": "数据库访问层设计",
+            "impact": "若前期未做 Repository 数据层抽象，升级局域网时需要重写整个数据访问代码。",
+            "reason": "从单机 SQLite 升级到局域网多端共享可能会因为并发冲突导致重构风险。",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "数据安全性与备份",
+            "dependency": "无依赖",
+            "impact": "完全离线单机运行下，若系统或硬盘损坏将导致所有业务数据彻底丢失。",
+            "reason": "用户未提及数据备份机制。",
+            "severity": "low",
+            "should_ask_user": false
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "开发成本略微增加，但未来局域网升级非常平滑，无需重构核心代码。",
+                "label": "保持单机 SQLite，但代码做数据层抽象，未来通过配置切换为局域网数据库（如 PostgreSQL/MySQL）"
+              },
+              {
+                "impact": "一步到位，但第一版的开发和部署复杂度会有所增加。",
+                "label": "直接在第一版就设计成局域网架构（如本地启动轻量级 API 服务），其他电脑通过浏览器或客户端访问"
+              },
+              {
+                "impact": "第一版开发极快，但未来升级局域网时需要重写大量底层代码。",
+                "label": "第一版仅考虑绝对单机，未来有局域网需求时再进行彻底重构"
+              }
+            ],
+            "question": "关于“未来加局域网共享”，您更倾向于哪种技术升级路径？",
+            "reason": "这决定了第一版的数据库架构是否需要引入面向局域网的接口设计，以避免后期重构。",
+            "recommendation": "(Recommended) 采用 SQLite 作为本地数据库，但在代码中通过 Repository 模式进行抽象，以便未来低成本切换为局域网数据库（如 PostgreSQL/MySQL）。",
+            "recommendation_reason": "这种设计能在 MVP 阶段保持完全离线和轻量化，同时为未来的局域网多用户并发写入提供平滑的过渡路径，避免重构整个应用。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "能防止配件被其他单据占用，但如果维修取消，需要处理复杂的库存回滚。",
+                "label": "维修单创建/添加配件时立即预扣减库存"
+              },
+              {
+                "impact": "最符合实际业务流，避免了频繁的库存回滚操作。",
+                "label": "维修单标记为“已完成”或“已领料”时扣减库存"
+              },
+              {
+                "impact": "系统开发最简单，但极易出现人工漏改，导致数据不准。",
+                "label": "由店员手动修改配件库存，维修单仅做文本记录，不自动扣减"
+              }
+            ],
+            "question": "店员在维修单中关联配件时，库存应该在什么时候自动扣减？",
+            "reason": "需要明确库存扣减的业务节点，以确保老板导出的库存报表准确无误。",
+            "recommendation": "(Recommended) 在维修单被标记为“已完成”或“已领料”时自动扣减库存数量。",
+            "recommendation_reason": "自动扣减能最大程度减少人工操作失误，确保老板导出的 Excel 库存报表是准确的。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "完全离线，不依赖任何网络服务，开发周期短，最稳定。",
+                "label": "直接在前台电脑上通过软件界面导出 Excel 到本地文件夹或 U 盘"
+              },
+              {
+                "impact": "方便老板远程查看，但增加了网络依赖和邮箱配置的复杂度。",
+                "label": "如果未来有网络，支持定时通过邮件自动将报表发送到老板邮箱"
+              }
+            ],
+            "question": "老板每日查看的 Excel 报表，首期推荐采用何种导出和交付方式？",
+            "reason": "这决定了是否需要开发邮件自动发送或网络传输功能，或者仅在本地生成文件。",
+            "recommendation": "(Recommended) 直接在前台电脑上由软件界面导出 Excel 到本地文件夹或 U 盘。",
+            "recommendation_reason": "因为是单机离线版，老板和店员使用同一台电脑，最直接简单的方式就是直接导出到本地目录。"
+          }
+        ],
+        "risks": [
+          "单机离线运行无自动云备份，若硬盘损坏或中毒将导致数据永久丢失。",
+          "若初期完全不进行抽象设计，未来升级局域网多端共享时需重构整个数据访问层。",
+          "使用网络共享 SQLite 数据库文件易导致数据损坏与锁冲突。"
+        ],
+        "unknowns": [
+          "未来局域网共享的具体并发规模与读写模式（是仅查看还是多端同时读写）",
+          "是否需要与任何外部系统（如扫码枪、打印机、短信通知）进行硬件对接",
+          "老板是否需要远程查看报表（即使在单机离线阶段）"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B",
+          "case": "case-06",
+          "duration_ms": 28520,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-06__B__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "单机数据备份由用户手动复制数据库文件或导出到外部U盘完成",
+              "老板与店员共用同一台前台电脑进行操作和导出报表",
+              "初期不需要支持复杂的单据打印，仅支持标准系统默认打印或暂不打印",
+              "配件库存扣减在维修单完成或领料时自动进行"
+            ],
+            "candidates": [
+              "使用 WPF (.NET 9) + SQLite 开发，保证原生的 Windows 体验、高性能与轻量级部署",
+              "使用 Tauri + React/Vue + SQLite 开发，易于未来向 Web/局域网架构进行迁移和跨平台适配",
+              "使用 WinForms + SQLite 开发，适合极速开发与老旧 Windows 机器的极致兼容"
+            ],
+            "confirmed": [
+              "平台为 Windows 桌面端应用",
+              "初始运行环境为完全离线单机运行",
+              "核心业务模块包括配件管理、客户管理、维修单管理以及报表导出",
+              "主要用户角色为前台店员（录入数据）与老板（查看报表）",
+              "未来有升级为局域网共享的规划"
+            ],
+            "conflicts": [
+              "“完全离线单机”与“未来局域网共享”在数据库选型上存在潜在冲突：SQLite 适合单机极简运行，但无法安全支撑局域网多端并发写入，直接共享数据库文件极易损坏。"
+            ],
+            "gaps": [
+              {
+                "area": "数据库架构与网络演进",
+                "dependency": "数据库访问层设计",
+                "impact": "若前期未做 Repository 数据层抽象，升级局域网时需要重写整个数据访问代码。",
+                "reason": "从单机 SQLite 升级到局域网多端共享可能会因为并发冲突导致重构风险。",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "数据安全性与备份",
+                "dependency": "无依赖",
+                "impact": "完全离线单机运行下，若系统或硬盘损坏将导致所有业务数据彻底丢失。",
+                "reason": "用户未提及数据备份机制。",
+                "severity": "low",
+                "should_ask_user": false
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "开发成本略微增加，但未来局域网升级非常平滑，无需重构核心代码。",
+                    "label": "保持单机 SQLite，但代码做数据层抽象，未来通过配置切换为局域网数据库（如 PostgreSQL/MySQL）"
+                  },
+                  {
+                    "impact": "一步到位，但第一版的开发和部署复杂度会有所增加。",
+                    "label": "直接在第一版就设计成局域网架构（如本地启动轻量级 API 服务），其他电脑通过浏览器或客户端访问"
+                  },
+                  {
+                    "impact": "第一版开发极快，但未来升级局域网时需要重写大量底层代码。",
+                    "label": "第一版仅考虑绝对单机，未来有局域网需求时再进行彻底重构"
+                  }
+                ],
+                "question": "关于“未来加局域网共享”，您更倾向于哪种技术升级路径？",
+                "reason": "这决定了第一版的数据库架构是否需要引入面向局域网的接口设计，以避免后期重构。",
+                "recommendation": "(Recommended) 采用 SQLite 作为本地数据库，但在代码中通过 Repository 模式进行抽象，以便未来低成本切换为局域网数据库（如 PostgreSQL/MySQL）。",
+                "recommendation_reason": "这种设计能在 MVP 阶段保持完全离线和轻量化，同时为未来的局域网多用户并发写入提供平滑的过渡路径，避免重构整个应用。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "能防止配件被其他单据占用，但如果维修取消，需要处理复杂的库存回滚。",
+                    "label": "维修单创建/添加配件时立即预扣减库存"
+                  },
+                  {
+                    "impact": "最符合实际业务流，避免了频繁的库存回滚操作。",
+                    "label": "维修单标记为“已完成”或“已领料”时扣减库存"
+                  },
+                  {
+                    "impact": "系统开发最简单，但极易出现人工漏改，导致数据不准。",
+                    "label": "由店员手动修改配件库存，维修单仅做文本记录，不自动扣减"
+                  }
+                ],
+                "question": "店员在维修单中关联配件时，库存应该在什么时候自动扣减？",
+                "reason": "需要明确库存扣减的业务节点，以确保老板导出的库存报表准确无误。",
+                "recommendation": "(Recommended) 在维修单被标记为“已完成”或“已领料”时自动扣减库存数量。",
+                "recommendation_reason": "自动扣减能最大程度减少人工操作失误，确保老板导出的 Excel 库存报表是准确的。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "完全离线，不依赖任何网络服务，开发周期短，最稳定。",
+                    "label": "直接在前台电脑上通过软件界面导出 Excel 到本地文件夹或 U 盘"
+                  },
+                  {
+                    "impact": "方便老板远程查看，但增加了网络依赖和邮箱配置的复杂度。",
+                    "label": "如果未来有网络，支持定时通过邮件自动将报表发送到老板邮箱"
+                  }
+                ],
+                "question": "老板每日查看的 Excel 报表，首期推荐采用何种导出和交付方式？",
+                "reason": "这决定了是否需要开发邮件自动发送或网络传输功能，或者仅在本地生成文件。",
+                "recommendation": "(Recommended) 直接在前台电脑上由软件界面导出 Excel 到本地文件夹或 U 盘。",
+                "recommendation_reason": "因为是单机离线版，老板和店员使用同一台电脑，最直接简单的方式就是直接导出到本地目录。"
+              }
+            ],
+            "risks": [
+              "单机离线运行无自动云备份，若硬盘损坏或中毒将导致数据永久丢失。",
+              "若初期完全不进行抽象设计，未来升级局域网多端共享时需重构整个数据访问层。",
+              "使用网络共享 SQLite 数据库文件易导致数据损坏与锁冲突。"
+            ],
+            "unknowns": [
+              "未来局域网共享的具体并发规模与读写模式（是仅查看还是多端同时读写）",
+              "是否需要与任何外部系统（如扫码枪、打印机、短信通知）进行硬件对接",
+              "老板是否需要远程查看报表（即使在单机离线阶段）"
+            ]
+          },
+          "prompt_chars": 1085,
+          "context_chars": 96,
+          "user_input_chars": 85,
+          "input_tokens": 19873,
+          "output_tokens": 7220,
+          "thinking_tokens": 5780,
+          "total_tokens": 27093,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 19873,
+            "output_tokens": 7220,
+            "thinking_tokens": 5780,
+            "cache_read_tokens": 0,
+            "total_tokens": 27093
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 28520,
+        "input_tokens": 19873,
+        "output_tokens": 7220,
+        "thinking_tokens": 5780,
+        "total_tokens": 27093,
+        "cache_read_tokens": 0,
+        "prompt_chars": 1085,
+        "context_chars": 96,
+        "user_input_chars": 85
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "React",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Vue",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Tauri",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "PostgreSQL",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "SQLite",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "MySQL",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:06:28.857Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 3,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.7,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B2",
+      "case": "case-06",
+      "name": "windows-desktop-inventory",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "结算货币默认为人民币（CNY）",
+          "每日导出的 Excel 文件将保存在用户本地指定的文件夹中",
+          "系统界面语言采用简体中文"
+        ],
+        "candidates": [
+          "在维修单中增加维修状态跟踪（例如：待修、进行中、已完工、已取走）",
+          "客户管理支持通过姓名或电话快速检索历史维修记录",
+          "配件管理支持设置安全库存预警，当数量低于阈值时进行提示",
+          "提供本地数据备份与恢复功能，以防单机硬件故障导致数据丢失"
+        ],
+        "confirmed": [
+          "目标用户为小型维修店",
+          "软件运行平台为 Windows 桌面端",
+          "店员需支持离线录入配件、客户和维修单",
+          "老板需要每日导出 Excel 以查看库存和收入",
+          "首期仅部署在一台前台电脑上单机使用",
+          "未来有在局域网内进行多机共享的潜在扩展需求"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "库存扣减业务流",
+            "dependency": "无",
+            "impact": "如果两者完全独立，店员需手动双重修改，易出现漏记或记错，导致库存数据失真。",
+            "reason": "用户未明确维修单消耗配件时，配件库存是否应当自动扣减。若不自动扣除，账面库存与实际库存将脱节，难以保证每日库存导出的准确性。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "多角色数据安全访问",
+            "dependency": "无",
+            "impact": "店员可能会接触到敏感的店铺财务报表及配件进货价，存在信息泄露风险。",
+            "reason": "单机多用户共用时，缺乏对敏感财务数据（如成本、收入导出）的访问控制。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "保证库存与业务的实时同步，减少人工操作，但需要在维修单和配件间建立关联逻辑。",
+                "label": "(Recommended) 自动关联扣减：录入维修单时选择所用配件，系统自动减少对应配件的库存数量。"
+              },
+              {
+                "impact": "系统各模块结构更简单、开发更快，但需要店员进行二次操作，容易出现漏改导致库存不准。",
+                "label": "完全独立管理：店员手动录入维修单，并单独手动去修改配件库存数量。"
+              }
+            ],
+            "question": "当店员创建维修单并使用配件时，系统是否需要自动扣减配件库存？",
+            "reason": "这决定了库存与维修业务的耦合程度。自动扣减能保证数据实时一致，而独立管理虽然系统结构更简单，但需要人工二次录入，极易出错。",
+            "recommendation": "(Recommended) 自动关联扣减：录入维修单时选择所用配件，系统自动减少对应配件的库存数量。",
+            "recommendation_reason": "这能实现业务闭环，大幅减少人工录入失误，保证老板看到的库存数据真实可靠。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "保障店铺财务数据安全，避免敏感财务与进货成本信息对店员公开。",
+                "label": "(Recommended) 角色权限区分：店员和老板使用不同的密码登录，店员屏蔽“导出 Excel”及财务敏感功能。"
+              },
+              {
+                "impact": "操作体验极其简便，省去登录步骤，但财务和成本数据对所有操作该电脑的人公开。",
+                "label": "无需权限区分：系统不设登录界面，打开即可使用全部功能，店员与老板共用同一套界面。"
+              }
+            ],
+            "question": "由于前期只有一台电脑供店员和老板共享使用，系统是否需要登录账号以区分不同角色的操作权限？",
+            "reason": "店员与老板关注的信息不同，特别是财务收入和配件进价属于敏感数据，需防范非授权查看或篡改。",
+            "recommendation": "(Recommended) 角色权限区分：通过简单的本地密码或角色选择进行登录，店员屏蔽“导出 Excel”及财务敏感功能。",
+            "recommendation_reason": "这能在单机共享环境下有效保障敏感经营数据的安全。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "未来升级局域网共享时，能以极低成本平滑过渡，无需重构底层存储逻辑。",
+                "label": "(Recommended) 架构预留：第一阶段单机运行，但底层设计支持未来多台电脑并发读写。"
+              },
+              {
+                "impact": "首版交付速度最快，但未来若要升级局域网共享，可能需要重写数据存储层。",
+                "label": "暂不考虑未来扩展：仅针对单机最简单的方式进行快速设计与交付。"
+              }
+            ],
+            "question": "对于未来“局域网共享”的潜在需求，在第一阶段的设计中，我们应该为多用户并发写入预留多少扩展性？",
+            "reason": "这直接影响底层的存储架构设计。若初期不作任何预留，未来升级时可能面临较大重构；若进行架构预留，会略微增加前期的考量，但有利于长远扩展。",
+            "recommendation": "(Recommended) 架构预留：第一阶段保持单机运行，但底层数据存取设计保留支持多用户并发扩展的能力。",
+            "recommendation_reason": "在不增加初期开发复杂度的情况下，为未来多用户共享预留升级空间，避免高额重构成本。"
+          }
+        ],
+        "risks": [
+          "单机离线运行风险：若前台电脑发生硬件损坏或系统崩溃，可能导致所有历史数据丢失",
+          "未来局域网升级风险：若初期设计未考虑多用户扩展，未来升级局域网共享时可能面临较大重构"
+        ],
+        "tensions": [
+          {
+            "description": "单机开发的极简性与未来局域网共享扩展性的折中",
+            "reason": "采用最简本地文件存储可实现快速交付，但若要兼顾未来局域网共享，则需要在底层数据结构设计上多做一些考量，这会略微增加前期的设计复杂度。"
+          }
+        ],
+        "unknowns": [
+          "配件、客户及维修单具体需要录入哪些核心业务字段",
+          "导出的 Excel 报表在格式、统计维度上是否有特定的排版要求",
+          "未来局域网共享时，是否需要多台电脑同时并发修改数据，还是仅需单向数据查看"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2",
+          "case": "case-06",
+          "duration_ms": 27472,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-06__B2__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "结算货币默认为人民币（CNY）",
+              "每日导出的 Excel 文件将保存在用户本地指定的文件夹中",
+              "系统界面语言采用简体中文"
+            ],
+            "candidates": [
+              "在维修单中增加维修状态跟踪（例如：待修、进行中、已完工、已取走）",
+              "客户管理支持通过姓名或电话快速检索历史维修记录",
+              "配件管理支持设置安全库存预警，当数量低于阈值时进行提示",
+              "提供本地数据备份与恢复功能，以防单机硬件故障导致数据丢失"
+            ],
+            "confirmed": [
+              "目标用户为小型维修店",
+              "软件运行平台为 Windows 桌面端",
+              "店员需支持离线录入配件、客户和维修单",
+              "老板需要每日导出 Excel 以查看库存和收入",
+              "首期仅部署在一台前台电脑上单机使用",
+              "未来有在局域网内进行多机共享的潜在扩展需求"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "库存扣减业务流",
+                "dependency": "无",
+                "impact": "如果两者完全独立，店员需手动双重修改，易出现漏记或记错，导致库存数据失真。",
+                "reason": "用户未明确维修单消耗配件时，配件库存是否应当自动扣减。若不自动扣除，账面库存与实际库存将脱节，难以保证每日库存导出的准确性。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "多角色数据安全访问",
+                "dependency": "无",
+                "impact": "店员可能会接触到敏感的店铺财务报表及配件进货价，存在信息泄露风险。",
+                "reason": "单机多用户共用时，缺乏对敏感财务数据（如成本、收入导出）的访问控制。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "保证库存与业务的实时同步，减少人工操作，但需要在维修单和配件间建立关联逻辑。",
+                    "label": "(Recommended) 自动关联扣减：录入维修单时选择所用配件，系统自动减少对应配件的库存数量。"
+                  },
+                  {
+                    "impact": "系统各模块结构更简单、开发更快，但需要店员进行二次操作，容易出现漏改导致库存不准。",
+                    "label": "完全独立管理：店员手动录入维修单，并单独手动去修改配件库存数量。"
+                  }
+                ],
+                "question": "当店员创建维修单并使用配件时，系统是否需要自动扣减配件库存？",
+                "reason": "这决定了库存与维修业务的耦合程度。自动扣减能保证数据实时一致，而独立管理虽然系统结构更简单，但需要人工二次录入，极易出错。",
+                "recommendation": "(Recommended) 自动关联扣减：录入维修单时选择所用配件，系统自动减少对应配件的库存数量。",
+                "recommendation_reason": "这能实现业务闭环，大幅减少人工录入失误，保证老板看到的库存数据真实可靠。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "保障店铺财务数据安全，避免敏感财务与进货成本信息对店员公开。",
+                    "label": "(Recommended) 角色权限区分：店员和老板使用不同的密码登录，店员屏蔽“导出 Excel”及财务敏感功能。"
+                  },
+                  {
+                    "impact": "操作体验极其简便，省去登录步骤，但财务和成本数据对所有操作该电脑的人公开。",
+                    "label": "无需权限区分：系统不设登录界面，打开即可使用全部功能，店员与老板共用同一套界面。"
+                  }
+                ],
+                "question": "由于前期只有一台电脑供店员和老板共享使用，系统是否需要登录账号以区分不同角色的操作权限？",
+                "reason": "店员与老板关注的信息不同，特别是财务收入和配件进价属于敏感数据，需防范非授权查看或篡改。",
+                "recommendation": "(Recommended) 角色权限区分：通过简单的本地密码或角色选择进行登录，店员屏蔽“导出 Excel”及财务敏感功能。",
+                "recommendation_reason": "这能在单机共享环境下有效保障敏感经营数据的安全。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "未来升级局域网共享时，能以极低成本平滑过渡，无需重构底层存储逻辑。",
+                    "label": "(Recommended) 架构预留：第一阶段单机运行，但底层设计支持未来多台电脑并发读写。"
+                  },
+                  {
+                    "impact": "首版交付速度最快，但未来若要升级局域网共享，可能需要重写数据存储层。",
+                    "label": "暂不考虑未来扩展：仅针对单机最简单的方式进行快速设计与交付。"
+                  }
+                ],
+                "question": "对于未来“局域网共享”的潜在需求，在第一阶段的设计中，我们应该为多用户并发写入预留多少扩展性？",
+                "reason": "这直接影响底层的存储架构设计。若初期不作任何预留，未来升级时可能面临较大重构；若进行架构预留，会略微增加前期的考量，但有利于长远扩展。",
+                "recommendation": "(Recommended) 架构预留：第一阶段保持单机运行，但底层数据存取设计保留支持多用户并发扩展的能力。",
+                "recommendation_reason": "在不增加初期开发复杂度的情况下，为未来多用户共享预留升级空间，避免高额重构成本。"
+              }
+            ],
+            "risks": [
+              "单机离线运行风险：若前台电脑发生硬件损坏或系统崩溃，可能导致所有历史数据丢失",
+              "未来局域网升级风险：若初期设计未考虑多用户扩展，未来升级局域网共享时可能面临较大重构"
+            ],
+            "tensions": [
+              {
+                "description": "单机开发的极简性与未来局域网共享扩展性的折中",
+                "reason": "采用最简本地文件存储可实现快速交付，但若要兼顾未来局域网共享，则需要在底层数据结构设计上多做一些考量，这会略微增加前期的设计复杂度。"
+              }
+            ],
+            "unknowns": [
+              "配件、客户及维修单具体需要录入哪些核心业务字段",
+              "导出的 Excel 报表在格式、统计维度上是否有特定的排版要求",
+              "未来局域网共享时，是否需要多台电脑同时并发修改数据，还是仅需单向数据查看"
+            ]
+          },
+          "prompt_chars": 3821,
+          "context_chars": 96,
+          "user_input_chars": 85,
+          "input_tokens": 20503,
+          "output_tokens": 9643,
+          "thinking_tokens": 8171,
+          "total_tokens": 30146,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20503,
+            "output_tokens": 9643,
+            "thinking_tokens": 8171,
+            "cache_read_tokens": 0,
+            "total_tokens": 30146
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 27472,
+        "input_tokens": 20503,
+        "output_tokens": 9643,
+        "thinking_tokens": 8171,
+        "total_tokens": 30146,
+        "cache_read_tokens": 0,
+        "prompt_chars": 3821,
+        "context_chars": 96,
+        "user_input_chars": 85
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T08:06:56.331Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 4,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.8,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B",
+      "case": "case-08",
+      "name": "local-first-notes",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "The app targets modern web browsers (PWA) as the primary platform to maximize team accessibility and ease of adoption.",
+          "A centralized sync server is acceptable to coordinate synchronization, store persistent backups, and manage user identity.",
+          "Users require a rich text editing interface (e.g. lists, headings, formatting) rather than plain text or markdown.",
+          "Media files (images/attachments) are secondary to text synchronization and can be handled via lazy uploading/downloading once online."
+        ],
+        "candidates": [
+          "Yjs + TipTap/ProseMirror (CRDT-based rich text editor with real-time and offline collaborative sync)",
+          "Automerge + custom document editor (JSON-based document CRDT)",
+          "Electric SQL / RxDB / Replicache (Local-first relational/document database synchronization engines)",
+          "Git-like branching and manual merge reconciliation for notes/sections"
+        ],
+        "confirmed": [
+          "Local-first architecture: The application must store and manage data locally by default.",
+          "Offline editing: Team members must be able to create, view, and edit notes without an active internet connection.",
+          "Automatic merge on reconnect: Notes must sync and merge automatically once a network connection is recovered.",
+          "Overwrite prevention: The system must prevent team members' edits from easily overwriting each other when merging.",
+          "Domain focus: Team meeting notes."
+        ],
+        "conflicts": [
+          "Offline Collaboration vs Identity/Permissions: Collaborative editing requires knowing who edited what to enforce permissions, but offline-first means authorization status cannot be validated against a server in real-time.",
+          "Automatic Character-Level Merging vs User Intent: While CRDTs automatically merge changes to avoid manual conflicts, overlapping edits can still lead to semantic gibberish or logical conflicts (e.g., duplicated action items) that technically 'overwrite' or disrupt a user's intent."
+        ],
+        "gaps": [
+          {
+            "area": "Data Sync & Conflict Resolution",
+            "dependency": "CRDT vs Database Sync Engine selection",
+            "impact": "Directly determines the feasibility of the 'cannot easily overwrite others' changes' requirement.",
+            "reason": "CRDTs (Yjs) allow real-time character-level merging, whereas local-first DB sync (Replicache/RxDB) works at the document/row level. This choice dictates the entire tech stack.",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "Target Platforms",
+            "dependency": "Platform-specific storage and file system APIs",
+            "impact": "Affects storage persistence guarantees (IndexedDB can be cleared by browsers, native SQLite/OPFS is more persistent).",
+            "reason": "We need to know whether to build a Web App (PWA) or a Desktop App (Tauri) for local-first storage persistence.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Identity & Authentication",
+            "dependency": "User session persistence when offline",
+            "impact": "Affects permission checks and edit history tracking when offline.",
+            "reason": "If a user is offline, they cannot authenticate with a remote OAuth provider. We need a way to sign in / identify users offline.",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Uses IndexedDB/OPFS for storage. Easy to share links, works on all devices offline, but browser storage is subject to eviction.",
+                "label": "Web App (PWA)"
+              },
+              {
+                "impact": "Allows native SQLite databases, robust filesystem access, and guaranteed storage persistence, but requires manual installation.",
+                "label": "Desktop App (Tauri / Electron)"
+              },
+              {
+                "impact": "Convenient for on-the-go meetings, uses SQLite, but editing long notes on mobile can be cumbersome.",
+                "label": "Mobile-first (React Native / Flutter)"
+              }
+            ],
+            "question": "What platform should be the primary target for this local-first meeting notes application?",
+            "reason": "Determines the storage engine, offline capabilities, and deployment complexity.",
+            "recommendation": "(Recommended) Web App (Progressive Web App / PWA)",
+            "recommendation_reason": "PWA offers low friction for team collaboration, offline capabilities via Service Workers, and cross-platform compatibility without native installation."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "No manual conflict prompts; changes merge gracefully, but might require minor manual cleanup if edits overlap semantically.",
+                "label": "Automated character-level merge (CRDT / Yjs)"
+              },
+              {
+                "impact": "Users explicitly review and choose which version of a paragraph/section to keep. Very safe but high friction.",
+                "label": "Block-level versioning & manual review (Git-like)"
+              },
+              {
+                "impact": "Simpler to implement, but edits from one of the users are discarded entirely if they edit the same document.",
+                "label": "Document-level branching with Last-Write-Wins (LWW)"
+              }
+            ],
+            "question": "How should conflicts be resolved when multiple offline edits are merged?",
+            "reason": "Crucial for the core requirement of 'not easily overwriting others' changes'.",
+            "recommendation": "(Recommended) Automated character-level merge (CRDT / Yjs)",
+            "recommendation_reason": "Yjs merges character-level changes automatically in a conflict-free manner, providing a Google Docs-like experience even after offline editing."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Requires server hosting, but provides a reliable source of truth, secure backups, and easy team permissions.",
+                "label": "Centralized Sync Server"
+              },
+              {
+                "impact": "No server hosting costs, high privacy, but requires devices to be online on the same local network simultaneously to sync.",
+                "label": "Peer-to-Peer (P2P) Local Sync (e.g., WebRTC)"
+              }
+            ],
+            "question": "How should synchronization work when the network is restored?",
+            "reason": "Decides the infrastructure architecture and backend requirements.",
+            "recommendation": "(Recommended) Centralized Sync Server (e.g., Yjs websocket server or Electric SQL)",
+            "recommendation_reason": "A centralized server makes user identity verification, persistence, sharing links, and initial sync setup extremely reliable."
+          }
+        ],
+        "risks": [
+          "High architectural complexity of CRDTs/OT compared to standard REST-based client-server apps.",
+          "Browser storage limits (IndexedDB/OPFS limits) if notes contain large attachments or history.",
+          "Semantic merge conflicts: CRDTs merge text safely at the character level, but can produce unreadable sentences if users edit the same line.",
+          "First-time load and seed sync performance as notes database grows."
+        ],
+        "unknowns": [
+          "Target deployment platforms (Web, Desktop, or Mobile) and local storage size requirements.",
+          "Identity model and user authentication flow when offline.",
+          "P2P local network sync requirement vs centralized server-facilitated sync.",
+          "Granularity of conflict resolution (character-level real-time vs block-level vs document-level)."
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B",
+          "case": "case-08",
+          "duration_ms": 23372,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-08__B__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "The app targets modern web browsers (PWA) as the primary platform to maximize team accessibility and ease of adoption.",
+              "A centralized sync server is acceptable to coordinate synchronization, store persistent backups, and manage user identity.",
+              "Users require a rich text editing interface (e.g. lists, headings, formatting) rather than plain text or markdown.",
+              "Media files (images/attachments) are secondary to text synchronization and can be handled via lazy uploading/downloading once online."
+            ],
+            "candidates": [
+              "Yjs + TipTap/ProseMirror (CRDT-based rich text editor with real-time and offline collaborative sync)",
+              "Automerge + custom document editor (JSON-based document CRDT)",
+              "Electric SQL / RxDB / Replicache (Local-first relational/document database synchronization engines)",
+              "Git-like branching and manual merge reconciliation for notes/sections"
+            ],
+            "confirmed": [
+              "Local-first architecture: The application must store and manage data locally by default.",
+              "Offline editing: Team members must be able to create, view, and edit notes without an active internet connection.",
+              "Automatic merge on reconnect: Notes must sync and merge automatically once a network connection is recovered.",
+              "Overwrite prevention: The system must prevent team members' edits from easily overwriting each other when merging.",
+              "Domain focus: Team meeting notes."
+            ],
+            "conflicts": [
+              "Offline Collaboration vs Identity/Permissions: Collaborative editing requires knowing who edited what to enforce permissions, but offline-first means authorization status cannot be validated against a server in real-time.",
+              "Automatic Character-Level Merging vs User Intent: While CRDTs automatically merge changes to avoid manual conflicts, overlapping edits can still lead to semantic gibberish or logical conflicts (e.g., duplicated action items) that technically 'overwrite' or disrupt a user's intent."
+            ],
+            "gaps": [
+              {
+                "area": "Data Sync & Conflict Resolution",
+                "dependency": "CRDT vs Database Sync Engine selection",
+                "impact": "Directly determines the feasibility of the 'cannot easily overwrite others' changes' requirement.",
+                "reason": "CRDTs (Yjs) allow real-time character-level merging, whereas local-first DB sync (Replicache/RxDB) works at the document/row level. This choice dictates the entire tech stack.",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "Target Platforms",
+                "dependency": "Platform-specific storage and file system APIs",
+                "impact": "Affects storage persistence guarantees (IndexedDB can be cleared by browsers, native SQLite/OPFS is more persistent).",
+                "reason": "We need to know whether to build a Web App (PWA) or a Desktop App (Tauri) for local-first storage persistence.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Identity & Authentication",
+                "dependency": "User session persistence when offline",
+                "impact": "Affects permission checks and edit history tracking when offline.",
+                "reason": "If a user is offline, they cannot authenticate with a remote OAuth provider. We need a way to sign in / identify users offline.",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Uses IndexedDB/OPFS for storage. Easy to share links, works on all devices offline, but browser storage is subject to eviction.",
+                    "label": "Web App (PWA)"
+                  },
+                  {
+                    "impact": "Allows native SQLite databases, robust filesystem access, and guaranteed storage persistence, but requires manual installation.",
+                    "label": "Desktop App (Tauri / Electron)"
+                  },
+                  {
+                    "impact": "Convenient for on-the-go meetings, uses SQLite, but editing long notes on mobile can be cumbersome.",
+                    "label": "Mobile-first (React Native / Flutter)"
+                  }
+                ],
+                "question": "What platform should be the primary target for this local-first meeting notes application?",
+                "reason": "Determines the storage engine, offline capabilities, and deployment complexity.",
+                "recommendation": "(Recommended) Web App (Progressive Web App / PWA)",
+                "recommendation_reason": "PWA offers low friction for team collaboration, offline capabilities via Service Workers, and cross-platform compatibility without native installation."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "No manual conflict prompts; changes merge gracefully, but might require minor manual cleanup if edits overlap semantically.",
+                    "label": "Automated character-level merge (CRDT / Yjs)"
+                  },
+                  {
+                    "impact": "Users explicitly review and choose which version of a paragraph/section to keep. Very safe but high friction.",
+                    "label": "Block-level versioning & manual review (Git-like)"
+                  },
+                  {
+                    "impact": "Simpler to implement, but edits from one of the users are discarded entirely if they edit the same document.",
+                    "label": "Document-level branching with Last-Write-Wins (LWW)"
+                  }
+                ],
+                "question": "How should conflicts be resolved when multiple offline edits are merged?",
+                "reason": "Crucial for the core requirement of 'not easily overwriting others' changes'.",
+                "recommendation": "(Recommended) Automated character-level merge (CRDT / Yjs)",
+                "recommendation_reason": "Yjs merges character-level changes automatically in a conflict-free manner, providing a Google Docs-like experience even after offline editing."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Requires server hosting, but provides a reliable source of truth, secure backups, and easy team permissions.",
+                    "label": "Centralized Sync Server"
+                  },
+                  {
+                    "impact": "No server hosting costs, high privacy, but requires devices to be online on the same local network simultaneously to sync.",
+                    "label": "Peer-to-Peer (P2P) Local Sync (e.g., WebRTC)"
+                  }
+                ],
+                "question": "How should synchronization work when the network is restored?",
+                "reason": "Decides the infrastructure architecture and backend requirements.",
+                "recommendation": "(Recommended) Centralized Sync Server (e.g., Yjs websocket server or Electric SQL)",
+                "recommendation_reason": "A centralized server makes user identity verification, persistence, sharing links, and initial sync setup extremely reliable."
+              }
+            ],
+            "risks": [
+              "High architectural complexity of CRDTs/OT compared to standard REST-based client-server apps.",
+              "Browser storage limits (IndexedDB/OPFS limits) if notes contain large attachments or history.",
+              "Semantic merge conflicts: CRDTs merge text safely at the character level, but can produce unreadable sentences if users edit the same line.",
+              "First-time load and seed sync performance as notes database grows."
+            ],
+            "unknowns": [
+              "Target deployment platforms (Web, Desktop, or Mobile) and local storage size requirements.",
+              "Identity model and user authentication flow when offline.",
+              "P2P local network sync requirement vs centralized server-facilitated sync.",
+              "Granularity of conflict resolution (character-level real-time vs block-level vs document-level)."
+            ]
+          },
+          "prompt_chars": 1077,
+          "context_chars": 88,
+          "user_input_chars": 77,
+          "input_tokens": 19861,
+          "output_tokens": 6753,
+          "thinking_tokens": 5197,
+          "total_tokens": 26614,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 19861,
+            "output_tokens": 6753,
+            "thinking_tokens": 5197,
+            "cache_read_tokens": 0,
+            "total_tokens": 26614
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 23372,
+        "input_tokens": 19861,
+        "output_tokens": 6753,
+        "thinking_tokens": 5197,
+        "total_tokens": 26614,
+        "cache_read_tokens": 0,
+        "prompt_chars": 1077,
+        "context_chars": 88,
+        "user_input_chars": 77
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "React",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Tauri",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Electron",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "SQLite",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "CRDT",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "WebSocket",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "OAuth",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:07:19.706Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.9,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B2",
+      "case": "case-08",
+      "name": "local-first-notes",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "Meeting notes primarily consist of rich text, headers, lists, and basic structural formatting.",
+          "The application is targeted at desktop and web platforms where users typically take meeting notes.",
+          "A single meeting note will typically have a small-to-medium number of concurrent editors (e.g., 2 to 10 users)."
+        ],
+        "candidates": [
+          "Block-based document structure to isolate user edits to specific paragraphs or sections.",
+          "Visual difference (diff) viewer to highlight merged or conflicting changes made by different team members.",
+          "Local version history/changelog interface to inspect, compare, and revert to previous states of the document.",
+          "Direct device-to-device synchronization over local area networks to share updates without public internet access."
+        ],
+        "confirmed": [
+          "The product is a team meeting notes application.",
+          "Notes are stored locally on the device by default (local-first).",
+          "Notes can be edited without an active network connection.",
+          "When connection is restored, team members must see the merged content.",
+          "The merging process must not easily overwrite other users' modifications."
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "User Identity Attribution",
+            "dependency": "Requires deciding on the offline identity model (e.g., pre-linked accounts vs local profiles).",
+            "impact": "Without verified identity, we cannot accurately attribute edits or enforce permissions, violating the 'not easily overwrite' requirement.",
+            "reason": "We need a way to identify users and attribute their edits during offline sessions.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Initial Note Sharing Flow",
+            "dependency": "Requires deciding on the initial note sharing mechanism (online team space vs offline file transfer).",
+            "impact": "Users cannot start collaborating on a note local-first unless there is a mechanism to establish the initial secure sync link between devices.",
+            "reason": "The initial connection and sharing flow between team members' devices is unspecified.",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Low friction, keeps document flow intact, but leaves the user to clean up duplicate sections manually.",
+                "label": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing."
+              },
+              {
+                "impact": "Guarantees immediate cleanup, but interrupts the user's workflow during a live meeting.",
+                "label": "Show a blocking conflict-resolution popup screen requiring the user to choose or merge changes before editing can continue."
+              },
+              {
+                "impact": "Zero workflow interruption, but users might not realize their offline changes were moved to history.",
+                "label": "Automatically choose the latest edit based on local device timestamps, but save the overridden version in an easily accessible page history."
+              }
+            ],
+            "question": "When offline edits to the exact same text block conflict, how should the application present and resolve them upon reconnection?",
+            "reason": "This defines the core user experience for collaboration and directly shapes how the system prevents overwriting others' work.",
+            "recommendation": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing.",
+            "recommendation_reason": "This prevents any data loss or immediate popup friction, keeping the meeting note editable while making the conflicting edits transparent."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Ensures strong security and consistent user profiles, but introduces a dependency on an initial internet connection.",
+                "label": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing."
+              },
+              {
+                "impact": "Fully offline from the start, but lacks verification, allowing anyone to claim another user's identity.",
+                "label": "Allow users to set a local display name and avatar directly on their device without any online login requirement."
+              }
+            ],
+            "question": "How should the application establish user identity to attribute edits, especially when working offline?",
+            "reason": "Establishing identity is necessary to label who wrote what and prevent unauthorized edits, but requiring online auth conflicts with the offline-first goal.",
+            "recommendation": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing.",
+            "recommendation_reason": "This ensures secure edit attribution and access control, while still allowing full offline editing capability once set up."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Highly convenient and automated, but requires a brief online phase before the meeting starts.",
+                "label": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices."
+              },
+              {
+                "impact": "Enables 100% offline note distribution, but increases manual file management effort for the users.",
+                "label": "Allow exporting and importing note files (e.g., via local file transfer or messaging apps) completely offline."
+              }
+            ],
+            "question": "How should team members initially share and link a new meeting note before they go offline?",
+            "reason": "We need to define how devices discover each other or how the note metadata is distributed to enable subsequent offline syncing.",
+            "recommendation": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices.",
+            "recommendation_reason": "This matches typical meeting workflows where agendas are set up beforehand, ensuring seamless transition to offline note-taking."
+          }
+        ],
+        "risks": [
+          "Simultaneous edits to the exact same sentence or word by offline users may result in confusing auto-merges that degrade readability.",
+          "Data sync latency or loss if a user edits offline and closes the application or device before reconnecting and syncing changes.",
+          "Privacy risk if sensitive meeting notes are synced over insecure local network channels without end-to-end encryption."
+        ],
+        "tensions": [
+          {
+            "description": "Automatic seamless merging vs. manual review overhead.",
+            "reason": "Fully automatic merges minimize user effort but risk creating grammatically or logically confused text. Requiring manual reviews preserves accuracy but increases friction for note-takers."
+          },
+          {
+            "description": "Local-first autonomy vs. real-time collaborative awareness.",
+            "reason": "Working completely offline gives users freedom and resilience, but prevents them from knowing who is currently modifying the same sections, increasing the likelihood of conflict."
+          }
+        ],
+        "unknowns": [
+          "How the system should identify users and verify edit permissions, especially while offline.",
+          "How notes are initially shared or linked between team members before they begin editing offline.",
+          "Whether non-text media attachments (such as audio recordings, images, or PDF slides) need to be stored and synchronized offline."
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2",
+          "case": "case-08",
+          "duration_ms": 27904,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-08__B2__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "Meeting notes primarily consist of rich text, headers, lists, and basic structural formatting.",
+              "The application is targeted at desktop and web platforms where users typically take meeting notes.",
+              "A single meeting note will typically have a small-to-medium number of concurrent editors (e.g., 2 to 10 users)."
+            ],
+            "candidates": [
+              "Block-based document structure to isolate user edits to specific paragraphs or sections.",
+              "Visual difference (diff) viewer to highlight merged or conflicting changes made by different team members.",
+              "Local version history/changelog interface to inspect, compare, and revert to previous states of the document.",
+              "Direct device-to-device synchronization over local area networks to share updates without public internet access."
+            ],
+            "confirmed": [
+              "The product is a team meeting notes application.",
+              "Notes are stored locally on the device by default (local-first).",
+              "Notes can be edited without an active network connection.",
+              "When connection is restored, team members must see the merged content.",
+              "The merging process must not easily overwrite other users' modifications."
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "User Identity Attribution",
+                "dependency": "Requires deciding on the offline identity model (e.g., pre-linked accounts vs local profiles).",
+                "impact": "Without verified identity, we cannot accurately attribute edits or enforce permissions, violating the 'not easily overwrite' requirement.",
+                "reason": "We need a way to identify users and attribute their edits during offline sessions.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Initial Note Sharing Flow",
+                "dependency": "Requires deciding on the initial note sharing mechanism (online team space vs offline file transfer).",
+                "impact": "Users cannot start collaborating on a note local-first unless there is a mechanism to establish the initial secure sync link between devices.",
+                "reason": "The initial connection and sharing flow between team members' devices is unspecified.",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "Low friction, keeps document flow intact, but leaves the user to clean up duplicate sections manually.",
+                    "label": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing."
+                  },
+                  {
+                    "impact": "Guarantees immediate cleanup, but interrupts the user's workflow during a live meeting.",
+                    "label": "Show a blocking conflict-resolution popup screen requiring the user to choose or merge changes before editing can continue."
+                  },
+                  {
+                    "impact": "Zero workflow interruption, but users might not realize their offline changes were moved to history.",
+                    "label": "Automatically choose the latest edit based on local device timestamps, but save the overridden version in an easily accessible page history."
+                  }
+                ],
+                "question": "When offline edits to the exact same text block conflict, how should the application present and resolve them upon reconnection?",
+                "reason": "This defines the core user experience for collaboration and directly shapes how the system prevents overwriting others' work.",
+                "recommendation": "(Recommended) Automatically preserve both edits inline with visual markers, allowing users to resolve the text naturally during editing.",
+                "recommendation_reason": "This prevents any data loss or immediate popup friction, keeping the meeting note editable while making the conflicting edits transparent."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Ensures strong security and consistent user profiles, but introduces a dependency on an initial internet connection.",
+                    "label": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing."
+                  },
+                  {
+                    "impact": "Fully offline from the start, but lacks verification, allowing anyone to claim another user's identity.",
+                    "label": "Allow users to set a local display name and avatar directly on their device without any online login requirement."
+                  }
+                ],
+                "question": "How should the application establish user identity to attribute edits, especially when working offline?",
+                "reason": "Establishing identity is necessary to label who wrote what and prevent unauthorized edits, but requiring online auth conflicts with the offline-first goal.",
+                "recommendation": "(Recommended) Require a one-time online login to link the device to a verified team account before allowing offline editing.",
+                "recommendation_reason": "This ensures secure edit attribution and access control, while still allowing full offline editing capability once set up."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Highly convenient and automated, but requires a brief online phase before the meeting starts.",
+                    "label": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices."
+                  },
+                  {
+                    "impact": "Enables 100% offline note distribution, but increases manual file management effort for the users.",
+                    "label": "Allow exporting and importing note files (e.g., via local file transfer or messaging apps) completely offline."
+                  }
+                ],
+                "question": "How should team members initially share and link a new meeting note before they go offline?",
+                "reason": "We need to define how devices discover each other or how the note metadata is distributed to enable subsequent offline syncing.",
+                "recommendation": "(Recommended) Create the meeting note on a shared team space when online, which automatically syncs it to all members' devices.",
+                "recommendation_reason": "This matches typical meeting workflows where agendas are set up beforehand, ensuring seamless transition to offline note-taking."
+              }
+            ],
+            "risks": [
+              "Simultaneous edits to the exact same sentence or word by offline users may result in confusing auto-merges that degrade readability.",
+              "Data sync latency or loss if a user edits offline and closes the application or device before reconnecting and syncing changes.",
+              "Privacy risk if sensitive meeting notes are synced over insecure local network channels without end-to-end encryption."
+            ],
+            "tensions": [
+              {
+                "description": "Automatic seamless merging vs. manual review overhead.",
+                "reason": "Fully automatic merges minimize user effort but risk creating grammatically or logically confused text. Requiring manual reviews preserves accuracy but increases friction for note-takers."
+              },
+              {
+                "description": "Local-first autonomy vs. real-time collaborative awareness.",
+                "reason": "Working completely offline gives users freedom and resilience, but prevents them from knowing who is currently modifying the same sections, increasing the likelihood of conflict."
+              }
+            ],
+            "unknowns": [
+              "How the system should identify users and verify edit permissions, especially while offline.",
+              "How notes are initially shared or linked between team members before they begin editing offline.",
+              "Whether non-text media attachments (such as audio recordings, images, or PDF slides) need to be stored and synchronized offline."
+            ]
+          },
+          "prompt_chars": 3813,
+          "context_chars": 88,
+          "user_input_chars": 77,
+          "input_tokens": 21234,
+          "output_tokens": 10939,
+          "thinking_tokens": 8163,
+          "total_tokens": 32173,
+          "cache_read_tokens": 28546,
+          "raw_usage": {
+            "input_tokens": 21234,
+            "output_tokens": 10939,
+            "thinking_tokens": 8163,
+            "cache_read_tokens": 28546,
+            "total_tokens": 32173
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 27904,
+        "input_tokens": 21234,
+        "output_tokens": 10939,
+        "thinking_tokens": 8163,
+        "total_tokens": 32173,
+        "cache_read_tokens": 28546,
+        "prompt_chars": 3813,
+        "context_chars": 88,
+        "user_input_chars": 77
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "E2EE",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:07:47.612Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.9,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B",
+      "case": "case-09",
+      "name": "password-manager",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "采用零知识（Zero-Knowledge）加密架构，所有敏感数据均在客户端加密后再同步，服务器无法解密。",
+          "主密码（Master Password）是唯一解密凭证，不提供服务器端的密码找回功能。",
+          "移动端同时支持 Android 和 iOS 平台。",
+          "浏览器插件主要针对 Chromium 系浏览器（Chrome, Edge）和 Firefox。"
+        ],
+        "candidates": [
+          "使用 Argon2id 作为密钥派生函数（KDF），结合 AES-256-GCM 进行本地加密。",
+          "第一阶段仅开发浏览器插件（覆盖桌面端）和移动端 App（如 React Native / Flutter），暂缓原生 Windows 桌面端。",
+          "后端同步服务支持自托管（Self-hosted），并提供 Docker 部署镜像。",
+          "利用各大平台的原生 Autofill API（如 Android Autofill, iOS Credentials Provider, 浏览器 Extension Scripting）实现自动填充。"
+        ],
+        "confirmed": [
+          "开发一款密码管理器，用于保存网站账号、密码、信用卡信息和安全笔记。",
+          "支持自动填充（Autofill）功能。",
+          "目标平台包括 Windows、浏览器插件和手机。",
+          "支持在设备间同步数据。"
+        ],
+        "conflicts": [
+          "全平台开发 vs 快速交付：同时开发 Windows + 浏览器插件 + 手机 App 的 MVP 范围过大，与快速验证核心功能冲突。",
+          "高安全性 vs 易用性（密码找回）：零知识加密无法找回密码，与普通用户期望的“忘记密码找回”体验冲突。"
+        ],
+        "gaps": [
+          {
+            "area": "安全与加密架构",
+            "dependency": "决定了本地数据库结构和同步 API 的接口设计。",
+            "impact": "如果安全架构不明确，后续的所有数据存储和同步设计都可能存在严重安全漏洞。",
+            "reason": "用户想法中未提及加密机制。作为密码管理器，这是最核心的基石，必须在编码前确立。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "MVP 平台范围",
+            "dependency": "决定了技术栈选型（如是否需要跨平台桌面框架）。",
+            "impact": "分散开发精力，导致各个平台的自动填充和同步体验都难以做好。",
+            "reason": "同时支持 Windows、浏览器和手机端，对于 MVP 来说范围过大，容易导致项目开发周期过长。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "同步机制与后端托管",
+            "dependency": "网络同步协议设计。",
+            "impact": "影响后端的部署复杂度与用户的隐私控制度。",
+            "reason": "设备间同步需要后端支持，但用户未指定是自建服务、使用第三方云盘（如 WebDAV）还是闭源托管云。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "确保极高的安全性，但主密码一旦遗失将无法找回数据。",
+                "label": "零知识加密（客户端加密，服务器仅存储加密密文，无法解密）"
+              },
+              {
+                "impact": "最安全，但无法实现多设备自动同步，用户体验较差。",
+                "label": "纯本地存储（不进行云端同步，通过文件手动导出/导入）"
+              },
+              {
+                "impact": "开发简单，可提供密码找回功能，但安全性较低，服务器管理员或黑客可能获取明文。",
+                "label": "传统云端加密（由服务器负责加密/解密）"
+              }
+            ],
+            "question": "为了确保您的密码管理器安全，您倾向于采用哪种加密与存储架构？",
+            "reason": "加密架构是密码管理器的核心，决定了系统的安全等级和用户数据的生命周期。",
+            "recommendation": "(Recommended) 零知识加密架构（客户端加密，服务器仅存储加密后的密文，使用 Argon2id + AES-256-GCM）",
+            "recommendation_reason": "这是现代安全密码管理器（如 Bitwarden, 1Password）的标准做法，能最大程度保证即使服务器被黑客入侵，用户的明文密码也不会泄露。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "性价比最高，桌面端通过浏览器插件完成自动填充，移动端满足便携需求。",
+                "label": "浏览器插件 + 移动端 App（覆盖大部分桌面和移动场景）"
+              },
+              {
+                "impact": "网页端自动填充体验较差，通常需要插件支持。",
+                "label": "纯网页端 + 移动端 App"
+              },
+              {
+                "impact": "工作量极大，多端适配和自动填充的实现会显著拉长开发周期。",
+                "label": "全平台同时开发（Windows + 浏览器插件 + 移动端）"
+              }
+            ],
+            "question": "由于同时开发 Windows 客户端、浏览器插件和手机 App 的 MVP 范围过大，您建议第一阶段（MVP）先从哪些平台开始？",
+            "reason": "减少初始开发范围，能更快交付可运行的版本并进行测试。",
+            "recommendation": "(Recommended) 优先开发浏览器插件 + 移动端 App（使用 Web 视图或跨平台框架），因为浏览器插件能覆盖绝大多数桌面端需求",
+            "recommendation_reason": "浏览器插件是电脑端使用率最高的入口，配合移动端即可满足绝大多数用户的日常跨设备使用场景。Windows 桌面端可在后续迭代中作为原生应用或通过 Tauri/Electron 包装插件代码实现。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "体验最好，支持自动同步，对用户隐私友好。",
+                "label": "自建轻量级云端同步服务（支持 Docker 部署与自托管）"
+              },
+              {
+                "impact": "无需开发后端服务，用户数据存在自己的云盘，但配置较繁琐，且某些平台（如插件）访问受限。",
+                "label": "集成第三方云盘同步（如 WebDAV, iCloud, Google Drive, OneDrive）"
+              },
+              {
+                "impact": "无需公网服务器，安全性高，但要求设备在同一局域网下同时在线才能同步。",
+                "label": "仅限局域网同步（P2P 同步）"
+              }
+            ],
+            "question": "您希望如何实现设备间的同步功能？",
+            "reason": "设备同步需要后端服务支持，这决定了系统架构的复杂度。",
+            "recommendation": "(Recommended) 开发一个轻量级的云端同步 API服务（例如使用 NestJS/Go/Python，支持 Docker 部署与自托管）",
+            "recommendation_reason": "能够实现无缝自动同步，且支持自托管（Self-hosted）对隐私要求高的用户极具吸引力。"
+          }
+        ],
+        "risks": [
+          "主密码遗失风险：由于是零知识加密，用户遗失主密码将导致所有数据永久丢失。",
+          "自动填充兼容性风险：不同浏览器及移动操作系统的自动填充 API 规范差异大，维护成本高。",
+          "同步冲突风险：在多设备离线编辑后同时上线，可能产生数据同步冲突导致数据覆盖。",
+          "安全性漏洞风险：客户端加密实现若存在逻辑漏洞，可能导致用户密码保险库被攻破。"
+        ],
+        "unknowns": [
+          "具体使用的跨平台技术栈（如 Web 技术、Flutter、React Native 或 Kotlin Multiplatform）。",
+          "是否需要支持生物识别登录（如 Windows Hello、Face ID / Touch ID）。",
+          "是否需要离线编辑功能（在无网状态下允许修改并记录冲突）。",
+          "是否需要团队/家庭分享功能，还是仅限单人使用。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B",
+          "case": "case-09",
+          "duration_ms": 21869,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-09__B__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "采用零知识（Zero-Knowledge）加密架构，所有敏感数据均在客户端加密后再同步，服务器无法解密。",
+              "主密码（Master Password）是唯一解密凭证，不提供服务器端的密码找回功能。",
+              "移动端同时支持 Android 和 iOS 平台。",
+              "浏览器插件主要针对 Chromium 系浏览器（Chrome, Edge）和 Firefox。"
+            ],
+            "candidates": [
+              "使用 Argon2id 作为密钥派生函数（KDF），结合 AES-256-GCM 进行本地加密。",
+              "第一阶段仅开发浏览器插件（覆盖桌面端）和移动端 App（如 React Native / Flutter），暂缓原生 Windows 桌面端。",
+              "后端同步服务支持自托管（Self-hosted），并提供 Docker 部署镜像。",
+              "利用各大平台的原生 Autofill API（如 Android Autofill, iOS Credentials Provider, 浏览器 Extension Scripting）实现自动填充。"
+            ],
+            "confirmed": [
+              "开发一款密码管理器，用于保存网站账号、密码、信用卡信息和安全笔记。",
+              "支持自动填充（Autofill）功能。",
+              "目标平台包括 Windows、浏览器插件和手机。",
+              "支持在设备间同步数据。"
+            ],
+            "conflicts": [
+              "全平台开发 vs 快速交付：同时开发 Windows + 浏览器插件 + 手机 App 的 MVP 范围过大，与快速验证核心功能冲突。",
+              "高安全性 vs 易用性（密码找回）：零知识加密无法找回密码，与普通用户期望的“忘记密码找回”体验冲突。"
+            ],
+            "gaps": [
+              {
+                "area": "安全与加密架构",
+                "dependency": "决定了本地数据库结构和同步 API 的接口设计。",
+                "impact": "如果安全架构不明确，后续的所有数据存储和同步设计都可能存在严重安全漏洞。",
+                "reason": "用户想法中未提及加密机制。作为密码管理器，这是最核心的基石，必须在编码前确立。",
+                "severity": "critical",
+                "should_ask_user": true
+              },
+              {
+                "area": "MVP 平台范围",
+                "dependency": "决定了技术栈选型（如是否需要跨平台桌面框架）。",
+                "impact": "分散开发精力，导致各个平台的自动填充和同步体验都难以做好。",
+                "reason": "同时支持 Windows、浏览器和手机端，对于 MVP 来说范围过大，容易导致项目开发周期过长。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "同步机制与后端托管",
+                "dependency": "网络同步协议设计。",
+                "impact": "影响后端的部署复杂度与用户的隐私控制度。",
+                "reason": "设备间同步需要后端支持，但用户未指定是自建服务、使用第三方云盘（如 WebDAV）还是闭源托管云。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "确保极高的安全性，但主密码一旦遗失将无法找回数据。",
+                    "label": "零知识加密（客户端加密，服务器仅存储加密密文，无法解密）"
+                  },
+                  {
+                    "impact": "最安全，但无法实现多设备自动同步，用户体验较差。",
+                    "label": "纯本地存储（不进行云端同步，通过文件手动导出/导入）"
+                  },
+                  {
+                    "impact": "开发简单，可提供密码找回功能，但安全性较低，服务器管理员或黑客可能获取明文。",
+                    "label": "传统云端加密（由服务器负责加密/解密）"
+                  }
+                ],
+                "question": "为了确保您的密码管理器安全，您倾向于采用哪种加密与存储架构？",
+                "reason": "加密架构是密码管理器的核心，决定了系统的安全等级和用户数据的生命周期。",
+                "recommendation": "(Recommended) 零知识加密架构（客户端加密，服务器仅存储加密后的密文，使用 Argon2id + AES-256-GCM）",
+                "recommendation_reason": "这是现代安全密码管理器（如 Bitwarden, 1Password）的标准做法，能最大程度保证即使服务器被黑客入侵，用户的明文密码也不会泄露。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "性价比最高，桌面端通过浏览器插件完成自动填充，移动端满足便携需求。",
+                    "label": "浏览器插件 + 移动端 App（覆盖大部分桌面和移动场景）"
+                  },
+                  {
+                    "impact": "网页端自动填充体验较差，通常需要插件支持。",
+                    "label": "纯网页端 + 移动端 App"
+                  },
+                  {
+                    "impact": "工作量极大，多端适配和自动填充的实现会显著拉长开发周期。",
+                    "label": "全平台同时开发（Windows + 浏览器插件 + 移动端）"
+                  }
+                ],
+                "question": "由于同时开发 Windows 客户端、浏览器插件和手机 App 的 MVP 范围过大，您建议第一阶段（MVP）先从哪些平台开始？",
+                "reason": "减少初始开发范围，能更快交付可运行的版本并进行测试。",
+                "recommendation": "(Recommended) 优先开发浏览器插件 + 移动端 App（使用 Web 视图或跨平台框架），因为浏览器插件能覆盖绝大多数桌面端需求",
+                "recommendation_reason": "浏览器插件是电脑端使用率最高的入口，配合移动端即可满足绝大多数用户的日常跨设备使用场景。Windows 桌面端可在后续迭代中作为原生应用或通过 Tauri/Electron 包装插件代码实现。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "体验最好，支持自动同步，对用户隐私友好。",
+                    "label": "自建轻量级云端同步服务（支持 Docker 部署与自托管）"
+                  },
+                  {
+                    "impact": "无需开发后端服务，用户数据存在自己的云盘，但配置较繁琐，且某些平台（如插件）访问受限。",
+                    "label": "集成第三方云盘同步（如 WebDAV, iCloud, Google Drive, OneDrive）"
+                  },
+                  {
+                    "impact": "无需公网服务器，安全性高，但要求设备在同一局域网下同时在线才能同步。",
+                    "label": "仅限局域网同步（P2P 同步）"
+                  }
+                ],
+                "question": "您希望如何实现设备间的同步功能？",
+                "reason": "设备同步需要后端服务支持，这决定了系统架构的复杂度。",
+                "recommendation": "(Recommended) 开发一个轻量级的云端同步 API服务（例如使用 NestJS/Go/Python，支持 Docker 部署与自托管）",
+                "recommendation_reason": "能够实现无缝自动同步，且支持自托管（Self-hosted）对隐私要求高的用户极具吸引力。"
+              }
+            ],
+            "risks": [
+              "主密码遗失风险：由于是零知识加密，用户遗失主密码将导致所有数据永久丢失。",
+              "自动填充兼容性风险：不同浏览器及移动操作系统的自动填充 API 规范差异大，维护成本高。",
+              "同步冲突风险：在多设备离线编辑后同时上线，可能产生数据同步冲突导致数据覆盖。",
+              "安全性漏洞风险：客户端加密实现若存在逻辑漏洞，可能导致用户密码保险库被攻破。"
+            ],
+            "unknowns": [
+              "具体使用的跨平台技术栈（如 Web 技术、Flutter、React Native 或 Kotlin Multiplatform）。",
+              "是否需要支持生物识别登录（如 Windows Hello、Face ID / Touch ID）。",
+              "是否需要离线编辑功能（在无网状态下允许修改并记录冲突）。",
+              "是否需要团队/家庭分享功能，还是仅限单人使用。"
+            ]
+          },
+          "prompt_chars": 1069,
+          "context_chars": 80,
+          "user_input_chars": 69,
+          "input_tokens": 19861,
+          "output_tokens": 7133,
+          "thinking_tokens": 5456,
+          "total_tokens": 26994,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 19861,
+            "output_tokens": 7133,
+            "thinking_tokens": 5456,
+            "cache_read_tokens": 0,
+            "total_tokens": 26994
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 21869,
+        "input_tokens": 19861,
+        "output_tokens": 7133,
+        "thinking_tokens": 5456,
+        "total_tokens": 26994,
+        "cache_read_tokens": 0,
+        "prompt_chars": 1069,
+        "context_chars": 80,
+        "user_input_chars": 69
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "React",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Tauri",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Electron",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Python",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "zero-knowledge",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        },
+        {
+          "type": "possible-premature-tech",
+          "term": "Docker",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:08:09.484Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.9,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b-vs-b2-targeted-1",
+      "variant": "B2",
+      "case": "case-09",
+      "name": "password-manager",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "目标用户为追求便利且有跨设备凭证管理需求的个人普通消费者",
+          "手机平台特指 iOS 和 Android 两个主流移动操作系统",
+          "自动填充功能主要针对主流网页浏览器（如 Chrome、Edge、Safari）和手机系统自带的自动填充服务框架"
+        ],
+        "candidates": [
+          "采用零知识（Zero-Knowledge）加密架构以保障数据绝对隐私",
+          "基于主密码（Master Password）在客户端进行本地密钥派生与数据解密",
+          "支持设备原生的生物识别解锁（如指纹/面部识别）以提升日常解锁体验"
+        ],
+        "confirmed": [
+          "产品形态为密码管理器",
+          "核心功能是保存网站账号、密码、信用卡信息和安全笔记",
+          "需要提供自动填充功能",
+          "目标平台包含 Windows、浏览器插件和手机端",
+          "支持在不同设备之间同步数据"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "MVP Scope",
+            "dependency": "确定 MVP 的核心首发平台",
+            "impact": "可能导致首发版本开发周期过长，且多平台同时开发会分散安全设计的精力，增加安全漏洞风险。",
+            "reason": "首发版本即要求同时支持 Windows、浏览器插件、手机端并实现同步，对于密码管理器这种对安全性要求极高的产品来说，开发与安全审计的工作量过大。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Data Sync Strategy",
+            "dependency": "明确同步和存储的信任模型",
+            "impact": "影响产品的技术架构、隐私政策以及用户对产品的信任度。",
+            "reason": "用户明确要求设备间同步，但尚未定义数据的存储归属与加密传输的具体隐私保护边界。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "能大幅降低首期开发难度，集中精力确保核心加密算法和同步功能的绝对安全，加快产品上线并收集用户反馈。",
+                "label": "(Recommended) 优先开发浏览器插件，以此为 MVP 核心，验证安全同步后再逐步扩展到手机和 Windows 客户端。"
+              },
+              {
+                "impact": "移动端使用体验较好，但网页端自动填充的实现会比较受限，且开发和发布审核周期较长。",
+                "label": "优先开发手机客户端，因为移动端的生物识别能提供更好的安全解锁体验。"
+              },
+              {
+                "impact": "能提供最完整的跨平台体验，但会大幅推迟项目上线时间，并显著增加安全审计的复杂度和成本。",
+                "label": "坚持首发必须同时支持所有平台（Windows、浏览器插件、手机），并实现完整的多端同步。"
+              }
+            ],
+            "question": "为了确保首个版本的安全性和快速上线，我们是否可以先专注于单一核心平台（例如浏览器插件）并配合云端同步，而不是在首发时同时支持 Windows、浏览器插件和手机？",
+            "reason": "密码管理器对安全性要求极高。同时开发和审计 Windows 客户端、浏览器插件和移动端 APP，会极大增加开发周期并带来更多潜在的安全漏洞面。先验证一个平台可以确保核心加密和同步机制足够稳固。",
+            "recommendation": "(Recommended) 优先开发浏览器插件作为 MVP 的首发平台，并提供云端同步能力。",
+            "recommendation_reason": "浏览器插件是用户使用密码管理器和自动填充功能最频繁的场景，开发成本相对较低，能最快为用户提供核心价值，同时便于迭代和安全验证。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "用户体验最流畅，安全性极高，但如果用户丢失主密码且未备份恢复密钥，数据将永久丢失。",
+                "label": "(Recommended) 零知识加密云同步：数据在用户本地加密后上传到托管云端，仅用户持有主密码，云端无法解密任何内容。"
+              },
+              {
+                "impact": "用户对数据有完全的控制权，无需信任第三方密码管理服务商，但配置门槛较高，同步体验可能不够顺畅。",
+                "label": "本地优先/用户自备云同步：数据保存在本地，通过本地局域网或用户自备的第三方云存储进行同步。"
+              },
+              {
+                "impact": "降低了用户因遗忘密码而丢失数据的风险，但意味着服务商在特定情况下能协助重置/获取解密路径，无法做到绝对的零知识隐私。",
+                "label": "传统云同步：数据加密存储在云端，但提供受限的安全恢复通道（如通过绑定的安全邮箱/手机找回密码）。"
+              }
+            ],
+            "question": "在跨设备同步时，您倾向于采用哪种数据存储与隐私控制方案？",
+            "reason": "这决定了产品的安全架构设计和用户的信任基础。不同的同步策略会直接影响到用户对隐私的掌控程度以及是否需要自备存储空间。",
+            "recommendation": "(Recommended) 采用零知识加密（Zero-Knowledge）云同步方案。",
+            "recommendation_reason": "这是目前主流安全密码管理器的标准做法。数据在本地加密后再同步，服务商无法查看内容，兼顾了多端同步的便利性和极高的隐私安全性。"
+          }
+        ],
+        "risks": [
+          "若同步时的加密实现或密钥管理不当，可能导致用户凭证在传输/存储中泄露。",
+          "若用户遗忘主密码且没有本地备份/紧急恢复密钥，会导致数据永久丢失。",
+          "自动填充机制若存在漏洞，可能会被恶意网页或跨站脚本（XSS）钓鱼窃取凭证。",
+          "多设备同时修改数据时可能产生同步冲突，导致用户最新修改的内容被覆盖。"
+        ],
+        "tensions": [
+          {
+            "description": "极高的安全性与用户便利性之间的权衡",
+            "reason": "强制要求强主密码和频繁锁屏能提高安全性，但会增加用户每次填充密码时的操作负担；自动填充越智能，越容易受到钓鱼或恶意脚本的诱骗。"
+          },
+          {
+            "description": "跨设备便捷同步与零知识隐私控制之间的权衡",
+            "reason": "零知识加密意味着服务端无法协助重置密码，一旦用户丢失主密码将永久丢失数据；而如果提供密码重置服务，则意味着服务端有能力解密数据，降低了安全信任级别。"
+          }
+        ],
+        "unknowns": [
+          "用户是否需要离线查看和编辑密码的能力",
+          "当用户遗忘主密码时的账号恢复策略（例如是否接受完全无法找回，或需要紧急联系人/本地恢复密钥等）",
+          "对于团队或家庭共享凭证的需求"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2",
+          "case": "case-09",
+          "duration_ms": 22017,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-09__B2__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "目标用户为追求便利且有跨设备凭证管理需求的个人普通消费者",
+              "手机平台特指 iOS 和 Android 两个主流移动操作系统",
+              "自动填充功能主要针对主流网页浏览器（如 Chrome、Edge、Safari）和手机系统自带的自动填充服务框架"
+            ],
+            "candidates": [
+              "采用零知识（Zero-Knowledge）加密架构以保障数据绝对隐私",
+              "基于主密码（Master Password）在客户端进行本地密钥派生与数据解密",
+              "支持设备原生的生物识别解锁（如指纹/面部识别）以提升日常解锁体验"
+            ],
+            "confirmed": [
+              "产品形态为密码管理器",
+              "核心功能是保存网站账号、密码、信用卡信息和安全笔记",
+              "需要提供自动填充功能",
+              "目标平台包含 Windows、浏览器插件和手机端",
+              "支持在不同设备之间同步数据"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "MVP Scope",
+                "dependency": "确定 MVP 的核心首发平台",
+                "impact": "可能导致首发版本开发周期过长，且多平台同时开发会分散安全设计的精力，增加安全漏洞风险。",
+                "reason": "首发版本即要求同时支持 Windows、浏览器插件、手机端并实现同步，对于密码管理器这种对安全性要求极高的产品来说，开发与安全审计的工作量过大。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Data Sync Strategy",
+                "dependency": "明确同步和存储的信任模型",
+                "impact": "影响产品的技术架构、隐私政策以及用户对产品的信任度。",
+                "reason": "用户明确要求设备间同步，但尚未定义数据的存储归属与加密传输的具体隐私保护边界。",
+                "severity": "medium",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "能大幅降低首期开发难度，集中精力确保核心加密算法和同步功能的绝对安全，加快产品上线并收集用户反馈。",
+                    "label": "(Recommended) 优先开发浏览器插件，以此为 MVP 核心，验证安全同步后再逐步扩展到手机和 Windows 客户端。"
+                  },
+                  {
+                    "impact": "移动端使用体验较好，但网页端自动填充的实现会比较受限，且开发和发布审核周期较长。",
+                    "label": "优先开发手机客户端，因为移动端的生物识别能提供更好的安全解锁体验。"
+                  },
+                  {
+                    "impact": "能提供最完整的跨平台体验，但会大幅推迟项目上线时间，并显著增加安全审计的复杂度和成本。",
+                    "label": "坚持首发必须同时支持所有平台（Windows、浏览器插件、手机），并实现完整的多端同步。"
+                  }
+                ],
+                "question": "为了确保首个版本的安全性和快速上线，我们是否可以先专注于单一核心平台（例如浏览器插件）并配合云端同步，而不是在首发时同时支持 Windows、浏览器插件和手机？",
+                "reason": "密码管理器对安全性要求极高。同时开发和审计 Windows 客户端、浏览器插件和移动端 APP，会极大增加开发周期并带来更多潜在的安全漏洞面。先验证一个平台可以确保核心加密和同步机制足够稳固。",
+                "recommendation": "(Recommended) 优先开发浏览器插件作为 MVP 的首发平台，并提供云端同步能力。",
+                "recommendation_reason": "浏览器插件是用户使用密码管理器和自动填充功能最频繁的场景，开发成本相对较低，能最快为用户提供核心价值，同时便于迭代和安全验证。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "用户体验最流畅，安全性极高，但如果用户丢失主密码且未备份恢复密钥，数据将永久丢失。",
+                    "label": "(Recommended) 零知识加密云同步：数据在用户本地加密后上传到托管云端，仅用户持有主密码，云端无法解密任何内容。"
+                  },
+                  {
+                    "impact": "用户对数据有完全的控制权，无需信任第三方密码管理服务商，但配置门槛较高，同步体验可能不够顺畅。",
+                    "label": "本地优先/用户自备云同步：数据保存在本地，通过本地局域网或用户自备的第三方云存储进行同步。"
+                  },
+                  {
+                    "impact": "降低了用户因遗忘密码而丢失数据的风险，但意味着服务商在特定情况下能协助重置/获取解密路径，无法做到绝对的零知识隐私。",
+                    "label": "传统云同步：数据加密存储在云端，但提供受限的安全恢复通道（如通过绑定的安全邮箱/手机找回密码）。"
+                  }
+                ],
+                "question": "在跨设备同步时，您倾向于采用哪种数据存储与隐私控制方案？",
+                "reason": "这决定了产品的安全架构设计和用户的信任基础。不同的同步策略会直接影响到用户对隐私的掌控程度以及是否需要自备存储空间。",
+                "recommendation": "(Recommended) 采用零知识加密（Zero-Knowledge）云同步方案。",
+                "recommendation_reason": "这是目前主流安全密码管理器的标准做法。数据在本地加密后再同步，服务商无法查看内容，兼顾了多端同步的便利性和极高的隐私安全性。"
+              }
+            ],
+            "risks": [
+              "若同步时的加密实现或密钥管理不当，可能导致用户凭证在传输/存储中泄露。",
+              "若用户遗忘主密码且没有本地备份/紧急恢复密钥，会导致数据永久丢失。",
+              "自动填充机制若存在漏洞，可能会被恶意网页或跨站脚本（XSS）钓鱼窃取凭证。",
+              "多设备同时修改数据时可能产生同步冲突，导致用户最新修改的内容被覆盖。"
+            ],
+            "tensions": [
+              {
+                "description": "极高的安全性与用户便利性之间的权衡",
+                "reason": "强制要求强主密码和频繁锁屏能提高安全性，但会增加用户每次填充密码时的操作负担；自动填充越智能，越容易受到钓鱼或恶意脚本的诱骗。"
+              },
+              {
+                "description": "跨设备便捷同步与零知识隐私控制之间的权衡",
+                "reason": "零知识加密意味着服务端无法协助重置密码，一旦用户丢失主密码将永久丢失数据；而如果提供密码重置服务，则意味着服务端有能力解密数据，降低了安全信任级别。"
+              }
+            ],
+            "unknowns": [
+              "用户是否需要离线查看和编辑密码的能力",
+              "当用户遗忘主密码时的账号恢复策略（例如是否接受完全无法找回，或需要紧急联系人/本地恢复密钥等）",
+              "对于团队或家庭共享凭证的需求"
+            ]
+          },
+          "prompt_chars": 3805,
+          "context_chars": 80,
+          "user_input_chars": 69,
+          "input_tokens": 12338,
+          "output_tokens": 6896,
+          "thinking_tokens": 5438,
+          "total_tokens": 19234,
+          "cache_read_tokens": 8149,
+          "raw_usage": {
+            "input_tokens": 12338,
+            "output_tokens": 6896,
+            "thinking_tokens": 5438,
+            "cache_read_tokens": 8149,
+            "total_tokens": 19234
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 22017,
+        "input_tokens": 12338,
+        "output_tokens": 6896,
+        "thinking_tokens": 5438,
+        "total_tokens": 19234,
+        "cache_read_tokens": 8149,
+        "prompt_chars": 3805,
+        "context_chars": 80,
+        "user_input_chars": 69
+      },
+      "technology_warnings": [
+        {
+          "type": "possible-premature-tech",
+          "term": "zero-knowledge",
+          "scope": "all-user-visible-fields",
+          "manual_review_needed": true
+        }
+      ],
+      "timestamp": "2026-08-22T08:08:31.504Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 3,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.6,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    }
+  ],
+  "variants": {
+    "B": {
+      "cases": 6,
+      "successful_cases": 6,
+      "structured_output_success_rate": 1,
+      "average_input_tokens_per_case": 18519.333333333332,
+      "average_output_tokens_per_case": 7916,
+      "average_thinking_tokens_per_case": 6164.166666666667,
+      "average_total_tokens_per_case": 26435.333333333332,
+      "average_duration_ms": 26800.5,
+      "average_prompt_chars": 1090.6666666666667,
+      "average_heuristic_quality_out_of_5": 4.833333333333333,
+      "quality_per_10k_tokens": 0.365672206390437,
+      "possible_premature_technology_warnings": 23
+    },
+    "B2": {
+      "cases": 6,
+      "successful_cases": 6,
+      "structured_output_success_rate": 1,
+      "average_input_tokens_per_case": 19271,
+      "average_output_tokens_per_case": 8618.166666666666,
+      "average_thinking_tokens_per_case": 6921.5,
+      "average_total_tokens_per_case": 27889.166666666668,
+      "average_duration_ms": 27207.166666666668,
+      "average_prompt_chars": 3826.6666666666665,
+      "average_heuristic_quality_out_of_5": 4.716666666666668,
+      "quality_per_10k_tokens": 0.33824364299160375,
+      "possible_premature_technology_warnings": 3
+    }
+  },
+  "infrastructure_adjustments": [
+    "Added isolated B2 prompt, inline schema, B2-only runner, all-field technology-warning heuristic, and B-vs-B2 reports. Variant B constitution, schema, provider, fixtures, and one-call behavior are unchanged."
+  ],
+  "generated_at": "2026-08-22T08:08:31.504Z"
+}

@@ -1,0 +1,849 @@
+{
+  "benchmark": "Project Architect Agent Benchmark v1 B2.1 Validation",
+  "run_id": "b2-1-variance-2",
+  "variant": "B2.1",
+  "cases_requested": [
+    "case-01",
+    "case-03",
+    "case-05"
+  ],
+  "cases_completed": [
+    "case-01",
+    "case-03",
+    "case-05"
+  ],
+  "stopped_early": false,
+  "stop_reason": null,
+  "guardrail": {
+    "max_input_tokens": 60000,
+    "max_total_tokens": 75000,
+    "max_duration_ms": 90000
+  },
+  "records": [
+    {
+      "run_id": "b2-1-variance-2",
+      "variant": "B2.1",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "软件首先面向个人桌面电脑用户，而非企业服务器或集群管理场景。"
+        ],
+        "candidates": [
+          "MVP 阶段聚焦于常规系统/应用临时缓存安全清理，并提供大文件/旧文件可视化占用榜单供用户选择性清理。",
+          "采用“确定性无害文件一键清理，潜在重要文件清晰提示并由用户显式确认”的安全与信任策略。"
+        ],
+        "confirmed": [
+          "目标是开发一款用于清理电脑存储空间的软件。"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "目标平台与受众定位",
+            "dependency": "无",
+            "impact": "不同桌面操作系统的存储机制、默认清理能力及用户痛点差异巨大，直接决定产品定位与核心功能设计。",
+            "reason": "尚未明确首发目标操作系统（如 Windows 或 macOS）以及核心目标用户群体。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "MVP 核心清理范围与安全边界",
+            "dependency": "目标平台与受众定位",
+            "impact": "清理范围过宽会大幅增加误删风险与体验复杂度，范围过窄则无法满足用户释放足够可用空间的核心诉求。",
+            "reason": "尚未界定首期版本仅清理无害临时文件，还是涵盖大文件、重复文件检索与应用深度残留。",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "聚焦于解决 Windows 常见的系统冗余、临时文件堆积与软件残留痛点，强调一键安全与直观体验。",
+                "label": "(Recommended) Windows 桌面平台，面向大众普通电脑用户与日常办公人群"
+              },
+              {
+                "impact": "聚焦于大体积创作缓存、开发依赖、大文件及精细化空间占用可视化分析。",
+                "label": "macOS 桌面平台，面向设计/开发/内容创作等专业用户"
+              },
+              {
+                "impact": "覆盖更广受众，但会显著增加初期产品体验统一与多系统适配的工作量。",
+                "label": "跨主流桌面平台（Windows 与 macOS 同时支持）"
+              }
+            ],
+            "question": "这款清理软件首发主要面向哪个操作系统平台与目标用户群体？",
+            "reason": "不同操作系统（如 Windows 与 macOS）自带的存储管理能力、常见垃圾文件类型及用户习惯完全不同。明确首发平台和用户画像是确立产品差异化价值与核心流程的前提。",
+            "recommendation": "(Recommended) 优先聚焦单一桌面平台（如 Windows 个人电脑用户），以需要快速腾出硬盘空间的普通大众与办公用户为核心。",
+            "recommendation_reason": "单平台切入能快速验证清理效果与交互体验，降低首发版本的复杂度，并能针对该系统的典型空间痛点（如系统升级残留、软件临时缓存）建立明确的安全清理信任。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "既能保证日常清理的零门槛与零误删风险，又能帮助急需空间的用户快速定位并清理占用大户。",
+                "label": "(Recommended) 组合模式：基础临时缓存一键安全清理 + 超大文件/旧文件可视化列表由用户确认删除"
+              },
+              {
+                "impact": "操作门槛极低、用户无心智负担，但能释放的磁盘空间总量相对有限。",
+                "label": "极简模式：仅专注于 100% 安全的系统与应用临时垃圾，主打“一键扫描、一键安全清理”"
+              },
+              {
+                "impact": "空间释放最彻底，但需要用户投入较多时间逐项决策，适合对电脑文件有一定掌控欲的用户。",
+                "label": "深度分析模式：专注于磁盘空间全景图谱分析、重复文件排查与应用深度残留清理"
+              }
+            ],
+            "question": "首发 MVP 版本的核心清理范围与用户交互方式如何界定？",
+            "reason": "清理软件的核心在于平衡“省心快速”与“数据安全”。不同清理范围（无害缓存 vs 大文件/重复文件 vs 深度卸载）对用户的决策成本和产品安全承诺要求差异极大。",
+            "recommendation": "(Recommended) 以“安全无感的一键缓存清理”配合“大文件占用可视化排行榜”为 MVP 核心。",
+            "recommendation_reason": "日常临时缓存可做到零风险一键释放，给用户即时正向反馈；而针对占用空间最大的大文件，提供清晰的视觉列表供用户自主挑选确认，兼顾安全性与显著的空间释放成效。"
+          }
+        ],
+        "risks": [
+          "误删用户重要个人文件或关键系统数据，导致系统异常或数据丢失，彻底破坏用户信任。",
+          "清理效果不明显或与操作系统自带的存储清理功能高度同质化，导致用户感知价值低。",
+          "扫描结果展示过于晦涩或技术化，增加普通用户的理解难度与决策疲劳。"
+        ],
+        "tensions": [
+          {
+            "description": "极致简化的“一键清理”与严格避免误删的数据安全控制之间的平衡。",
+            "reason": "操作越自动化、确认提示越少，用户越轻松，但误删风险越高；若每项清理均需用户逐个审查，安全性更高但会大幅增加普通用户的认知负担。"
+          },
+          {
+            "description": "深度空间释放成效与低决策成本清理的定位取舍。",
+            "reason": "无害临时缓存清理安全省心但单次释放空间有限；排查大文件、长期未用文件或应用残留能释放大量空间，但必然需要用户深入介入辨别与确认。"
+          }
+        ],
+        "unknowns": [
+          "目标操作系统平台（Windows / macOS / 多平台）。",
+          "核心目标用户画像及对技术术语的接受程度。",
+          "商业模式与产品形态（免费独立小工具、付费买断软件或增值服务）。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-01",
+          "duration_ms": 23991,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-variance-2\\case-01__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "软件首先面向个人桌面电脑用户，而非企业服务器或集群管理场景。"
+            ],
+            "candidates": [
+              "MVP 阶段聚焦于常规系统/应用临时缓存安全清理，并提供大文件/旧文件可视化占用榜单供用户选择性清理。",
+              "采用“确定性无害文件一键清理，潜在重要文件清晰提示并由用户显式确认”的安全与信任策略。"
+            ],
+            "confirmed": [
+              "目标是开发一款用于清理电脑存储空间的软件。"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "目标平台与受众定位",
+                "dependency": "无",
+                "impact": "不同桌面操作系统的存储机制、默认清理能力及用户痛点差异巨大，直接决定产品定位与核心功能设计。",
+                "reason": "尚未明确首发目标操作系统（如 Windows 或 macOS）以及核心目标用户群体。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "MVP 核心清理范围与安全边界",
+                "dependency": "目标平台与受众定位",
+                "impact": "清理范围过宽会大幅增加误删风险与体验复杂度，范围过窄则无法满足用户释放足够可用空间的核心诉求。",
+                "reason": "尚未界定首期版本仅清理无害临时文件，还是涵盖大文件、重复文件检索与应用深度残留。",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "聚焦于解决 Windows 常见的系统冗余、临时文件堆积与软件残留痛点，强调一键安全与直观体验。",
+                    "label": "(Recommended) Windows 桌面平台，面向大众普通电脑用户与日常办公人群"
+                  },
+                  {
+                    "impact": "聚焦于大体积创作缓存、开发依赖、大文件及精细化空间占用可视化分析。",
+                    "label": "macOS 桌面平台，面向设计/开发/内容创作等专业用户"
+                  },
+                  {
+                    "impact": "覆盖更广受众，但会显著增加初期产品体验统一与多系统适配的工作量。",
+                    "label": "跨主流桌面平台（Windows 与 macOS 同时支持）"
+                  }
+                ],
+                "question": "这款清理软件首发主要面向哪个操作系统平台与目标用户群体？",
+                "reason": "不同操作系统（如 Windows 与 macOS）自带的存储管理能力、常见垃圾文件类型及用户习惯完全不同。明确首发平台和用户画像是确立产品差异化价值与核心流程的前提。",
+                "recommendation": "(Recommended) 优先聚焦单一桌面平台（如 Windows 个人电脑用户），以需要快速腾出硬盘空间的普通大众与办公用户为核心。",
+                "recommendation_reason": "单平台切入能快速验证清理效果与交互体验，降低首发版本的复杂度，并能针对该系统的典型空间痛点（如系统升级残留、软件临时缓存）建立明确的安全清理信任。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "既能保证日常清理的零门槛与零误删风险，又能帮助急需空间的用户快速定位并清理占用大户。",
+                    "label": "(Recommended) 组合模式：基础临时缓存一键安全清理 + 超大文件/旧文件可视化列表由用户确认删除"
+                  },
+                  {
+                    "impact": "操作门槛极低、用户无心智负担，但能释放的磁盘空间总量相对有限。",
+                    "label": "极简模式：仅专注于 100% 安全的系统与应用临时垃圾，主打“一键扫描、一键安全清理”"
+                  },
+                  {
+                    "impact": "空间释放最彻底，但需要用户投入较多时间逐项决策，适合对电脑文件有一定掌控欲的用户。",
+                    "label": "深度分析模式：专注于磁盘空间全景图谱分析、重复文件排查与应用深度残留清理"
+                  }
+                ],
+                "question": "首发 MVP 版本的核心清理范围与用户交互方式如何界定？",
+                "reason": "清理软件的核心在于平衡“省心快速”与“数据安全”。不同清理范围（无害缓存 vs 大文件/重复文件 vs 深度卸载）对用户的决策成本和产品安全承诺要求差异极大。",
+                "recommendation": "(Recommended) 以“安全无感的一键缓存清理”配合“大文件占用可视化排行榜”为 MVP 核心。",
+                "recommendation_reason": "日常临时缓存可做到零风险一键释放，给用户即时正向反馈；而针对占用空间最大的大文件，提供清晰的视觉列表供用户自主挑选确认，兼顾安全性与显著的空间释放成效。"
+              }
+            ],
+            "risks": [
+              "误删用户重要个人文件或关键系统数据，导致系统异常或数据丢失，彻底破坏用户信任。",
+              "清理效果不明显或与操作系统自带的存储清理功能高度同质化，导致用户感知价值低。",
+              "扫描结果展示过于晦涩或技术化，增加普通用户的理解难度与决策疲劳。"
+            ],
+            "tensions": [
+              {
+                "description": "极致简化的“一键清理”与严格避免误删的数据安全控制之间的平衡。",
+                "reason": "操作越自动化、确认提示越少，用户越轻松，但误删风险越高；若每项清理均需用户逐个审查，安全性更高但会大幅增加普通用户的认知负担。"
+              },
+              {
+                "description": "深度空间释放成效与低决策成本清理的定位取舍。",
+                "reason": "无害临时缓存清理安全省心但单次释放空间有限；排查大文件、长期未用文件或应用残留能释放大量空间，但必然需要用户深入介入辨别与确认。"
+              }
+            ],
+            "unknowns": [
+              "目标操作系统平台（Windows / macOS / 多平台）。",
+              "核心目标用户画像及对技术术语的接受程度。",
+              "商业模式与产品形态（免费独立小工具、付费买断软件或增值服务）。"
+            ]
+          },
+          "prompt_chars": 5766,
+          "context_chars": 26,
+          "user_input_chars": 15,
+          "input_tokens": 20914,
+          "output_tokens": 4511,
+          "thinking_tokens": 3212,
+          "total_tokens": 25425,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20914,
+            "output_tokens": 4511,
+            "thinking_tokens": 3212,
+            "cache_read_tokens": 0,
+            "total_tokens": 25425
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 23991,
+        "input_tokens": 20914,
+        "output_tokens": 4511,
+        "thinking_tokens": 3212,
+        "total_tokens": 25425,
+        "cache_read_tokens": 0,
+        "prompt_chars": 5766,
+        "context_chars": 26,
+        "user_input_chars": 15
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:23:20.929Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.8,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b2-1-variance-2",
+      "variant": "B2.1",
+      "case": "case-03",
+      "name": "complete-study-planner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "用户的考研科目设置符合中国研究生招生考试的常规分类（公共课如政治、英语、数学及专业课）。",
+          "首批参与验证的 20 名种子用户具备在桌面电脑浏览器上规划与记录复习的日常习惯。",
+          "注册与登录主要用于区分用户与实现跨电脑查看，首版仅需基础的邮箱身份校验与密码凭据管理。"
+        ],
+        "candidates": [
+          "考研公共课阶段性大纲模板：为统考公共课提供标准复习阶段与大纲知识块模板，减少手动录入成本。",
+          "计划再平衡辅助：当任务积压或频繁延后时，主动提供周任务重排建议与负荷预警。",
+          "周度复盘视图：在每周结束时生成完成度简报与未完成原因小结，帮助调整下周时间投入。"
+        ],
+        "confirmed": [
+          "目标用户：准备考研的中国大学生。",
+          "产品形态与平台：Web 学习计划工具，首版仅支持中文界面和桌面浏览器访问。",
+          "初次引导输入：首次进入时选择考试日期、科目、每周可学习时长和当前基础。",
+          "核心生成能力：系统按周生成可由用户调整的复习计划。",
+          "主页呈现：显示本周任务、完成进度和距离考试的倒计时。",
+          "任务操作能力：任务详情页支持标记完成、延后或拆分任务。",
+          "数据与访问策略：支持邮箱注册，数据保存在云端并支持在不同电脑登录查看与编辑。",
+          "界面与体验定位：安静、具有鼓励感但不幼稚，结合日历与待办事项的形式。",
+          "MVP 排除范围：首版不包含社交、课程市场、AI 聊天和移动端。",
+          "验证方案与成功指标：先招募 20 名学生试用，以连续两周完成任务的比例判断产品价值。"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "核心计划生成规则与颗粒度",
+            "dependency": "确定初始周计划的具体生成逻辑与用户填充深度",
+            "impact": "直接影响首批用户初次进入时的上手门槛和计划的实际可执行度。",
+            "reason": "用户明确了输入项（日期、科目、时长、基础），但未定义系统是提供细化到知识点的任务大纲，还是仅生成宏观时间分配框架由用户自填。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "任务延后与计划再平衡机制",
+            "dependency": "确定任务延后后的日程重新分配策略",
+            "impact": "若缺乏合理的超载消化策略，任务频繁延后会导致后续周负荷过重，引发用户流失。",
+            "reason": "考研复习常出现实际进度落后于计划的情况，需明确延后如何影响本周与后续周的负荷。",
+            "severity": "medium",
+            "should_ask_user": false
+          },
+          {
+            "area": "专业课与自命题差异化支持策略",
+            "dependency": "明确统考科目与非统考专业课在首版中的支持范围",
+            "impact": "影响 20 名种子用户的专业覆盖度及测试有效性。",
+            "reason": "各高校自命题专业课大纲差异极大，需明确首版是否对专业课采用统一的自定义策略。",
+            "severity": "low",
+            "should_ask_user": false
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "兼顾公共课的低门槛冷启动与专业课的个性化自由度，MVP 范围可控且适用面广。",
+                "label": "(Recommended) 提供公共课（政治、英语、数学）阶段大纲模板，专业课仅生成时间框架并由用户自行填入内容"
+              },
+              {
+                "impact": "完全通用，无需维护各科目大纲，但用户首次配置耗时较长，对自主规划能力较弱的学生容易产生启动门槛。",
+                "label": "仅根据时长和基础生成每周时间块与进度节奏，所有具体学习任务均由用户自行定义"
+              },
+              {
+                "impact": "开箱即用度高，但将首版试用范围严格限制在特定统考专业考生群体中。",
+                "label": "首版仅支持特定全国统考科目，并提供完全自动化的每日细分知识点学习计划"
+              }
+            ],
+            "question": "在系统初次生成按周复习计划时，应当提供预设的科目知识大纲模板，还是由用户在规划的时间框架内自行填写任务？",
+            "reason": "核心生成逻辑直接决定了用户的初次使用体验与试用有效性。考研公共课具有较固定的复习阶段，若全部手动填写门槛高；若全部自动内置，专业课的差异又极大。明确此产品策略是界定首版范围的关键。",
+            "recommendation": "(Recommended) 提供公共课（政治、英语、数学）阶段大纲模板，专业课仅生成时间框架并由用户自行填入内容",
+            "recommendation_reason": "既能降低大部分考生在公共科目上的规划与输入成本，又能灵活包容各校自命题专业课的个性化需求，避免首版因内容录入量过大而延误验证。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "保持日程弹性，并在负荷超限时促使用户主动审视学习强度，防止滚雪球式放弃。",
+                "label": "(Recommended) 任务顺延至本周空闲时段或下周，当总负荷超过每周预设时长时给出负荷提醒并建议调整预期"
+              },
+              {
+                "impact": "由用户完全主导日程重排，但对考生的主动复盘意识要求较高。",
+                "label": "延后任务直接归入待办箱，由用户在周末统一手动重新分配到后续周"
+              }
+            ],
+            "question": "当考生在详情页选择“延后”某项任务时，系统应当如何处理该任务与后续计划的平衡？",
+            "reason": "备考期间任务拖延与积压十分常见，延后处理机制直接关系到能否达成“连续两周完成任务”的验证指标。",
+            "recommendation": "(Recommended) 任务顺延至本周空闲时段或下周，当总负荷超过每周预设时长时给出负荷提醒并建议调整预期",
+            "recommendation_reason": "在保证计划灵活性的同时，及时提供防过载预警，符合产品“安静、鼓励”的陪伴定位。"
+          }
+        ],
+        "risks": [
+          "负荷过重导致的早期流失风险：若初期生成的计划强度与考生的实际执行力不匹配且缺乏适应性，20 名种子用户可能在前两周产生挫败感并放弃使用，导致无法得出客观的价值验证结论。",
+          "任务积压逃避风险：若延后和拆分操作缺乏正向引导，未完成任务堆积可能破坏“安静、鼓励”的产品氛围，反而加重考生的备考焦虑。"
+        ],
+        "tensions": [
+          {
+            "description": "桌面端专注体验与随时记录便捷性的取舍",
+            "reason": "桌面浏览器环境利于沉浸式规划和全局日历查看，但考研学生在自习室或图书馆可能无法即时在电脑上打卡或拆分任务，可能导致进度更新延迟。"
+          },
+          {
+            "description": "标准化生成与高度个性化节奏的平衡",
+            "reason": "过强的预设生成可能无法匹配每位考生的特殊进度与自命题需求，而过弱的生成则增加用户的初始规划负担。"
+          }
+        ],
+        "unknowns": [
+          "20 名种子用户的报考专业分布（纯统考科目考生 vs. 含有复杂自命题专业课考生）。",
+          "参与试用考生当前所处的备考阶段（基础期、强化期还是冲刺期），阶段不同对周计划粒度的要求不同。",
+          "用户在使用邮箱注册后，对于找回凭证与重要日程邮件提醒的产品预期。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-03",
+          "duration_ms": 35592,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-variance-2\\case-03__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "用户的考研科目设置符合中国研究生招生考试的常规分类（公共课如政治、英语、数学及专业课）。",
+              "首批参与验证的 20 名种子用户具备在桌面电脑浏览器上规划与记录复习的日常习惯。",
+              "注册与登录主要用于区分用户与实现跨电脑查看，首版仅需基础的邮箱身份校验与密码凭据管理。"
+            ],
+            "candidates": [
+              "考研公共课阶段性大纲模板：为统考公共课提供标准复习阶段与大纲知识块模板，减少手动录入成本。",
+              "计划再平衡辅助：当任务积压或频繁延后时，主动提供周任务重排建议与负荷预警。",
+              "周度复盘视图：在每周结束时生成完成度简报与未完成原因小结，帮助调整下周时间投入。"
+            ],
+            "confirmed": [
+              "目标用户：准备考研的中国大学生。",
+              "产品形态与平台：Web 学习计划工具，首版仅支持中文界面和桌面浏览器访问。",
+              "初次引导输入：首次进入时选择考试日期、科目、每周可学习时长和当前基础。",
+              "核心生成能力：系统按周生成可由用户调整的复习计划。",
+              "主页呈现：显示本周任务、完成进度和距离考试的倒计时。",
+              "任务操作能力：任务详情页支持标记完成、延后或拆分任务。",
+              "数据与访问策略：支持邮箱注册，数据保存在云端并支持在不同电脑登录查看与编辑。",
+              "界面与体验定位：安静、具有鼓励感但不幼稚，结合日历与待办事项的形式。",
+              "MVP 排除范围：首版不包含社交、课程市场、AI 聊天和移动端。",
+              "验证方案与成功指标：先招募 20 名学生试用，以连续两周完成任务的比例判断产品价值。"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "核心计划生成规则与颗粒度",
+                "dependency": "确定初始周计划的具体生成逻辑与用户填充深度",
+                "impact": "直接影响首批用户初次进入时的上手门槛和计划的实际可执行度。",
+                "reason": "用户明确了输入项（日期、科目、时长、基础），但未定义系统是提供细化到知识点的任务大纲，还是仅生成宏观时间分配框架由用户自填。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "任务延后与计划再平衡机制",
+                "dependency": "确定任务延后后的日程重新分配策略",
+                "impact": "若缺乏合理的超载消化策略，任务频繁延后会导致后续周负荷过重，引发用户流失。",
+                "reason": "考研复习常出现实际进度落后于计划的情况，需明确延后如何影响本周与后续周的负荷。",
+                "severity": "medium",
+                "should_ask_user": false
+              },
+              {
+                "area": "专业课与自命题差异化支持策略",
+                "dependency": "明确统考科目与非统考专业课在首版中的支持范围",
+                "impact": "影响 20 名种子用户的专业覆盖度及测试有效性。",
+                "reason": "各高校自命题专业课大纲差异极大，需明确首版是否对专业课采用统一的自定义策略。",
+                "severity": "low",
+                "should_ask_user": false
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "兼顾公共课的低门槛冷启动与专业课的个性化自由度，MVP 范围可控且适用面广。",
+                    "label": "(Recommended) 提供公共课（政治、英语、数学）阶段大纲模板，专业课仅生成时间框架并由用户自行填入内容"
+                  },
+                  {
+                    "impact": "完全通用，无需维护各科目大纲，但用户首次配置耗时较长，对自主规划能力较弱的学生容易产生启动门槛。",
+                    "label": "仅根据时长和基础生成每周时间块与进度节奏，所有具体学习任务均由用户自行定义"
+                  },
+                  {
+                    "impact": "开箱即用度高，但将首版试用范围严格限制在特定统考专业考生群体中。",
+                    "label": "首版仅支持特定全国统考科目，并提供完全自动化的每日细分知识点学习计划"
+                  }
+                ],
+                "question": "在系统初次生成按周复习计划时，应当提供预设的科目知识大纲模板，还是由用户在规划的时间框架内自行填写任务？",
+                "reason": "核心生成逻辑直接决定了用户的初次使用体验与试用有效性。考研公共课具有较固定的复习阶段，若全部手动填写门槛高；若全部自动内置，专业课的差异又极大。明确此产品策略是界定首版范围的关键。",
+                "recommendation": "(Recommended) 提供公共课（政治、英语、数学）阶段大纲模板，专业课仅生成时间框架并由用户自行填入内容",
+                "recommendation_reason": "既能降低大部分考生在公共科目上的规划与输入成本，又能灵活包容各校自命题专业课的个性化需求，避免首版因内容录入量过大而延误验证。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "保持日程弹性，并在负荷超限时促使用户主动审视学习强度，防止滚雪球式放弃。",
+                    "label": "(Recommended) 任务顺延至本周空闲时段或下周，当总负荷超过每周预设时长时给出负荷提醒并建议调整预期"
+                  },
+                  {
+                    "impact": "由用户完全主导日程重排，但对考生的主动复盘意识要求较高。",
+                    "label": "延后任务直接归入待办箱，由用户在周末统一手动重新分配到后续周"
+                  }
+                ],
+                "question": "当考生在详情页选择“延后”某项任务时，系统应当如何处理该任务与后续计划的平衡？",
+                "reason": "备考期间任务拖延与积压十分常见，延后处理机制直接关系到能否达成“连续两周完成任务”的验证指标。",
+                "recommendation": "(Recommended) 任务顺延至本周空闲时段或下周，当总负荷超过每周预设时长时给出负荷提醒并建议调整预期",
+                "recommendation_reason": "在保证计划灵活性的同时，及时提供防过载预警，符合产品“安静、鼓励”的陪伴定位。"
+              }
+            ],
+            "risks": [
+              "负荷过重导致的早期流失风险：若初期生成的计划强度与考生的实际执行力不匹配且缺乏适应性，20 名种子用户可能在前两周产生挫败感并放弃使用，导致无法得出客观的价值验证结论。",
+              "任务积压逃避风险：若延后和拆分操作缺乏正向引导，未完成任务堆积可能破坏“安静、鼓励”的产品氛围，反而加重考生的备考焦虑。"
+            ],
+            "tensions": [
+              {
+                "description": "桌面端专注体验与随时记录便捷性的取舍",
+                "reason": "桌面浏览器环境利于沉浸式规划和全局日历查看，但考研学生在自习室或图书馆可能无法即时在电脑上打卡或拆分任务，可能导致进度更新延迟。"
+              },
+              {
+                "description": "标准化生成与高度个性化节奏的平衡",
+                "reason": "过强的预设生成可能无法匹配每位考生的特殊进度与自命题需求，而过弱的生成则增加用户的初始规划负担。"
+              }
+            ],
+            "unknowns": [
+              "20 名种子用户的报考专业分布（纯统考科目考生 vs. 含有复杂自命题专业课考生）。",
+              "参与试用考生当前所处的备考阶段（基础期、强化期还是冲刺期），阶段不同对周计划粒度的要求不同。",
+              "用户在使用邮箱注册后，对于找回凭证与重要日程邮件提醒的产品预期。"
+            ]
+          },
+          "prompt_chars": 5990,
+          "context_chars": 250,
+          "user_input_chars": 239,
+          "input_tokens": 21058,
+          "output_tokens": 7000,
+          "thinking_tokens": 5207,
+          "total_tokens": 28058,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 21058,
+            "output_tokens": 7000,
+            "thinking_tokens": 5207,
+            "cache_read_tokens": 0,
+            "total_tokens": 28058
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 35592,
+        "input_tokens": 21058,
+        "output_tokens": 7000,
+        "thinking_tokens": 5207,
+        "total_tokens": 28058,
+        "cache_read_tokens": 0,
+        "prompt_chars": 5990,
+        "context_chars": 250,
+        "user_input_chars": 239
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:23:56.524Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.8,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b2-1-variance-2",
+      "variant": "B2.1",
+      "case": "case-05",
+      "name": "offline-sync-conflict",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "知识库主要面向个人单人记录与阅读整理，暂不包含多人实时协作需求。"
+        ],
+        "candidates": [
+          "以纯单机离线为主体，跨设备仅提供用户主动发起的本地文件导出与迁移能力。",
+          "采用多设备服务流转模式，换电脑后自动获取数据，但需向用户明确数据离开本机的信任边界。",
+          "在用户显式授权且新旧设备同时在场时进行设备间流转，避免数据在外部长期留存。"
+        ],
+        "confirmed": [
+          "产品定位为个人知识库。",
+          "要求必须完全离线，任何内容都不能离开用户电脑。",
+          "要求用户更换电脑后数据能够自动同步。",
+          "要求同步过程无需用户做任何设置。"
+        ],
+        "conflicts": [
+          "命题一：'数据必须完全离线，任何内容都不能离开用户电脑'；命题二：'用户更换电脑后数据自动同步且无需任何设置'。两项硬性要求互斥：若数据严格不离开原设备，新设备无法在无用户任何操作介入的情况下自动感知并获取数据。"
+        ],
+        "gaps": [
+          {
+            "area": "数据流动边界与多设备使用承诺",
+            "dependency": "用户对隐私安全承诺与多设备便捷性的根本权衡",
+            "impact": "决定产品是完全隔离的单机工具，还是具备多设备流转能力的服务形态",
+            "reason": "用户同时要求的'绝对离线不出机'与'换电脑免设置自动同步'存在根本性逻辑冲突，需先确立核心产品定位",
+            "severity": "critical",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "获得最高等级的数据隐私与掌控感，但更换设备时需要用户进行一次手动迁移操作。",
+                "label": "（推荐）坚守数据不出本机：产品完全单机离线运行，换电脑时由用户主动进行离线导出与导入"
+              },
+              {
+                "impact": "获得极致的跨设备连续使用体验，但需相应调整“数据绝不出本机”的隐私与安全承诺。",
+                "label": "优先跨设备自动可用：允许数据进行跨设备流转，更换电脑后自动获得数据"
+              },
+              {
+                "impact": "兼顾一定的流转便利性与数据私密性，但换电脑时需要两台设备同时可用并由用户显式授权。",
+                "label": "受控的双设备直接流转：仅在用户显式触发且新旧设备同时在场确认时同步，不经过第三方持久留存"
+              }
+            ],
+            "question": "在“数据绝对不离开当前电脑”与“换电脑时自动同步且零设置”之间，您希望知识库以哪一项作为最核心的产品承诺？",
+            "reason": "这两个要求存在直接逻辑冲突。必须首先明确核心信任边界与产品定位，才能界定首发版本的范围与用户交互方式。",
+            "recommendation": "（推荐）优先确立“数据完全由用户掌控且不出本机”的隐私承诺，将跨设备使用定义为用户主动发起的受控迁移，而非后台自动流转。",
+            "recommendation_reason": "个人知识库用户对数据隐私高度敏感，强烈的本地安全承诺是核心价值；若强行追求免设置的自动同步，必然打破数据不出本机的基本信任边界。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "使用门槛低，核心编辑与查阅体验轻快高效。",
+                "label": "（推荐）轻量笔记与文本：专注于文字记录、分类标签与即时全文检索"
+              },
+              {
+                "impact": "覆盖更全面的资料收集场景，但会增加单机存储管理与浏览交互的复杂度。",
+                "label": "多格式知识归档：支持文档、图片等多媒体资料的集中存储与分类管理"
+              }
+            ],
+            "question": "知识库首发版本最核心支持的内容形式是什么？",
+            "reason": "明确首发版本的核心信息流与内容形态，有助于确定最小可用产品（MVP）的边界与交互重心。",
+            "recommendation": "（推荐）首发版本聚焦于轻量结构化笔记与快速全文检索。",
+            "recommendation_reason": "纯文本与轻量笔记的记录阻力最小、单机离线体验最可靠，能以最快路径验证个人知识库的核心价值。"
+          }
+        ],
+        "risks": [
+          "若对外承诺'数据绝不出本机'但后台进行跨设备数据传输，将直接破坏产品的核心隐私承诺与用户信任。",
+          "若彻底禁止数据流出且缺乏主动迁移手段，当用户设备损坏或遗失时，将面临知识资产永久不可逆丢失的风险。"
+        ],
+        "tensions": [
+          {
+            "description": "绝对的本地数据隐私控制与无感的跨设备连续体验之间的权衡。",
+            "reason": "强化数据留在本机的安全感需要用户进行明确的主动授权或操作；而追求完全免配置的自动化体验则必然需要放宽数据不出本机的边界限制。"
+          }
+        ],
+        "unknowns": [
+          "用户在'极致数据私密与完全不出机'与'免设置的跨设备自动可用'之间的核心优先级取舍。",
+          "知识库初期承载的核心内容类型（例如纯文本笔记、结构化文档还是多媒体附件）。",
+          "用户对知识库数据备份与防丢失的容忍度和预期处置策略。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-05",
+          "duration_ms": 29394,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-variance-2\\case-05__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "知识库主要面向个人单人记录与阅读整理，暂不包含多人实时协作需求。"
+            ],
+            "candidates": [
+              "以纯单机离线为主体，跨设备仅提供用户主动发起的本地文件导出与迁移能力。",
+              "采用多设备服务流转模式，换电脑后自动获取数据，但需向用户明确数据离开本机的信任边界。",
+              "在用户显式授权且新旧设备同时在场时进行设备间流转，避免数据在外部长期留存。"
+            ],
+            "confirmed": [
+              "产品定位为个人知识库。",
+              "要求必须完全离线，任何内容都不能离开用户电脑。",
+              "要求用户更换电脑后数据能够自动同步。",
+              "要求同步过程无需用户做任何设置。"
+            ],
+            "conflicts": [
+              "命题一：'数据必须完全离线，任何内容都不能离开用户电脑'；命题二：'用户更换电脑后数据自动同步且无需任何设置'。两项硬性要求互斥：若数据严格不离开原设备，新设备无法在无用户任何操作介入的情况下自动感知并获取数据。"
+            ],
+            "gaps": [
+              {
+                "area": "数据流动边界与多设备使用承诺",
+                "dependency": "用户对隐私安全承诺与多设备便捷性的根本权衡",
+                "impact": "决定产品是完全隔离的单机工具，还是具备多设备流转能力的服务形态",
+                "reason": "用户同时要求的'绝对离线不出机'与'换电脑免设置自动同步'存在根本性逻辑冲突，需先确立核心产品定位",
+                "severity": "critical",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "获得最高等级的数据隐私与掌控感，但更换设备时需要用户进行一次手动迁移操作。",
+                    "label": "（推荐）坚守数据不出本机：产品完全单机离线运行，换电脑时由用户主动进行离线导出与导入"
+                  },
+                  {
+                    "impact": "获得极致的跨设备连续使用体验，但需相应调整“数据绝不出本机”的隐私与安全承诺。",
+                    "label": "优先跨设备自动可用：允许数据进行跨设备流转，更换电脑后自动获得数据"
+                  },
+                  {
+                    "impact": "兼顾一定的流转便利性与数据私密性，但换电脑时需要两台设备同时可用并由用户显式授权。",
+                    "label": "受控的双设备直接流转：仅在用户显式触发且新旧设备同时在场确认时同步，不经过第三方持久留存"
+                  }
+                ],
+                "question": "在“数据绝对不离开当前电脑”与“换电脑时自动同步且零设置”之间，您希望知识库以哪一项作为最核心的产品承诺？",
+                "reason": "这两个要求存在直接逻辑冲突。必须首先明确核心信任边界与产品定位，才能界定首发版本的范围与用户交互方式。",
+                "recommendation": "（推荐）优先确立“数据完全由用户掌控且不出本机”的隐私承诺，将跨设备使用定义为用户主动发起的受控迁移，而非后台自动流转。",
+                "recommendation_reason": "个人知识库用户对数据隐私高度敏感，强烈的本地安全承诺是核心价值；若强行追求免设置的自动同步，必然打破数据不出本机的基本信任边界。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "使用门槛低，核心编辑与查阅体验轻快高效。",
+                    "label": "（推荐）轻量笔记与文本：专注于文字记录、分类标签与即时全文检索"
+                  },
+                  {
+                    "impact": "覆盖更全面的资料收集场景，但会增加单机存储管理与浏览交互的复杂度。",
+                    "label": "多格式知识归档：支持文档、图片等多媒体资料的集中存储与分类管理"
+                  }
+                ],
+                "question": "知识库首发版本最核心支持的内容形式是什么？",
+                "reason": "明确首发版本的核心信息流与内容形态，有助于确定最小可用产品（MVP）的边界与交互重心。",
+                "recommendation": "（推荐）首发版本聚焦于轻量结构化笔记与快速全文检索。",
+                "recommendation_reason": "纯文本与轻量笔记的记录阻力最小、单机离线体验最可靠，能以最快路径验证个人知识库的核心价值。"
+              }
+            ],
+            "risks": [
+              "若对外承诺'数据绝不出本机'但后台进行跨设备数据传输，将直接破坏产品的核心隐私承诺与用户信任。",
+              "若彻底禁止数据流出且缺乏主动迁移手段，当用户设备损坏或遗失时，将面临知识资产永久不可逆丢失的风险。"
+            ],
+            "tensions": [
+              {
+                "description": "绝对的本地数据隐私控制与无感的跨设备连续体验之间的权衡。",
+                "reason": "强化数据留在本机的安全感需要用户进行明确的主动授权或操作；而追求完全免配置的自动化体验则必然需要放宽数据不出本机的边界限制。"
+              }
+            ],
+            "unknowns": [
+              "用户在'极致数据私密与完全不出机'与'免设置的跨设备自动可用'之间的核心优先级取舍。",
+              "知识库初期承载的核心内容类型（例如纯文本笔记、结构化文档还是多媒体附件）。",
+              "用户对知识库数据备份与防丢失的容忍度和预期处置策略。"
+            ]
+          },
+          "prompt_chars": 5810,
+          "context_chars": 70,
+          "user_input_chars": 59,
+          "input_tokens": 20947,
+          "output_tokens": 6748,
+          "thinking_tokens": 5552,
+          "total_tokens": 27695,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20947,
+            "output_tokens": 6748,
+            "thinking_tokens": 5552,
+            "cache_read_tokens": 0,
+            "total_tokens": 27695
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 29394,
+        "input_tokens": 20947,
+        "output_tokens": 6748,
+        "thinking_tokens": 5552,
+        "total_tokens": 27695,
+        "cache_read_tokens": 0,
+        "prompt_chars": 5810,
+        "context_chars": 70,
+        "user_input_chars": 59
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:24:25.920Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 4,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.7,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "cases": 3,
+    "successful_cases": 3,
+    "structured_output_success_rate": 1,
+    "average_input_tokens_per_case": 20973,
+    "average_output_tokens_per_case": 6086.333333333333,
+    "average_thinking_tokens_per_case": 4657,
+    "average_total_tokens_per_case": 27059.333333333332,
+    "average_duration_ms": 29659,
+    "average_heuristic_quality_out_of_5": 4.766666666666667,
+    "possible_premature_technology_warnings": 0
+  },
+  "infrastructure_adjustments": [
+    "B2.1 constitution adds a cross-field Capability Before Mechanism compliance pass. The runner adds warning-only detection for Chinese and English mechanism terms. Existing provider, B2 inline schema, fixtures, Variant B, and one-call execution model are unchanged."
+  ],
+  "generated_at": "2026-08-22T09:24:25.921Z"
+}

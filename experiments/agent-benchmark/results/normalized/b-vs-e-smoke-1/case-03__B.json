@@ -1,0 +1,348 @@
+{
+  "run_id": "b-vs-e-smoke-1",
+  "variant": "B",
+  "case": "case-03",
+  "name": "complete-study-planner",
+  "success": true,
+  "output": {
+    "assumptions": [
+      "Target users (college students) have regular access to a desktop or laptop computer during their daily study routine.",
+      "The 20 trial users can be easily reached and assisted with email registration issues if needed.",
+      "The exam syllabus and materials are already sourced by the users themselves; the tool acts only as a planner, not a content provider.",
+      "A weekly granularity is sufficient for tracking progress without requiring hourly schedules in the MVP.",
+      "A 2-week continuous task completion rate is a reliable early indicator of long-term product value."
+    ],
+    "candidates": [
+      "Predefined weekly milestones for major public subjects (Mathematics I/II/III, English I/II, Political Theory) to automate task generation.",
+      "Syllabus templates for user-defined custom professional subjects.",
+      "Task priority tags (High, Medium, Low) to help users prioritize when behind schedule.",
+      "Simple calendar export (ICS format) for WeChat, Apple Calendar, or Outlook."
+    ],
+    "confirmed": [
+      "Targeted at Chinese postgraduate entrance exam (考研) candidates.",
+      "Language support: Chinese (Simplified) only.",
+      "Platform support: Desktop web browsers only.",
+      "Onboarding inputs: Exam date, chosen subjects, weekly study hours, and current foundation level.",
+      "Core engine: System automatically generates a weekly-based review plan.",
+      "Core feature: Generated plan must be adjustable by the user.",
+      "Homepage components: Current week's tasks, weekly completion progress, and exam countdown.",
+      "Task detail options: Mark as completed, postpone (延后), or split (拆分).",
+      "Data storage: Email registration/login with cloud database synchronization.",
+      "UI/UX theme: Quiet, encouraging, professional, combining calendar and to-do lists.",
+      "Out of MVP Scope: Social features, course marketplace, AI chat, and mobile application/web version.",
+      "Validation strategy: Test with 20 students, success measured by the proportion of students who continuously complete tasks for two weeks."
+    ],
+    "conflicts": [
+      "User Demographics vs. Authentication Choice: Email registration is chosen for ease of MVP development, but Chinese college students heavily prefer WeChat/SMS logins, which may affect trial onboarding completion.",
+      "Desktop Only vs. Library Study Habit: 考研 students spend most of their study time in libraries or study rooms where opening a laptop just to check off a task is inconvenient compared to checking it on a mobile screen."
+    ],
+    "gaps": [
+      {
+        "area": "Mobile Accessibility / Responsive Layout",
+        "dependency": "UX and Responsive Design Strategy",
+        "impact": "High risk of false negatives in the validation trial (users actually studying but failing to log on desktop).",
+        "reason": "While a full mobile app is excluded from MVP, complete lack of mobile accessibility might prevent students from logging tasks completed while studying in libraries.",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "Onboarding Plan Content / Syllabus Database",
+        "dependency": "Plan Generation Engine Data Source",
+        "impact": "Users cannot get a plan upon onboarding, causing immediate churn.",
+        "reason": "The generation logic for the plans is undefined. If the system doesn't know the syllabus of the subjects, it cannot generate tasks.",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "Postponement Impact Logic",
+        "dependency": "Task Engine & Calendar Logic",
+        "impact": "A pileup of tasks could break the planning algorithm or cause user anxiety.",
+        "reason": "There is no rule for how a postponed task is rescheduled. Does it push everything back or compress the schedule?",
+        "severity": "medium",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "Pre-populates core subjects, minimizes data collection overhead, reduces onboarding friction.",
+            "label": "(Recommended) Predefine standard weekly milestones for common public subjects (Math, English, Politics), and let users manually enter tasks for professional subjects."
+          },
+          {
+            "impact": "No syllabus database needed, but shifts the work of setting up the schedule entirely onto the user.",
+            "label": "Require users to manually input all subjects, milestones, and task structures from scratch."
+          },
+          {
+            "impact": "Ensures full automation, but significantly delays MVP launch due to massive data compilation effort.",
+            "label": "Build a complete database of all possible 考研 subjects and milestones before launching the trial."
+          }
+        ],
+        "question": "How should the system generate the initial study plan for the MVP?",
+        "reason": "Generating a high-quality study plan requires mapping out all subjects. Since AI is out of scope, we need a simple but effective way to populate tasks.",
+        "recommendation": "Predefine standard weekly milestones for common public subjects (Math, English, Politics), and let users manually enter tasks for professional subjects.",
+        "recommendation_reason": "This keeps the MVP scope small while still offering immediate value for the subjects that 90%+ of candidates take, avoiding the need to pre-build databases for hundreds of specialized professional courses."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "Simple to implement, gives users full control, and prevents compounding stress.",
+            "label": "(Recommended) Move postponed tasks to a 'Backlog' or 'Inbox' for manual redistribution, showing a gentle warning if the backlog grows too large."
+          },
+          {
+            "impact": "Keeps the plan realistic but will eventually push the target date past the fixed exam date, rendering the plan invalid.",
+            "label": "Automatically shift all subsequent tasks down the timeline, extending the overall plan length."
+          },
+          {
+            "impact": "Keeps the target date fixed, but incrementally increases the weekly study load, which can lead to burnout.",
+            "label": "Distribute the postponed hours proportionally across all remaining weeks."
+          }
+        ],
+        "question": "How should the system handle rescheduled (postponed) tasks?",
+        "reason": "In 考研, falling behind schedule is extremely common. The mechanism for handling postponed tasks will dictate the tone of the UI and the complexity of the backend.",
+        "recommendation": "Move postponed tasks to a 'Backlog' or 'Inbox' for manual redistribution, showing a gentle warning if the backlog grows too large.",
+        "recommendation_reason": "Automatically recalculating and shifting the entire plan can be technically complex and psychologically overwhelming for the user. A backlog queue gives them control to manually reschedule when they feel ready."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "Saves weeks of administrative setup time, though slightly higher friction for users.",
+            "label": "(Recommended) Stick to Email registration for the 20-student MVP to bypass Chinese regulatory/corporate verification, adding direct onboarding support."
+          },
+          {
+            "impact": "Seamless user experience, but requires a registered Chinese enterprise and WeChat developer account verification.",
+            "label": "Integrate WeChat scan-to-login, accepting the overhead of registering a corporate developer account."
+          },
+          {
+            "impact": "Very common and low friction, but requires real-name registration with an SMS provider and is prone to spam/cost issues.",
+            "label": "Use SMS code verification login."
+          }
+        ],
+        "question": "What authentication method should be used for the 20-student trial?",
+        "reason": "While email is simple to implement, WeChat login or SMS login is the standard in China and has much higher completion rates.",
+        "recommendation": "Stick to Email registration for the 20-student MVP to bypass Chinese regulatory/corporate verification, adding direct onboarding support.",
+        "recommendation_reason": "For a private trial of 20 hand-picked students, we can coordinate with them directly and assist with any setup issues, avoiding the need for formal corporate registration."
+      }
+    ],
+    "risks": [
+      "Device Disconnect Risk (High): Students study in libraries where they might not open a laptop. Lacking a mobile-friendly view to log tasks could lead to under-reporting and artificial validation failure.",
+      "Onboarding/Setup Friction (Medium): If the system cannot generate realistic tasks immediately, manually setting up a 6-month schedule on day one will cause users to drop out before the 2-week trial starts.",
+      "Login Friction (Medium): Chinese college students rarely check email, leading to forgotten passwords, missed verification links, and activation drop-offs.",
+      "Rescheduling Burnout (Medium): Continuous postponement without a smart consolidation logic will lead to an overwhelming backlog, making the UI feel stressful rather than quiet."
+    ],
+    "unknowns": [
+      "The target threshold for the validation metric (what percentage of the 20 students completing 2 weeks constitutes a success?).",
+      "The specific professional subjects required by the 20 trial users.",
+      "The exact UX behavior and logic for splitting tasks (e.g., subtasks vs. duplication)."
+    ]
+  },
+  "calls": [
+    {
+      "task": "single-custom",
+      "variant": "B",
+      "case": "case-03",
+      "duration_ms": 26406,
+      "exit_code": 0,
+      "timed_out": false,
+      "structured_success": true,
+      "success": true,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-e-smoke-1\\case-03__B__01__single-custom.json",
+      "output": {
+        "assumptions": [
+          "Target users (college students) have regular access to a desktop or laptop computer during their daily study routine.",
+          "The 20 trial users can be easily reached and assisted with email registration issues if needed.",
+          "The exam syllabus and materials are already sourced by the users themselves; the tool acts only as a planner, not a content provider.",
+          "A weekly granularity is sufficient for tracking progress without requiring hourly schedules in the MVP.",
+          "A 2-week continuous task completion rate is a reliable early indicator of long-term product value."
+        ],
+        "candidates": [
+          "Predefined weekly milestones for major public subjects (Mathematics I/II/III, English I/II, Political Theory) to automate task generation.",
+          "Syllabus templates for user-defined custom professional subjects.",
+          "Task priority tags (High, Medium, Low) to help users prioritize when behind schedule.",
+          "Simple calendar export (ICS format) for WeChat, Apple Calendar, or Outlook."
+        ],
+        "confirmed": [
+          "Targeted at Chinese postgraduate entrance exam (考研) candidates.",
+          "Language support: Chinese (Simplified) only.",
+          "Platform support: Desktop web browsers only.",
+          "Onboarding inputs: Exam date, chosen subjects, weekly study hours, and current foundation level.",
+          "Core engine: System automatically generates a weekly-based review plan.",
+          "Core feature: Generated plan must be adjustable by the user.",
+          "Homepage components: Current week's tasks, weekly completion progress, and exam countdown.",
+          "Task detail options: Mark as completed, postpone (延后), or split (拆分).",
+          "Data storage: Email registration/login with cloud database synchronization.",
+          "UI/UX theme: Quiet, encouraging, professional, combining calendar and to-do lists.",
+          "Out of MVP Scope: Social features, course marketplace, AI chat, and mobile application/web version.",
+          "Validation strategy: Test with 20 students, success measured by the proportion of students who continuously complete tasks for two weeks."
+        ],
+        "conflicts": [
+          "User Demographics vs. Authentication Choice: Email registration is chosen for ease of MVP development, but Chinese college students heavily prefer WeChat/SMS logins, which may affect trial onboarding completion.",
+          "Desktop Only vs. Library Study Habit: 考研 students spend most of their study time in libraries or study rooms where opening a laptop just to check off a task is inconvenient compared to checking it on a mobile screen."
+        ],
+        "gaps": [
+          {
+            "area": "Mobile Accessibility / Responsive Layout",
+            "dependency": "UX and Responsive Design Strategy",
+            "impact": "High risk of false negatives in the validation trial (users actually studying but failing to log on desktop).",
+            "reason": "While a full mobile app is excluded from MVP, complete lack of mobile accessibility might prevent students from logging tasks completed while studying in libraries.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Onboarding Plan Content / Syllabus Database",
+            "dependency": "Plan Generation Engine Data Source",
+            "impact": "Users cannot get a plan upon onboarding, causing immediate churn.",
+            "reason": "The generation logic for the plans is undefined. If the system doesn't know the syllabus of the subjects, it cannot generate tasks.",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "Postponement Impact Logic",
+            "dependency": "Task Engine & Calendar Logic",
+            "impact": "A pileup of tasks could break the planning algorithm or cause user anxiety.",
+            "reason": "There is no rule for how a postponed task is rescheduled. Does it push everything back or compress the schedule?",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Pre-populates core subjects, minimizes data collection overhead, reduces onboarding friction.",
+                "label": "(Recommended) Predefine standard weekly milestones for common public subjects (Math, English, Politics), and let users manually enter tasks for professional subjects."
+              },
+              {
+                "impact": "No syllabus database needed, but shifts the work of setting up the schedule entirely onto the user.",
+                "label": "Require users to manually input all subjects, milestones, and task structures from scratch."
+              },
+              {
+                "impact": "Ensures full automation, but significantly delays MVP launch due to massive data compilation effort.",
+                "label": "Build a complete database of all possible 考研 subjects and milestones before launching the trial."
+              }
+            ],
+            "question": "How should the system generate the initial study plan for the MVP?",
+            "reason": "Generating a high-quality study plan requires mapping out all subjects. Since AI is out of scope, we need a simple but effective way to populate tasks.",
+            "recommendation": "Predefine standard weekly milestones for common public subjects (Math, English, Politics), and let users manually enter tasks for professional subjects.",
+            "recommendation_reason": "This keeps the MVP scope small while still offering immediate value for the subjects that 90%+ of candidates take, avoiding the need to pre-build databases for hundreds of specialized professional courses."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Simple to implement, gives users full control, and prevents compounding stress.",
+                "label": "(Recommended) Move postponed tasks to a 'Backlog' or 'Inbox' for manual redistribution, showing a gentle warning if the backlog grows too large."
+              },
+              {
+                "impact": "Keeps the plan realistic but will eventually push the target date past the fixed exam date, rendering the plan invalid.",
+                "label": "Automatically shift all subsequent tasks down the timeline, extending the overall plan length."
+              },
+              {
+                "impact": "Keeps the target date fixed, but incrementally increases the weekly study load, which can lead to burnout.",
+                "label": "Distribute the postponed hours proportionally across all remaining weeks."
+              }
+            ],
+            "question": "How should the system handle rescheduled (postponed) tasks?",
+            "reason": "In 考研, falling behind schedule is extremely common. The mechanism for handling postponed tasks will dictate the tone of the UI and the complexity of the backend.",
+            "recommendation": "Move postponed tasks to a 'Backlog' or 'Inbox' for manual redistribution, showing a gentle warning if the backlog grows too large.",
+            "recommendation_reason": "Automatically recalculating and shifting the entire plan can be technically complex and psychologically overwhelming for the user. A backlog queue gives them control to manually reschedule when they feel ready."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Saves weeks of administrative setup time, though slightly higher friction for users.",
+                "label": "(Recommended) Stick to Email registration for the 20-student MVP to bypass Chinese regulatory/corporate verification, adding direct onboarding support."
+              },
+              {
+                "impact": "Seamless user experience, but requires a registered Chinese enterprise and WeChat developer account verification.",
+                "label": "Integrate WeChat scan-to-login, accepting the overhead of registering a corporate developer account."
+              },
+              {
+                "impact": "Very common and low friction, but requires real-name registration with an SMS provider and is prone to spam/cost issues.",
+                "label": "Use SMS code verification login."
+              }
+            ],
+            "question": "What authentication method should be used for the 20-student trial?",
+            "reason": "While email is simple to implement, WeChat login or SMS login is the standard in China and has much higher completion rates.",
+            "recommendation": "Stick to Email registration for the 20-student MVP to bypass Chinese regulatory/corporate verification, adding direct onboarding support.",
+            "recommendation_reason": "For a private trial of 20 hand-picked students, we can coordinate with them directly and assist with any setup issues, avoiding the need for formal corporate registration."
+          }
+        ],
+        "risks": [
+          "Device Disconnect Risk (High): Students study in libraries where they might not open a laptop. Lacking a mobile-friendly view to log tasks could lead to under-reporting and artificial validation failure.",
+          "Onboarding/Setup Friction (Medium): If the system cannot generate realistic tasks immediately, manually setting up a 6-month schedule on day one will cause users to drop out before the 2-week trial starts.",
+          "Login Friction (Medium): Chinese college students rarely check email, leading to forgotten passwords, missed verification links, and activation drop-offs.",
+          "Rescheduling Burnout (Medium): Continuous postponement without a smart consolidation logic will lead to an overwhelming backlog, making the UI feel stressful rather than quiet."
+        ],
+        "unknowns": [
+          "The target threshold for the validation metric (what percentage of the 20 students completing 2 weeks constitutes a success?).",
+          "The specific professional subjects required by the 20 trial users.",
+          "The exact UX behavior and logic for splitting tasks (e.g., subtasks vs. duplication)."
+        ]
+      },
+      "prompt_chars": 1240,
+      "context_chars": 250,
+      "user_input_chars": 239,
+      "input_tokens": 19968,
+      "output_tokens": 8011,
+      "thinking_tokens": 6103,
+      "total_tokens": 27979,
+      "cache_read_tokens": 0,
+      "raw_usage": {
+        "input_tokens": 19968,
+        "output_tokens": 8011,
+        "thinking_tokens": 6103,
+        "cache_read_tokens": 0,
+        "total_tokens": 27979
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 1,
+    "duration_ms": 26406,
+    "input_tokens": 19968,
+    "output_tokens": 8011,
+    "thinking_tokens": 6103,
+    "total_tokens": 27979,
+    "cache_read_tokens": 0,
+    "prompt_chars": 1240,
+    "context_chars": 250,
+    "user_input_chars": 239
+  },
+  "timestamp": "2026-08-22T06:31:16.798Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 2,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5,
+      "assumption_over_specification": 5,
+      "conflict_precision": 5
+    },
+    "heuristicQuality": 4.6,
+    "matchedSignals": 1,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals",
+      "assumption_over_specification": "heuristic/manual-review-needed",
+      "conflict_precision": "heuristic/manual-review-needed"
+    }
+  }
+}

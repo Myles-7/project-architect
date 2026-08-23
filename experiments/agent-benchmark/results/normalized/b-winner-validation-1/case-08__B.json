@@ -1,0 +1,252 @@
+{
+  "run_id": "b-winner-validation-1",
+  "variant": "B",
+  "case": "case-08",
+  "name": "local-first-notes",
+  "success": true,
+  "output": {
+    "assumptions": [
+      "The primary platform is Web/Desktop (laptops/desktops) since meeting notes are typically typed.",
+      "Meeting notes contain rich text (paragraphs, headings, lists, tasks) rather than heavy binary attachments like video or long audio in the MVP.",
+      "Synchronization happens via the internet using a centralized relay/backup database when online, rather than P2P local network discovery.",
+      "A simple shared workspace/document model is sufficient for the MVP instead of fine-grained role-based access control."
+    ],
+    "candidates": [
+      "CRDTs (Conflict-free Replicated Data Types) like Yjs or Automerge for automatic and safe text merging.",
+      "Centralized synchronization server (e.g., Yjs websocket provider, Liveblocks, or custom Go/Node relay) to mediate syncing.",
+      "IndexedDB (Dexie.js / RxDB) for browser-based offline local storage, or SQLite (via Tauri/WASM) for desktop.",
+      "TipTap or Lexical rich text editors integrated with Yjs for a smooth WYSIWYG experience."
+    ],
+    "confirmed": [
+      "The application is a team meeting notes application.",
+      "The application must be local-first, default storing data locally.",
+      "The application must support offline editing.",
+      "Upon reconnecting, offline modifications must sync and merge with team members' content.",
+      "The sync process must not easily overwrite others' changes."
+    ],
+    "conflicts": [
+      "Offline Edit Freedom vs Strict Access Control: Ensuring users can edit offline conflicts with preventing unauthorized edits in real-time.",
+      "Automatic Merge vs Content Coherence: Automatically merging text ensures no overwrites but can lead to unreadable sentences if edits overlap closely."
+    ],
+    "gaps": [
+      {
+        "area": "Conflict Resolution UX",
+        "dependency": "User confirmation on whether automatic merge is always acceptable or if visual revision comparison is needed.",
+        "impact": "Without a version history or diff view, users may feel they lost control when automatic merges make unexpected edits.",
+        "reason": "CRDTs merge text cleanly at the byte level, but semantic changes may still clash (e.g., two people editing the same sentence).",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "Offline Authorization Policies",
+        "dependency": "Design of token-based authentication valid for offline usage.",
+        "impact": "If tokens last too long, deactivated users can edit documents offline; if too short, valid offline users cannot edit.",
+        "reason": "Local-first systems struggle with instant revocation without online validation.",
+        "severity": "high",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "Uses Yjs/Automerge, low user friction, high development velocity.",
+            "label": "(Recommended) Seamless automatic merging (CRDT-based) with a 'Version History' panel to inspect and restore past changes."
+          },
+          {
+            "impact": "Maximum control, high friction, slower user flow.",
+            "label": "Manual review/approval flow (Git-like) where offline edits are treated as proposals."
+          }
+        ],
+        "question": "How should conflict resolution behave when offline edits overlap? Do you want seamless automatic merging (like Google Docs) or a visual version comparison/approval flow?",
+        "reason": "Determines the synchronization and data structures (CRDTs vs custom version logs).",
+        "recommendation": "(Recommended) Seamless automatic merging (CRDT-based) with a 'Version History' panel to inspect and restore past changes.",
+        "recommendation_reason": "Provides the best balance between ease of use and safety, avoiding the high friction of Git-like manual merging for non-developers."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "Easier to implement, supports remote teams, reliable cloud backup.",
+            "label": "(Recommended) Centralized secure cloud relay (e.g., WebSocket sync server) with local caching."
+          },
+          {
+            "impact": "Complete privacy and works without internet, but connection reliability is highly dependent on local network configurations.",
+            "label": "Pure local network P2P (mDNS/LAN discovery) sync directly between devices."
+          }
+        ],
+        "question": "Where should the synchronization occur? Over the public internet via a secure cloud coordinator, or locally via peer-to-peer (LAN/Wi-Fi) without internet?",
+        "reason": "Defines network requirements and connection reliability.",
+        "recommendation": "(Recommended) Centralized secure cloud relay (e.g., WebSocket sync server) with local caching.",
+        "recommendation_reason": "Vastly simplifies network traversal (NAT/firewalls) and ensures data is backed up, while working offline locally."
+      }
+    ],
+    "risks": [
+      "CRDT history state bloat over time leading to high memory usage and slow loading on local client devices.",
+      "Security vulnerabilities where offline edits from unauthorized/revoked users are merged into the document because verification can only happen after reconnection.",
+      "Coherence issues where automated character-by-character merging results in grammatically incorrect or overlapping sentences."
+    ],
+    "unknowns": [
+      "Whether real-time collaboration (collaborative editing when online) is required, or if async version-control editing is preferred.",
+      "Whether end-to-end encryption (E2EE) is a requirement for meeting notes security.",
+      "How offline user authentication and token expiration should be handled when keys are revoked during offline periods."
+    ]
+  },
+  "calls": [
+    {
+      "task": "single-custom",
+      "variant": "B",
+      "case": "case-08",
+      "duration_ms": 22903,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "structured_success": true,
+      "success": true,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-winner-validation-1\\case-08__B__01__single-custom.json",
+      "output": {
+        "assumptions": [
+          "The primary platform is Web/Desktop (laptops/desktops) since meeting notes are typically typed.",
+          "Meeting notes contain rich text (paragraphs, headings, lists, tasks) rather than heavy binary attachments like video or long audio in the MVP.",
+          "Synchronization happens via the internet using a centralized relay/backup database when online, rather than P2P local network discovery.",
+          "A simple shared workspace/document model is sufficient for the MVP instead of fine-grained role-based access control."
+        ],
+        "candidates": [
+          "CRDTs (Conflict-free Replicated Data Types) like Yjs or Automerge for automatic and safe text merging.",
+          "Centralized synchronization server (e.g., Yjs websocket provider, Liveblocks, or custom Go/Node relay) to mediate syncing.",
+          "IndexedDB (Dexie.js / RxDB) for browser-based offline local storage, or SQLite (via Tauri/WASM) for desktop.",
+          "TipTap or Lexical rich text editors integrated with Yjs for a smooth WYSIWYG experience."
+        ],
+        "confirmed": [
+          "The application is a team meeting notes application.",
+          "The application must be local-first, default storing data locally.",
+          "The application must support offline editing.",
+          "Upon reconnecting, offline modifications must sync and merge with team members' content.",
+          "The sync process must not easily overwrite others' changes."
+        ],
+        "conflicts": [
+          "Offline Edit Freedom vs Strict Access Control: Ensuring users can edit offline conflicts with preventing unauthorized edits in real-time.",
+          "Automatic Merge vs Content Coherence: Automatically merging text ensures no overwrites but can lead to unreadable sentences if edits overlap closely."
+        ],
+        "gaps": [
+          {
+            "area": "Conflict Resolution UX",
+            "dependency": "User confirmation on whether automatic merge is always acceptable or if visual revision comparison is needed.",
+            "impact": "Without a version history or diff view, users may feel they lost control when automatic merges make unexpected edits.",
+            "reason": "CRDTs merge text cleanly at the byte level, but semantic changes may still clash (e.g., two people editing the same sentence).",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "Offline Authorization Policies",
+            "dependency": "Design of token-based authentication valid for offline usage.",
+            "impact": "If tokens last too long, deactivated users can edit documents offline; if too short, valid offline users cannot edit.",
+            "reason": "Local-first systems struggle with instant revocation without online validation.",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Uses Yjs/Automerge, low user friction, high development velocity.",
+                "label": "(Recommended) Seamless automatic merging (CRDT-based) with a 'Version History' panel to inspect and restore past changes."
+              },
+              {
+                "impact": "Maximum control, high friction, slower user flow.",
+                "label": "Manual review/approval flow (Git-like) where offline edits are treated as proposals."
+              }
+            ],
+            "question": "How should conflict resolution behave when offline edits overlap? Do you want seamless automatic merging (like Google Docs) or a visual version comparison/approval flow?",
+            "reason": "Determines the synchronization and data structures (CRDTs vs custom version logs).",
+            "recommendation": "(Recommended) Seamless automatic merging (CRDT-based) with a 'Version History' panel to inspect and restore past changes.",
+            "recommendation_reason": "Provides the best balance between ease of use and safety, avoiding the high friction of Git-like manual merging for non-developers."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Easier to implement, supports remote teams, reliable cloud backup.",
+                "label": "(Recommended) Centralized secure cloud relay (e.g., WebSocket sync server) with local caching."
+              },
+              {
+                "impact": "Complete privacy and works without internet, but connection reliability is highly dependent on local network configurations.",
+                "label": "Pure local network P2P (mDNS/LAN discovery) sync directly between devices."
+              }
+            ],
+            "question": "Where should the synchronization occur? Over the public internet via a secure cloud coordinator, or locally via peer-to-peer (LAN/Wi-Fi) without internet?",
+            "reason": "Defines network requirements and connection reliability.",
+            "recommendation": "(Recommended) Centralized secure cloud relay (e.g., WebSocket sync server) with local caching.",
+            "recommendation_reason": "Vastly simplifies network traversal (NAT/firewalls) and ensures data is backed up, while working offline locally."
+          }
+        ],
+        "risks": [
+          "CRDT history state bloat over time leading to high memory usage and slow loading on local client devices.",
+          "Security vulnerabilities where offline edits from unauthorized/revoked users are merged into the document because verification can only happen after reconnection.",
+          "Coherence issues where automated character-by-character merging results in grammatically incorrect or overlapping sentences."
+        ],
+        "unknowns": [
+          "Whether real-time collaboration (collaborative editing when online) is required, or if async version-control editing is preferred.",
+          "Whether end-to-end encryption (E2EE) is a requirement for meeting notes security.",
+          "How offline user authentication and token expiration should be handled when keys are revoked during offline periods."
+        ]
+      },
+      "prompt_chars": 1077,
+      "user_input_chars": 77,
+      "input_tokens": 19863,
+      "output_tokens": 6904,
+      "thinking_tokens": 5722,
+      "total_tokens": 26767,
+      "cache_read_tokens": 0,
+      "raw_usage": {
+        "input_tokens": 19863,
+        "output_tokens": 6904,
+        "thinking_tokens": 5722,
+        "cache_read_tokens": 0,
+        "total_tokens": 26767
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 1,
+    "duration_ms": 22903,
+    "input_tokens": 19863,
+    "output_tokens": 6904,
+    "thinking_tokens": 5722,
+    "total_tokens": 26767,
+    "cache_read_tokens": 0,
+    "prompt_chars": 1077,
+    "user_input_chars": 77
+  },
+  "timestamp": "2026-08-22T06:45:25.602Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 3,
+      "question_relevance": 4,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5,
+      "assumption_over_specification": 5,
+      "conflict_precision": 5
+    },
+    "heuristicQuality": 4.6,
+    "matchedSignals": 2,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals",
+      "assumption_over_specification": "heuristic/manual-review-needed",
+      "conflict_precision": "heuristic/manual-review-needed"
+    }
+  }
+}

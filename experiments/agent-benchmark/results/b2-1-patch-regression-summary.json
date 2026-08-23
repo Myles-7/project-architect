@@ -1,0 +1,1308 @@
+{
+  "benchmark": "Project Architect Agent Benchmark v1 B2.1 Validation",
+  "run_id": "b2-1-patch-regression-1",
+  "variant": "B2.1",
+  "cases_requested": [
+    "case-01",
+    "case-05",
+    "case-08",
+    "case-09"
+  ],
+  "cases_completed": [
+    "case-01",
+    "case-05",
+    "case-08",
+    "case-09"
+  ],
+  "stopped_early": false,
+  "stop_reason": null,
+  "guardrail": {
+    "max_input_tokens": 60000,
+    "max_total_tokens": 75000,
+    "max_duration_ms": 90000
+  },
+  "records": [
+    {
+      "run_id": "b2-1-patch-regression-1",
+      "variant": "B2.1",
+      "case": "case-01",
+      "name": "vague-cleaner",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "The software operates locally on the user's computer and does not require an active network connection to perform its core functions.",
+          "The target user is a typical desktop computer user who wants a simple, guided cleanup process rather than navigating manual system settings."
+        ],
+        "candidates": [
+          "Focus on safe-to-delete user temporary files, browser cache, and application log files for the first release.",
+          "Incorporate a file preview and categorization system before any deletion occurs.",
+          "Target Windows as the primary launch platform.",
+          "Provide user-adjustable size thresholds for identifying large files."
+        ],
+        "confirmed": [
+          "A software application that scans and cleans up disk space on a personal computer."
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "Operating System Platform",
+            "dependency": "None",
+            "impact": "Determines the system integration boundaries, permissions design, and user interface guidelines.",
+            "reason": "The target operating system (Windows, macOS, or Linux) is not specified.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Safety and Trust Policy",
+            "dependency": "None",
+            "impact": "Critical for user trust, as deleting files carries the risk of data loss.",
+            "reason": "No safety rules or validation flow have been defined for the file deletion action.",
+            "severity": "critical",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Allows targeting the largest segment of desktop users seeking disk cleanup and simplifies file access permissions.",
+                "label": "(Recommended) Focus on Windows first, targeting standard temporary folders."
+              },
+              {
+                "impact": "Requires navigating macOS sandboxing constraints and targeting Apple's user base.",
+                "label": "Focus on macOS first, prioritizing macOS users and its specific system layout."
+              },
+              {
+                "impact": "Increases initial scope and requires designing for two distinct file systems and user experiences simultaneously.",
+                "label": "Support both Windows and macOS from the first release."
+              }
+            ],
+            "question": "Which operating system platform should this cleanup software target first?",
+            "reason": "Selecting the primary platform now is essential because the file permission models, target audience expectations, and system directory structures differ significantly between operating systems.",
+            "recommendation": "(Recommended) Focus on Windows first, targeting standard temporary folders.",
+            "recommendation_reason": "Windows has a very large market share of users actively seeking third-party cleanup utilities, and standard user permissions allow access to the most common temporary directories without complex sandboxing restrictions."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Provides a safer experience that does not require administrative privilege prompts during onboarding.",
+                "label": "(Recommended) Restrict cleanup to current user-level folders (e.g., user temp folders, browser caches)."
+              },
+              {
+                "impact": "Enables cleaning more system-wide space but requires prompting the user for administrative access.",
+                "label": "Include system-wide temporary files and caches, requesting elevated permissions."
+              }
+            ],
+            "question": "Should the cleanup capability extend to system-wide files or be restricted to user-level files?",
+            "reason": "Accessing system-wide directories can free up more space but requires elevated permissions, which impacts the onboarding flow and user trust.",
+            "recommendation": "(Recommended) Restrict cleanup to current user-level folders (e.g., user temp folders, browser caches).",
+            "recommendation_reason": "Restricting access to user-level folders avoids security prompt friction for new users while still cleaning the majority of common storage bloat."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Ensures maximum safety and builds trust, though it adds a step before cleaning is completed.",
+                "label": "(Recommended) Use a 'Preview and Confirm' approach: show users exactly what files will be deleted and require explicit approval before cleaning."
+              },
+              {
+                "impact": "Balances speed and safety by minimizing prompts for safe areas while protecting personal folders.",
+                "label": "Use an automated 'Safe Cleanup' approach: automatically delete only guaranteed safe files (e.g., system temp caches) and require confirmation only for user-generated files."
+              },
+              {
+                "impact": "Offers the fastest experience but carries the highest risk of accidental file loss and low user trust.",
+                "label": "Provide full automation: scan and clean silently in the background based on predefined rules, prioritizing speed and zero user friction."
+              }
+            ],
+            "question": "How should the software handle the safety/trust policy for deleting files?",
+            "reason": "Deleting files is a high-risk capability; establishing a clear trust model is critical to prevent accidental data loss and maintain user confidence.",
+            "recommendation": "(Recommended) Use a 'Preview and Confirm' approach: show users exactly what files will be deleted and require explicit approval before cleaning.",
+            "recommendation_reason": "For a new product, establishing trust is paramount. A preview step guarantees the user remains in control of their files and prevents accidental deletions."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Offers a clear, simple path for average users to quickly reclaim space without feeling overwhelmed.",
+                "label": "(Recommended) A simple 'Scan and Clean' dashboard showing a summary of space reclaimable by category with a one-click clean."
+              },
+              {
+                "impact": "Appeals to advanced users who want precise control over every byte deleted, but increases complexity for casual users.",
+                "label": "A detailed file browser interface that lists files by size, date, and type, allowing power users to manually select and inspect individual files."
+              },
+              {
+                "impact": "Provides a set-and-forget experience, keeping the app out of sight until action is actually needed.",
+                "label": "An automated background agent that notifies the user only when disk space drops below a certain threshold and offers to clean it."
+              }
+            ],
+            "question": "What core workflow should the user experience when opening the software to clean their computer?",
+            "reason": "This defines the primary interaction model and UX direction for the product's core value proposition.",
+            "recommendation": "(Recommended) A simple 'Scan and Clean' dashboard showing a summary of space reclaimable by category with a one-click clean.",
+            "recommendation_reason": "This strikes the best balance of simplicity, speed, and safety for the majority of users, allowing them to see what is happening without forcing them to navigate a complex file browser."
+          }
+        ],
+        "risks": [
+          "Accidental deletion of critical system files or active user files, causing system instability or loss of important data.",
+          "Negative user perception or lack of trust if the deletion process is not transparent or lacks clear confirmation."
+        ],
+        "tensions": [
+          {
+            "description": "Automation efficiency vs. user control and trust.",
+            "reason": "Fully automatic cleanup saves time but increases the risk of deleting desired files and reduces user confidence. Requiring manual approval for all deletions increases safety but adds friction to the cleanup process."
+          },
+          {
+            "description": "Scanning depth vs. execution speed.",
+            "reason": "Scanning deep system folders and analyzing large files provides more comprehensive cleanup but takes longer, potentially impacting the user's system performance during the scan."
+          }
+        ],
+        "unknowns": [
+          "The specific file categories the user wants to prioritize (e.g., downloads, browser caches, system logs, duplicate files).",
+          "The level of user involvement required (e.g., fully automated cleanup vs. granular user selection)."
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-01",
+          "duration_ms": 29494,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-patch-regression-1\\case-01__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "The software operates locally on the user's computer and does not require an active network connection to perform its core functions.",
+              "The target user is a typical desktop computer user who wants a simple, guided cleanup process rather than navigating manual system settings."
+            ],
+            "candidates": [
+              "Focus on safe-to-delete user temporary files, browser cache, and application log files for the first release.",
+              "Incorporate a file preview and categorization system before any deletion occurs.",
+              "Target Windows as the primary launch platform.",
+              "Provide user-adjustable size thresholds for identifying large files."
+            ],
+            "confirmed": [
+              "A software application that scans and cleans up disk space on a personal computer."
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "Operating System Platform",
+                "dependency": "None",
+                "impact": "Determines the system integration boundaries, permissions design, and user interface guidelines.",
+                "reason": "The target operating system (Windows, macOS, or Linux) is not specified.",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "Safety and Trust Policy",
+                "dependency": "None",
+                "impact": "Critical for user trust, as deleting files carries the risk of data loss.",
+                "reason": "No safety rules or validation flow have been defined for the file deletion action.",
+                "severity": "critical",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "Allows targeting the largest segment of desktop users seeking disk cleanup and simplifies file access permissions.",
+                    "label": "(Recommended) Focus on Windows first, targeting standard temporary folders."
+                  },
+                  {
+                    "impact": "Requires navigating macOS sandboxing constraints and targeting Apple's user base.",
+                    "label": "Focus on macOS first, prioritizing macOS users and its specific system layout."
+                  },
+                  {
+                    "impact": "Increases initial scope and requires designing for two distinct file systems and user experiences simultaneously.",
+                    "label": "Support both Windows and macOS from the first release."
+                  }
+                ],
+                "question": "Which operating system platform should this cleanup software target first?",
+                "reason": "Selecting the primary platform now is essential because the file permission models, target audience expectations, and system directory structures differ significantly between operating systems.",
+                "recommendation": "(Recommended) Focus on Windows first, targeting standard temporary folders.",
+                "recommendation_reason": "Windows has a very large market share of users actively seeking third-party cleanup utilities, and standard user permissions allow access to the most common temporary directories without complex sandboxing restrictions."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Provides a safer experience that does not require administrative privilege prompts during onboarding.",
+                    "label": "(Recommended) Restrict cleanup to current user-level folders (e.g., user temp folders, browser caches)."
+                  },
+                  {
+                    "impact": "Enables cleaning more system-wide space but requires prompting the user for administrative access.",
+                    "label": "Include system-wide temporary files and caches, requesting elevated permissions."
+                  }
+                ],
+                "question": "Should the cleanup capability extend to system-wide files or be restricted to user-level files?",
+                "reason": "Accessing system-wide directories can free up more space but requires elevated permissions, which impacts the onboarding flow and user trust.",
+                "recommendation": "(Recommended) Restrict cleanup to current user-level folders (e.g., user temp folders, browser caches).",
+                "recommendation_reason": "Restricting access to user-level folders avoids security prompt friction for new users while still cleaning the majority of common storage bloat."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Ensures maximum safety and builds trust, though it adds a step before cleaning is completed.",
+                    "label": "(Recommended) Use a 'Preview and Confirm' approach: show users exactly what files will be deleted and require explicit approval before cleaning."
+                  },
+                  {
+                    "impact": "Balances speed and safety by minimizing prompts for safe areas while protecting personal folders.",
+                    "label": "Use an automated 'Safe Cleanup' approach: automatically delete only guaranteed safe files (e.g., system temp caches) and require confirmation only for user-generated files."
+                  },
+                  {
+                    "impact": "Offers the fastest experience but carries the highest risk of accidental file loss and low user trust.",
+                    "label": "Provide full automation: scan and clean silently in the background based on predefined rules, prioritizing speed and zero user friction."
+                  }
+                ],
+                "question": "How should the software handle the safety/trust policy for deleting files?",
+                "reason": "Deleting files is a high-risk capability; establishing a clear trust model is critical to prevent accidental data loss and maintain user confidence.",
+                "recommendation": "(Recommended) Use a 'Preview and Confirm' approach: show users exactly what files will be deleted and require explicit approval before cleaning.",
+                "recommendation_reason": "For a new product, establishing trust is paramount. A preview step guarantees the user remains in control of their files and prevents accidental deletions."
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "Offers a clear, simple path for average users to quickly reclaim space without feeling overwhelmed.",
+                    "label": "(Recommended) A simple 'Scan and Clean' dashboard showing a summary of space reclaimable by category with a one-click clean."
+                  },
+                  {
+                    "impact": "Appeals to advanced users who want precise control over every byte deleted, but increases complexity for casual users.",
+                    "label": "A detailed file browser interface that lists files by size, date, and type, allowing power users to manually select and inspect individual files."
+                  },
+                  {
+                    "impact": "Provides a set-and-forget experience, keeping the app out of sight until action is actually needed.",
+                    "label": "An automated background agent that notifies the user only when disk space drops below a certain threshold and offers to clean it."
+                  }
+                ],
+                "question": "What core workflow should the user experience when opening the software to clean their computer?",
+                "reason": "This defines the primary interaction model and UX direction for the product's core value proposition.",
+                "recommendation": "(Recommended) A simple 'Scan and Clean' dashboard showing a summary of space reclaimable by category with a one-click clean.",
+                "recommendation_reason": "This strikes the best balance of simplicity, speed, and safety for the majority of users, allowing them to see what is happening without forcing them to navigate a complex file browser."
+              }
+            ],
+            "risks": [
+              "Accidental deletion of critical system files or active user files, causing system instability or loss of important data.",
+              "Negative user perception or lack of trust if the deletion process is not transparent or lacks clear confirmation."
+            ],
+            "tensions": [
+              {
+                "description": "Automation efficiency vs. user control and trust.",
+                "reason": "Fully automatic cleanup saves time but increases the risk of deleting desired files and reduces user confidence. Requiring manual approval for all deletions increases safety but adds friction to the cleanup process."
+              },
+              {
+                "description": "Scanning depth vs. execution speed.",
+                "reason": "Scanning deep system folders and analyzing large files provides more comprehensive cleanup but takes longer, potentially impacting the user's system performance during the scan."
+              }
+            ],
+            "unknowns": [
+              "The specific file categories the user wants to prioritize (e.g., downloads, browser caches, system logs, duplicate files).",
+              "The level of user involvement required (e.g., fully automated cleanup vs. granular user selection)."
+            ]
+          },
+          "prompt_chars": 4403,
+          "context_chars": 26,
+          "user_input_chars": 15,
+          "input_tokens": 20637,
+          "output_tokens": 9661,
+          "thinking_tokens": 8061,
+          "total_tokens": 30298,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20637,
+            "output_tokens": 9661,
+            "thinking_tokens": 8061,
+            "cache_read_tokens": 0,
+            "total_tokens": 30298
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 29494,
+        "input_tokens": 20637,
+        "output_tokens": 9661,
+        "thinking_tokens": 8061,
+        "total_tokens": 30298,
+        "cache_read_tokens": 0,
+        "prompt_chars": 4403,
+        "context_chars": 26,
+        "user_input_chars": 15
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:04:46.669Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 4,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.8,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b2-1-patch-regression-1",
+      "variant": "B2.1",
+      "case": "case-05",
+      "name": "offline-sync-conflict",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "该知识库供单人使用，无需多用户实时协同或共同编辑。",
+          "用户拥有至少两台设备，且这些设备能定期接入同一局域网或互联网连接。"
+        ],
+        "candidates": [
+          "局域网内的设备间自动同步能力。",
+          "使用用户自控的外部存储路径的加密同步能力。",
+          "用于离线迁移的手动导出与导入备份能力。"
+        ],
+        "confirmed": [
+          "产品定位为个人知识库。",
+          "应用必须为完全离线优先。",
+          "任何可读内容均不能脱离用户控制或被第三方获取。",
+          "用户更换电脑时，数据必须能够自动同步。",
+          "同步过程必须要求零用户配置/设置。"
+        ],
+        "conflicts": [
+          "命题 1：'任何内容都不能离开用户电脑'。",
+          "命题 2：'用户换电脑后数据要自动同步，且不用用户做任何设置'。",
+          "冲突分析：如果任何内容都严禁离开原电脑的物理边界，那么在没有任何用户手动配置或网络传输的情况下，数据在物理上无法自动同步到新电脑。自动同步必须允许数据跨越网络或物理介质传输，这与完全不离开电脑的严格限制冲突。"
+        ],
+        "gaps": [
+          {
+            "area": "信任边界与设备配对",
+            "dependency": "设备授权策略",
+            "impact": "在没有任何设备所有权验证机制或操作的情况下，数据可能会同步到网络中的任意电脑。",
+            "reason": "零用户配置的要求与防止未授权设备自动同步数据的安全要求存在直接冲突。",
+            "severity": "critical",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "支持在不同网络下实现无缝自动同步，同时确保数据对第三方完全保密。",
+                "label": "(推荐) 允许加密数据通过外部存储/服务器同步，只要服务商无法读取其中的具体内容。"
+              },
+              {
+                "impact": "消除了第三方托管，但要求两台电脑同时开机并在同一网络下才能进行同步。",
+                "label": "严格禁止数据离开我的物理设备，仅限制在设备相互靠近且处于同一局域网时进行直接传输。"
+              },
+              {
+                "impact": "完全避免网络传输，但在更换电脑时需要手动操作和配置。",
+                "label": "采用手动的本地导出与导入方式（例如通过USB拷贝），不进行任何自动的网络同步。"
+              }
+            ],
+            "question": "请明确托管同步数据的服务商是否允许访问或读取您的内容，或者数据是否必须保持除了您自己的设备外任何人都无法读取的状态？",
+            "reason": "我们需要现在澄清这一点，因为信任边界的定义直接决定了自动同步功能的可行性。如果数据在任何情况下都严禁离开原电脑的物理边界，那么在没有用户手动物理介质传输的情况下，自动同步到新电脑是无法实现的。",
+            "recommendation": "(推荐) 仅在同步服务商完全无法读取内容的前提下，允许加密数据通过外部网络或服务器进行同步。",
+            "recommendation_reason": "这既能满足用户在更换电脑时实现零配置自动同步的体验，又符合不让任何可读内容脱离用户控制的隐私初衷。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "仅在添加新设备时需要一次操作，即可保障数据安全。",
+                "label": "(推荐) 在已授权的旧电脑上进行一次性确认，以信任新电脑。"
+              },
+              {
+                "impact": "无需旧电脑在线，但需要在新设备上进行一次性登录或拷贝密钥的操作。",
+                "label": "通过预先存在的用户账号或共享密钥文件，自动对设备进行授权。"
+              }
+            ],
+            "question": "请明确新电脑如何向系统证明其属于您，以授权进行自动同步？",
+            "reason": "由于您要求零配置，我们需要一种安全的方式在旧电脑 and 新电脑之间建立信任，以防您的私密知识库自动同步到局域网内的未授权设备。",
+            "recommendation": "(推荐) 在首次连接时，要求在您已有的电脑上进行一次性确认（如点击同意或确认匹配码）。",
+            "recommendation_reason": "这能以极低的用户操作成本确保安全边界，既避免了复杂的配置设置，又防止了未授权访问。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "需要采用跨平台的设计方案。",
+                "label": "(推荐) 跨平台支持（例如在 Windows 和 macOS 之间同步）。"
+              },
+              {
+                "impact": "可以简化与系统级原生同步机制的集成。",
+                "label": "仅在同类操作系统之间同步（例如仅在 Windows 电脑之间切换）。"
+              }
+            ],
+            "question": "您主要在哪些操作系统之间切换（例如 Windows、macOS、Linux），且不同系统上的界面是否需要保持完全一致？",
+            "reason": "这决定了目标平台的兼容性要求以及切换电脑时的用户体验设计。",
+            "recommendation": "(推荐) 支持跨平台的桌面运行环境，以便在不同操作系统间无缝切换。",
+            "recommendation_reason": "确保无论用户选择何种桌面环境，均能正常访问和使用知识库。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "防止数据意外丢失，但在发生冲突时需要用户决策。",
+                "label": "(推荐) 展示内容差异对比，由我手动选择解决方式或同时保留。"
+              },
+              {
+                "impact": "保持无缝和全自动的体验，同时提供找回被覆盖内容的手段。",
+                "label": "自动保留最新修改的版本，并将旧版本归档为备份副本。"
+              }
+            ],
+            "question": "当不同电脑上出现冲突的离线修改时，系统应当如何向您呈现并解决这些冲突？",
+            "reason": "由于应用是离线优先的，您可能会在两台未同步的电脑上修改同一个笔记，我们需要定义解决这些并发修改的用户体验。",
+            "recommendation": "(推荐) 提供直观的差异对比，让您选择合并或同时保留两个版本。",
+            "recommendation_reason": "防止内容被无意中覆盖，确保您的知识库数据完整安全。"
+          }
+        ],
+        "risks": [
+          "数据丢失风险：若设备在同步至另一台设备前发生硬件故障，数据可能永久丢失。",
+          "安全风险：若同步完全自动且无任何设置，局域网内的未知设备可能会自动拉取或拦截用户的私密数据。"
+        ],
+        "tensions": [
+          {
+            "description": "严格的数据隔离（完全离线）与多设备自动同步便利性之间的权衡。",
+            "reason": "最大程度的本地隔离可防止任何网络泄露，但会限制或使跨设备自动传输数据变得更加复杂。"
+          },
+          {
+            "description": "零配置同步与设备访问控制之间的权衡。",
+            "reason": "零配置能提供无缝的配对体验，但会削弱用户显式控制哪些设备可以加入同步圈的能力。"
+          }
+        ],
+        "unknowns": [
+          "用户计划在哪些具体的操作系统之间切换。",
+          "用户对同步延迟的容忍度（如：是否需要即时同步，还是在应用启动/关闭时同步即可）。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-05",
+          "duration_ms": 36225,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-patch-regression-1\\case-05__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "该知识库供单人使用，无需多用户实时协同或共同编辑。",
+              "用户拥有至少两台设备，且这些设备能定期接入同一局域网或互联网连接。"
+            ],
+            "candidates": [
+              "局域网内的设备间自动同步能力。",
+              "使用用户自控的外部存储路径的加密同步能力。",
+              "用于离线迁移的手动导出与导入备份能力。"
+            ],
+            "confirmed": [
+              "产品定位为个人知识库。",
+              "应用必须为完全离线优先。",
+              "任何可读内容均不能脱离用户控制或被第三方获取。",
+              "用户更换电脑时，数据必须能够自动同步。",
+              "同步过程必须要求零用户配置/设置。"
+            ],
+            "conflicts": [
+              "命题 1：'任何内容都不能离开用户电脑'。",
+              "命题 2：'用户换电脑后数据要自动同步，且不用用户做任何设置'。",
+              "冲突分析：如果任何内容都严禁离开原电脑的物理边界，那么在没有任何用户手动配置或网络传输的情况下，数据在物理上无法自动同步到新电脑。自动同步必须允许数据跨越网络或物理介质传输，这与完全不离开电脑的严格限制冲突。"
+            ],
+            "gaps": [
+              {
+                "area": "信任边界与设备配对",
+                "dependency": "设备授权策略",
+                "impact": "在没有任何设备所有权验证机制或操作的情况下，数据可能会同步到网络中的任意电脑。",
+                "reason": "零用户配置的要求与防止未授权设备自动同步数据的安全要求存在直接冲突。",
+                "severity": "critical",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "critical",
+                "options": [
+                  {
+                    "impact": "支持在不同网络下实现无缝自动同步，同时确保数据对第三方完全保密。",
+                    "label": "(推荐) 允许加密数据通过外部存储/服务器同步，只要服务商无法读取其中的具体内容。"
+                  },
+                  {
+                    "impact": "消除了第三方托管，但要求两台电脑同时开机并在同一网络下才能进行同步。",
+                    "label": "严格禁止数据离开我的物理设备，仅限制在设备相互靠近且处于同一局域网时进行直接传输。"
+                  },
+                  {
+                    "impact": "完全避免网络传输，但在更换电脑时需要手动操作和配置。",
+                    "label": "采用手动的本地导出与导入方式（例如通过USB拷贝），不进行任何自动的网络同步。"
+                  }
+                ],
+                "question": "请明确托管同步数据的服务商是否允许访问或读取您的内容，或者数据是否必须保持除了您自己的设备外任何人都无法读取的状态？",
+                "reason": "我们需要现在澄清这一点，因为信任边界的定义直接决定了自动同步功能的可行性。如果数据在任何情况下都严禁离开原电脑的物理边界，那么在没有用户手动物理介质传输的情况下，自动同步到新电脑是无法实现的。",
+                "recommendation": "(推荐) 仅在同步服务商完全无法读取内容的前提下，允许加密数据通过外部网络或服务器进行同步。",
+                "recommendation_reason": "这既能满足用户在更换电脑时实现零配置自动同步的体验，又符合不让任何可读内容脱离用户控制的隐私初衷。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "仅在添加新设备时需要一次操作，即可保障数据安全。",
+                    "label": "(推荐) 在已授权的旧电脑上进行一次性确认，以信任新电脑。"
+                  },
+                  {
+                    "impact": "无需旧电脑在线，但需要在新设备上进行一次性登录或拷贝密钥的操作。",
+                    "label": "通过预先存在的用户账号或共享密钥文件，自动对设备进行授权。"
+                  }
+                ],
+                "question": "请明确新电脑如何向系统证明其属于您，以授权进行自动同步？",
+                "reason": "由于您要求零配置，我们需要一种安全的方式在旧电脑 and 新电脑之间建立信任，以防您的私密知识库自动同步到局域网内的未授权设备。",
+                "recommendation": "(推荐) 在首次连接时，要求在您已有的电脑上进行一次性确认（如点击同意或确认匹配码）。",
+                "recommendation_reason": "这能以极低的用户操作成本确保安全边界，既避免了复杂的配置设置，又防止了未授权访问。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "需要采用跨平台的设计方案。",
+                    "label": "(推荐) 跨平台支持（例如在 Windows 和 macOS 之间同步）。"
+                  },
+                  {
+                    "impact": "可以简化与系统级原生同步机制的集成。",
+                    "label": "仅在同类操作系统之间同步（例如仅在 Windows 电脑之间切换）。"
+                  }
+                ],
+                "question": "您主要在哪些操作系统之间切换（例如 Windows、macOS、Linux），且不同系统上的界面是否需要保持完全一致？",
+                "reason": "这决定了目标平台的兼容性要求以及切换电脑时的用户体验设计。",
+                "recommendation": "(推荐) 支持跨平台的桌面运行环境，以便在不同操作系统间无缝切换。",
+                "recommendation_reason": "确保无论用户选择何种桌面环境，均能正常访问和使用知识库。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "防止数据意外丢失，但在发生冲突时需要用户决策。",
+                    "label": "(推荐) 展示内容差异对比，由我手动选择解决方式或同时保留。"
+                  },
+                  {
+                    "impact": "保持无缝和全自动的体验，同时提供找回被覆盖内容的手段。",
+                    "label": "自动保留最新修改的版本，并将旧版本归档为备份副本。"
+                  }
+                ],
+                "question": "当不同电脑上出现冲突的离线修改时，系统应当如何向您呈现并解决这些冲突？",
+                "reason": "由于应用是离线优先的，您可能会在两台未同步的电脑上修改同一个笔记，我们需要定义解决这些并发修改的用户体验。",
+                "recommendation": "(推荐) 提供直观的差异对比，让您选择合并或同时保留两个版本。",
+                "recommendation_reason": "防止内容被无意中覆盖，确保您的知识库数据完整安全。"
+              }
+            ],
+            "risks": [
+              "数据丢失风险：若设备在同步至另一台设备前发生硬件故障，数据可能永久丢失。",
+              "安全风险：若同步完全自动且无任何设置，局域网内的未知设备可能会自动拉取或拦截用户的私密数据。"
+            ],
+            "tensions": [
+              {
+                "description": "严格的数据隔离（完全离线）与多设备自动同步便利性之间的权衡。",
+                "reason": "最大程度的本地隔离可防止任何网络泄露，但会限制或使跨设备自动传输数据变得更加复杂。"
+              },
+              {
+                "description": "零配置同步与设备访问控制之间的权衡。",
+                "reason": "零配置能提供无缝的配对体验，但会削弱用户显式控制哪些设备可以加入同步圈的能力。"
+              }
+            ],
+            "unknowns": [
+              "用户计划在哪些具体的操作系统之间切换。",
+              "用户对同步延迟的容忍度（如：是否需要即时同步，还是在应用启动/关闭时同步即可）。"
+            ]
+          },
+          "prompt_chars": 4447,
+          "context_chars": 70,
+          "user_input_chars": 59,
+          "input_tokens": 20668,
+          "output_tokens": 14455,
+          "thinking_tokens": 12861,
+          "total_tokens": 35123,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20668,
+            "output_tokens": 14455,
+            "thinking_tokens": 12861,
+            "cache_read_tokens": 0,
+            "total_tokens": 35123
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 36225,
+        "input_tokens": 20668,
+        "output_tokens": 14455,
+        "thinking_tokens": 12861,
+        "total_tokens": 35123,
+        "cache_read_tokens": 0,
+        "prompt_chars": 4447,
+        "context_chars": 70,
+        "user_input_chars": 59
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:05:22.897Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 1
+        },
+        "heuristicQuality": 4.5,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b2-1-patch-regression-1",
+      "variant": "B2.1",
+      "case": "case-08",
+      "name": "local-first-notes",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "会议笔记应用主要以文本和简单的排版（如列表、标题）为核心内容载体，不涉及超大二进制文件的频繁实时同步。",
+          "团队成员在离线编辑后，能够接受在重新连网时有短暂的秒级同步与合并延迟。"
+        ],
+        "candidates": [
+          "在网络恢复并检测到编辑冲突时，向用户提供直观的冲突对比与选择保留界面。",
+          "提供笔记的完整版本历史记录，允许团队成员随时查看并回滚到之前的任意版本。",
+          "支持团队成员之间的笔记共享与协作权限管理（如只读、可编辑）。"
+        ],
+        "confirmed": [
+          "会议笔记数据默认存储在用户本地设备上，在无网络连接状态下依然支持编辑与保存。",
+          "恢复网络连接后，团队成员需能看到自动合并后的内容，且系统不可轻易覆盖任何成员的修改。"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "运行平台选择",
+            "dependency": "目标用户的设备使用习惯与首发平台倾向",
+            "impact": "无法评估本地文件系统的访问受限程度，影响数据保存的可靠性策略。",
+            "reason": "用户想法中未指定应用运行的目标平台（桌面/移动/网页），这会直接影响本地存储的持久化边界和离线交互体验。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "冲突合并的用户交互规则",
+            "dependency": "团队对于同步冲突容错度与操作心流的权衡",
+            "impact": "可能导致合并算法与用户实际期望的安全感不符，或者因过度打扰而破坏编辑体验。",
+            "reason": "用户要求'不能轻易覆盖别人的修改'，但尚未明确具体的冲突交互表现（如内联高亮、强弹窗或版本历史保留）。",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "提供最稳固的本地文件系统访问控制，离线体验不受浏览器限制，但增加了用户的下载安装成本。",
+                "label": "(推荐) 优先推出桌面客户端（Windows/macOS），方便会议中高频录入"
+              },
+              {
+                "impact": "便于现场或移动会议记录，但长文本录入体验较差，且需处理移动操作系统更严格的后台同步与存储限制。",
+                "label": "优先推出移动端 App（iOS/Android），适合团队成员携带移动设备随时随地进行会议记录"
+              },
+              {
+                "impact": "用户使用门槛极低，但容易受到浏览器缓存清理机制的影响，导致本地优先的持久性受到挑战。",
+                "label": "优先推出网页端应用（Web App），方便用户零安装跨平台打开"
+              }
+            ],
+            "question": "为了明确应用的用户场景与本地数据控制的实现边界，请问该应用首发的目标平台是什么？",
+            "reason": "运行平台（如桌面端、移动端或网页端）不仅决定了用户在离线状态下编辑会议笔记时的交互场景，更关键的是决定了我们能在多大程度上安全、持久地读写本地文件而不受浏览器等运行环境的清理限制。因此在定义MVP架构前必须首要确认。",
+            "recommendation": "(推荐) 优先以桌面客户端（Windows/macOS）作为首发平台。",
+            "recommendation_reason": "桌面客户端拥有更稳定、不受浏览器缓存清理机制影响的本地文件系统访问权限，能完美提供'默认存在本机'且'离线可编辑'的 local-first 安全感，且完美契合会议场景下高频的键盘输入需求。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "确保绝不覆盖他人内容，保障数据安全的同时保持流畅的阅读和编辑心流（非阻塞）。",
+                "label": "(推荐) 自动合并无冲突部分，并在文档内联标记冲突区域提供对比，同时保留完整修改历史"
+              },
+              {
+                "impact": "绝对保证冲突在第一时间得到解决，但频繁的弹窗会严重打断用户的会议记录体验。",
+                "label": "采用强交互提示：在检测到冲突时强制弹窗，用户必须手动解决冲突后才能继续查看和编辑"
+              },
+              {
+                "impact": "合并逻辑最简单且无丢失风险，但可能导致文档结构混乱，需要用户事后进行大量的手动清理工作。",
+                "label": "采用追加拼接方式：自动将两个冲突版本按顺序拼接在一起，并标明各自作者"
+              }
+            ],
+            "question": "当多个团队成员在离线状态下对笔记的同一个段落进行了冲突修改，您希望系统在恢复网络时如何确保'不轻易覆盖'？",
+            "reason": "这关系到核心协作流程中用户对数据安全感的认知。当自动合并无法完美解决冲突时，需要明确是在界面上提供怎样的容错与解决机制。",
+            "recommendation": "(推荐) 采用非阻塞的内联标记与历史版本机制。",
+            "recommendation_reason": "这样既不会阻断用户的编辑或阅读心流（非阻塞式），又能提供绝对的数据安全保障（保留历史），让用户拥有最终控制权。"
+          }
+        ],
+        "risks": [
+          "多人在离线状态下对同一段落进行大幅度不相容修改，恢复网络后导致自动合并结果混乱，增加用户手动整理的负担。",
+          "由于网络恢复时自动合并策略的局限，用户可能在不知情的情况下发现自己的本地修改被他人标记为冲突并隐藏，产生数据丢失的恐慌感。"
+        ],
+        "tensions": [
+          {
+            "description": "完全自动化的内容合并 vs 严格保护不被覆盖的冲突提示",
+            "reason": "过度自动合并可能导致细微但关键的修改被静默吞没；而过度频繁的冲突确认弹窗则会严重打断用户的会议记录和阅读体验。"
+          },
+          {
+            "description": "本地数据的绝对掌控权 vs 团队协同共享的最终一致性",
+            "reason": "Local-first 强调每个用户对本地数据的绝对控制，但团队协同又要求最终与他人同步一致，这在离线编辑后合并时可能带来局部修改被覆盖或重置的心理落差。"
+          }
+        ],
+        "unknowns": [
+          "应用首发的具体运行平台（如桌面端、移动端或网页端）。",
+          "团队成员的身份认证与加入会议/共享笔记的具体流程。",
+          "服务提供商是否能够访问或查看用户同步的笔记数据（即隐私和信任边界）。"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-08",
+          "duration_ms": 30930,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-patch-regression-1\\case-08__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "会议笔记应用主要以文本和简单的排版（如列表、标题）为核心内容载体，不涉及超大二进制文件的频繁实时同步。",
+              "团队成员在离线编辑后，能够接受在重新连网时有短暂的秒级同步与合并延迟。"
+            ],
+            "candidates": [
+              "在网络恢复并检测到编辑冲突时，向用户提供直观的冲突对比与选择保留界面。",
+              "提供笔记的完整版本历史记录，允许团队成员随时查看并回滚到之前的任意版本。",
+              "支持团队成员之间的笔记共享与协作权限管理（如只读、可编辑）。"
+            ],
+            "confirmed": [
+              "会议笔记数据默认存储在用户本地设备上，在无网络连接状态下依然支持编辑与保存。",
+              "恢复网络连接后，团队成员需能看到自动合并后的内容，且系统不可轻易覆盖任何成员的修改。"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "运行平台选择",
+                "dependency": "目标用户的设备使用习惯与首发平台倾向",
+                "impact": "无法评估本地文件系统的访问受限程度，影响数据保存的可靠性策略。",
+                "reason": "用户想法中未指定应用运行的目标平台（桌面/移动/网页），这会直接影响本地存储的持久化边界和离线交互体验。",
+                "severity": "high",
+                "should_ask_user": true
+              },
+              {
+                "area": "冲突合并的用户交互规则",
+                "dependency": "团队对于同步冲突容错度与操作心流的权衡",
+                "impact": "可能导致合并算法与用户实际期望的安全感不符，或者因过度打扰而破坏编辑体验。",
+                "reason": "用户要求'不能轻易覆盖别人的修改'，但尚未明确具体的冲突交互表现（如内联高亮、强弹窗或版本历史保留）。",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "提供最稳固的本地文件系统访问控制，离线体验不受浏览器限制，但增加了用户的下载安装成本。",
+                    "label": "(推荐) 优先推出桌面客户端（Windows/macOS），方便会议中高频录入"
+                  },
+                  {
+                    "impact": "便于现场或移动会议记录，但长文本录入体验较差，且需处理移动操作系统更严格的后台同步与存储限制。",
+                    "label": "优先推出移动端 App（iOS/Android），适合团队成员携带移动设备随时随地进行会议记录"
+                  },
+                  {
+                    "impact": "用户使用门槛极低，但容易受到浏览器缓存清理机制的影响，导致本地优先的持久性受到挑战。",
+                    "label": "优先推出网页端应用（Web App），方便用户零安装跨平台打开"
+                  }
+                ],
+                "question": "为了明确应用的用户场景与本地数据控制的实现边界，请问该应用首发的目标平台是什么？",
+                "reason": "运行平台（如桌面端、移动端或网页端）不仅决定了用户在离线状态下编辑会议笔记时的交互场景，更关键的是决定了我们能在多大程度上安全、持久地读写本地文件而不受浏览器等运行环境的清理限制。因此在定义MVP架构前必须首要确认。",
+                "recommendation": "(推荐) 优先以桌面客户端（Windows/macOS）作为首发平台。",
+                "recommendation_reason": "桌面客户端拥有更稳定、不受浏览器缓存清理机制影响的本地文件系统访问权限，能完美提供'默认存在本机'且'离线可编辑'的 local-first 安全感，且完美契合会议场景下高频的键盘输入需求。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "确保绝不覆盖他人内容，保障数据安全的同时保持流畅的阅读和编辑心流（非阻塞）。",
+                    "label": "(推荐) 自动合并无冲突部分，并在文档内联标记冲突区域提供对比，同时保留完整修改历史"
+                  },
+                  {
+                    "impact": "绝对保证冲突在第一时间得到解决，但频繁的弹窗会严重打断用户的会议记录体验。",
+                    "label": "采用强交互提示：在检测到冲突时强制弹窗，用户必须手动解决冲突后才能继续查看和编辑"
+                  },
+                  {
+                    "impact": "合并逻辑最简单且无丢失风险，但可能导致文档结构混乱，需要用户事后进行大量的手动清理工作。",
+                    "label": "采用追加拼接方式：自动将两个冲突版本按顺序拼接在一起，并标明各自作者"
+                  }
+                ],
+                "question": "当多个团队成员在离线状态下对笔记的同一个段落进行了冲突修改，您希望系统在恢复网络时如何确保'不轻易覆盖'？",
+                "reason": "这关系到核心协作流程中用户对数据安全感的认知。当自动合并无法完美解决冲突时，需要明确是在界面上提供怎样的容错与解决机制。",
+                "recommendation": "(推荐) 采用非阻塞的内联标记与历史版本机制。",
+                "recommendation_reason": "这样既不会阻断用户的编辑或阅读心流（非阻塞式），又能提供绝对的数据安全保障（保留历史），让用户拥有最终控制权。"
+              }
+            ],
+            "risks": [
+              "多人在离线状态下对同一段落进行大幅度不相容修改，恢复网络后导致自动合并结果混乱，增加用户手动整理的负担。",
+              "由于网络恢复时自动合并策略的局限，用户可能在不知情的情况下发现自己的本地修改被他人标记为冲突并隐藏，产生数据丢失的恐慌感。"
+            ],
+            "tensions": [
+              {
+                "description": "完全自动化的内容合并 vs 严格保护不被覆盖的冲突提示",
+                "reason": "过度自动合并可能导致细微但关键的修改被静默吞没；而过度频繁的冲突确认弹窗则会严重打断用户的会议记录和阅读体验。"
+              },
+              {
+                "description": "本地数据的绝对掌控权 vs 团队协同共享的最终一致性",
+                "reason": "Local-first 强调每个用户对本地数据的绝对控制，但团队协同又要求最终与他人同步一致，这在离线编辑后合并时可能带来局部修改被覆盖或重置的心理落差。"
+              }
+            ],
+            "unknowns": [
+              "应用首发的具体运行平台（如桌面端、移动端或网页端）。",
+              "团队成员的身份认证与加入会议/共享笔记的具体流程。",
+              "服务提供商是否能够访问或查看用户同步的笔记数据（即隐私和信任边界）。"
+            ]
+          },
+          "prompt_chars": 4465,
+          "context_chars": 88,
+          "user_input_chars": 77,
+          "input_tokens": 23089,
+          "output_tokens": 12386,
+          "thinking_tokens": 9658,
+          "total_tokens": 35475,
+          "cache_read_tokens": 28551,
+          "raw_usage": {
+            "input_tokens": 23089,
+            "output_tokens": 12386,
+            "thinking_tokens": 9658,
+            "cache_read_tokens": 28551,
+            "total_tokens": 35475
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 30930,
+        "input_tokens": 23089,
+        "output_tokens": 12386,
+        "thinking_tokens": 9658,
+        "total_tokens": 35475,
+        "cache_read_tokens": 28551,
+        "prompt_chars": 4465,
+        "context_chars": 88,
+        "user_input_chars": 77
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:05:53.829Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 4,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 4,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.7,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    },
+    {
+      "run_id": "b2-1-patch-regression-1",
+      "variant": "B2.1",
+      "case": "case-09",
+      "name": "password-manager",
+      "success": true,
+      "output": {
+        "assumptions": [
+          "浏览器插件将适配市面主流的浏览器环境（如基于 Chromium 内核的浏览器和 Firefox）。",
+          "移动端应用将同时支持 iOS 和 Android 系统，以覆盖大多数智能手机用户。"
+        ],
+        "candidates": [
+          "支持离线数据访问，即使在没有网络连接时，用户也能在本地查看和检索已保存的信息。",
+          "设备间数据的自动变化感知与同步，当一台设备更新数据后，其他在线设备能自动或手动同步最新状态。",
+          "使用设备本地自带的安全锁定机制（如面部识别、指纹或操作系统锁）进行快速解锁与二次验证。"
+        ],
+        "confirmed": [
+          "用户需要保存和管理四类敏感数据：网站账号、密码、信用卡信息以及安全笔记。",
+          "系统必须提供在网页或应用中自动填充这些凭证的能力。",
+          "应用需要支持 Windows 桌面端、浏览器插件以及移动端三个平台。",
+          "数据需要在用户的多个设备之间进行同步。"
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "产品发布范围 (MVP Scope)",
+            "dependency": "需要优先确定首版必须支持的最小平台组合。",
+            "impact": "无法尽早收集用户对于核心密码存储和自动填充体验的真实反馈，推迟了产品推向市场的周期。",
+            "reason": "在首个版本中同时交付 Windows、浏览器插件、移动端以及多端同步，开发和验证的工作量极大，会导致产品推迟上线。",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "安全与信赖边界 (Security Policy)",
+            "dependency": "信任与隐私保护级别的决策。",
+            "impact": "可能导致后续设计出的同步策略不符合用户的安全心理预期，或增加不必要的系统复杂性。",
+            "reason": "尚未定义托管服务器是否能够知晓同步数据的内容，这是安全类产品的核心资产承诺，缺失此定义将无法进行后续任何架构规划。",
+            "severity": "high",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "提供极致的安全性，但用户必须自行承担凭证遗失后数据永久丢失的风险。",
+                "label": "(推荐) 服务端无授权：数据在离开设备前即处理为不可读状态，托管服务商无法查看，若遗失解锁凭证则数据永久无法还原。"
+              },
+              {
+                "impact": "提供更好的易用性和灾难恢复能力，但引入了服务商可信度以及云端数据泄露的风险。",
+                "label": "服务端可受信任处理：托管服务器在必要时（如协助用户找回）可经用户授权后还原数据内容。"
+              }
+            ],
+            "question": "关于设备间同步的数据，服务提供商（托管数据的服务器方）是否应该有权限还原并读取您的明文账号、密码和信用卡信息？",
+            "reason": "这是安全类产品的基石决策，决定了我们是追求完全不信任服务器的隐私保护，还是允许云端具有知情权以便提供更丰富的辅助服务（如云端找回）。这必须在任何技术或架构设计开始前明确。",
+            "recommendation": "(推荐) 保证数据绝对私密，托管服务器不具备任何还原或读取明文数据的能力，数据只能在用户持有的设备上被授权还原。",
+            "recommendation_reason": "作为密码管理器，保护用户免受服务商泄露或托管服务器被黑客攻破的影响是最高优先级。业界成熟的同类产品普遍遵循服务器无知情权的原则，以建立强大的用户信任。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "既保障了服务器零知情，又为用户提供了自主掌控的备份恢复路径。",
+                "label": "(推荐) 物理应急凭证：首次设置时在本地生成一份唯一的物理恢复凭证，用户需妥善保存于物理世界中。若同时遗失主解锁凭证与物理凭证，数据永久丢失。"
+              },
+              {
+                "impact": "安全性最高，不留任何旁路，但对用户的凭证管理能力有极高要求，容错率极低。",
+                "label": "无备用恢复：只认可唯一的主解锁凭证，遗失即意味着数据彻底作废，确保最高安全级别。"
+              },
+              {
+                "impact": "提供了社交化的恢复途径，降低了个人单点遗失的风险，但需要设计信任链机制。",
+                "label": "基于授信联系人协作：通过多位用户预先设定的授信联系人协助，共同确认身份后恢复数据。"
+              }
+            ],
+            "question": "在服务提供商无法读取数据（如选择服务端无授权）的前提下，您希望为用户提供怎样的账号恢复政策以应对遗失主凭证的情况？",
+            "reason": "由于服务器无法协助重置密码，一旦用户遗失主凭证，将面临数据永久丢失的后果。我们需要确定是接受这种硬性安全代价，还是通过其他非服务器依赖的渠道来提供恢复手段。",
+            "recommendation": "(推荐) 允许生成仅保存在本地的一次性物理紧急恢复密钥，由用户自行在物理介质中妥善保存。",
+            "recommendation_reason": "这种方式可以在不破坏‘服务器无知情权’的前提下，为用户提供唯一的容灾恢复手段，降低误操作导致的数据彻底丢失风险。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "可以快速触达高频用户场景，尽早验证核心同步与填充体验。",
+                "label": "(推荐) 浏览器插件 + 手机端：覆盖最核心的网页与移动端登录场景，并包含多端同步能力。"
+              },
+              {
+                "impact": "开发周期最短，但无法立刻验证跨设备同步的核心能力。",
+                "label": "仅限浏览器插件：以最快速度验证核心密码存储与自动填充逻辑，暂不处理跨设备同步。"
+              },
+              {
+                "impact": "首版功能完整，但开发和测试周期会成倍增加，延迟市场反馈。",
+                "label": "全平台一次性交付：坚持首版必须包含 Windows 桌面应用、浏览器插件以及手机端，接受较长的开发周期。"
+              }
+            ],
+            "question": "为了尽快将产品推向市场并验证其核心的安全存储与填充体验，您在首个版本（MVP）中更倾向于优先支持哪些平台的组合？",
+            "reason": "多平台开发与同步联调会大幅拉长首次发布周期。收窄首版平台范围能更早地交付产品，并基于真实反馈进行多设备同步体验的迭代。",
+            "recommendation": "(推荐) 优先实现‘浏览器插件 + 手机端’，并在这一组合间建立基础的同步与填充能力。",
+            "recommendation_reason": "网页端登录和手机端应用登录是自动填充最核心、最痛点的场景，也是用户最频繁使用的终端。Windows独立桌面应用可以在下一阶段作为增量功能加入。"
+          }
+        ],
+        "risks": [
+          "敏感数据泄露风险：如果传输通道或托管数据的存储服务能够获取明文信息，一旦托管环境受损或有内部威胁，用户的全部凭证将面临暴露的风险。",
+          "数据永久丢失风险：若设定为绝对的数据隐私控制（托管端无法还原数据），一旦用户遗失唯一的本地主解锁凭证，其存储的所有数据将永久无法恢复。",
+          "同步冲突导致的数据覆盖风险：在多设备频繁修改的情况下，若合并策略不明确，可能导致用户的关键修改被旧数据覆盖而丢失。"
+        ],
+        "tensions": [
+          {
+            "description": "跨设备自动同步的便利性与高强度数据隔离的冲突。",
+            "reason": "用户希望多端无感同步，但数据的网络传输与外部托管会增加暴露面，需要在操作便捷度与暴露风险控制之间取得平衡。"
+          },
+          {
+            "description": "用户数据的绝对控制权与容错恢复机制的冲突。",
+            "reason": "若追求服务器完全无法读取的安全隐私，当用户遗失主凭证时，服务提供商将彻底无法帮助找回密码，极大地降低了产品的容错性。"
+          }
+        ],
+        "unknowns": [
+          "在没有网络连接的离线状态下，用户是否需要具备修改和新增数据的能力？",
+          "如果多台设备在离线状态下对同一条记录进行了不同修改，当它们重新上线时，应该如何向用户呈现和合并这些冲突？",
+          "如何验证并确认一台新设备确实属于该用户，从而允许其加入同步设备列表中？",
+          "自动填充能力是否需要支持移动端原生应用（Native Apps），还是仅限于浏览器内的网页表单？"
+        ]
+      },
+      "calls": [
+        {
+          "task": "single-custom",
+          "variant": "B2.1",
+          "case": "case-09",
+          "duration_ms": 48762,
+          "exit_code": 0,
+          "timed_out": false,
+          "structured_success": true,
+          "success": true,
+          "stderr": null,
+          "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b2-1-patch-regression-1\\case-09__B2.1__01__single-call.json",
+          "output": {
+            "assumptions": [
+              "浏览器插件将适配市面主流的浏览器环境（如基于 Chromium 内核的浏览器和 Firefox）。",
+              "移动端应用将同时支持 iOS 和 Android 系统，以覆盖大多数智能手机用户。"
+            ],
+            "candidates": [
+              "支持离线数据访问，即使在没有网络连接时，用户也能在本地查看和检索已保存的信息。",
+              "设备间数据的自动变化感知与同步，当一台设备更新数据后，其他在线设备能自动或手动同步最新状态。",
+              "使用设备本地自带的安全锁定机制（如面部识别、指纹或操作系统锁）进行快速解锁与二次验证。"
+            ],
+            "confirmed": [
+              "用户需要保存和管理四类敏感数据：网站账号、密码、信用卡信息以及安全笔记。",
+              "系统必须提供在网页或应用中自动填充这些凭证的能力。",
+              "应用需要支持 Windows 桌面端、浏览器插件以及移动端三个平台。",
+              "数据需要在用户的多个设备之间进行同步。"
+            ],
+            "conflicts": [],
+            "gaps": [
+              {
+                "area": "产品发布范围 (MVP Scope)",
+                "dependency": "需要优先确定首版必须支持的最小平台组合。",
+                "impact": "无法尽早收集用户对于核心密码存储和自动填充体验的真实反馈，推迟了产品推向市场的周期。",
+                "reason": "在首个版本中同时交付 Windows、浏览器插件、移动端以及多端同步，开发和验证的工作量极大，会导致产品推迟上线。",
+                "severity": "medium",
+                "should_ask_user": true
+              },
+              {
+                "area": "安全与信赖边界 (Security Policy)",
+                "dependency": "信任与隐私保护级别的决策。",
+                "impact": "可能导致后续设计出的同步策略不符合用户的安全心理预期，或增加不必要的系统复杂性。",
+                "reason": "尚未定义托管服务器是否能够知晓同步数据的内容，这是安全类产品的核心资产承诺，缺失此定义将无法进行后续任何架构规划。",
+                "severity": "high",
+                "should_ask_user": true
+              }
+            ],
+            "questions": [
+              {
+                "allow_free_input": true,
+                "importance": "high",
+                "options": [
+                  {
+                    "impact": "提供极致的安全性，但用户必须自行承担凭证遗失后数据永久丢失的风险。",
+                    "label": "(推荐) 服务端无授权：数据在离开设备前即处理为不可读状态，托管服务商无法查看，若遗失解锁凭证则数据永久无法还原。"
+                  },
+                  {
+                    "impact": "提供更好的易用性和灾难恢复能力，但引入了服务商可信度以及云端数据泄露的风险。",
+                    "label": "服务端可受信任处理：托管服务器在必要时（如协助用户找回）可经用户授权后还原数据内容。"
+                  }
+                ],
+                "question": "关于设备间同步的数据，服务提供商（托管数据的服务器方）是否应该有权限还原并读取您的明文账号、密码和信用卡信息？",
+                "reason": "这是安全类产品的基石决策，决定了我们是追求完全不信任服务器的隐私保护，还是允许云端具有知情权以便提供更丰富的辅助服务（如云端找回）。这必须在任何技术或架构设计开始前明确。",
+                "recommendation": "(推荐) 保证数据绝对私密，托管服务器不具备任何还原或读取明文数据的能力，数据只能在用户持有的设备上被授权还原。",
+                "recommendation_reason": "作为密码管理器，保护用户免受服务商泄露或托管服务器被黑客攻破的影响是最高优先级。业界成熟的同类产品普遍遵循服务器无知情权的原则，以建立强大的用户信任。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "既保障了服务器零知情，又为用户提供了自主掌控的备份恢复路径。",
+                    "label": "(推荐) 物理应急凭证：首次设置时在本地生成一份唯一的物理恢复凭证，用户需妥善保存于物理世界中。若同时遗失主解锁凭证与物理凭证，数据永久丢失。"
+                  },
+                  {
+                    "impact": "安全性最高，不留任何旁路，但对用户的凭证管理能力有极高要求，容错率极低。",
+                    "label": "无备用恢复：只认可唯一的主解锁凭证，遗失即意味着数据彻底作废，确保最高安全级别。"
+                  },
+                  {
+                    "impact": "提供了社交化的恢复途径，降低了个人单点遗失的风险，但需要设计信任链机制。",
+                    "label": "基于授信联系人协作：通过多位用户预先设定的授信联系人协助，共同确认身份后恢复数据。"
+                  }
+                ],
+                "question": "在服务提供商无法读取数据（如选择服务端无授权）的前提下，您希望为用户提供怎样的账号恢复政策以应对遗失主凭证的情况？",
+                "reason": "由于服务器无法协助重置密码，一旦用户遗失主凭证，将面临数据永久丢失的后果。我们需要确定是接受这种硬性安全代价，还是通过其他非服务器依赖的渠道来提供恢复手段。",
+                "recommendation": "(推荐) 允许生成仅保存在本地的一次性物理紧急恢复密钥，由用户自行在物理介质中妥善保存。",
+                "recommendation_reason": "这种方式可以在不破坏‘服务器无知情权’的前提下，为用户提供唯一的容灾恢复手段，降低误操作导致的数据彻底丢失风险。"
+              },
+              {
+                "allow_free_input": true,
+                "importance": "normal",
+                "options": [
+                  {
+                    "impact": "可以快速触达高频用户场景，尽早验证核心同步与填充体验。",
+                    "label": "(推荐) 浏览器插件 + 手机端：覆盖最核心的网页与移动端登录场景，并包含多端同步能力。"
+                  },
+                  {
+                    "impact": "开发周期最短，但无法立刻验证跨设备同步的核心能力。",
+                    "label": "仅限浏览器插件：以最快速度验证核心密码存储与自动填充逻辑，暂不处理跨设备同步。"
+                  },
+                  {
+                    "impact": "首版功能完整，但开发和测试周期会成倍增加，延迟市场反馈。",
+                    "label": "全平台一次性交付：坚持首版必须包含 Windows 桌面应用、浏览器插件以及手机端，接受较长的开发周期。"
+                  }
+                ],
+                "question": "为了尽快将产品推向市场并验证其核心的安全存储与填充体验，您在首个版本（MVP）中更倾向于优先支持哪些平台的组合？",
+                "reason": "多平台开发与同步联调会大幅拉长首次发布周期。收窄首版平台范围能更早地交付产品，并基于真实反馈进行多设备同步体验的迭代。",
+                "recommendation": "(推荐) 优先实现‘浏览器插件 + 手机端’，并在这一组合间建立基础的同步与填充能力。",
+                "recommendation_reason": "网页端登录和手机端应用登录是自动填充最核心、最痛点的场景，也是用户最频繁使用的终端。Windows独立桌面应用可以在下一阶段作为增量功能加入。"
+              }
+            ],
+            "risks": [
+              "敏感数据泄露风险：如果传输通道或托管数据的存储服务能够获取明文信息，一旦托管环境受损或有内部威胁，用户的全部凭证将面临暴露的风险。",
+              "数据永久丢失风险：若设定为绝对的数据隐私控制（托管端无法还原数据），一旦用户遗失唯一的本地主解锁凭证，其存储的所有数据将永久无法恢复。",
+              "同步冲突导致的数据覆盖风险：在多设备频繁修改的情况下，若合并策略不明确，可能导致用户的关键修改被旧数据覆盖而丢失。"
+            ],
+            "tensions": [
+              {
+                "description": "跨设备自动同步的便利性与高强度数据隔离的冲突。",
+                "reason": "用户希望多端无感同步，但数据的网络传输与外部托管会增加暴露面，需要在操作便捷度与暴露风险控制之间取得平衡。"
+              },
+              {
+                "description": "用户数据的绝对控制权与容错恢复机制的冲突。",
+                "reason": "若追求服务器完全无法读取的安全隐私，当用户遗失主凭证时，服务提供商将彻底无法帮助找回密码，极大地降低了产品的容错性。"
+              }
+            ],
+            "unknowns": [
+              "在没有网络连接的离线状态下，用户是否需要具备修改和新增数据的能力？",
+              "如果多台设备在离线状态下对同一条记录进行了不同修改，当它们重新上线时，应该如何向用户呈现和合并这些冲突？",
+              "如何验证并确认一台新设备确实属于该用户，从而允许其加入同步设备列表中？",
+              "自动填充能力是否需要支持移动端原生应用（Native Apps），还是仅限于浏览器内的网页表单？"
+            ]
+          },
+          "prompt_chars": 4457,
+          "context_chars": 80,
+          "user_input_chars": 69,
+          "input_tokens": 20658,
+          "output_tokens": 12555,
+          "thinking_tokens": 10663,
+          "total_tokens": 33213,
+          "cache_read_tokens": 0,
+          "raw_usage": {
+            "input_tokens": 20658,
+            "output_tokens": 12555,
+            "thinking_tokens": 10663,
+            "cache_read_tokens": 0,
+            "total_tokens": 33213
+          }
+        }
+      ],
+      "metrics": {
+        "calls_per_case": 1,
+        "duration_ms": 48762,
+        "input_tokens": 20658,
+        "output_tokens": 12555,
+        "thinking_tokens": 10663,
+        "total_tokens": 33213,
+        "cache_read_tokens": 0,
+        "prompt_chars": 4457,
+        "context_chars": 80,
+        "user_input_chars": 69
+      },
+      "technology_warnings": [],
+      "timestamp": "2026-08-22T09:06:42.594Z",
+      "evaluation": {
+        "scores": {
+          "key_gap_coverage": 5,
+          "question_relevance": 5,
+          "duplicate_question_risk": 5,
+          "silent_assumption_safety": 5,
+          "challenge_ability": 5,
+          "recommendation_quality": 4,
+          "structured_output_reliability": 5,
+          "conciseness": 5,
+          "assumption_over_specification": 5,
+          "conflict_precision": 5
+        },
+        "heuristicQuality": 4.9,
+        "matchedSignals": 3,
+        "notes": {
+          "duplicate_question_risk": "manual-review-needed",
+          "recommendation_quality": "heuristic",
+          "key_gap_coverage": "heuristic using fixture signals",
+          "assumption_over_specification": "heuristic/manual-review-needed",
+          "conflict_precision": "heuristic/manual-review-needed"
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "cases": 4,
+    "successful_cases": 4,
+    "structured_output_success_rate": 1,
+    "average_input_tokens_per_case": 21263,
+    "average_output_tokens_per_case": 12264.25,
+    "average_thinking_tokens_per_case": 10310.75,
+    "average_total_tokens_per_case": 33527.25,
+    "average_duration_ms": 36352.75,
+    "average_heuristic_quality_out_of_5": 4.725,
+    "possible_premature_technology_warnings": 0
+  },
+  "infrastructure_adjustments": [
+    "Added isolated B2.1 behavior-only constitution and B2.1-only runner. Existing provider, B2 inline schema, fixtures, Variant B, and one-call execution model are unchanged."
+  ],
+  "generated_at": "2026-08-22T09:06:42.595Z"
+}

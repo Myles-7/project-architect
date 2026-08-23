@@ -1,0 +1,407 @@
+{
+  "run_id": "smoke-1",
+  "variant": "C",
+  "case": "case-01",
+  "name": "vague-cleaner",
+  "output": {
+    "confirmed": [
+      "目标是构建一款用于清理电脑存储空间、释放磁盘容量的软件工具",
+      "产品核心业务定位为文件扫描与磁盘垃圾清理"
+    ],
+    "candidates": [
+      "目标操作系统候选：Windows（如 WPF/WinUI/C# 或 Rust/Tauri）、macOS、Linux 或跨平台桌面应用",
+      "清理范围候选：系统临时文件/缓存、应用残留数据、浏览器缓存/Cookie、大文件分析、重复文件扫描、开发者构建缓存（node_modules/Docker等）",
+      "产品形态候选：一键式极简 GUI 界面、专业级树状可视化分析器（类似 SpaceSniffer/TreeSize）、轻量 CLI 命令行工具",
+      "清理机制候选：规则库驱动清理（安全白名单目录）、智能启发式扫描、用户手动勾选复核清理"
+    ],
+    "assumptions": [
+      "优先支持主流桌面操作系统（如 Windows）或采用跨平台桌面架构",
+      "默认采用安全删除策略（如优先移至回收站或进行软删除，避免直接不可逆硬删除）",
+      "核心清理引擎完全运行在本地，无需依赖网络服务即可执行扫描与清理"
+    ],
+    "unknowns": [
+      "目标受众画像：面向大众普通用户（强调一键极简与高安全性），还是开发者/专业高级用户（强调深度定制与开发缓存清理）？",
+      "目标运行平台与技术栈偏好（如 C#/.NET、Rust/Tauri、C++/Qt、Electron、Python/PySide 等）？",
+      "MVP 首期版本的核心功能边界：仅包含基础临时文件清理，还是需要大文件可视化分析、重复文件检索等扩展能力？",
+      "是否需要磁盘占用可视化图表（饼图/树状矩形图 Treemap）与实时监控/定时提醒功能？",
+      "产品分发与开源模式（开源免费自用、闭源商业化工具等）？"
+    ],
+    "risks": [
+      "误删关键系统文件或用户未保存数据，导致系统不稳定或严重数据丢失风险（高危）",
+      "管理员权限（UAC / Root 提权）要求及访问被锁定/占用文件时的异常处理风险",
+      "MVP 范围蔓延：初期试图覆盖过多清理类别（如注册表、碎片整理、重复去重、自启管理），导致开发周期与稳定性失控",
+      "批量扫描与删除操作可能被系统安全软件/杀毒工具拦截或误报为恶意行为"
+    ],
+    "project_tags": [
+      "desktop-app",
+      "disk-cleaner",
+      "system-utility",
+      "storage-management",
+      "file-system",
+      "utility-tool"
+    ],
+    "gaps": [
+      {
+        "area": "目标受众与用户画像 (Target Audience & Persona)",
+        "dependency": "MVP 功能边界界定、UI/UX 交互复杂度设计、默认预设清理规则库的制定。",
+        "impact": "决定产品的核心价值定位与交互基调。若面向普通用户，需以极致安全和一键自动化为主；若面向开发者/高级用户，则需强化开发环境缓存扫描与高自由度规则配置。",
+        "reason": "尚未明确产品是面向大众普通小白用户，还是程序员/技术极客/专业运维人员。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "MVP 首期功能范围与边界 (MVP Scope & Feature Boundary)",
+        "dependency": "开发工期评估、核心算法与数据结构选型（如哈希比对、多线程目录遍历）、交付里程碑规划。",
+        "impact": "功能候选跨度过大（涵盖临时文件、大文件分析树、重复文件去重、注册表等）。若首期缺乏清晰边界，易导致范围蔓延、开发周期失控及初期稳定性难以保证。",
+        "reason": "未明确首期交付的核心功能闭环边界，尚未对候选功能进行优先级划分与硬性裁剪。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "数据安全与防误删机制 (Data Safety & Deletion Strategy)",
+        "dependency": "文件扫描规则引擎、删除执行器模块、回收站/隔离区回滚机制设计、权限异常捕获。",
+        "impact": "磁盘清理具备不可逆破坏风险。若缺少严密的系统关键路径黑名单与二次确认机制，极易导致误删系统关键文件或用户未保存的重要资产，造成不可挽回的损失与信任危机。",
+        "reason": "当前仅假设为默认软删除，缺乏针对系统关键目录黑名单、被占用/只读文件处理、隔离区暂存与误删恢复回滚的完整安全防护策略。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "目标运行平台与技术栈架构 (Target Platform & Architecture)",
+        "dependency": "开发脚手架搭建、跨平台抽象层设计、系统底层 API（文件遍历、回收站接口、UAC提权）调用。",
+        "impact": "不同操作系统的文件系统规范、权限模型与存储路径差异显著。过早追求跨平台会显著推高初期架构复杂度与适配成本。",
+        "reason": "尚未明确首期是专精单一平台（如 Windows 10/11）还是多平台支持，以及技术栈选型偏好（如 C#/.NET、Rust/Tauri、C++/Qt）。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "产品形态与交互范式 (UX/UI & Interaction Paradigm)",
+        "dependency": "前端视图层设计、图表渲染性能优化、扫描状态数据流管理。",
+        "impact": "决定了前端技术选型与性能要求（例如海量文件树图表渲染需解决性能卡顿问题），并直接影响用户的核心操作动线。",
+        "reason": "尚未确定产品是一键极简清理器、树状/方块矩形可视化分析器（如 SpaceSniffer/WizTree），还是综合仪表盘。",
+        "severity": "medium",
+        "should_ask_user": true
+      }
+    ],
+    "conflicts": [
+      "普通用户诉求的“一键极简/无感知安全清理”与开发者/高级用户的“深度定制/特定构建缓存（如 node_modules、Docker）清理”在交互复杂度与默认安全策略上存在定位冲突。",
+      "极致简洁流畅的用户体验与访问系统受限目录所必需的“管理员提权（UAC 弹窗授权/权限升级）”在操作流与无感体验上存在摩擦与冲突。",
+      "跨平台通用架构（如统一代码库支持 Win/macOS/Linux）与针对单一 OS 底层专属目录/机制（如 Windows 注册表、休眠文件、系统卷信息等）的高效深度清理能力之间存在实现难度与维护成本的冲突。"
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "产品交互极致简化，依赖高置信度内置白名单规则库（如系统 Temp、更新备份、浏览器缓存），用户仅需“一键扫描-一键清理”，无学习门槛。",
+            "label": "面向大众普通用户：主打一键极简与高安全性清理（系统垃圾、浏览器及常用应用临时缓存）"
+          },
+          {
+            "impact": "需集成针对各类构建工具链的专属规则与探测能力（如扫描指定工作区的 node_modules、.gradle、Docker 无用镜像等），提供更深度的路径自定义与配置项。",
+            "label": "面向开发者 / 极客用户：主打开发环境深度瘦身与构建缓存清理（node_modules、Docker 缓存等）"
+          },
+          {
+            "impact": "核心转向文件系统索引遍历与可视化图表渲染（树状矩形图/Treemap），弱化自动删除，由用户根据空间占用排行自主决策清理。",
+            "label": "磁盘空间可视化分析专家：主打大文件与空间占用树状图分析（类似 SpaceSniffer/WizTree）"
+          }
+        ],
+        "question": "这款电脑空间清理软件的目标受众与核心定位是什么？",
+        "reason": "目标用户群体直接决定了清理规则库的深度、UI 交互复杂度以及默认的安全风险偏好。普通用户需要无脑安全的自动化，而开发者/专业用户则需要深度定制与开发缓存清理能力。",
+        "recommendation": "面向大众普通用户：主打一键极简与高安全性清理（系统垃圾、浏览器及常用应用临时缓存）",
+        "recommendation_reason": "大众用户面临的 C 盘爆满、系统和浏览器缓存冗余痛点最为普遍，且以白名单规则驱动的清理风险最低、价值回报最直观，最适合作为首期验证产品价值的切入点。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "开发周期最短、稳定性最高，仅需维护高置信度的安全规则库，用户动线为“扫描 -> 预览清单 -> 一键释放”。",
+            "label": "仅聚焦“系统临时文件 + 常见第三方应用与浏览器缓存清理”（高确定性安全清理）"
+          },
+          {
+            "impact": "在缓存清理基础上增加了全盘大文件扫描引擎与列表展示，能帮用户直观找出占用 GB 级别的大文件，但需额外处理全盘遍历性能与文件筛选交互。",
+            "label": "“基础临时缓存清理 + 大文件占用排查”（缓存清理 + 空间大户发现）"
+          },
+          {
+            "impact": "涉及文件哈希计算比对（重复文件去重）、系统注册表扫描或开机自启项管理，功能极度分散，开发与兼容性测试成本高，极易导致范围蔓延。",
+            "label": "全功能综合工具箱（临时缓存 + 大文件 + 重复文件去重 + 注册表/启动项）"
+          }
+        ],
+        "question": "MVP 首期版本建议将核心功能边界收敛在哪些范围？",
+        "reason": "空间清理相关的功能点极多（临时文件、大文件、重复去重、注册表、休眠瘦身等），若首期边界不清，容易导致架构臃肿、性能瓶颈及交付周期失控。",
+        "recommendation": "仅聚焦“系统临时文件 + 常见第三方应用与浏览器缓存清理”（高确定性安全清理）",
+        "recommendation_reason": "临时文件与应用缓存占用空间大、清理效果立竿见影且属于无害垃圾，能在最短开发周期内构建高稳定、低风险的 MVP 闭环。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "安全性最高，一旦用户误勾选重要文件可从系统回收站快速还原；但需要处理回收站空间配额限制及跨磁盘分区的兼容性。",
+            "label": "默认软删除（优先移入系统回收站 / 隔离暂存区）+ 系统核心路径强黑名单拦截"
+          },
+          {
+            "impact": "空间释放最即时彻底，但若规则库误判或用户误选重要目录将导致数据不可挽回，对白名单匹配精度要求极高。",
+            "label": "默认直接硬删除（彻底释放磁盘空间），但执行前强制弹出风险预警与二次确认清单"
+          },
+          {
+            "impact": "在空间释放效率与安全之间取得平衡，但需在规则引擎中维护每条清理项的危险等级分类逻辑。",
+            "label": "分级删除策略：高确定性缓存直接永久删除，潜在风险/大文件移入回收站或隔离区"
+          }
+        ],
+        "question": "在执行清理操作时，应采取怎样的数据安全与防误删保护策略？",
+        "reason": "磁盘清理具有破坏性与不可逆风险，若缺少严密的系统关键路径防护与回滚机制，极易导致系统崩溃或重要用户数据丢失。",
+        "recommendation": "默认软删除（优先移入系统回收站 / 隔离暂存区）+ 系统核心路径强黑名单拦截",
+        "recommendation_reason": "软删除与关键路径黑名单是桌面清理工具最基础的安全底线，能为用户提供“后悔药”机制，最大程度避免误删导致的灾难性数据损失。"
+      }
+    ]
+  },
+  "calls": [
+    {
+      "task": "idea-analysis",
+      "success": true,
+      "duration_ms": 22331,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-1\\case-01__C__01__idea-analysis.json",
+      "output": {
+        "assumptions": [
+          "优先支持主流桌面操作系统（如 Windows）或采用跨平台桌面架构",
+          "默认采用安全删除策略（如优先移至回收站或进行软删除，避免直接不可逆硬删除）",
+          "核心清理引擎完全运行在本地，无需依赖网络服务即可执行扫描与清理"
+        ],
+        "candidates": [
+          "目标操作系统候选：Windows（如 WPF/WinUI/C# 或 Rust/Tauri）、macOS、Linux 或跨平台桌面应用",
+          "清理范围候选：系统临时文件/缓存、应用残留数据、浏览器缓存/Cookie、大文件分析、重复文件扫描、开发者构建缓存（node_modules/Docker等）",
+          "产品形态候选：一键式极简 GUI 界面、专业级树状可视化分析器（类似 SpaceSniffer/TreeSize）、轻量 CLI 命令行工具",
+          "清理机制候选：规则库驱动清理（安全白名单目录）、智能启发式扫描、用户手动勾选复核清理"
+        ],
+        "confirmed": [
+          "目标是构建一款用于清理电脑存储空间、释放磁盘容量的软件工具",
+          "产品核心业务定位为文件扫描与磁盘垃圾清理"
+        ],
+        "project_tags": [
+          "desktop-app",
+          "disk-cleaner",
+          "system-utility",
+          "storage-management",
+          "file-system",
+          "utility-tool"
+        ],
+        "risks": [
+          "误删关键系统文件或用户未保存数据，导致系统不稳定或严重数据丢失风险（高危）",
+          "管理员权限（UAC / Root 提权）要求及访问被锁定/占用文件时的异常处理风险",
+          "MVP 范围蔓延：初期试图覆盖过多清理类别（如注册表、碎片整理、重复去重、自启管理），导致开发周期与稳定性失控",
+          "批量扫描与删除操作可能被系统安全软件/杀毒工具拦截或误报为恶意行为"
+        ],
+        "unknowns": [
+          "目标受众画像：面向大众普通用户（强调一键极简与高安全性），还是开发者/专业高级用户（强调深度定制与开发缓存清理）？",
+          "目标运行平台与技术栈偏好（如 C#/.NET、Rust/Tauri、C++/Qt、Electron、Python/PySide 等）？",
+          "MVP 首期版本的核心功能边界：仅包含基础临时文件清理，还是需要大文件可视化分析、重复文件检索等扩展能力？",
+          "是否需要磁盘占用可视化图表（饼图/树状矩形图 Treemap）与实时监控/定时提醒功能？",
+          "产品分发与开源模式（开源免费自用、闭源商业化工具等）？"
+        ]
+      },
+      "input_tokens": 19635,
+      "output_tokens": 2244,
+      "thinking_tokens": 1652,
+      "total_tokens": 21879,
+      "raw_usage": {
+        "input_tokens": 19635,
+        "output_tokens": 2244,
+        "thinking_tokens": 1652,
+        "cache_read_tokens": 0,
+        "total_tokens": 21879
+      }
+    },
+    {
+      "task": "gap-analysis",
+      "success": true,
+      "duration_ms": 31011,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-1\\case-01__C__02__gap-analysis.json",
+      "output": {
+        "conflicts": [
+          "普通用户诉求的“一键极简/无感知安全清理”与开发者/高级用户的“深度定制/特定构建缓存（如 node_modules、Docker）清理”在交互复杂度与默认安全策略上存在定位冲突。",
+          "极致简洁流畅的用户体验与访问系统受限目录所必需的“管理员提权（UAC 弹窗授权/权限升级）”在操作流与无感体验上存在摩擦与冲突。",
+          "跨平台通用架构（如统一代码库支持 Win/macOS/Linux）与针对单一 OS 底层专属目录/机制（如 Windows 注册表、休眠文件、系统卷信息等）的高效深度清理能力之间存在实现难度与维护成本的冲突。"
+        ],
+        "gaps": [
+          {
+            "area": "目标受众与用户画像 (Target Audience & Persona)",
+            "dependency": "MVP 功能边界界定、UI/UX 交互复杂度设计、默认预设清理规则库的制定。",
+            "impact": "决定产品的核心价值定位与交互基调。若面向普通用户，需以极致安全和一键自动化为主；若面向开发者/高级用户，则需强化开发环境缓存扫描与高自由度规则配置。",
+            "reason": "尚未明确产品是面向大众普通小白用户，还是程序员/技术极客/专业运维人员。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "MVP 首期功能范围与边界 (MVP Scope & Feature Boundary)",
+            "dependency": "开发工期评估、核心算法与数据结构选型（如哈希比对、多线程目录遍历）、交付里程碑规划。",
+            "impact": "功能候选跨度过大（涵盖临时文件、大文件分析树、重复文件去重、注册表等）。若首期缺乏清晰边界，易导致范围蔓延、开发周期失控及初期稳定性难以保证。",
+            "reason": "未明确首期交付的核心功能闭环边界，尚未对候选功能进行优先级划分与硬性裁剪。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "数据安全与防误删机制 (Data Safety & Deletion Strategy)",
+            "dependency": "文件扫描规则引擎、删除执行器模块、回收站/隔离区回滚机制设计、权限异常捕获。",
+            "impact": "磁盘清理具备不可逆破坏风险。若缺少严密的系统关键路径黑名单与二次确认机制，极易导致误删系统关键文件或用户未保存的重要资产，造成不可挽回的损失与信任危机。",
+            "reason": "当前仅假设为默认软删除，缺乏针对系统关键目录黑名单、被占用/只读文件处理、隔离区暂存与误删恢复回滚的完整安全防护策略。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "目标运行平台与技术栈架构 (Target Platform & Architecture)",
+            "dependency": "开发脚手架搭建、跨平台抽象层设计、系统底层 API（文件遍历、回收站接口、UAC提权）调用。",
+            "impact": "不同操作系统的文件系统规范、权限模型与存储路径差异显著。过早追求跨平台会显著推高初期架构复杂度与适配成本。",
+            "reason": "尚未明确首期是专精单一平台（如 Windows 10/11）还是多平台支持，以及技术栈选型偏好（如 C#/.NET、Rust/Tauri、C++/Qt）。",
+            "severity": "medium",
+            "should_ask_user": true
+          },
+          {
+            "area": "产品形态与交互范式 (UX/UI & Interaction Paradigm)",
+            "dependency": "前端视图层设计、图表渲染性能优化、扫描状态数据流管理。",
+            "impact": "决定了前端技术选型与性能要求（例如海量文件树图表渲染需解决性能卡顿问题），并直接影响用户的核心操作动线。",
+            "reason": "尚未确定产品是一键极简清理器、树状/方块矩形可视化分析器（如 SpaceSniffer/WizTree），还是综合仪表盘。",
+            "severity": "medium",
+            "should_ask_user": true
+          }
+        ]
+      },
+      "input_tokens": 20347,
+      "output_tokens": 4399,
+      "thinking_tokens": 3471,
+      "total_tokens": 24746,
+      "raw_usage": {
+        "input_tokens": 20347,
+        "output_tokens": 4399,
+        "thinking_tokens": 3471,
+        "cache_read_tokens": 0,
+        "total_tokens": 24746
+      }
+    },
+    {
+      "task": "question-compose",
+      "success": true,
+      "duration_ms": 26667,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-1\\case-01__C__03__question-compose.json",
+      "output": {
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "产品交互极致简化，依赖高置信度内置白名单规则库（如系统 Temp、更新备份、浏览器缓存），用户仅需“一键扫描-一键清理”，无学习门槛。",
+                "label": "面向大众普通用户：主打一键极简与高安全性清理（系统垃圾、浏览器及常用应用临时缓存）"
+              },
+              {
+                "impact": "需集成针对各类构建工具链的专属规则与探测能力（如扫描指定工作区的 node_modules、.gradle、Docker 无用镜像等），提供更深度的路径自定义与配置项。",
+                "label": "面向开发者 / 极客用户：主打开发环境深度瘦身与构建缓存清理（node_modules、Docker 缓存等）"
+              },
+              {
+                "impact": "核心转向文件系统索引遍历与可视化图表渲染（树状矩形图/Treemap），弱化自动删除，由用户根据空间占用排行自主决策清理。",
+                "label": "磁盘空间可视化分析专家：主打大文件与空间占用树状图分析（类似 SpaceSniffer/WizTree）"
+              }
+            ],
+            "question": "这款电脑空间清理软件的目标受众与核心定位是什么？",
+            "reason": "目标用户群体直接决定了清理规则库的深度、UI 交互复杂度以及默认的安全风险偏好。普通用户需要无脑安全的自动化，而开发者/专业用户则需要深度定制与开发缓存清理能力。",
+            "recommendation": "面向大众普通用户：主打一键极简与高安全性清理（系统垃圾、浏览器及常用应用临时缓存）",
+            "recommendation_reason": "大众用户面临的 C 盘爆满、系统和浏览器缓存冗余痛点最为普遍，且以白名单规则驱动的清理风险最低、价值回报最直观，最适合作为首期验证产品价值的切入点。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "开发周期最短、稳定性最高，仅需维护高置信度的安全规则库，用户动线为“扫描 -> 预览清单 -> 一键释放”。",
+                "label": "仅聚焦“系统临时文件 + 常见第三方应用与浏览器缓存清理”（高确定性安全清理）"
+              },
+              {
+                "impact": "在缓存清理基础上增加了全盘大文件扫描引擎与列表展示，能帮用户直观找出占用 GB 级别的大文件，但需额外处理全盘遍历性能与文件筛选交互。",
+                "label": "“基础临时缓存清理 + 大文件占用排查”（缓存清理 + 空间大户发现）"
+              },
+              {
+                "impact": "涉及文件哈希计算比对（重复文件去重）、系统注册表扫描或开机自启项管理，功能极度分散，开发与兼容性测试成本高，极易导致范围蔓延。",
+                "label": "全功能综合工具箱（临时缓存 + 大文件 + 重复文件去重 + 注册表/启动项）"
+              }
+            ],
+            "question": "MVP 首期版本建议将核心功能边界收敛在哪些范围？",
+            "reason": "空间清理相关的功能点极多（临时文件、大文件、重复去重、注册表、休眠瘦身等），若首期边界不清，容易导致架构臃肿、性能瓶颈及交付周期失控。",
+            "recommendation": "仅聚焦“系统临时文件 + 常见第三方应用与浏览器缓存清理”（高确定性安全清理）",
+            "recommendation_reason": "临时文件与应用缓存占用空间大、清理效果立竿见影且属于无害垃圾，能在最短开发周期内构建高稳定、低风险的 MVP 闭环。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "安全性最高，一旦用户误勾选重要文件可从系统回收站快速还原；但需要处理回收站空间配额限制及跨磁盘分区的兼容性。",
+                "label": "默认软删除（优先移入系统回收站 / 隔离暂存区）+ 系统核心路径强黑名单拦截"
+              },
+              {
+                "impact": "空间释放最即时彻底，但若规则库误判或用户误选重要目录将导致数据不可挽回，对白名单匹配精度要求极高。",
+                "label": "默认直接硬删除（彻底释放磁盘空间），但执行前强制弹出风险预警与二次确认清单"
+              },
+              {
+                "impact": "在空间释放效率与安全之间取得平衡，但需在规则引擎中维护每条清理项的危险等级分类逻辑。",
+                "label": "分级删除策略：高确定性缓存直接永久删除，潜在风险/大文件移入回收站或隔离区"
+              }
+            ],
+            "question": "在执行清理操作时，应采取怎样的数据安全与防误删保护策略？",
+            "reason": "磁盘清理具有破坏性与不可逆风险，若缺少严密的系统关键路径防护与回滚机制，极易导致系统崩溃或重要用户数据丢失。",
+            "recommendation": "默认软删除（优先移入系统回收站 / 隔离暂存区）+ 系统核心路径强黑名单拦截",
+            "recommendation_reason": "软删除与关键路径黑名单是桌面清理工具最基础的安全底线，能为用户提供“后悔药”机制，最大程度避免误删导致的灾难性数据损失。"
+          }
+        ]
+      },
+      "input_tokens": 21373,
+      "output_tokens": 4594,
+      "thinking_tokens": 3412,
+      "total_tokens": 25967,
+      "raw_usage": {
+        "input_tokens": 21373,
+        "output_tokens": 4594,
+        "thinking_tokens": 3412,
+        "cache_read_tokens": 0,
+        "total_tokens": 25967
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 3,
+    "duration_ms": 80009,
+    "input_tokens": 61355,
+    "output_tokens": 11237,
+    "thinking_tokens": 8535,
+    "total_tokens": 72592
+  },
+  "success": true,
+  "timestamp": "2026-08-22T05:14:21.901Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 5,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5
+    },
+    "heuristicQuality": 4.875,
+    "matchedSignals": 3,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["confirmed", "candidates", "assumptions", "unknowns", "risks", "gaps", "conflicts", "questions"],
+  "properties": {
+    "confirmed": {"type":"array","items":{"type":"string"}},
+    "candidates": {"type":"array","items":{"type":"string"}},
+    "assumptions": {"type":"array","items":{"type":"string"}},
+    "unknowns": {"type":"array","items":{"type":"string"}},
+    "risks": {"type":"array","items":{"type":"string"}},
+    "conflicts": {"type":"array","items":{"type":"string"}},
+    "gaps": {"type":"array","items":{"type":"object","additionalProperties":false,"required":["area","severity","reason","impact","dependency","should_ask_user"],"properties":{"area":{"type":"string"},"severity":{"enum":["low","medium","high","critical"]},"reason":{"type":"string"},"impact":{"type":"string"},"dependency":{"type":"string"},"should_ask_user":{"type":"boolean"}}}},
+    "questions": {"type":"array","items":{"type":"object","additionalProperties":false,"required":["importance","question","reason","recommendation","recommendation_reason","options","allow_free_input"],"properties":{"importance":{"enum":["normal","high","critical"]},"question":{"type":"string"},"reason":{"type":"string"},"recommendation":{"type":"string"},"recommendation_reason":{"type":"string"},"options":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["label","impact"],"properties":{"label":{"type":"string"},"impact":{"type":"string"}}}},"allow_free_input":{"type":"boolean"}}}}
+  }
+}

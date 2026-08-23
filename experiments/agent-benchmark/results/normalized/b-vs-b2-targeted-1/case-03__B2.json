@@ -1,0 +1,329 @@
+{
+  "run_id": "b-vs-b2-targeted-1",
+  "variant": "B2",
+  "case": "case-03",
+  "name": "complete-study-planner",
+  "success": true,
+  "output": {
+    "assumptions": [
+      "Students have reliable internet access on their desktop/laptop computers during their dedicated study review times.",
+      "The postgraduate exam date is a fixed target in the future and does not change once entered by the user.",
+      "Weekly study hour budgets remain relatively stable week-to-week unless manually adjusted by the student."
+    ],
+    "candidates": [
+      "Pre-loaded postgraduate syllabus templates for standard subjects (Politics, English, Math, common majors) to simplify onboarding.",
+      "A structured weekly review/re-planning prompt (e.g., every Sunday) to help students reflect and adjust the next week's load.",
+      "A graceful buffer mechanism that visually groups deferred tasks separately to avoid cluttering the active week's dashboard."
+    ],
+    "confirmed": [
+      "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+      "Supported language: Chinese only for the first version.",
+      "Supported platform: Desktop browsers only for the first version.",
+      "Onboarding inputs: Exam date, subjects, weekly study hours, and current foundation.",
+      "Core feature: Generation of a week-by-week adjustable review plan.",
+      "Homepage elements: Current week's tasks, completion progress, and countdown to the exam.",
+      "Task detail actions: Mark as complete, defer, or split.",
+      "Identity/Storage: Email registration, cloud data storage, and cross-device login capability.",
+      "UX/UI style: Quiet, encouraging, mature (not childish), combining calendar and to-do list concepts.",
+      "MVP exclusions: Social features, course marketplace, AI chat, and native mobile apps.",
+      "Validation cohort: 20 students for the initial trial.",
+      "Validation success metric: The percentage of students who complete their tasks for two consecutive weeks."
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "Task rescheduling flow",
+        "dependency": "Task detail actions (defer/split)",
+        "impact": "If deferred tasks are simply dumped into the next week without redistribution rules, the student will experience compounding planning debt, leading to abandonment.",
+        "reason": "No flow is defined for how the system recalculates or redistributes tasks when they are deferred or split.",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "Syllabus and Task Generation Source",
+        "dependency": "Plan generation logic",
+        "impact": "If users must enter every study task manually, onboarding friction will be extremely high. If templates are pre-defined, the tool must manage syllabus accuracy.",
+        "reason": "It is not specified whether task lists are generated from a pre-defined subject syllabus template or if they are entirely user-inputted.",
+        "severity": "medium",
+        "should_ask_user": false
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "Maintains a realistic and achievable schedule, preventing the feeling of accumulated debt while keeping the student in control.",
+            "label": "(Recommended) Weekly Re-planning Checkpoint: Prompt the student at the end of the week to manually adjust their weekly study hours, shift the target scope, or extend the review duration to absorb the deferred tasks."
+          },
+          {
+            "impact": "Simplifies application logic but heavily risks demotivating the student as their weekly task load compounds.",
+            "label": "Automatic Rollover: Push all incomplete tasks to the next week automatically, increasing that week's daily workload."
+          },
+          {
+            "impact": "Keeps the daily schedule constant but might result in the student failing to cover all exam material before the fixed exam date.",
+            "label": "Deadline Warning: Keep the weekly workload constant but warn the user that they will not finish the syllabus before the exam unless they manually adjust their pace."
+          }
+        ],
+        "question": "How should the tool handle plan recalculation when a student consistently falls behind, defers, or splits tasks?",
+        "reason": "If the system simply rolls over unfinished tasks without a clear renegotiation flow, it will create 'planning debt' that demotivates students. This directly threatens your primary success metric (consecutive 2-week task completion).",
+        "recommendation": "Implement a weekly re-planning checkpoint that prompts the user to re-negotiate their plan (e.g., adjust weekly hours, extend timelines, or downscope sub-topics) rather than letting tasks pile up.",
+        "recommendation_reason": "This keeps the plan realistic and respects user autonomy without childish gamification."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "Minimizes onboarding drop-off, but provides less precise plan calibration.",
+            "label": "(Recommended) Phase-based Self-assessment Checklist: Select from broad stages for each subject (e.g., 'Zero foundation', 'First-round review finished', 'Doing mock tests')."
+          },
+          {
+            "impact": "More objective, but requires students to have taken a recent mock exam or practice set prior to using the tool.",
+            "label": "Target Score Gap Entry: Input target score vs. current estimated/mock score."
+          },
+          {
+            "impact": "Gives total control to the user but introduces extreme onboarding friction, risking drop-off before the plan is generated.",
+            "label": "Manual Syllabus Configuration: The user manually inputs their own chapters and starting points."
+          }
+        ],
+        "question": "How should the student's 'current foundation' (当前基础) be assessed during onboarding to bootstrap the initial plan?",
+        "reason": "This assessment directly dictates the baseline intensity and starting point of the generated plan; if it is too complex, onboarding friction will be too high; if it is too vague, the generated plan will be inaccurate.",
+        "recommendation": "Use a simple self-assessment checklist of broad phases (e.g., 'Zero foundation', 'Finished first round of review', 'Doing mock exams') for each selected subject.",
+        "recommendation_reason": "This provides a fast onboarding experience while offering enough calibration to scale the first month's study intensity."
+      },
+      {
+        "allow_free_input": true,
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "Significantly improves completion tracking accuracy because students can check off tasks in real-time in libraries/classrooms. Minimal scope creep if plan generation and settings remain desktop-only.",
+            "label": "(Recommended) Responsive Mobile-web Checklist: Optimize the task listing and check-off screens for mobile web browsers, keeping all onboarding and plan configuration desktop-only."
+          },
+          {
+            "impact": "Keeps the initial build strictly within the defined scope, but risks low user engagement and inaccurate metrics because students must wait to log progress on their computers.",
+            "label": "Strictly Desktop-only Layout: Rely on students logging into a computer at the end of their study day to update their progress."
+          }
+        ],
+        "question": "Since students often study in classrooms/libraries without convenient desktop access, should the MVP support a mobile-responsive view solely for checking off tasks?",
+        "reason": "A strict desktop-only limitation makes real-time logging inconvenient for students studying on the go. This could lead to delayed or forgotten updates, directly impacting the accuracy of your 2-week consecutive completion validation metric.",
+        "recommendation": "Design a responsive mobile view limited strictly to viewing the daily checklist and marking tasks as complete, while keeping onboarding and planning desktop-only.",
+        "recommendation_reason": "This fits the user's physical study habits without expanding the MVP to a full mobile planning tool."
+      }
+    ],
+    "risks": [
+      "Accumulated task debt ('planning debt') causing students to feel overwhelmed and abandon the tool.",
+      "High onboarding drop-off if the process of specifying subjects and foundation levels is too tedious or ambiguous.",
+      "Under-logging or inaccurate completion metrics due to the friction of only being able to check off tasks when on a desktop browser."
+    ],
+    "tensions": [
+      {
+        "description": "Quiet, mature UI style vs. Completion nudging",
+        "reason": "A quiet and non-intrusive calendar/to-do design may lack the visual urgency or notifications needed to prompt students to complete tasks, which is critical for validating the 2-week consecutive completion metric."
+      },
+      {
+        "description": "Desktop-only MVP vs. Physical study environments",
+        "reason": "Postgraduate students study heavily in university libraries, study rooms, or classrooms where laptops may not always be open or convenient for checking off quick daily tasks."
+      }
+    ],
+    "unknowns": [
+      "The level of task granularity (e.g., hourly schedules, daily study topics, or weekly chapter-level milestones) that the planning engine will generate.",
+      "Whether the syllabus content and task generation logic will cover all possible major/professional subjects or focus initially on common public subjects (Politics, English, Math)."
+    ]
+  },
+  "calls": [
+    {
+      "task": "single-custom",
+      "variant": "B2",
+      "case": "case-03",
+      "duration_ms": 26325,
+      "exit_code": 0,
+      "timed_out": false,
+      "structured_success": true,
+      "success": true,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b-vs-b2-targeted-1\\case-03__B2__01__single-call.json",
+      "output": {
+        "assumptions": [
+          "Students have reliable internet access on their desktop/laptop computers during their dedicated study review times.",
+          "The postgraduate exam date is a fixed target in the future and does not change once entered by the user.",
+          "Weekly study hour budgets remain relatively stable week-to-week unless manually adjusted by the student."
+        ],
+        "candidates": [
+          "Pre-loaded postgraduate syllabus templates for standard subjects (Politics, English, Math, common majors) to simplify onboarding.",
+          "A structured weekly review/re-planning prompt (e.g., every Sunday) to help students reflect and adjust the next week's load.",
+          "A graceful buffer mechanism that visually groups deferred tasks separately to avoid cluttering the active week's dashboard."
+        ],
+        "confirmed": [
+          "Target audience: Chinese college students preparing for the postgraduate entrance exam (考研).",
+          "Supported language: Chinese only for the first version.",
+          "Supported platform: Desktop browsers only for the first version.",
+          "Onboarding inputs: Exam date, subjects, weekly study hours, and current foundation.",
+          "Core feature: Generation of a week-by-week adjustable review plan.",
+          "Homepage elements: Current week's tasks, completion progress, and countdown to the exam.",
+          "Task detail actions: Mark as complete, defer, or split.",
+          "Identity/Storage: Email registration, cloud data storage, and cross-device login capability.",
+          "UX/UI style: Quiet, encouraging, mature (not childish), combining calendar and to-do list concepts.",
+          "MVP exclusions: Social features, course marketplace, AI chat, and native mobile apps.",
+          "Validation cohort: 20 students for the initial trial.",
+          "Validation success metric: The percentage of students who complete their tasks for two consecutive weeks."
+        ],
+        "conflicts": [],
+        "gaps": [
+          {
+            "area": "Task rescheduling flow",
+            "dependency": "Task detail actions (defer/split)",
+            "impact": "If deferred tasks are simply dumped into the next week without redistribution rules, the student will experience compounding planning debt, leading to abandonment.",
+            "reason": "No flow is defined for how the system recalculates or redistributes tasks when they are deferred or split.",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "Syllabus and Task Generation Source",
+            "dependency": "Plan generation logic",
+            "impact": "If users must enter every study task manually, onboarding friction will be extremely high. If templates are pre-defined, the tool must manage syllabus accuracy.",
+            "reason": "It is not specified whether task lists are generated from a pre-defined subject syllabus template or if they are entirely user-inputted.",
+            "severity": "medium",
+            "should_ask_user": false
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "Maintains a realistic and achievable schedule, preventing the feeling of accumulated debt while keeping the student in control.",
+                "label": "(Recommended) Weekly Re-planning Checkpoint: Prompt the student at the end of the week to manually adjust their weekly study hours, shift the target scope, or extend the review duration to absorb the deferred tasks."
+              },
+              {
+                "impact": "Simplifies application logic but heavily risks demotivating the student as their weekly task load compounds.",
+                "label": "Automatic Rollover: Push all incomplete tasks to the next week automatically, increasing that week's daily workload."
+              },
+              {
+                "impact": "Keeps the daily schedule constant but might result in the student failing to cover all exam material before the fixed exam date.",
+                "label": "Deadline Warning: Keep the weekly workload constant but warn the user that they will not finish the syllabus before the exam unless they manually adjust their pace."
+              }
+            ],
+            "question": "How should the tool handle plan recalculation when a student consistently falls behind, defers, or splits tasks?",
+            "reason": "If the system simply rolls over unfinished tasks without a clear renegotiation flow, it will create 'planning debt' that demotivates students. This directly threatens your primary success metric (consecutive 2-week task completion).",
+            "recommendation": "Implement a weekly re-planning checkpoint that prompts the user to re-negotiate their plan (e.g., adjust weekly hours, extend timelines, or downscope sub-topics) rather than letting tasks pile up.",
+            "recommendation_reason": "This keeps the plan realistic and respects user autonomy without childish gamification."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "Minimizes onboarding drop-off, but provides less precise plan calibration.",
+                "label": "(Recommended) Phase-based Self-assessment Checklist: Select from broad stages for each subject (e.g., 'Zero foundation', 'First-round review finished', 'Doing mock tests')."
+              },
+              {
+                "impact": "More objective, but requires students to have taken a recent mock exam or practice set prior to using the tool.",
+                "label": "Target Score Gap Entry: Input target score vs. current estimated/mock score."
+              },
+              {
+                "impact": "Gives total control to the user but introduces extreme onboarding friction, risking drop-off before the plan is generated.",
+                "label": "Manual Syllabus Configuration: The user manually inputs their own chapters and starting points."
+              }
+            ],
+            "question": "How should the student's 'current foundation' (当前基础) be assessed during onboarding to bootstrap the initial plan?",
+            "reason": "This assessment directly dictates the baseline intensity and starting point of the generated plan; if it is too complex, onboarding friction will be too high; if it is too vague, the generated plan will be inaccurate.",
+            "recommendation": "Use a simple self-assessment checklist of broad phases (e.g., 'Zero foundation', 'Finished first round of review', 'Doing mock exams') for each selected subject.",
+            "recommendation_reason": "This provides a fast onboarding experience while offering enough calibration to scale the first month's study intensity."
+          },
+          {
+            "allow_free_input": true,
+            "importance": "normal",
+            "options": [
+              {
+                "impact": "Significantly improves completion tracking accuracy because students can check off tasks in real-time in libraries/classrooms. Minimal scope creep if plan generation and settings remain desktop-only.",
+                "label": "(Recommended) Responsive Mobile-web Checklist: Optimize the task listing and check-off screens for mobile web browsers, keeping all onboarding and plan configuration desktop-only."
+              },
+              {
+                "impact": "Keeps the initial build strictly within the defined scope, but risks low user engagement and inaccurate metrics because students must wait to log progress on their computers.",
+                "label": "Strictly Desktop-only Layout: Rely on students logging into a computer at the end of their study day to update their progress."
+              }
+            ],
+            "question": "Since students often study in classrooms/libraries without convenient desktop access, should the MVP support a mobile-responsive view solely for checking off tasks?",
+            "reason": "A strict desktop-only limitation makes real-time logging inconvenient for students studying on the go. This could lead to delayed or forgotten updates, directly impacting the accuracy of your 2-week consecutive completion validation metric.",
+            "recommendation": "Design a responsive mobile view limited strictly to viewing the daily checklist and marking tasks as complete, while keeping onboarding and planning desktop-only.",
+            "recommendation_reason": "This fits the user's physical study habits without expanding the MVP to a full mobile planning tool."
+          }
+        ],
+        "risks": [
+          "Accumulated task debt ('planning debt') causing students to feel overwhelmed and abandon the tool.",
+          "High onboarding drop-off if the process of specifying subjects and foundation levels is too tedious or ambiguous.",
+          "Under-logging or inaccurate completion metrics due to the friction of only being able to check off tasks when on a desktop browser."
+        ],
+        "tensions": [
+          {
+            "description": "Quiet, mature UI style vs. Completion nudging",
+            "reason": "A quiet and non-intrusive calendar/to-do design may lack the visual urgency or notifications needed to prompt students to complete tasks, which is critical for validating the 2-week consecutive completion metric."
+          },
+          {
+            "description": "Desktop-only MVP vs. Physical study environments",
+            "reason": "Postgraduate students study heavily in university libraries, study rooms, or classrooms where laptops may not always be open or convenient for checking off quick daily tasks."
+          }
+        ],
+        "unknowns": [
+          "The level of task granularity (e.g., hourly schedules, daily study topics, or weekly chapter-level milestones) that the planning engine will generate.",
+          "Whether the syllabus content and task generation logic will cover all possible major/professional subjects or focus initially on common public subjects (Politics, English, Math)."
+        ]
+      },
+      "prompt_chars": 3975,
+      "context_chars": 250,
+      "user_input_chars": 239,
+      "input_tokens": 20608,
+      "output_tokens": 7287,
+      "thinking_tokens": 5429,
+      "total_tokens": 27895,
+      "cache_read_tokens": 0,
+      "raw_usage": {
+        "input_tokens": 20608,
+        "output_tokens": 7287,
+        "thinking_tokens": 5429,
+        "cache_read_tokens": 0,
+        "total_tokens": 27895
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 1,
+    "duration_ms": 26325,
+    "input_tokens": 20608,
+    "output_tokens": 7287,
+    "thinking_tokens": 5429,
+    "total_tokens": 27895,
+    "cache_read_tokens": 0,
+    "prompt_chars": 3975,
+    "context_chars": 250,
+    "user_input_chars": 239
+  },
+  "technology_warnings": [],
+  "timestamp": "2026-08-22T08:04:08.334Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 2,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5,
+      "assumption_over_specification": 5,
+      "conflict_precision": 5
+    },
+    "heuristicQuality": 4.6,
+    "matchedSignals": 1,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals",
+      "assumption_over_specification": "heuristic/manual-review-needed",
+      "conflict_precision": "heuristic/manual-review-needed"
+    }
+  }
+}

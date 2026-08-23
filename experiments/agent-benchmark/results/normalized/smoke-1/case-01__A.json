@@ -1,0 +1,319 @@
+{
+  "run_id": "smoke-1",
+  "variant": "A",
+  "case": "case-01",
+  "name": "vague-cleaner",
+  "output": {
+    "assumptions": [
+      "目标操作系统包括 Windows (因为用户正在使用 Windows 系统)",
+      "目标用户是普通电脑用户，需要简单、安全、直观的清理方式",
+      "清理的范围是临时文件、缓存和日志等非核心系统文件，避免误删用户个人文档",
+      "软件将完全在本地运行，不需要复杂的云端后端服务"
+    ],
+    "candidates": [
+      "使用 Tauri 框架 (Rust 后端 + HTML/JS 前端) 构建轻量级的桌面 GUI 应用",
+      "使用 Python (PyQt 或 Tkinter) 快速开发原型，但打包体积可能较大",
+      "使用 C# / .NET (WPF) 开发 Windows 原生清理工具，拥有最佳的系统兼容性与性能",
+      "开发一个轻量级的 CLI 命令行清理工具 (如 Rust 或 Go 编写)，适合技术型用户",
+      "功能候选：扫描系统临时文件夹、清理主流浏览器缓存、重复文件查找、大文件可视化分析"
+    ],
+    "confirmed": [
+      "核心目标是开发一款用于清理电脑空间、释放磁盘存储的软件",
+      "这是一个运行在个人电脑 (PC) 操作系统上的桌面应用程序",
+      "核心机制是识别并安全地删除无用或冗余的文件"
+    ],
+    "conflicts": [
+      "彻底性与安全性冲突：清理深度越深 (如清理系统更新备份、注册表)，释放空间越多，但导致系统崩溃或应用异常的风险越高。",
+      "极简设计与用户控制权冲突：一键清理非常省心，但用户无法控制删除哪些文件；详细的清单和勾选项更安全，但容易让普通用户感到困惑。"
+    ],
+    "gaps": [
+      {
+        "area": "支持的操作系统 (Target OS)",
+        "dependency": "开发语言与平台 API 的选择",
+        "impact": "无法确定要扫描的文件夹路径 (如 Windows 的 AppData 对比 macOS 的 Library) 和所使用的系统 API。",
+        "reason": "不同操作系统的文件系统结构、缓存目录和权限管理机制完全不同。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "用户界面类型 (UI/UX Type)",
+        "dependency": "前端框架与技术栈选择",
+        "impact": "直接影响开发工作量、打包大小以及目标用户群体的接受度。",
+        "reason": "图形界面 (GUI) 与命令行界面 (CLI) 的开发流程和框架完全不同。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "数据安全与防误删策略 (Safety Protocol)",
+        "dependency": "清理引擎的核心逻辑设计",
+        "impact": "若无安全机制，一旦发生误删，将导致用户系统损坏或丢失重要个人文件，带来灾难性后果。",
+        "reason": "未定义如何防止误删关键系统文件以及是否提供备份/恢复/回收站等缓冲手段。",
+        "severity": "critical",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "可以使用 Windows API 和标准的临时目录路径，开发难度较低。",
+            "label": "仅支持 Windows 系统"
+          },
+          {
+            "impact": "需要使用跨平台框架 (如 Tauri)，并针对不同系统适配不同的扫描路径。",
+            "label": "支持跨平台 (Windows, macOS, Linux)"
+          },
+          {
+            "impact": "需要使用 macOS 的 Swift/Objective-C 或跨平台框架，适配 macOS 的沙盒机制。",
+            "label": "仅支持 macOS 系统"
+          }
+        ],
+        "question": "该软件需要支持哪些操作系统？",
+        "reason": "操作系统的选择决定了技术栈、文件路径配置以及打包部署方式。",
+        "recommendation": "(推荐) 优先支持 Windows 系统，并在架构设计上保留跨平台的可能性。",
+        "recommendation_reason": "Windows 系统的市场份额大、临时文件堆积问题最普遍，且用户当前所使用的操作系统也是 Windows，便于开发和本地测试。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "high",
+        "options": [
+          {
+            "impact": "需要设计前端界面，用户门槛低，受众更广。推荐使用 Tauri，打包体积小且性能优异。",
+            "label": "图形用户界面 (GUI) - 适合普通用户一键清理"
+          },
+          {
+            "impact": "无需开发前端，开发速度极快，适合程序员和高级用户。",
+            "label": "命令行界面 (CLI) - 适合技术型用户和自动化脚本"
+          },
+          {
+            "impact": "常驻后台，定期提醒或自动清理，体验更轻量。",
+            "label": "系统托盘 / 菜单栏小工具 - 轻量级且无感运行"
+          }
+        ],
+        "question": "您希望软件采用什么样的交互界面 (UI)？",
+        "reason": "界面类型决定了前端框架的选择和交互流程的复杂度。",
+        "recommendation": "(推荐) 采用现代化的 GUI (推荐使用 Tauri 框架)，以“一键清理”为主、自主选择为辅。",
+        "recommendation_reason": "清理类工具的用户大多希望操作简单直接，Tauri 能够提供现代化 Web 界面且保持极低的系统资源占用。"
+      },
+      {
+        "allow_free_input": true,
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "安全性最高，但清理出的空间可能不是极限最大。",
+            "label": "采用严格的白名单机制，只清理已知安全的临时目录，且默认将文件移至回收站而非直接粉碎"
+          },
+          {
+            "impact": "需要开发额外的扫描分析和用户二次确认界面，增加开发工作量。",
+            "label": "在清理前展示完整的待删除文件列表，由用户逐项勾选确认"
+          },
+          {
+            "impact": "开发成本高，但能给用户提供后悔药，避免任何数据丢失的风险。",
+            "label": "清理前自动创建系统还原点，或将文件临时备份到安全区域，保留一段时间后自动删除"
+          }
+        ],
+        "question": "在清理电脑空间时，您希望如何保证用户数据的安全性，防止误删？",
+        "reason": "清理软件最大的风险是误删系统文件或用户的重要文档，安全机制是该类软件的核心竞争力。",
+        "recommendation": "(推荐) 采用“严格白名单目录扫描” + “默认移至系统回收站/垃圾桶”的组合方案。",
+        "recommendation_reason": "白名单能从源头上杜绝误删系统关键文件的风险；而将文件移动到回收站而不是直接永久删除，给了用户找回文件的余地，安全性与体验更佳。"
+      }
+    ],
+    "risks": [
+      "误删系统文件导致操作系统损坏，无法正常启动或软件崩溃。",
+      "误删用户正在编辑的临时文档或第三方软件的激活授权缓存，导致数据丢失。",
+      "由于权限不足 (如未以管理员身份运行) 导致无法访问或清理部分系统临时文件夹，使清理效果打折扣。",
+      "杀毒软件可能会误报此类有文件读写和删除权限的清理软件为恶意程序 (False Positive)。",
+      "清理工具市场极度饱和 (有 CCleaner, BleachBit, Geek Uninstaller, 以及系统自带的存储感知)，需要清晰的差异化定位。"
+    ],
+    "unknowns": [
+      "具体的清理深度：是仅清理系统自带临时文件，还是需要支持清理第三方软件 (如微信、浏览器、Adobe 等) 的缓存？",
+      "是否需要附加功能：例如大文件扫描、重复文件查找、软件卸载残留清理或开机启动项管理？",
+      "用户的开发背景与技术栈偏好，以便推荐最合适的开发框架。",
+      "软件的发布和分发方式：是开源免费软件，还是作为商业收费软件，还是作为个人练习项目？是否需要上架应用商店？"
+    ]
+  },
+  "calls": [
+    {
+      "task": "baseline",
+      "success": true,
+      "duration_ms": 30671,
+      "exit_code": 0,
+      "timed_out": false,
+      "stderr": null,
+      "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\smoke-1\\case-01__A__01__baseline.json",
+      "output": {
+        "assumptions": [
+          "目标操作系统包括 Windows (因为用户正在使用 Windows 系统)",
+          "目标用户是普通电脑用户，需要简单、安全、直观的清理方式",
+          "清理的范围是临时文件、缓存和日志等非核心系统文件，避免误删用户个人文档",
+          "软件将完全在本地运行，不需要复杂的云端后端服务"
+        ],
+        "candidates": [
+          "使用 Tauri 框架 (Rust 后端 + HTML/JS 前端) 构建轻量级的桌面 GUI 应用",
+          "使用 Python (PyQt 或 Tkinter) 快速开发原型，但打包体积可能较大",
+          "使用 C# / .NET (WPF) 开发 Windows 原生清理工具，拥有最佳的系统兼容性与性能",
+          "开发一个轻量级的 CLI 命令行清理工具 (如 Rust 或 Go 编写)，适合技术型用户",
+          "功能候选：扫描系统临时文件夹、清理主流浏览器缓存、重复文件查找、大文件可视化分析"
+        ],
+        "confirmed": [
+          "核心目标是开发一款用于清理电脑空间、释放磁盘存储的软件",
+          "这是一个运行在个人电脑 (PC) 操作系统上的桌面应用程序",
+          "核心机制是识别并安全地删除无用或冗余的文件"
+        ],
+        "conflicts": [
+          "彻底性与安全性冲突：清理深度越深 (如清理系统更新备份、注册表)，释放空间越多，但导致系统崩溃或应用异常的风险越高。",
+          "极简设计与用户控制权冲突：一键清理非常省心，但用户无法控制删除哪些文件；详细的清单和勾选项更安全，但容易让普通用户感到困惑。"
+        ],
+        "gaps": [
+          {
+            "area": "支持的操作系统 (Target OS)",
+            "dependency": "开发语言与平台 API 的选择",
+            "impact": "无法确定要扫描的文件夹路径 (如 Windows 的 AppData 对比 macOS 的 Library) 和所使用的系统 API。",
+            "reason": "不同操作系统的文件系统结构、缓存目录和权限管理机制完全不同。",
+            "severity": "critical",
+            "should_ask_user": true
+          },
+          {
+            "area": "用户界面类型 (UI/UX Type)",
+            "dependency": "前端框架与技术栈选择",
+            "impact": "直接影响开发工作量、打包大小以及目标用户群体的接受度。",
+            "reason": "图形界面 (GUI) 与命令行界面 (CLI) 的开发流程和框架完全不同。",
+            "severity": "high",
+            "should_ask_user": true
+          },
+          {
+            "area": "数据安全与防误删策略 (Safety Protocol)",
+            "dependency": "清理引擎的核心逻辑设计",
+            "impact": "若无安全机制，一旦发生误删，将导致用户系统损坏或丢失重要个人文件，带来灾难性后果。",
+            "reason": "未定义如何防止误删关键系统文件以及是否提供备份/恢复/回收站等缓冲手段。",
+            "severity": "critical",
+            "should_ask_user": true
+          }
+        ],
+        "questions": [
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "可以使用 Windows API 和标准的临时目录路径，开发难度较低。",
+                "label": "仅支持 Windows 系统"
+              },
+              {
+                "impact": "需要使用跨平台框架 (如 Tauri)，并针对不同系统适配不同的扫描路径。",
+                "label": "支持跨平台 (Windows, macOS, Linux)"
+              },
+              {
+                "impact": "需要使用 macOS 的 Swift/Objective-C 或跨平台框架，适配 macOS 的沙盒机制。",
+                "label": "仅支持 macOS 系统"
+              }
+            ],
+            "question": "该软件需要支持哪些操作系统？",
+            "reason": "操作系统的选择决定了技术栈、文件路径配置以及打包部署方式。",
+            "recommendation": "(推荐) 优先支持 Windows 系统，并在架构设计上保留跨平台的可能性。",
+            "recommendation_reason": "Windows 系统的市场份额大、临时文件堆积问题最普遍，且用户当前所使用的操作系统也是 Windows，便于开发和本地测试。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "high",
+            "options": [
+              {
+                "impact": "需要设计前端界面，用户门槛低，受众更广。推荐使用 Tauri，打包体积小且性能优异。",
+                "label": "图形用户界面 (GUI) - 适合普通用户一键清理"
+              },
+              {
+                "impact": "无需开发前端，开发速度极快，适合程序员和高级用户。",
+                "label": "命令行界面 (CLI) - 适合技术型用户和自动化脚本"
+              },
+              {
+                "impact": "常驻后台，定期提醒或自动清理，体验更轻量。",
+                "label": "系统托盘 / 菜单栏小工具 - 轻量级且无感运行"
+              }
+            ],
+            "question": "您希望软件采用什么样的交互界面 (UI)？",
+            "reason": "界面类型决定了前端框架的选择和交互流程的复杂度。",
+            "recommendation": "(推荐) 采用现代化的 GUI (推荐使用 Tauri 框架)，以“一键清理”为主、自主选择为辅。",
+            "recommendation_reason": "清理类工具的用户大多希望操作简单直接，Tauri 能够提供现代化 Web 界面且保持极低的系统资源占用。"
+          },
+          {
+            "allow_free_input": true,
+            "importance": "critical",
+            "options": [
+              {
+                "impact": "安全性最高，但清理出的空间可能不是极限最大。",
+                "label": "采用严格的白名单机制，只清理已知安全的临时目录，且默认将文件移至回收站而非直接粉碎"
+              },
+              {
+                "impact": "需要开发额外的扫描分析和用户二次确认界面，增加开发工作量。",
+                "label": "在清理前展示完整的待删除文件列表，由用户逐项勾选确认"
+              },
+              {
+                "impact": "开发成本高，但能给用户提供后悔药，避免任何数据丢失的风险。",
+                "label": "清理前自动创建系统还原点，或将文件临时备份到安全区域，保留一段时间后自动删除"
+              }
+            ],
+            "question": "在清理电脑空间时，您希望如何保证用户数据的安全性，防止误删？",
+            "reason": "清理软件最大的风险是误删系统文件或用户的重要文档，安全机制是该类软件的核心竞争力。",
+            "recommendation": "(推荐) 采用“严格白名单目录扫描” + “默认移至系统回收站/垃圾桶”的组合方案。",
+            "recommendation_reason": "白名单能从源头上杜绝误删系统关键文件的风险；而将文件移动到回收站而不是直接永久删除，给了用户找回文件的余地，安全性与体验更佳。"
+          }
+        ],
+        "risks": [
+          "误删系统文件导致操作系统损坏，无法正常启动或软件崩溃。",
+          "误删用户正在编辑的临时文档或第三方软件的激活授权缓存，导致数据丢失。",
+          "由于权限不足 (如未以管理员身份运行) 导致无法访问或清理部分系统临时文件夹，使清理效果打折扣。",
+          "杀毒软件可能会误报此类有文件读写和删除权限的清理软件为恶意程序 (False Positive)。",
+          "清理工具市场极度饱和 (有 CCleaner, BleachBit, Geek Uninstaller, 以及系统自带的存储感知)，需要清晰的差异化定位。"
+        ],
+        "unknowns": [
+          "具体的清理深度：是仅清理系统自带临时文件，还是需要支持清理第三方软件 (如微信、浏览器、Adobe 等) 的缓存？",
+          "是否需要附加功能：例如大文件扫描、重复文件查找、软件卸载残留清理或开机启动项管理？",
+          "用户的开发背景与技术栈偏好，以便推荐最合适的开发框架。",
+          "软件的发布和分发方式：是开源免费软件，还是作为商业收费软件，还是作为个人练习项目？是否需要上架应用商店？"
+        ]
+      },
+      "input_tokens": 19734,
+      "output_tokens": 5958,
+      "thinking_tokens": 4292,
+      "total_tokens": 25692,
+      "raw_usage": {
+        "input_tokens": 19734,
+        "output_tokens": 5958,
+        "thinking_tokens": 4292,
+        "cache_read_tokens": 0,
+        "total_tokens": 25692
+      }
+    }
+  ],
+  "metrics": {
+    "calls_per_case": 1,
+    "duration_ms": 30671,
+    "input_tokens": 19734,
+    "output_tokens": 5958,
+    "thinking_tokens": 4292,
+    "total_tokens": 25692
+  },
+  "success": true,
+  "timestamp": "2026-08-22T05:16:26.848Z",
+  "evaluation": {
+    "scores": {
+      "key_gap_coverage": 5,
+      "question_relevance": 5,
+      "duplicate_question_risk": 5,
+      "silent_assumption_safety": 5,
+      "challenge_ability": 5,
+      "recommendation_quality": 4,
+      "structured_output_reliability": 5,
+      "conciseness": 5
+    },
+    "heuristicQuality": 4.875,
+    "matchedSignals": 3,
+    "notes": {
+      "duplicate_question_risk": "manual-review-needed",
+      "recommendation_quality": "heuristic",
+      "key_gap_coverage": "heuristic using fixture signals"
+    }
+  }
+}

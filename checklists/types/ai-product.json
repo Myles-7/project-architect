@@ -1,0 +1,23 @@
+[
+  {
+    "id": "chk-ai-fallback-policy",
+    "area": "trust_safety",
+    "criterion": "当底层 AI 出现幻觉、超时、网络中断或格式错误时，产品有明确的降级呈现与可恢复提示。",
+    "importance": "high",
+    "applicableWhen": { "tags": ["AI Product", "AI 工作台", "AI Agent"] }
+  },
+  {
+    "id": "chk-ai-cost-guardrail",
+    "area": "technical_boundary",
+    "criterion": "有明确的 Token 消耗防护预期或长文本截断策略，避免单次调用成本失控。",
+    "importance": "normal",
+    "applicableWhen": { "tags": ["AI Product", "AI 工作台"] }
+  },
+  {
+    "id": "chk-ai-structured-output",
+    "area": "technical_boundary",
+    "criterion": "明确依赖结构化输出（JSON Schema）而非从自由文本中爬取业务状态。",
+    "importance": "critical",
+    "applicableWhen": { "tags": ["AI Product"] }
+  }
+]
