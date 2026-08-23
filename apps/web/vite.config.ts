@@ -8,8 +8,16 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'lucide-react', 'clsx', 'tailwind-merge'],
+  },
   server: {
     port: 5173,
-    strictPort: false,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+      },
+    },
   },
 });
