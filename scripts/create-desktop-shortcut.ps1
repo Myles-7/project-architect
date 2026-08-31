@@ -13,7 +13,7 @@ $Shortcut.TargetPath = "$env:SystemRoot\System32\wscript.exe"
 $Shortcut.Arguments = "`"$TargetVBS`""
 $Shortcut.WorkingDirectory = "$ProjectRoot"
 $Shortcut.Description = "Project Architect — 本地 AI 项目构思工作台"
-$Shortcut.IconLocation = "$env:SystemRoot\System32\shell32.dll,220"
+$Shortcut.IconLocation = "$ProjectRoot\assets\app-icon.ico,0"
 $Shortcut.Save()
 
 Write-Host "========================================================" -ForegroundColor Cyan
