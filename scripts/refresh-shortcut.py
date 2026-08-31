@@ -21,7 +21,15 @@ desktop_dirs = get_desktop_paths()
 print("Found Desktop directories:", desktop_dirs)
 
 project_root = r"D:\桌面\项目构思"
-ico_path = os.path.join(project_root, "assets", "app-icon.ico")
+ico_src = os.path.join(project_root, "assets", "app-icon.png")
+ico_path = os.path.join(project_root, "assets", "app-icon-v3.ico")
+
+# Ensure app-icon-v3.ico exists from the latest PNG
+from PIL import Image
+img = Image.open(ico_src)
+sizes = [(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)]
+img.save(ico_path, format="ICO", sizes=sizes)
+
 vbs_path = os.path.join(project_root, "scripts", "start-silent.vbs")
 
 # VBScript script to create shortcut via WScript.Shell
