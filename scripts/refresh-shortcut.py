@@ -22,9 +22,9 @@ print("Found Desktop directories:", desktop_dirs)
 
 project_root = r"D:\桌面\项目构思"
 ico_src = os.path.join(project_root, "assets", "app-icon.png")
-ico_path = os.path.join(project_root, "assets", "app-icon-v3.ico")
+ico_path = os.path.join(project_root, "assets", "app-icon-v4.ico")
 
-# Ensure app-icon-v3.ico exists from the latest PNG
+# Ensure app-icon-v4.ico exists from the latest PNG
 from PIL import Image
 img = Image.open(ico_src)
 sizes = [(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)]
