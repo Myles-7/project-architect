@@ -76,7 +76,7 @@ describe('Golden Document Review 3 — Project Architect (Complex Self-Hosting S
     await stateEngine.addDecision(
       projectPath,
       'mvp_scope',
-      'Core State Engine, Discovery Intelligence, B2.1 Constitution, Document Compiler',
+      'Core State Engine, Discovery Intelligence, B3 Constitution, Document Compiler',
       s3.metadata.stateRevision,
       'locked'
     );
@@ -121,8 +121,12 @@ describe('Golden Document Review 3 — Project Architect (Complex Self-Hosting S
     expect(compileResult.readiness.maturityLevel).toBe('Level 5: Stable');
     expect(compileResult.readiness.score).toBeGreaterThanOrEqual(95);
 
-    // 2. Verify all 9 documents generated (7 core + AI_SPEC.md + SECURITY.md)
-    expect(compileResult.manifest.items.length).toBe(9);
+    // 2. Verify all 11 documents generated (8 core + AI_SPEC.md + DESKTOP_SPEC.md + SECURITY_SPEC.md)
+    expect(compileResult.manifest.items.length).toBe(11);
+    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'SECURITY_SPEC.md'))).toBe(true);
 
     // 3. Verify AGENTS.md locked decisions and source attribution
     const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));
@@ -130,9 +134,9 @@ describe('Golden Document Review 3 — Project Architect (Complex Self-Hosting S
     expect(agentsContent).toContain('[Locked: User]');
     expect(agentsContent).toContain('Source: Decision');
 
-    // 4. Verify SECURITY.md
-    const securityContent = await storage.readText(join(projectPath, 'docs', 'SECURITY.md'));
-    expect(securityContent).toContain('Security & Privacy Architecture');
+    // 4. Verify SECURITY_SPEC.md
+    const securityContent = await storage.readText(join(projectPath, 'docs', 'specs', 'SECURITY_SPEC.md'));
+    expect(securityContent).toContain('Security & Data Protection Architecture');
 
     // 5. Verify all documents are up-to-date
     const finalSnapshot = await stateEngine.getSnapshot(projectPath);

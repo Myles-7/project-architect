@@ -1,24 +1,30 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { existsSync } from 'node:fs';
 import type { AIProvider } from './AIProvider.js';
 import {
   DEFAULT_RUNTIME_CONFIG,
   type AIProviderRequest,
   type StructuredResult,
   type ProviderUsage,
+  type ProviderHealthView,
 } from '@project-architect/contracts';
 
 export class AntigravityCliProvider implements AIProvider {
   readonly name = 'antigravity-cli';
   private cliExecutable: string;
   private maxBufferBytes: number;
+  private cliPrefixArgs: string[];
+  private hasObservedPromptCache = false;
 
   constructor(
     cliExecutable: string = process.env.AGY_CLI || 'agy.exe',
-    maxBufferBytes: number = DEFAULT_RUNTIME_CONFIG.provider.maxBufferBytes
+    maxBufferBytes: number = DEFAULT_RUNTIME_CONFIG.provider.maxBufferBytes,
+    cliPrefixArgs: string[] = []
   ) {
     this.cliExecutable = cliExecutable;
     this.maxBufferBytes = maxBufferBytes;
+    this.cliPrefixArgs = [...cliPrefixArgs];
   }
 
   async complete<T = unknown>(request: AIProviderRequest): Promise<StructuredResult<T>> {
@@ -36,9 +42,15 @@ export class AntigravityCliProvider implements AIProvider {
       let stderrBytes = 0;
       let timedOut = false;
       let bufferExceeded = false;
+      let cancelled = false;
       let closed = false;
+      let timer: NodeJS.Timeout | undefined;
 
       const args = [
+        ...this.cliPrefixArgs,
+        // Antigravity only accepts a non-interactive prompt through -p/--print.
+        // Passing it positionally makes the CLI ignore the whole prompt.
+        '-p',
         fullPrompt,
         '--output-format',
         'json',
@@ -65,19 +77,55 @@ export class AntigravityCliProvider implements AIProvider {
         } catch {}
         if (process.platform === 'win32') {
           try {
-            spawn('taskkill', ['/pid', String(pid), '/T', '/F'], {
+            const killer = spawn('taskkill', ['/pid', String(pid), '/T', '/F'], {
               shell: false,
               windowsHide: true,
               stdio: 'ignore',
             });
+            killer.unref();
           } catch {}
         }
       };
 
-      const timer = setTimeout(() => {
+      const finishTerminal = (
+        status: 'cancelled' | 'timed-out' | 'failed',
+        message: string,
+        exitCode: number | null
+      ) => {
+        if (closed) return;
+        closed = true;
+        if (timer) clearTimeout(timer);
+        request.abortSignal?.removeEventListener('abort', abortHandler);
+        terminateProcess(child.pid);
+        resolvePromise({
+          status,
+          structuredSuccess: false,
+          structuredOutput: null,
+          rawEnvelope: null,
+          stderr: message,
+          exitCode,
+          durationMs: Date.now() - startTime,
+          usage: this.emptyUsage(),
+          provider: this.name,
+        });
+      };
+
+      const abortHandler = () => {
+        if (closed) return;
+        cancelled = true;
+        finishTerminal('cancelled', 'Discovery run was cancelled.', null);
+      };
+
+      if (request.abortSignal?.aborted) {
+        abortHandler();
+      } else {
+        request.abortSignal?.addEventListener('abort', abortHandler, { once: true });
+      }
+
+      timer = setTimeout(() => {
         if (closed) return;
         timedOut = true;
-        terminateProcess(child.pid);
+        finishTerminal('timed-out', `Process timed out after ${timeoutMs}ms`, -1);
       }, timeoutMs);
 
       child.stdout?.on('data', (chunk: Buffer | string) => {
@@ -86,7 +134,7 @@ export class AntigravityCliProvider implements AIProvider {
         stdoutBytes += len;
         if (stdoutBytes > this.maxBufferBytes) {
           bufferExceeded = true;
-          terminateProcess(child.pid);
+          finishTerminal('failed', `Process output exceeded maximum buffer limit of ${this.maxBufferBytes} bytes`, -1);
           return;
         }
         stdout += chunk.toString();
@@ -98,7 +146,7 @@ export class AntigravityCliProvider implements AIProvider {
         stderrBytes += len;
         if (stderrBytes > this.maxBufferBytes) {
           bufferExceeded = true;
-          terminateProcess(child.pid);
+          finishTerminal('failed', `Process output exceeded maximum buffer limit of ${this.maxBufferBytes} bytes`, -1);
           return;
         }
         stderr += chunk.toString();
@@ -108,7 +156,22 @@ export class AntigravityCliProvider implements AIProvider {
         if (closed) return;
         closed = true;
         clearTimeout(timer);
+        request.abortSignal?.removeEventListener('abort', abortHandler);
         const durationMs = Date.now() - startTime;
+        if (cancelled) {
+          resolvePromise({
+            status: 'cancelled',
+            structuredSuccess: false,
+            structuredOutput: null,
+            rawEnvelope: null,
+            stderr: 'Discovery run was cancelled.',
+            exitCode: null,
+            durationMs,
+            usage: this.emptyUsage(),
+            provider: this.name,
+          });
+          return;
+        }
         resolvePromise({
           status: 'failed',
           structuredSuccess: false,
@@ -126,7 +189,22 @@ export class AntigravityCliProvider implements AIProvider {
         if (closed) return;
         closed = true;
         clearTimeout(timer);
+        request.abortSignal?.removeEventListener('abort', abortHandler);
         const durationMs = Date.now() - startTime;
+
+        if (cancelled) {
+          return resolvePromise({
+            status: 'cancelled',
+            structuredSuccess: false,
+            structuredOutput: null,
+            rawEnvelope: null,
+            stderr: 'Discovery run was cancelled.',
+            exitCode: code ?? null,
+            durationMs,
+            usage: this.emptyUsage(),
+            provider: this.name,
+          });
+        }
 
         if (bufferExceeded) {
           return resolvePromise({
@@ -174,6 +252,10 @@ export class AntigravityCliProvider implements AIProvider {
           const envelope = JSON.parse(stdout);
           const structuredOutput = envelope.structured_output as T | undefined;
           const usage = this.extractUsage(envelope);
+
+          if (typeof usage.cacheReadTokens === 'number' && usage.cacheReadTokens > 0) {
+            this.hasObservedPromptCache = true;
+          }
 
           if (!structuredOutput) {
             return resolvePromise({
@@ -236,5 +318,101 @@ export class AntigravityCliProvider implements AIProvider {
       totalTokens: 'unavailable',
       cacheReadTokens: 'unavailable',
     };
+  }
+
+  async healthCheck(): Promise<ProviderHealthView> {
+    const checkedAt = new Date().toISOString();
+    const isExplicitPath = this.cliExecutable.includes('/') || this.cliExecutable.includes('\\');
+    const promptCacheStatus = this.hasObservedPromptCache ? 'observed' : 'unknown';
+
+    // 1. If explicit path is provided, directly check its existence
+    if (isExplicitPath && !existsSync(resolve(this.cliExecutable))) {
+      return {
+        status: 'unavailable',
+        providerName: 'Antigravity CLI',
+        modelName: 'Claude 3.5 Sonnet / Gemini via AGY',
+        inferenceLocation: 'unknown',
+        sendsProjectContextOffDevice: 'unknown',
+        structuredOutput: 'supported',
+        promptCache: 'unknown',
+        checkedAt,
+        executable: this.cliExecutable,
+        lastFailureCode: 'EXECUTABLE_NOT_FOUND',
+        guidance: `未在本地找到指定的 Antigravity CLI 可执行文件 (${this.cliExecutable})。请检查 AGY_CLI 环境变量配置。`,
+      };
+    }
+
+    // 2. Perform minimal non-sensitive probe (no project data sent)
+    try {
+      const probe = spawnSync(this.cliExecutable, ['--version'], {
+        shell: false,
+        windowsHide: true,
+        timeout: 5000,
+        encoding: 'utf8',
+      });
+
+      if (probe.error) {
+        const isNotFound = (probe.error as any).code === 'ENOENT';
+        return {
+          status: isNotFound ? 'unavailable' : 'degraded',
+          providerName: 'Antigravity CLI',
+          modelName: 'Claude 3.5 Sonnet / Gemini via AGY',
+          inferenceLocation: isNotFound ? 'unknown' : 'remote',
+          sendsProjectContextOffDevice: isNotFound ? 'unknown' : true,
+          structuredOutput: 'supported',
+          promptCache: promptCacheStatus,
+          checkedAt,
+          executable: this.cliExecutable,
+          lastFailureCode: isNotFound ? 'EXECUTABLE_NOT_FOUND' : 'PROBE_FAILED',
+          guidance: isNotFound
+            ? `系统 PATH 中未找到命令 "${this.cliExecutable}"，请安装 Antigravity CLI 或配置 AGY_CLI。`
+            : 'CLI 进程启动失败。错误信息已安全脱敏，请检查可执行权限或系统环境。',
+        };
+      }
+
+      if (probe.status !== 0) {
+        return {
+          status: 'degraded',
+          providerName: 'Antigravity CLI',
+          modelName: 'Claude 3.5 Sonnet / Gemini via AGY',
+          inferenceLocation: 'remote',
+          sendsProjectContextOffDevice: true,
+          structuredOutput: 'supported',
+          promptCache: promptCacheStatus,
+          checkedAt,
+          executable: this.cliExecutable,
+          lastFailureCode: 'PROBE_FAILED',
+          guidance: 'Antigravity CLI 存在但最小版本探测退出码非 0。请检查 CLI 登录授权状态与网络连接。',
+        };
+      }
+
+      return {
+        status: 'ready',
+        providerName: 'Antigravity CLI',
+        modelName: 'Claude 3.5 Sonnet / Gemini via AGY',
+        inferenceLocation: 'remote',
+        sendsProjectContextOffDevice: true,
+        structuredOutput: 'supported',
+        promptCache: promptCacheStatus,
+        checkedAt,
+        executable: this.cliExecutable,
+        lastSuccessAt: checkedAt,
+        guidance: 'Antigravity CLI 引擎运行正常。项目文件保存在本地，单轮推演时将选定上下文发往配置模型。',
+      };
+    } catch {
+      return {
+        status: 'degraded',
+        providerName: 'Antigravity CLI',
+        modelName: 'Claude 3.5 Sonnet / Gemini via AGY',
+        inferenceLocation: 'remote',
+        sendsProjectContextOffDevice: true,
+        structuredOutput: 'supported',
+        promptCache: promptCacheStatus,
+        checkedAt,
+        executable: this.cliExecutable,
+        lastFailureCode: 'PROBE_EXCEPTION',
+        guidance: '健康探测发生异常，已阻断潜在错误泄露。请检查本地运行环境。',
+      };
+    }
   }
 }

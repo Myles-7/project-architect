@@ -1,0 +1,21 @@
+# {{PROJECT_NAME}} — Data Synchronization & Conflict Resolution Specification
+
+> **Specification Version**: 1.0 (State Revision: {{SOURCE_REVISION}})  
+> **Compiled At**: {{GENERATED_AT}}
+
+---
+
+## 1. Synchronization Topology & Boundaries
+
+- **State Distribution**: Multi-device or remote synchronization model.
+- **Network Boundaries**: Explicit handling of intermittent connectivity and offline operation.
+
+---
+
+## 2. Conflict Resolution Invariants
+
+Coding agents must obey the following concurrency rules:
+
+1. **Deterministic Resolution**: Concurrent state changes must resolve deterministically (e.g. LWW timestamp, CRDT, or explicit user conflict modal).
+2. **Zero Silent Overwrite**: Conflicting user edits must never be silently dropped or overwritten without audit trace.
+3. **Idempotency**: Sync messages and payloads must be idempotent across network retries.

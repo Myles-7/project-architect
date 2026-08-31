@@ -106,7 +106,10 @@ describe('Golden Document Review 1 — SpaceCleaner (Desktop Utility)', () => {
     expect(compileResult.readiness.score).toBeGreaterThanOrEqual(95);
 
     // 2. Check Document Manifest
-    expect(compileResult.manifest.items.length).toBe(7);
+    expect(compileResult.manifest.items.length).toBe(10); // 8 core + DESKTOP_SPEC.md + PRIVACY_SPEC.md
+    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'PRIVACY_SPEC.md'))).toBe(true);
 
     // 3. Check Source Attribution in AGENTS.md
     const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));

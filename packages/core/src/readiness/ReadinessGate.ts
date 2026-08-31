@@ -172,6 +172,17 @@ export class ReadinessGate {
       };
     }
 
+    // 1b. Staleness check: Prior approval must be valid for the current state revision
+    const currentRev = snapshot.metadata.stateRevision;
+    const basisRev = currentReadiness?.basisRevision ?? currentRev;
+    const hasPriorApproval = disposition.startsWith('approved') || stage === 'approved';
+    if (hasPriorApproval && currentRev > basisRev + 1) {
+      return {
+        allowed: false,
+        reason: `Cannot compile documents: Current readiness approval is stale (evaluated at rev.${basisRev}, current is rev.${currentRev}). Any modification to project facts invalidates prior approvals. Please re-run readiness review and re-approve.`,
+      };
+    }
+
     // 2. Open Critical Conflicts check
     const openCriticalConflicts = (snapshot.gaps?.conflicts || []).filter(
       (c) => c.status === 'open' && c.severity === 'critical'

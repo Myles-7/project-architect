@@ -5,6 +5,11 @@ import { QuestionSelector } from './QuestionSelector.js';
 export interface QuestionEngineResult {
   questions: QuestionItem[];
   autoAssumptions: AssumptionItem[];
+  batch: {
+    id: string;
+    stage: import('@project-architect/contracts').QuestionBatchStage;
+    diagnostics: import('./QuestionSelector.js').QuestionSelectionDiagnostics;
+  };
 }
 
 /** Coordinates deterministic question arbitration and structured wording. */
@@ -32,10 +37,17 @@ export class QuestionEngine {
       usedQuestionTexts.add(this.normalizeText(composed.question));
       return composed;
     });
+    const batchId = `batch-${snapshot.metadata.stateRevision}-${Date.now().toString(36)}`;
+    for (const question of questions) {
+      question.batchId = batchId;
+      question.batchStage = selection.policy.stage;
+      question.basisRevision = snapshot.metadata.stateRevision;
+    }
 
     return {
       questions,
       autoAssumptions: selection.gapsToAssume.map((gap) => this.composer.toAssumption(gap)),
+      batch: { id: batchId, stage: selection.policy.stage, diagnostics: selection.diagnostics },
     };
   }
 

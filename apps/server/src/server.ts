@@ -1,16 +1,26 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFile } from 'node:child_process';
+import { platform } from 'node:os';
 import {
   ProjectStateEngine,
   WorkspaceGuard,
   FileStorage,
+  DiscoveryTurnStore,
   projectOverviewProjection,
   readinessProjection,
   documentProjection,
   timelineProjection,
+  projectDiscoveryProgressProjection,
+  ProjectForkService,
+  ProjectTrashService,
+  DocumentExportService,
+  DocumentDiffEngine,
 } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider, AntigravityCliProvider } from '@project-architect/agent';
+import { DiscoveryJobManager } from './DiscoveryJobManager.js';
 import {
   ErrorCode,
   type ApiResponse,
@@ -20,6 +30,8 @@ import {
   type TypedRef,
   type DecisionRef,
   type QuestionRef,
+  type DiscoveryJobView,
+  type AgentRunTrace,
 } from '@project-architect/contracts';
 
 export interface ServerOptions {
@@ -29,6 +41,16 @@ export interface ServerOptions {
   workspaceRoot?: string;
   projectsDir?: string;
   useMockAI?: boolean;
+  discoveryJobs?: DiscoveryJobManager;
+}
+
+/**
+ * Resolves the repository root independently from process.cwd().
+ * The packaged server is launched from apps/server, while active B3 assets and
+ * historical benchmark evidence live under the repository-level experiments folder.
+ */
+export function resolveRepositoryRoot(moduleDirectory: string = dirname(fileURLToPath(import.meta.url))): string {
+  return resolve(moduleDirectory, '..', '..', '..');
 }
 
 export function createApp(options: ServerOptions = {}): express.Express {
@@ -57,7 +79,40 @@ export function createApp(options: ServerOptions = {}): express.Express {
   const storage = new FileStorage();
   const engine = options.engine || new ProjectStateEngine(storage, guard);
   const provider = options.useMockAI ? new MockAIProvider() : new AntigravityCliProvider();
-  const orchestrator = options.orchestrator || new AIOrchestrator(provider, engine, process.cwd(), storage);
+  const orchestrator =
+    options.orchestrator || new AIOrchestrator(provider, engine, resolveRepositoryRoot(), storage);
+  const turnStore = new DiscoveryTurnStore(storage);
+  const discoveryJobs =
+    options.discoveryJobs ||
+    new DiscoveryJobManager(
+      orchestrator,
+      (projectPath) => engine.getSnapshot(projectPath),
+      turnStore,
+      engine
+    );
+
+  const withPendingAnswerCount = async (
+    projectPath: string,
+    snapshot: any,
+    job: DiscoveryJobView,
+  ): Promise<DiscoveryJobView> => {
+    const traceFile = join(projectPath, 'runtime', 'agent-runs.json');
+    let lastDiscoveryCompletedAt: string | undefined;
+    if (await storage.exists(traceFile)) {
+      try {
+        const traces = await storage.readJson<AgentRunTrace[]>(traceFile);
+        lastDiscoveryCompletedAt = traces.at(-1)?.completedAt;
+      } catch {
+        // A damaged observability file must never block user decisions or job polling.
+      }
+    }
+    const pendingAnswerCount = snapshot.questions.items.filter((question: any) =>
+      question.status === 'answered' &&
+      question.answeredAt &&
+      (!lastDiscoveryCompletedAt || question.answeredAt > lastDiscoveryCompletedAt)
+    ).length;
+    return { ...job, pendingAnswerCount };
+  };
 
   // Persistent project registry in workspace root
   const registryFile = join(guard.workspaceRoot, '.projects-registry.json');
@@ -97,7 +152,7 @@ export function createApp(options: ServerOptions = {}): express.Express {
     await saveRegistry();
   };
 
-  const resolveProjectLocation = async (rawId: string): Promise<string> => {
+  const resolveProjectLocation = async (rawId: string, options?: { allowTrashed?: boolean }): Promise<string> => {
     const cleanId = guard.validateProjectId(rawId);
     let entry = projectRegistry.get(cleanId);
     if (!entry) {
@@ -120,6 +175,12 @@ export function createApp(options: ServerOptions = {}): express.Express {
     }
     if (!entry || !(await storage.exists(entry.projectPath))) {
       throw projectNotFoundError(cleanId);
+    }
+    if (entry.trashedAt && !options?.allowTrashed) {
+      const err: any = new Error(`Project "${cleanId}" is in the recycle bin. Please restore it first.`);
+      err.code = ErrorCode.STATE_VALIDATION_FAILED;
+      err.recoverable = true;
+      throw err;
     }
     return entry.projectPath;
   };
@@ -162,7 +223,24 @@ export function createApp(options: ServerOptions = {}): express.Express {
     try {
       const body = assertObject(req.body);
       const name = assertString(body.name, 'name');
-      const idea = assertString(body.idea, 'idea');
+      const rawIdea = typeof body.idea === 'string' && body.idea.trim() ? body.idea.trim() : undefined;
+      const rawIntent = body.initialIntent && typeof body.initialIntent === 'object'
+        ? {
+            targetUser: assertString(body.initialIntent.targetUser, 'initialIntent.targetUser'),
+            coreProblem: assertString(body.initialIntent.coreProblem, 'initialIntent.coreProblem'),
+            desiredOutcome: assertString(body.initialIntent.desiredOutcome, 'initialIntent.desiredOutcome'),
+            constraints: typeof body.initialIntent.constraints === 'string' && body.initialIntent.constraints.trim()
+              ? body.initialIntent.constraints.trim()
+              : undefined,
+          }
+        : undefined;
+
+      if (!rawIdea && !rawIntent) {
+        const err: any = new Error('Either idea or initialIntent (targetUser, coreProblem, desiredOutcome) must be provided.');
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
+      }
+
       const projectId = body.projectId ? guard.validateProjectId(body.projectId) : undefined;
       const projectTags = Array.isArray(body.projectTags) ? body.projectTags : undefined;
       let targetLocation: string | undefined;
@@ -175,7 +253,8 @@ export function createApp(options: ServerOptions = {}): express.Express {
 
       const { projectPath: actualPath, snapshot } = await engine.createProject({
         name,
-        idea,
+        idea: rawIdea,
+        initialIntent: rawIntent,
         projectId,
         projectTags,
         projectPath: targetLocation,
@@ -247,15 +326,348 @@ export function createApp(options: ServerOptions = {}): express.Express {
   });
 
   // 3. List Recent Projects
-  app.get('/api/projects', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  app.get('/api/projects', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       await loadRegistry();
-      const projects = Array.from(projectRegistry.values()).sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
+      const includeTrashed = req.query.includeTrashed === 'true';
+      const projects = Array.from(projectRegistry.values())
+        .filter((p) => includeTrashed || !p.trashedAt)
+        .sort((a, b) => {
+          // Pinned projects first
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        });
       res.json({
         success: true,
         data: { projects },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.1 Rename Project
+  app.post('/api/projects/:id/rename', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      const body = assertObject(req.body);
+      const newName = assertString(body.name, 'name');
+      const expectedRevision =
+        body.expectedRevision !== undefined ? assertInteger(body.expectedRevision, 'expectedRevision') : undefined;
+
+      const updatedSnapshot = await engine.renameProject(projectPath, newName, expectedRevision);
+      const cleanId = updatedSnapshot.metadata.projectId;
+      const existing = projectRegistry.get(cleanId);
+      const updatedItem: RecentProjectItem = {
+        projectId: cleanId,
+        name: updatedSnapshot.metadata.name,
+        stage: updatedSnapshot.metadata.stage,
+        updatedAt: updatedSnapshot.metadata.updatedAt,
+        projectPath,
+        isPinned: existing?.isPinned,
+        isArchived: existing?.isArchived,
+      };
+      await registerProject(updatedItem);
+
+      res.json({
+        success: true,
+        data: { project: updatedItem },
+        stateRevision: updatedSnapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.2 Duplicate Project (Fork Idea)
+  app.post('/api/projects/:id/duplicate', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const sourcePath = await resolveProjectLocation(req.params.id as string);
+      const sourceSnapshot = await engine.getSnapshot(sourcePath);
+      const body = req.body || {};
+      const newName = body.newName ? assertString(body.newName, 'newName') : `${sourceSnapshot.metadata.name} (副本)`;
+      const newProjectId = `${guard.validateProjectId(req.params.id as string)}-fork-${Date.now().toString(36).slice(-4)}`;
+
+      const forkResult = await ProjectForkService.forkProject({
+        sourcePath,
+        newName,
+        newProjectId,
+        storage,
+        guard,
+        engine,
+      });
+
+      const newItem: RecentProjectItem = {
+        projectId: forkResult.newProjectId,
+        name: newName,
+        stage: forkResult.snapshot.metadata.stage,
+        updatedAt: forkResult.snapshot.metadata.updatedAt,
+        projectPath: forkResult.targetPath,
+        isPinned: false,
+        isArchived: false,
+      };
+      await registerProject(newItem);
+
+      res.json({
+        success: true,
+        data: { project: newItem },
+        stateRevision: forkResult.snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.3 Toggle Archive
+  app.post('/api/projects/:id/archive', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const cleanId = guard.validateProjectId(req.params.id as string);
+      let entry = projectRegistry.get(cleanId);
+      if (!entry) {
+        await resolveProjectLocation(cleanId);
+        entry = projectRegistry.get(cleanId);
+      }
+      if (!entry) throw projectNotFoundError(cleanId);
+
+      const isArchived = !entry.isArchived;
+      entry.isArchived = isArchived;
+      await registerProject(entry);
+
+      res.json({
+        success: true,
+        data: { projectId: cleanId, isArchived },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.4 Toggle Pin
+  app.post('/api/projects/:id/pin', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const cleanId = guard.validateProjectId(req.params.id as string);
+      let entry = projectRegistry.get(cleanId);
+      if (!entry) {
+        await resolveProjectLocation(cleanId);
+        entry = projectRegistry.get(cleanId);
+      }
+      if (!entry) throw projectNotFoundError(cleanId);
+
+      const isPinned = !entry.isPinned;
+      entry.isPinned = isPinned;
+      await registerProject(entry);
+
+      res.json({
+        success: true,
+        data: { projectId: cleanId, isPinned },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.5 Move Project to Trash (Recoverable Delete)
+  app.delete('/api/projects/:id', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const cleanId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(cleanId);
+
+      const trashResult = await ProjectTrashService.moveToTrash({
+        projectId: cleanId,
+        projectPath,
+        storage,
+        guard,
+      });
+
+      let entry = projectRegistry.get(cleanId);
+      if (entry) {
+        entry.trashedAt = trashResult.trashedAt;
+        entry.trashPath = trashResult.trashPath;
+        entry.originalPath = projectPath;
+        entry.projectPath = trashResult.trashPath;
+      } else {
+        entry = {
+          projectId: cleanId,
+          name: cleanId,
+          stage: 'created',
+          updatedAt: trashResult.trashedAt,
+          projectPath: trashResult.trashPath,
+          trashedAt: trashResult.trashedAt,
+          trashPath: trashResult.trashPath,
+          originalPath: projectPath,
+        };
+        projectRegistry.set(cleanId, entry);
+      }
+      await saveRegistry();
+
+      res.json({
+        success: true,
+        data: {
+          projectId: cleanId,
+          deleted: true,
+          trashed: true,
+          trashPath: trashResult.trashPath,
+          trashedAt: trashResult.trashedAt,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.5.1 Restore Project from Trash
+  app.post('/api/projects/:id/restore', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const cleanId = guard.validateProjectId(req.params.id as string);
+      let entry = projectRegistry.get(cleanId);
+      let trashPath = entry?.trashPath;
+
+      if (!trashPath) {
+        // Look in .trash directory for latest matching folder
+        if (await storage.exists(guard.trashDir)) {
+          const files = await storage.listFiles(guard.trashDir);
+          const matches = files
+            .filter((f) => f.startsWith(`${cleanId}-`))
+            .sort()
+            .reverse();
+          if (matches.length > 0 && matches[0]) {
+            trashPath = join(guard.trashDir, matches[0]);
+          }
+        }
+      }
+
+      if (!trashPath || !(await storage.exists(trashPath))) {
+        const err: any = new Error(`Cannot restore: project "${cleanId}" not found in trash.`);
+        err.code = ErrorCode.STATE_RECOVERY_REQUIRED;
+        throw err;
+      }
+
+      const body = req.body || {};
+      const targetPath = body.targetPath;
+
+      const restoreResult = await ProjectTrashService.restoreFromTrash({
+        projectId: cleanId,
+        trashPath,
+        targetPath,
+        storage,
+        guard,
+      });
+
+      const restoredSnapshot = await engine.loadProject(restoreResult.projectPath);
+
+      const updatedItem: RecentProjectItem = {
+        projectId: cleanId,
+        name: restoredSnapshot.metadata.name,
+        stage: restoredSnapshot.metadata.stage,
+        updatedAt: new Date().toISOString(),
+        projectPath: restoreResult.projectPath,
+        isPinned: entry?.isPinned || false,
+        isArchived: entry?.isArchived || false,
+      };
+      await registerProject(updatedItem);
+
+      res.json({
+        success: true,
+        data: { project: updatedItem },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.5.2 Purge Project Permanently from Trash
+  app.delete('/api/projects/:id/purge', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const cleanId = guard.validateProjectId(req.params.id as string);
+      const entry = projectRegistry.get(cleanId);
+      const trashPath = entry?.trashPath;
+
+      if (!trashPath) {
+        // Look in .trash directory for matching folders
+        if (await storage.exists(guard.trashDir)) {
+          const files = await storage.listFiles(guard.trashDir);
+          const matches = files.filter((f) => f.startsWith(`${cleanId}-`));
+          for (const match of matches) {
+            const p = join(guard.trashDir, match);
+            await ProjectTrashService.purgeFromTrash({ trashPath: p, storage, guard });
+          }
+        }
+      } else {
+        await ProjectTrashService.purgeFromTrash({ trashPath, storage, guard });
+      }
+
+      projectRegistry.delete(cleanId);
+      await saveRegistry();
+
+      res.json({
+        success: true,
+        data: { projectId: cleanId, purged: true },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.6 Open in Local Folder / Explorer
+  app.post('/api/projects/:id/open-folder', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      let opened = false;
+      const osPlatform = platform();
+
+      if (osPlatform === 'win32') {
+        execFile('explorer.exe', [projectPath], () => {});
+        opened = true;
+      } else if (osPlatform === 'darwin') {
+        execFile('open', [projectPath], () => {});
+        opened = true;
+      }
+
+      res.json({
+        success: true,
+        data: { projectId: req.params.id, projectPath, opened },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.7 Provider Health & Diagnostics
+  app.get('/api/provider/health', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const activeProvider = orchestrator.getProvider();
+      const health = await activeProvider.healthCheck();
+      res.json({
+        success: true,
+        data: {
+          ...health,
+          modelName: health.modelName || 'Unknown Model',
+          isLocal: health.inferenceLocation === 'local',
+          details: health.guidance,
+          health,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 3.8 Material Context Exclusion Toggle
+  app.post('/api/projects/:id/inputs/:inputId/toggle', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      const inputId = req.params.inputId as string;
+      const body = req.body || {};
+      const updatedRef = await engine.toggleInputExclusion(
+        projectPath,
+        inputId,
+        body.exclude,
+        body.expectedRevision
+      );
+      res.json({
+        success: true,
+        data: { inputId: updatedRef.id, status: updatedRef.status },
       });
     } catch (err) {
       next(err);
@@ -513,6 +925,60 @@ export function createApp(options: ServerOptions = {}): express.Express {
     }
   });
 
+  // 10.1 Dismiss unanswered advisory questions without creating decisions.
+  app.post('/api/projects/:id/questions/dismiss', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      const body = assertObject(req.body);
+      if (!Array.isArray(body.questionRefs) || body.questionRefs.length === 0) {
+        throw new Error('questionRefs must be a non-empty array.');
+      }
+      const questionRefs = body.questionRefs.map((value: unknown, index: number) =>
+        assertString(value, `questionRefs[${index}]`) as QuestionRef
+      );
+      const expectedRevision = assertInteger(body.expectedRevision, 'expectedRevision');
+      const snapshot = await engine.dismissQuestions(projectPath, questionRefs, expectedRevision);
+      res.json({
+        success: true,
+        data: { snapshot },
+        stateRevision: snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 10.2 Answer Question as an active Assumption instead of a Confirmed Decision
+  app.post('/api/projects/:id/questions/answer-assumption', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      const body = assertObject(req.body);
+      const questionRef = assertString(body.questionRef, 'questionRef') as QuestionRef;
+      const assumptionStatement = assertString(body.assumptionStatement, 'assumptionStatement');
+      const rationale = body.rationale ? assertString(body.rationale, 'rationale') : undefined;
+      const expectedRevision = assertInteger(body.expectedRevision, 'expectedRevision');
+
+      const { assumptionRef, snapshot } = await engine.answerQuestionAsAssumption(
+        projectPath,
+        questionRef,
+        assumptionStatement,
+        expectedRevision,
+        rationale
+      );
+
+      res.json({
+        success: true,
+        data: {
+          assumptionRef,
+          snapshot,
+        },
+        stateRevision: snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // 11. Run Discovery Turn
   app.post('/api/projects/:id/discovery', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -531,6 +997,110 @@ export function createApp(options: ServerOptions = {}): express.Express {
         success: true,
         data: discoveryRes,
         stateRevision: discoveryRes.snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 11.0 Record Discovery User Free Input (pre-persistence before scheduling job)
+  app.post('/api/projects/:id/discovery/inputs', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(projectId);
+      const body = assertObject(req.body);
+      const text = assertString(body.text, 'text');
+      const snap = await engine.getSnapshot(projectPath);
+      const expectedRevision =
+        body.expectedRevision !== undefined
+          ? assertInteger(body.expectedRevision, 'expectedRevision')
+          : snap.metadata.stateRevision;
+
+      const result = await engine.recordDiscoveryInput(projectPath, text, expectedRevision);
+      res.status(201).json({
+        success: true,
+        data: {
+          inputRef: result.inputRef,
+          turnId: result.turnId,
+          snapshot: result.snapshot,
+        },
+        stateRevision: result.snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 11.1 Queue one non-blocking discovery turn using the latest persisted user decisions.
+  app.post('/api/projects/:id/discovery/jobs', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(projectId);
+      const body = assertObject(req.body);
+      const expectedRevision = assertInteger(body.expectedRevision, 'expectedRevision');
+      const userMessage = body.userMessage ? assertString(body.userMessage, 'userMessage') : undefined;
+      const turnId = body.turnId ? assertString(body.turnId, 'turnId') : undefined;
+      const job = await discoveryJobs.schedule(projectId, projectPath, expectedRevision, userMessage, turnId);
+      const snapshot = await engine.getSnapshot(projectPath);
+      res.json({ success: true, data: { job: await withPendingAnswerCount(projectPath, snapshot, job) }, stateRevision: snapshot.metadata.stateRevision });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 11.2 Poll the current local background discovery status. This is read-only.
+  app.get('/api/projects/:id/discovery/jobs/current', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(projectId);
+      const snapshot = await engine.getSnapshot(projectPath);
+      res.json({ success: true, data: { job: await withPendingAnswerCount(projectPath, snapshot, discoveryJobs.get(projectId)) }, stateRevision: snapshot.metadata.stateRevision });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 11.3 Cancel a queued or running background discovery turn. User decisions remain persisted.
+  app.post('/api/projects/:id/discovery/jobs/cancel', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(projectId);
+      const snapshot = await engine.getSnapshot(projectPath);
+      const job = discoveryJobs.cancel(projectId);
+      res.json({ success: true, data: { job: await withPendingAnswerCount(projectPath, snapshot, job) }, stateRevision: snapshot.metadata.stateRevision });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 11.4 Get Discovery Turn History
+  app.get('/api/projects/:id/discovery/turns', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(projectId);
+      const turns = await engine.getDiscoveryTurns(projectPath);
+      const snapshot = await engine.getSnapshot(projectPath);
+      res.json({
+        success: true,
+        data: { turns },
+        stateRevision: snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 11.5 Get Unified Discovery Progress View
+  app.get('/api/projects/:id/discovery/progress', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectId = guard.validateProjectId(req.params.id as string);
+      const projectPath = await resolveProjectLocation(projectId);
+      const snapshot = await engine.getSnapshot(projectPath);
+      const progress = projectDiscoveryProgressProjection(snapshot);
+      res.json({
+        success: true,
+        data: { progress },
+        stateRevision: snapshot.metadata.stateRevision,
       });
     } catch (err) {
       next(err);
@@ -643,6 +1213,43 @@ export function createApp(options: ServerOptions = {}): express.Express {
     }
   });
 
+  // 16. Export Documents as Atomic ZIP
+  app.get('/api/projects/:id/documents/export-zip', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      const exportService = new DocumentExportService(storage);
+      const result = await exportService.exportZip(projectPath);
+
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodeURIComponent(req.params.id as string)}-documents.zip"`
+      );
+      res.setHeader('Content-Length', result.totalBytes);
+      res.end(result.zipBuffer);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // 17. Compare Documents Diff before regenerating
+  app.get('/api/projects/:id/documents/diff', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const projectPath = await resolveProjectLocation(req.params.id as string);
+      const snapshot = await engine.getSnapshot(projectPath);
+      const diffEngine = new DocumentDiffEngine();
+      const diffs = diffEngine.diff(snapshot);
+
+      res.json({
+        success: true,
+        data: { diffs },
+        stateRevision: snapshot.metadata.stateRevision,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // Global Error Handler & Status Code Mapping
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const isCorsError = err.message?.includes('CORS policy blocked');
@@ -689,6 +1296,7 @@ function getHttpStatus(err: any): number {
       return 409;
     case ErrorCode.READINESS_NOT_APPROVED:
     case ErrorCode.DECISION_LOCKED:
+    case ErrorCode.DECISION_STATE_INVALID:
       return 422;
     case ErrorCode.PROVIDER_TIMEOUT:
       return 504;

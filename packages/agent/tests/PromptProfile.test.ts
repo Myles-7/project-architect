@@ -25,7 +25,7 @@ describe('Prompt Profile System Unit Tests (Phase 3.5.1)', () => {
       expect(profile.taskInstruction).toBeDefined();
       expect(profile.taskInstruction.length).toBeGreaterThan(50);
       expect(profile.systemPrompt).toBeDefined();
-      expect(profile.b2Rules.length).toBeGreaterThan(0);
+      expect(profile.mandatoryRules.length).toBeGreaterThan(0);
     }
   });
 
@@ -40,7 +40,9 @@ describe('Prompt Profile System Unit Tests (Phase 3.5.1)', () => {
 
     const qProfile = await promptLoader.loadPromptProfile('question-generation');
     expect(qProfile.taskInstruction).toContain('Question Generation');
-    expect(qProfile.taskInstruction).toContain('Strict Question Budget');
+    expect(qProfile.taskInstruction).toContain('Adaptive Question Set');
+    expect(qProfile.taskInstruction).toContain('natural Simplified Chinese');
+    expect(qProfile.taskInstruction).toContain('what will actually change');
 
     const decProfile = await promptLoader.loadPromptProfile('decision-review');
     expect(decProfile.taskInstruction).toContain('Decision Review');
@@ -57,5 +59,7 @@ describe('Prompt Profile System Unit Tests (Phase 3.5.1)', () => {
     const promptText = await promptLoader.buildPromptText('question-generation');
     expect(promptText).toContain('Constitution');
     expect(promptText).toContain('Question Generation');
+    expect(promptText).toContain('Language and Readability');
+    expect(promptText).toContain('natural Simplified Chinese');
   });
 });

@@ -18,9 +18,21 @@ export interface DecisionItem {
   evidenceRefs: TypedRef[];         // Pointing to input/question/etc.
   confirmedBy?: 'user';             // Required when status is 'confirmed' or 'locked'
   supersededBy?: DecisionRef;       // Points to the new decision replacing this one
+  decisionKey?: string;             // Topic key from B3 Discovery
+  rationale?: string;               // Justification / tradeoffs
+  affectedAreas?: string[];         // Secondary areas impacted by this decision
+  sourceArea?: string;              // Preserved original area before migration/normalization
   createdAt: string;                // ISO 8601
   updatedAt: string;                // ISO 8601
 }
+
+export interface CandidateDecisionItem extends DecisionItem {
+  status: 'candidate';
+  decisionKey?: string;
+  rationale?: string;
+  affectedAreas?: string[];
+}
+
 
 export type DecisionTraceAction =
   | 'question-answered'

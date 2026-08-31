@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1787705812508",
+  "gaps": [
+    {
+      "id": "gap-ai-功能边界与三方集成-5fd0",
+      "area": "功能边界与三方集成",
+      "decisionKey": "github_integration_mode",
+      "dependsOn": [],
+      "severity": "critical",
+      "reason": "用户提出“想要复用GitHub已有项目”，但其在产品功能上的具体指向（是导入代码模板还是让 Agent 自动检索开源算法）尚未明确。",
+      "impact": "决定了系统是否需要开发模板解析器、检索增强生成（RAG）组件或联网搜索机制。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "critical",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 84,
+      "priority": "high"
+    },
+    {
+      "id": "gap-ai-技术底线与安全隔离-5fd0",
+      "area": "技术底线与安全隔离",
+      "decisionKey": "sandbox_execution_location",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "由于“纯本地运行”和“云端沙箱”的冲突，需要明确代码的实际运行载体是本地还是云端。",
+      "impact": "影响数据隐私的承诺是否成立，以及平台侧容器托管的运营成本与安全架构。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 75,
+      "priority": "high"
+    },
+    {
+      "id": "gap-ai-质量验收标准-5fd0",
+      "area": "质量验收标准",
+      "decisionKey": "paper_and_code_quality_acceptance",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "现有的验收标准仅为各 Agent 的接口协议单元测试，无法保证最终交付给用户的论文和代码具备实际竞赛价值。",
+      "impact": "决定了系统上线前如何自动化或人工验证生成的 Word 论文排版与求解代码的真实可用性。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 75,
+      "priority": "high"
+    },
+    {
+      "id": "gap-ai-界面体验与生成规范-5fd0",
+      "area": "界面体验与生成规范",
+      "decisionKey": "formula_code_notation_consistency",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "论文公式中的符号表示法与求解代码中的变量命名如果不一致，会造成极差的对照阅读体验。",
+      "impact": "影响双栏比对展示中的公式可读性，以及用户调试和修改代码的顺畅度。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-ai-本地运行环境兼容性-5fd0",
+      "area": "本地运行环境兼容性",
+      "decisionKey": "code_execution_dependency_management",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "数学建模代码依赖高度专业且多样的 Python 科学计算库，需要明确如何解决运行时环境的依赖缺失问题。",
+      "impact": "决定了系统代码求解的成功率，以及是否会因为环境缺失依赖导致生成中断。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    }
+  ],
+  "conflicts": [],
+  "tensions": [
+    {
+      "id": "tns-1787705854484-mxun",
+      "description": "完全自动化的建模体验与高准确率要求之间的张力",
+      "reason": "自动化程度越高，用户越容易一键获得结果，但大模型的幻觉以及缺乏人类干预会导致建模细节错误频发，降低结果可用性。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787705854484-zxtd",
+      "description": "本地优先（Local-First）的安全架构与开箱即用（Zero-Config）之间的张力",
+      "reason": "本地运行能最大程度保护用户的学术隐私与数据安全，但需要用户自行配置本地 Python 运行环境与 LaTeX 编译器，大幅提高了软件的使用门槛。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731134389-kmyr",
+      "description": "双栏对照展示（左公式，右代码）与一键式全自动生成（用户直接拿到最终论文与代码）的体验张力。",
+      "reason": "一键全自动生成意味着用户在生成过程中不需要关注公式和代码的生成细节，而双栏对照展示则偏向交互式协作，如何在纯自动生成场景下合理展示双栏内容是一个体验张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731134390-nzu7",
+      "description": "使用场景覆盖范围广（技术边界与用户流程首发版本覆盖更多场景）与首发版本先采用边界清晰方案的范围张力。",
+      "reason": "在首发版本中，既想覆盖更多建模比赛和题目场景，又需要保持边界清晰、全流程自动生成，这给模型泛化能力和系统鲁棒性带来了很大挑战。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731239634-8gez",
+      "description": "一键式全自动生成与多 Agent 协同的响应耗时折中",
+      "reason": "多 Agent（建模师、程序员、写作手）在进行复杂的数学建模、代码编写、安全沙箱运行以及 Word 论文排版时，整体执行链路非常长。一键式生成的等待时间可能长达数分钟，这与用户对即时反馈的体验预期存在张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731239634-ee97",
+      "description": "双栏对照展示与纯本地 Word 交付的体验对齐",
+      "reason": "系统在 UI 上提供双栏对照（左公式、右代码）以方便用户在生成过程中实时查看，但最终交付物仅为 Word 格式（.docx）。这意味着用户在界面上看到的精美交互对照排版，在导出为 Word 时需要转换为符合学术论文规范的单栏或特定排版，二者在排版表现上存在体验不对齐的张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731455588-2gr0",
+      "description": "本地隐私与用户使用门槛的矛盾",
+      "reason": "为了实现完美的本地隐私（数据不出本地），需要将代码运行在本地。但如果为了安全性引入本地 Docker 等隔离环境，会显著增加普通学生的软件安装难度和配置门槛。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731455588-894w",
+      "description": "全自动一键生成与竞赛个性化微调的冲突",
+      "reason": "定位是“一键式全自动生成”以降低使用门槛，但在实际竞赛中，不同队伍的算法选择、参数调优以及论文阐述侧重点各有不同，过度自动化可能会限制用户的自主调整空间。",
+      "status": "open"
+    }
+  ],
+  "updatedAt": "2026-08-26T08:04:58.306Z"
+}

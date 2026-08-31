@@ -6,7 +6,7 @@ import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 import type { DiscoveryResult } from '@project-architect/contracts';
 
-describe('B2.1 Golden Benchmark Regression Suite (Phase 2.5)', () => {
+describe('Discovery Safety Regression Suite', () => {
   let tempBaseDir: string;
   let stateEngine: ProjectStateEngine;
   let mockProvider: MockAIProvider;
@@ -14,7 +14,7 @@ describe('B2.1 Golden Benchmark Regression Suite (Phase 2.5)', () => {
   let storage: FileStorage;
 
   beforeEach(async () => {
-    tempBaseDir = await mkdtemp(join(tmpdir(), 'pa-b21-regression-'));
+    tempBaseDir = await mkdtemp(join(tmpdir(), 'pa-b3-regression-'));
     storage = new FileStorage();
     stateEngine = new ProjectStateEngine(storage);
     mockProvider = new MockAIProvider();
@@ -82,9 +82,11 @@ describe('B2.1 Golden Benchmark Regression Suite (Phase 2.5)', () => {
     });
 
     const s = res.snapshot;
-    // 1. Budget: Exactly 1 critical question
-    expect(s.questions.items.length).toBe(1);
+    // 1. B3 presents both independent critical decisions in the initial batch.
+    expect(s.questions.items.length).toBeGreaterThanOrEqual(2);
+    expect(s.questions.items.length).toBeLessThanOrEqual(12);
     expect(s.questions.items[0]?.importance).toBe('critical');
+    expect(new Set(s.questions.items.map((question) => question.decisionKey)).size).toBe(s.questions.items.length);
 
     // 2. Gaps: Target user and MVP scope present
     expect(s.gaps.gaps.some((g) => g.area === 'target_user')).toBe(true);
@@ -151,10 +153,12 @@ describe('B2.1 Golden Benchmark Regression Suite (Phase 2.5)', () => {
 
     const s = res.snapshot;
     // Anti-repetition: Must NOT ask about platform or mobile exclusion
-    const questionText = s.questions.items[0]?.question || '';
+    const generatedQuestion = s.questions.items.find((question) => question.status === 'proposed');
+    const questionText = generatedQuestion?.question || '';
     expect(questionText).not.toContain('移动端');
     expect(questionText).not.toContain('Web');
-    expect(questionText).toContain('user_flows');
+    expect(questionText).toMatch(/[\u3400-\u9fff]/u);
+    expect(generatedQuestion?.decisionKey).toContain('user_flows');
   });
 
   it('Case-05: Strict Offline vs Sync Conflict — Precision hard conflict without false positives', async () => {
@@ -312,8 +316,8 @@ describe('B2.1 Golden Benchmark Regression Suite (Phase 2.5)', () => {
 
     const s = res.snapshot;
     // High-priority question is on Trust & Safety
-    expect(s.questions.items[0]?.importance).toBe('critical');
-    expect(s.questions.items[0]?.question).toContain('trust_safety');
+    const trustQuestion = s.questions.items.find((question) => question.question.includes('trust_safety'));
+    expect(trustQuestion?.importance).toBe('critical');
 
     // Zero premature crypto implementation leaks (no specific ciphers/iterations)
     const text = JSON.stringify(s);

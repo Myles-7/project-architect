@@ -29,8 +29,19 @@ import {
   type AddInputResponse,
   type RunDiscoveryTurnRequest,
   type RunDiscoveryTurnResponse,
+  type DiscoveryJobView,
+  type ScheduleDiscoveryJobRequest,
+  type ScheduleDiscoveryJobResponse,
+  type CancelDiscoveryJobRequest,
+  type CancelDiscoveryJobResponse,
+  type RecordDiscoveryInputRequest,
+  type RecordDiscoveryInputResponse,
+  type GetDiscoveryTurnsResponse,
+  type GetDiscoveryProgressResponse,
   type AnswerQuestionRequest,
   type AnswerQuestionResponse,
+  type DismissQuestionsRequest,
+  type DismissQuestionsResponse,
   type ConfirmDecisionRequest,
   type LockDecisionRequest,
   type UnlockDecisionRequest,
@@ -43,6 +54,16 @@ import {
   type GenerateDocumentsResponse,
   type ReadDocumentRequest,
   type ReadDocumentResponse,
+  type RenameProjectResponse,
+  type DuplicateProjectResponse,
+  type ToggleProjectArchiveResponse,
+  type ToggleProjectPinResponse,
+  type DeleteProjectResponse,
+  type RestoreProjectResponse,
+  type PurgeProjectResponse,
+  type OpenProjectFolderResponse,
+  type ProviderHealthResponse,
+  type ToggleInputExclusionResponse,
 } from '@project-architect/contracts';
 
 export class ApiClientError extends Error {
@@ -277,6 +298,81 @@ export class ProjectArchitectApiClient {
     return res.data;
   }
 
+  public async scheduleDiscoveryJob(
+    projectId: string,
+    req: ScheduleDiscoveryJobRequest,
+    signal?: AbortSignal
+  ): Promise<ScheduleDiscoveryJobResponse> {
+    const res = await this.request<ScheduleDiscoveryJobResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/discovery/jobs`,
+      { method: 'POST', body: JSON.stringify(req) },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getCurrentDiscoveryJob(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<DiscoveryJobView> {
+    const res = await this.request<{ job: DiscoveryJobView }>(
+      `/api/projects/${encodeURIComponent(projectId)}/discovery/jobs/current`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data.job;
+  }
+
+  public async cancelDiscoveryJob(
+    projectId: string,
+    req: CancelDiscoveryJobRequest,
+    signal?: AbortSignal
+  ): Promise<CancelDiscoveryJobResponse> {
+    const res = await this.request<CancelDiscoveryJobResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/discovery/jobs/cancel`,
+      { method: 'POST', body: JSON.stringify(req) },
+      signal
+    );
+    return res.data;
+  }
+
+  public async recordDiscoveryInput(
+    projectId: string,
+    req: RecordDiscoveryInputRequest,
+    signal?: AbortSignal
+  ): Promise<RecordDiscoveryInputResponse> {
+    const res = await this.request<RecordDiscoveryInputResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/discovery/inputs`,
+      { method: 'POST', body: JSON.stringify(req) },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getDiscoveryTurns(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<GetDiscoveryTurnsResponse> {
+    const res = await this.request<GetDiscoveryTurnsResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/discovery/turns`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getDiscoveryProgress(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<GetDiscoveryProgressResponse> {
+    const res = await this.request<GetDiscoveryProgressResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/discovery/progress`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
   // ==========================================================================
   // 4. Questions & Decision Governance Mutations
   // ==========================================================================
@@ -292,6 +388,35 @@ export class ProjectArchitectApiClient {
         method: 'POST',
         body: JSON.stringify(req),
       },
+      signal
+    );
+    return res.data;
+  }
+
+  public async answerQuestionAsAssumption(
+    projectId: string,
+    req: import('@project-architect/contracts').AnswerQuestionAsAssumptionRequest,
+    signal?: AbortSignal
+  ): Promise<import('@project-architect/contracts').AnswerQuestionAsAssumptionResponse> {
+    const res = await this.request<import('@project-architect/contracts').AnswerQuestionAsAssumptionResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/questions/answer-assumption`,
+      {
+        method: 'POST',
+        body: JSON.stringify(req),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async dismissQuestions(
+    projectId: string,
+    req: DismissQuestionsRequest,
+    signal?: AbortSignal
+  ): Promise<DismissQuestionsResponse> {
+    const res = await this.request<DismissQuestionsResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/questions/dismiss`,
+      { method: 'POST', body: JSON.stringify(req) },
       signal
     );
     return res.data;
@@ -423,6 +548,127 @@ export class ProjectArchitectApiClient {
       {
         method: 'POST',
         body: JSON.stringify(req),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  // Project Management Lifecycle
+  public async renameProject(
+    projectId: string,
+    name: string,
+    expectedRevision?: number,
+    signal?: AbortSignal
+  ): Promise<RecentProjectItem> {
+    const res = await this.request<RenameProjectResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/rename`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ name, expectedRevision }),
+      },
+      signal
+    );
+    return res.data.project;
+  }
+
+  public async duplicateProject(
+    projectId: string,
+    newName?: string,
+    signal?: AbortSignal
+  ): Promise<RecentProjectItem> {
+    const res = await this.request<DuplicateProjectResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/duplicate`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ newName }),
+      },
+      signal
+    );
+    return res.data.project;
+  }
+
+  public async archiveProject(projectId: string, signal?: AbortSignal): Promise<boolean> {
+    const res = await this.request<ToggleProjectArchiveResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/archive`,
+      { method: 'POST' },
+      signal
+    );
+    return res.data.isArchived;
+  }
+
+  public async pinProject(projectId: string, signal?: AbortSignal): Promise<boolean> {
+    const res = await this.request<ToggleProjectPinResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/pin`,
+      { method: 'POST' },
+      signal
+    );
+    return res.data.isPinned;
+  }
+
+  public async deleteProject(projectId: string, signal?: AbortSignal): Promise<boolean> {
+    const res = await this.request<DeleteProjectResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}`,
+      { method: 'DELETE' },
+      signal
+    );
+    return res.data.deleted;
+  }
+
+  public async restoreProject(
+    projectId: string,
+    targetPath?: string,
+    signal?: AbortSignal
+  ): Promise<RecentProjectItem> {
+    const res = await this.request<RestoreProjectResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/restore`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ targetPath }),
+      },
+      signal
+    );
+    return res.data.project;
+  }
+
+  public async purgeProject(projectId: string, signal?: AbortSignal): Promise<boolean> {
+    const res = await this.request<PurgeProjectResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/purge`,
+      { method: 'DELETE' },
+      signal
+    );
+    return res.data.purged;
+  }
+
+  public async openProjectFolder(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<OpenProjectFolderResponse> {
+    const res = await this.request<OpenProjectFolderResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/open-folder`,
+      { method: 'POST' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getProviderHealth(signal?: AbortSignal): Promise<ProviderHealthResponse> {
+    const res = await this.request<ProviderHealthResponse>('/api/provider/health', undefined, signal);
+    return res.data;
+  }
+
+  public async toggleInputExclusion(
+    projectId: string,
+    inputId: string,
+    exclude?: boolean,
+    expectedRevision?: number,
+    signal?: AbortSignal
+  ): Promise<ToggleInputExclusionResponse> {
+    const res = await this.request<ToggleInputExclusionResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/inputs/${encodeURIComponent(inputId)}/toggle`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ exclude, expectedRevision }),
       },
       signal
     );

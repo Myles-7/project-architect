@@ -12,7 +12,9 @@ import {
 import { useProjectSession } from '../../state/ProjectSessionContext.js';
 import { ThemeToggle } from '../common/ThemeToggle.js';
 import { StageBadge } from '../common/StatusBadge.js';
+import { TopNavDiscoveryPill } from './TopNavDiscoveryPill.js';
 import type { WorkspaceTab } from '../../types/session.js';
+
 
 interface TopNavProps {
   onNavigateHome: () => void;
@@ -47,9 +49,9 @@ export const TopNav: React.FC<TopNavProps> = ({ onNavigateHome }) => {
       <div className="flex items-center gap-2 text-xs min-w-0">
         <button
           onClick={toggleLeftSidebar}
-          className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer min-touch-target flex items-center justify-center"
           title={uiState.isLeftSidebarCollapsed ? '展开导航栏' : '折叠导航栏'}
-          aria-label="切换侧边栏"
+          aria-label={uiState.isLeftSidebarCollapsed ? '展开主导航栏' : '折叠主导航栏'}
         >
           {uiState.isLeftSidebarCollapsed ? (
             <PanelLeftOpen className="w-4 h-4" />
@@ -60,8 +62,9 @@ export const TopNav: React.FC<TopNavProps> = ({ onNavigateHome }) => {
 
         <button
           onClick={onNavigateHome}
-          className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors p-1 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+          className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors p-1.5 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer min-touch-target"
           title="返回项目首页"
+          aria-label="返回项目首页"
         >
           <Home className="w-3.5 h-3.5" />
           <span className="hidden sm:inline font-medium">首页</span>
@@ -94,8 +97,11 @@ export const TopNav: React.FC<TopNavProps> = ({ onNavigateHome }) => {
 
       {/* Right: Actions & Overview Toggle */}
       <div className="flex items-center gap-2">
+        <TopNavDiscoveryPill />
+
         {/* Readiness Quick Access Button */}
         <button
+
           onClick={() => setActiveTab('readiness')}
           className={`hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer border ${
             uiState.activeTab === 'readiness'
@@ -129,13 +135,13 @@ export const TopNav: React.FC<TopNavProps> = ({ onNavigateHome }) => {
         {/* Right Overview Drawer Toggle */}
         <button
           onClick={toggleOverview}
-          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+          className={`p-1.5 rounded-lg transition-colors cursor-pointer min-touch-target flex items-center justify-center ${
             !uiState.isOverviewCollapsed
               ? 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
               : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800'
           }`}
-          title={uiState.isOverviewCollapsed ? '展开 Overview 看板' : '折叠 Overview 看板'}
-          aria-label="切换 Overview 看板"
+          title={uiState.isOverviewCollapsed ? '展开项目全景概览' : '折叠项目全景概览'}
+          aria-label={uiState.isOverviewCollapsed ? '展开项目全景概览' : '折叠项目全景概览'}
         >
           {uiState.isOverviewCollapsed ? (
             <PanelRightOpen className="w-4 h-4" />

@@ -12,29 +12,52 @@ import type {
   ProjectSessionAction,
   ThemeMode,
   WorkspaceTab,
+  HighlightTarget,
 } from '../types/session.js';
 import {
   initialProjectSessionState,
   projectSessionReducer,
 } from './projectSessionReducer.js';
-import type { ProjectSnapshot } from '@project-architect/contracts';
+import type { ProjectSnapshot, DiscoveryJobView, InitialProjectIntent } from '@project-architect/contracts';
 import {
   ProjectArchitectApiClient,
   defaultApiClient,
   ApiClientError,
 } from '../api/client.js';
+import type { DiscoveryResult } from '@project-architect/contracts';
 
-interface ProjectSessionContextValue {
+export interface ProjectSessionContextValue {
   state: ProjectSessionState;
   dispatch: React.Dispatch<ProjectSessionAction>;
   apiClient: ProjectArchitectApiClient;
   // High-level session actions
   loadProject: (projectId: string) => Promise<ProjectSnapshot>;
-  createProject: (name: string, idea: string, projectTags?: string[]) => Promise<{ projectId: string; snapshot: ProjectSnapshot }>;
+  createProject: (
+    name: string,
+    idea?: string,
+    projectTags?: string[],
+    initialIntent?: InitialProjectIntent
+  ) => Promise<{ projectId: string; snapshot: ProjectSnapshot }>;
   openProject: (projectId: string) => Promise<ProjectSnapshot>;
   refreshSnapshot: () => Promise<ProjectSnapshot | null>;
   runInitialDiscovery: (projectId?: string) => Promise<void>;
+  setLatestDiscovery: (
+    discoveryResult: DiscoveryResult,
+    diagnostics?: { durationMs?: number; totalTokens?: number | 'unavailable' },
+    timestamp?: string
+  ) => void;
+  scheduleDiscoveryJob: (expectedRevision?: number, userMessage?: string, turnId?: string) => Promise<DiscoveryJobView>;
+  cancelDiscoveryJob: () => Promise<DiscoveryJobView | null>;
+  fetchDiscoveryJob: () => Promise<DiscoveryJobView | null>;
+  answerQuestionAsAssumption: (
+    questionRef: import('@project-architect/contracts').QuestionRef,
+    assumptionStatement: string,
+    rationale?: string
+  ) => Promise<number>;
   clearSession: () => void;
+  // Navigation & Linking
+  setHighlightTarget: (target: HighlightTarget | null) => void;
+  jumpToFix: (target: { tab: WorkspaceTab; sectionId?: string; itemRef?: string; questionId?: string }) => void;
   // UI preferences
   setTheme: (theme: ThemeMode) => void;
   setActiveTab: (tab: WorkspaceTab) => void;
@@ -135,8 +158,9 @@ export function ProjectSessionProvider({
   const createProject = useCallback(
     async (
       name: string,
-      idea: string,
-      projectTags?: string[]
+      idea?: string,
+      projectTags?: string[],
+      initialIntent?: InitialProjectIntent
     ): Promise<{ projectId: string; snapshot: ProjectSnapshot }> => {
       cancelActiveRequest();
       const controller = new AbortController();
@@ -144,7 +168,7 @@ export function ProjectSessionProvider({
 
       dispatch({ type: 'SET_REQUEST_STATE', payload: { status: 'loading', error: null, lastAction: 'create_project' } });
       try {
-        const res = await apiClient.createProject({ name, idea, projectTags }, controller.signal);
+        const res = await apiClient.createProject({ name, idea, initialIntent, projectTags }, controller.signal);
         dispatch({
           type: 'SET_ACTIVE_PROJECT',
           payload: { projectId: res.projectId, snapshot: res.snapshot },
@@ -164,6 +188,75 @@ export function ProjectSessionProvider({
     [apiClient, cancelActiveRequest]
   );
 
+  const fetchDiscoveryJob = useCallback(async (): Promise<DiscoveryJobView | null> => {
+    if (!state.activeProjectId) {
+      dispatch({ type: 'SET_DISCOVERY_JOB', payload: null });
+      return null;
+    }
+    try {
+      const job = await apiClient.getCurrentDiscoveryJob(state.activeProjectId);
+      dispatch({ type: 'SET_DISCOVERY_JOB', payload: job });
+      return job;
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.error('Failed to poll discovery job status:', err);
+      }
+      return null;
+    }
+  }, [apiClient, state.activeProjectId]);
+
+  const scheduleDiscoveryJob = useCallback(
+    async (expectedRevision?: number, userMessage?: string, turnId?: string): Promise<DiscoveryJobView> => {
+      if (!state.activeProjectId) throw new Error('No active project');
+      const rev = expectedRevision ?? state.stateRevision ?? 1;
+      const res = await apiClient.scheduleDiscoveryJob(state.activeProjectId, {
+        projectId: state.activeProjectId,
+        expectedRevision: rev,
+        userMessage,
+        turnId,
+      });
+      dispatch({ type: 'SET_DISCOVERY_JOB', payload: res.job });
+      return res.job;
+    },
+    [apiClient, state.activeProjectId, state.stateRevision]
+  );
+
+  const answerQuestionAsAssumption = useCallback(
+    async (
+      questionRef: import('@project-architect/contracts').QuestionRef,
+      assumptionStatement: string,
+      rationale?: string
+    ): Promise<number> => {
+      if (!state.activeProjectId) throw new Error('No active project');
+      const rev = state.stateRevision ?? 1;
+      const res = await apiClient.answerQuestionAsAssumption(state.activeProjectId, {
+        projectId: state.activeProjectId,
+        questionRef,
+        assumptionStatement,
+        rationale,
+        expectedRevision: rev,
+      });
+      dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot: res.snapshot } });
+      return res.snapshot.metadata.stateRevision;
+    },
+    [apiClient, state.activeProjectId, state.stateRevision]
+  );
+
+  const cancelDiscoveryJob = useCallback(async (): Promise<DiscoveryJobView | null> => {
+    if (!state.activeProjectId) return null;
+    try {
+      const res = await apiClient.cancelDiscoveryJob(state.activeProjectId, {
+        projectId: state.activeProjectId,
+      });
+      dispatch({ type: 'SET_DISCOVERY_JOB', payload: res.job });
+      return res.job;
+    } catch (err) {
+      console.error('Failed to cancel discovery job:', err);
+      return null;
+    }
+  }, [apiClient, state.activeProjectId]);
+
+
   const refreshSnapshot = useCallback(async (): Promise<ProjectSnapshot | null> => {
     if (!state.activeProjectId) return null;
     const controller = new AbortController();
@@ -179,6 +272,72 @@ export function ProjectSessionProvider({
     }
   }, [apiClient, state.activeProjectId]);
 
+  // Global polling for active background discovery jobs
+  useEffect(() => {
+    if (!state.activeProjectId) return;
+    void fetchDiscoveryJob();
+  }, [state.activeProjectId, fetchDiscoveryJob]);
+
+  useEffect(() => {
+    const status = state.discoveryJob?.status;
+    if (!status || !['queued', 'running'].includes(status)) return;
+
+    const timer = window.setInterval(async () => {
+      const job = await fetchDiscoveryJob();
+      if (job && !['queued', 'running'].includes(job.status)) {
+        await refreshSnapshot();
+      }
+    }, 1500);
+
+    return () => window.clearInterval(timer);
+  }, [state.discoveryJob?.status, fetchDiscoveryJob, refreshSnapshot]);
+
+  const setHighlightTarget = useCallback((target: HighlightTarget | null) => {
+    dispatch({ type: 'SET_HIGHLIGHT_TARGET', payload: target });
+  }, []);
+
+  const jumpToFix = useCallback(
+    (target: { tab: WorkspaceTab; sectionId?: string; itemRef?: string; questionId?: string }) => {
+      dispatch({ type: 'SET_ACTIVE_TAB', payload: target.tab });
+      if (target.sectionId || target.itemRef || target.questionId) {
+        // Ensure overview drawer is open if jumping to overview
+        if (target.tab === 'chat' && (target.sectionId || target.itemRef)) {
+          if (state.uiState.isOverviewCollapsed) {
+            dispatch({ type: 'TOGGLE_OVERVIEW' });
+          }
+        }
+        dispatch({
+          type: 'SET_HIGHLIGHT_TARGET',
+          payload: {
+            sectionId: target.sectionId,
+            itemRef: target.itemRef,
+            questionId: target.questionId,
+            timestamp: Date.now(),
+          },
+        });
+      }
+    },
+    [state.uiState.isOverviewCollapsed]
+  );
+
+  const setLatestDiscovery = useCallback(
+    (
+      discoveryResult: DiscoveryResult,
+      diagnostics?: { durationMs?: number; totalTokens?: number | 'unavailable' },
+      timestamp?: string
+    ) => {
+      dispatch({
+        type: 'SET_LATEST_DISCOVERY',
+        payload: {
+          discoveryResult,
+          diagnostics,
+          timestamp: timestamp || new Date().toLocaleTimeString(),
+        },
+      });
+    },
+    []
+  );
+
   const runInitialDiscovery = useCallback(
     async (projectIdOverride?: string): Promise<void> => {
       const targetId = projectIdOverride || state.activeProjectId;
@@ -191,16 +350,20 @@ export function ProjectSessionProvider({
       });
 
       try {
-        // Single provider call for initial broad-pass discovery
         const res = await apiClient.runDiscoveryTurn(targetId, {
           projectId: targetId,
           expectedRevision: currentRev,
         });
-
-        // Update with updated canonical snapshot
         dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot: res.snapshot } });
+        dispatch({
+          type: 'SET_LATEST_DISCOVERY',
+          payload: {
+            discoveryResult: res.discoveryResult,
+            diagnostics: res.diagnostics,
+            timestamp: new Date().toLocaleTimeString(),
+          },
+        });
       } catch (err: any) {
-        // Project remains preserved on failure, inform user cleanly
         const msg =
           err instanceof ApiClientError
             ? `项目已创建，首次分析失败 (${err.message})，可点击重试。`
@@ -242,6 +405,13 @@ export function ProjectSessionProvider({
         openProject,
         refreshSnapshot,
         runInitialDiscovery,
+        setLatestDiscovery,
+        scheduleDiscoveryJob,
+        cancelDiscoveryJob,
+        fetchDiscoveryJob,
+        answerQuestionAsAssumption,
+        setHighlightTarget,
+        jumpToFix,
         clearSession,
         setTheme,
         setActiveTab,

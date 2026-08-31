@@ -66,7 +66,7 @@ describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Proj
     await stateEngine.addDecision(
       projectPath,
       'mvp_scope',
-      'Core State Engine, Discovery Intelligence, B2.1 Constitution, Document Compiler',
+      'Core State Engine, Discovery Intelligence, B3 Constitution, Document Compiler',
       s2.metadata.stateRevision,
       'locked'
     );
@@ -91,8 +91,8 @@ describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Proj
     const compileResult = await orchestrator.compileDocuments(projectPath);
 
     expect(compileResult.readiness.ready).toBe(true);
-    // Includes 7 core + AI_SPEC.md + SECURITY.md = 9 documents
-    expect(compileResult.manifest.items.length).toBe(9);
+    // Includes 8 core + AI_SPEC.md + DESKTOP_SPEC.md + SECURITY_SPEC.md = 11 documents
+    expect(compileResult.manifest.items.length).toBe(11);
 
     // Verify all files on disk
     expect(await storage.exists(join(projectPath, 'AGENTS.md'))).toBe(true);
@@ -100,10 +100,12 @@ describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Proj
     expect(await storage.exists(join(projectPath, 'docs', 'PRODUCT.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'USER_FLOWS.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'UX_UI_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'DEVELOPMENT_PLAN.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'ACCEPTANCE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'AI_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'SECURITY.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'SECURITY_SPEC.md'))).toBe(true);
 
     // Verify AGENTS.md locked decisions
     const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));

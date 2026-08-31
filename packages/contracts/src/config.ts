@@ -32,14 +32,27 @@ export interface AppRuntimeConfig {
   };
 }
 
+/**
+ * Shared contracts are consumed by both Node.js services and the browser UI.
+ * Read Node environment variables through `globalThis` so importing this module
+ * never assumes that the browser exposes a `process` global.
+ */
+function readRuntimeEnv(name: string): string | undefined {
+  const runtime = globalThis as typeof globalThis & {
+    process?: { env?: Record<string, string | undefined> };
+  };
+
+  return runtime.process?.env?.[name];
+}
+
 export const DEFAULT_RUNTIME_CONFIG: AppRuntimeConfig = {
   workspace: {
-    workspaceRoot: process.env.PA_WORKSPACE_DIR || '.workspace',
+    workspaceRoot: readRuntimeEnv('PA_WORKSPACE_DIR') || '.workspace',
     projectsSubdir: 'projects',
   },
   provider: {
-    cliExecutable: process.env.AGY_CLI || 'agy.exe',
-    timeoutMs: Number(process.env.PA_TIMEOUT_MS) || 90_000,
+    cliExecutable: readRuntimeEnv('AGY_CLI') || 'agy.exe',
+    timeoutMs: Number(readRuntimeEnv('PA_TIMEOUT_MS')) || 90_000,
     warningDurationMs: 45_000,
     maxBufferBytes: 10 * 1024 * 1024,
   },

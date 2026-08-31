@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { access } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { createApp } from '../src/server.js';
+import { createApp, resolveRepositoryRoot } from '../src/server.js';
 import { FileStorage, ProjectStateEngine, WorkspaceGuard } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 
@@ -13,6 +15,18 @@ describe('Server Security & Hardening Tests (Phase 4.8.1)', () => {
   let engine: ProjectStateEngine;
   let orchestrator: AIOrchestrator;
   const storage = new FileStorage();
+
+  it('resolves active B3 agent assets from the repository root when the server runs from apps/server', async () => {
+    const repositoryRoot = resolveRepositoryRoot(resolve(process.cwd(), 'apps', 'server', 'dist'));
+
+    expect(repositoryRoot).toBe(process.cwd());
+    await expect(
+      access(
+        resolve(repositoryRoot, 'experiments', 'agent-benchmark', 'schemas', 'b3-discovery.schema.json'),
+        constants.R_OK
+      )
+    ).resolves.toBeUndefined();
+  });
 
   beforeEach(() => {
     testProjectDir = join(tmpdir(), `pa-sec-test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`);

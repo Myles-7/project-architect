@@ -173,4 +173,31 @@ describe('Context Profiles Unit Tests (Phase 3.2)', () => {
     expect(ctxQ).not.toBe(ctxDec);
     expect(ctxDec).not.toBe(ctxRead);
   });
+
+  it('7. Question refinement keeps the linked gap and locked bounds within its focused 12k budget', () => {
+    const snapshot = createBaseSnapshot();
+    snapshot.questions.items.push({
+      id: 'q-focus', issueRef: 'gap:gap-01', importance: 'high', question: 'Which language scope?',
+      reason: 'Defines MVP.', recommendation: 'TypeScript only', recommendationReason: 'Fastest MVP.',
+      options: [], allowFreeInput: true, status: 'shown', createdAt: '',
+    });
+    snapshot.decisions.items.push({
+      id: 'dec-locked', area: 'mvp_scope', statement: 'Local-only deployment is non-negotiable',
+      status: 'locked', origin: 'user', evidenceRefs: [], confirmedBy: 'user', createdAt: '', updatedAt: '',
+    });
+    for (let index = 0; index < 20; index++) {
+      snapshot.decisions.items.push({
+        id: `dec-long-${index}`, area: 'secondary', statement: `Unrelated decision ${index}: ${'detail '.repeat(1_000)}`,
+        status: 'confirmed', origin: 'user', evidenceRefs: [], confirmedBy: 'user', createdAt: '', updatedAt: '',
+      });
+    }
+
+    const ctx = contextManager.buildContextForMode('question-generation', snapshot, {
+      questionAnswer: { questionRef: 'question:q-focus', selectedOption: 'TypeScript only' },
+    });
+
+    expect(ctx.length).toBeLessThanOrEqual(12_000);
+    expect(ctx).toContain('MVP does not define supported languages');
+    expect(ctx).toContain('Local-only deployment is non-negotiable');
+  });
 });

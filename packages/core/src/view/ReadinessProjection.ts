@@ -1,11 +1,14 @@
 import { ReadinessGate } from '../readiness/ReadinessGate.js';
-import type {
-  ProjectSnapshot,
-  ReadinessView,
-  ReadinessAreaView,
-  ReadinessIssueView,
-  DecisionRef,
-  GapRef,
+import { ReadinessActionPolicy } from '../readiness/ReadinessActionPolicy.js';
+import { AreaRegistry } from '../areas/AreaRegistry.js';
+import {
+  CANONICAL_B3_AREAS,
+  type ProjectSnapshot,
+  type ReadinessView,
+  type ReadinessAreaView,
+  type ReadinessIssueView,
+  type DecisionRef,
+  type GapRef,
 } from '@project-architect/contracts';
 
 /**
@@ -23,28 +26,26 @@ export function readinessProjection(snapshot: ProjectSnapshot): ReadinessView {
   const openConflicts = (snapshot.gaps?.conflicts || []).filter((c) => c.status === 'open');
   const assumptions = (snapshot.assumptions?.items || []).filter((a) => a.status === 'active');
 
-  const requiredAreas = currentReadiness?.requiredAreas || [
-    'project_overview',
-    'target_user',
-    'mvp_scope',
-    'technical_boundary',
-  ];
+  const requiredAreas = currentReadiness?.requiredAreas && currentReadiness.requiredAreas.length > 0
+    ? currentReadiness.requiredAreas
+    : [...CANONICAL_B3_AREAS];
 
   const ackConflicts = currentReadiness?.criticalConflictAcknowledgements || [];
   const ackIssues = currentReadiness?.knownIssueAcknowledgements || [];
 
   // 1. Derive Readiness Areas
   const areas: ReadinessAreaView[] = requiredAreas.map((areaId) => {
+    const canonicalArea = AreaRegistry.normalize(areaId);
     const matchedDecision = decisions.find(
-      (d) => (d.area === areaId || d.id === areaId) && (d.status === 'confirmed' || d.status === 'locked')
+      (d) => (AreaRegistry.normalize(d.area) === canonicalArea || d.id === areaId) && (d.status === 'confirmed' || d.status === 'locked')
     );
-    const blockingGaps = openGaps.filter((g) => g.area === areaId).map((g) => `gap:${g.id}` as GapRef);
+    const blockingGaps = openGaps.filter((g) => AreaRegistry.normalize(g.area) === canonicalArea).map((g) => `gap:${g.id}` as GapRef);
 
     const isSatisfied = Boolean(matchedDecision) && blockingGaps.length === 0;
 
     return {
       areaId,
-      title: formatAreaTitle(areaId),
+      title: AreaRegistry.getReadinessTitle(areaId),
       isSatisfied,
       decisionRef: matchedDecision ? (`decision:${matchedDecision.id}` as DecisionRef) : undefined,
       blockingGapRefs: blockingGaps,
@@ -76,7 +77,7 @@ export function readinessProjection(snapshot: ProjectSnapshot): ReadinessView {
       blockingIssues.push({
         id: `gap:${g.id}`,
         severity: g.severity === 'critical' ? 'critical' : 'high',
-        message: `Gap in ${formatAreaTitle(g.area)}: ${g.reason || g.impact || 'Unresolved dependency'}`,
+        message: `Gap in ${AreaRegistry.getReadinessTitle(g.area)}: ${g.reason || g.impact || 'Unresolved dependency'}`,
         targetRef: `gap:${g.id}`,
         isAcknowledged: isAck,
       });
@@ -89,7 +90,9 @@ export function readinessProjection(snapshot: ProjectSnapshot): ReadinessView {
   const hasUnackCritical = blockingIssues.some((i) => i.severity === 'critical' && !i.isAcknowledged);
 
   let level: 1 | 2 | 3 | 4 | 5 = 1;
-  let score = Math.round(areaRatio * 60 + (hasUnackCritical ? 0 : 30) + (assumptions.length > 0 ? 10 : 0));
+  // Active assumptions are unverified risks and do not award arbitrary bonuses
+  const assumptionPenalty = Math.min(10, Math.floor(assumptions.length * 1.5));
+  let score = Math.round(areaRatio * 60 + (hasUnackCritical ? 0 : 40) - assumptionPenalty);
   score = Math.max(10, Math.min(100, score));
 
   if (score >= 90 && !hasUnackCritical && areaRatio === 1) {
@@ -117,15 +120,46 @@ export function readinessProjection(snapshot: ProjectSnapshot): ReadinessView {
     warnings.push(`${assumptions.length} active assumption(s) currently apply.`);
   }
 
+  const currentRevision = snapshot.metadata.stateRevision;
+  const basisRevision = currentReadiness?.basisRevision ?? currentRevision;
+  const isStale = Boolean(currentReadiness && currentRevision > basisRevision + 1);
+
+  const coverage = {
+    total: areas.length,
+    satisfied: satisfiedCount,
+    ratio: areaRatio,
+  };
+
+  // Credibility calculation (0 - 100):
+  // Coverage measures completeness; Credibility measures trustworthiness.
+  // Assumptions strictly penalize or maintain, NEVER award positive points.
+  let credibility = 100;
+  credibility -= openConflicts.filter((c) => c.severity === 'critical').length * 30;
+  credibility -= openGaps.filter((g) => g.severity === 'critical').length * 20;
+  credibility -= openGaps.filter((g) => g.severity === 'high').length * 10;
+  credibility -= assumptions.length * 5;
+  credibility -= Math.round((1 - areaRatio) * 40);
+  const credibilityScore = Math.max(0, Math.min(100, credibility));
+
+  const actions = ReadinessActionPolicy.evaluateActions(snapshot);
+
   return {
-    sourceStateRevision: snapshot.metadata.stateRevision,
+    basisRevision,
+    currentRevision,
+    isStale,
+    coverage,
+    credibilityScore,
+    areas,
+    actions,
+
+    // Compatibility fields
+    sourceStateRevision: currentRevision,
     projectId: snapshot.metadata.projectId,
     level,
     score,
     status,
     isReadyForDocs,
     userDisposition,
-    areas,
     blockingIssues,
     warnings,
     activeAssumptions: assumptions.map((a) => ({
@@ -135,23 +169,4 @@ export function readinessProjection(snapshot: ProjectSnapshot): ReadinessView {
     })),
     canGenerateDocs,
   };
-}
-
-function formatAreaTitle(areaId: string): string {
-  switch (areaId) {
-    case 'project_overview':
-    case 'vision':
-      return 'Project Vision & Overview';
-    case 'target_user':
-    case 'user':
-      return 'Target User Persona';
-    case 'mvp_scope':
-    case 'scope':
-      return 'MVP Functional Scope';
-    case 'technical_boundary':
-    case 'constraints':
-      return 'Platform & Technical Boundary';
-    default:
-      return areaId.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  }
 }

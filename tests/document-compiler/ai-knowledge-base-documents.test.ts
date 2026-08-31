@@ -91,11 +91,13 @@ describe('Document Compiler E2E — AI Knowledge Base (Medium Dynamic Project)',
     const compileResult = await orchestrator.compileDocuments(projectPath);
 
     expect(compileResult.readiness.ready).toBe(true);
-    expect(compileResult.manifest.items.length).toBe(8); // 7 core + AI_SPEC.md
+    expect(compileResult.manifest.items.length).toBe(10); // 8 core + AI_SPEC.md + DESKTOP_SPEC.md
 
-    // Verify AI_SPEC.md is generated
-    expect(await storage.exists(join(projectPath, 'docs', 'AI_SPEC.md'))).toBe(true);
-    const aiSpecContent = await storage.readText(join(projectPath, 'docs', 'AI_SPEC.md'));
+    // Verify TECHNICAL_GUIDE.md and specs/AI_SPEC.md are generated
+    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
+    const aiSpecContent = await storage.readText(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'));
     expect(aiSpecContent).toContain('AI & Intelligence Specification');
 
     // Verify AGENTS.md locked decisions

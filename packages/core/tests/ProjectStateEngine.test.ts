@@ -93,7 +93,7 @@ describe('ProjectStateEngine Core Tests', () => {
     const snapAfterAsmConfirm = await engine.confirmDecision(testProjectDir, `assumption:${asm!.id}`, 3);
     expect(snapAfterAsmConfirm.metadata.stateRevision).toBe(4);
     const convertedAsm = snapAfterAsmConfirm.assumptions.items.find((a) => a.id === asm!.id);
-    expect(convertedAsm?.status).toBe('converted');
+    expect(['converted', 'resolved']).toContain(convertedAsm?.status);
     const newDec = snapAfterAsmConfirm.decisions.items.find((d) => d.statement.includes('100 entries'));
     expect(newDec?.status).toBe('confirmed');
     expect(newDec?.confirmedBy).toBe('user');
@@ -147,5 +147,25 @@ describe('ProjectStateEngine Core Tests', () => {
     await expect(
       engine.confirmDecision(testProjectDir, 'decision:dec-01', 99)
     ).rejects.toThrow('State revision conflict');
+  });
+
+  it('dismisses several B3 questions atomically without creating decisions', async () => {
+    await engine.createProject({ name: 'B3', idea: 'A vague idea', projectPath: testProjectDir });
+    const gap = { id: 'gap-b3', area: 'mvp_scope', decisionKey: 'mvp_scope:first_release', dependsOn: [], severity: 'high' as const, reason: 'scope', impact: 'delivery', shouldAskUser: true, status: 'open' as const };
+    const question = (id: string, key: string) => ({
+      id, issueRef: 'gap:gap-b3' as const, importance: 'high' as const, question: key,
+      reason: 'now', recommendation: 'small', recommendationReason: 'focus', options: [],
+      allowFreeInput: true as const, status: 'proposed' as const, createdAt: '', decisionKey: key,
+      dependsOn: [], batchId: 'batch-1', batchStage: 'initial' as const, basisRevision: 1,
+    });
+    const discovered = await engine.applyDiscoveryTurn(testProjectDir, {
+      confirmed: [], candidates: [], assumptions: [], unknowns: [], risks: [], conflicts: [], tensions: [], gaps: [], questions: [],
+    }, 1, { prioritizedGaps: [gap], questions: [question('q-1', 'key-1'), question('q-2', 'key-2')] });
+
+    const beforeDecisions = discovered.decisions.items.length;
+    const dismissed = await engine.dismissQuestions(testProjectDir, ['question:q-1', 'question:q-2'], 2);
+    expect(dismissed.metadata.stateRevision).toBe(3);
+    expect(dismissed.questions.items.filter((item) => item.status === 'dismissed')).toHaveLength(2);
+    expect(dismissed.decisions.items).toHaveLength(beforeDecisions);
   });
 });

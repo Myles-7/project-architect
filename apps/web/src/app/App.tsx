@@ -1,4 +1,5 @@
 import React from 'react';
+import type { InitialProjectIntent } from '@project-architect/contracts';
 import { useProjectSession } from '../state/ProjectSessionContext.js';
 import { HomeView } from './HomeView.js';
 import { AppShell } from './AppShell.js';
@@ -7,6 +8,7 @@ import { useToast } from '../components/common/Toast.js';
 export const App: React.FC = () => {
   const {
     state,
+    apiClient,
     createProject,
     openProject,
     runInitialDiscovery,
@@ -23,10 +25,35 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleCreateProject = async (name: string, idea: string) => {
+  const handleCreateProject = async (
+    name: string,
+    idea?: string,
+    initialIntent?: InitialProjectIntent,
+    attachedFiles?: { filename: string; kind: 'text' | 'image' | 'file'; content: string; contentEncoding?: 'utf8' | 'base64' }[]
+  ) => {
     try {
-      const res = await createProject(name, idea);
+      const res = await createProject(name, idea, undefined, initialIntent);
       info(`已创建 ${name}，正在推演初始蓝图...`, '项目创建成功');
+
+      // Upload any initial attached materials
+      if (attachedFiles && attachedFiles.length > 0) {
+        let rev = res.snapshot.metadata.stateRevision;
+        for (const file of attachedFiles) {
+          try {
+            await apiClient.addInput(res.projectId, {
+              projectId: res.projectId,
+              kind: file.kind,
+              filename: file.filename,
+              content: file.content,
+              contentEncoding: file.contentEncoding,
+              expectedRevision: rev,
+            });
+            rev++;
+          } catch (err) {
+            console.error(`Failed to attach initial material ${file.filename}:`, err);
+          }
+        }
+      }
 
       // Trigger initial discovery turn (single provider call)
       runInitialDiscovery(res.projectId);
@@ -34,6 +61,7 @@ export const App: React.FC = () => {
       error(err.message || '请检查本地后端服务', '创建项目失败');
     }
   };
+
 
   const handleNavigateHome = () => {
     clearSession();

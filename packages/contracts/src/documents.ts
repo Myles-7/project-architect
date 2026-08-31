@@ -3,11 +3,15 @@ export type DocumentType =
   | 'product'
   | 'user-flow'
   | 'ux-ui'
+  | 'technical-guide'
   | 'development-plan'
   | 'acceptance'
   | 'agents'
   | 'ai-spec'
+  | 'desktop-spec'
   | 'security'
+  | 'sync-spec'
+  | 'privacy-spec'
   | 'custom';
 
 export type DocumentStatus = 'draft' | 'generated' | 'approved' | 'exported';
@@ -74,7 +78,36 @@ export interface DocumentsState {
   updatedAt: string;
 }
 
-export type DocumentManifest = DocumentsState;
+export interface DocumentManifestItem extends DocumentReference {
+  contentHash: string;
+  sourceStats?: {
+    confirmed: number;
+    locked: number;
+    assumptions: number;
+    generatedStructure: number;
+  };
+}
+
+export interface DocumentManifest {
+  id: string;
+  projectId: string;
+  sourceRevision: number;
+  readinessReviewId: string;
+  readinessBasisRevision: number;
+  generatedAt: string;
+  documents: DocumentManifestItem[];
+  warnings: string[];
+  sourceCoverage: {
+    confirmed: number;
+    locked: number;
+    assumptions: number;
+    generatedStructure: number;
+  };
+  // Compatibility with DocumentsState
+  items: DocumentReference[];
+  schemaVersion: number;
+  updatedAt: string;
+}
 
 export interface DocumentPlanItem {
   type: DocumentType;

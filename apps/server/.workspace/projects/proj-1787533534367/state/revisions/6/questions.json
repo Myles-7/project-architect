@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1787533534367",
+  "items": [
+    {
+      "id": "q-mt6kg8dh-8pyr",
+      "issueRef": "gap:gap-ai-mvp_scope-g8dh",
+      "gapRef": "gap:gap-ai-mvp_scope-g8dh",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "首发版本中，分步 Agent 的核心功能范围和最简可行流转步骤（MVP 边界）应如何定义？",
+      "reason": "首发功能边界如果不明确，会导致 Agent 系统的执行链路过于冗长或发散，难以在竞赛的紧急时效内提供准确、可控的阶段性产出。",
+      "whyNow": "首发功能边界如果不明确，会导致 Agent 系统的执行链路过于冗长或发散，难以在竞赛的紧急时效内提供准确、可控的阶段性产出。",
+      "impact": "可能导致多步Agent范围无节制扩张，难以聚焦核心价值。",
+      "recommendation": "(Recommended) 聚焦核心闭环：主要提供“输入题目文本 -> 抽取与梳理符号定义 -> 自动翻译为数学公式 -> 生成可运行的计算与算法代码”的顺序流转功能。",
+      "recommendationReason": "这样能最大程度地把控公式和符号定义的准确度，降低生成代码运行失败的风险，同时满足竞赛中最耗时的数学建模与编程核心痛点。",
+      "options": [
+        {
+          "label": "(Recommended) 聚焦核心闭环：主要提供“输入题目文本 -> 抽取与梳理符号定义 -> 自动翻译为数学公式 -> 生成可运行的计算与算法代码”的顺序流转功能。",
+          "impact": "重点解决建模中最困难的公式构建与编程翻译痛点，确保单步质量，易于快速交付。"
+        },
+        {
+          "label": "全流程竞赛支持：在核心闭环外，扩展包含“自动读取和整理题目附带的原始数据集”以及“自动排版并生成最终学术论文草稿”的多步流转。",
+          "impact": "覆盖更广的竞赛环节，但会显著增加系统的复杂度，中间任何一步的误差都会累积，导致首发版本难以稳定。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T01:37:24.581Z"
+    },
+    {
+      "id": "q-mt6k6jcr-cdoc",
+      "issueRef": "gap:gap-ai-target_user-6jcq",
+      "gapRef": "gap:gap-ai-target_user-6jcq",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "数学建模分步Agent的首发目标用户是哪一类群体，他们的核心使用场景是什么？",
+      "reason": "明确目标用户将指引分步Agent的引导语设计、UX交互深度以及首步拆解粒度。",
+      "whyNow": "明确目标用户将指引分步Agent的引导语设计、UX交互深度以及首步拆解粒度。",
+      "impact": "可能导致交互流程和引导语偏离实际目标群体的习惯。",
+      "recommendation": "(Recommended) 以面临数学建模竞赛或学术论文撰写的学生/科研人员为首发目标用户，主要场景为从问题阅读到数学模型建立与代码生成的全流程辅助。",
+      "recommendationReason": "这类用户对建模效率有迫切需求，接受度高，且建模流程相对标准化。",
+      "options": [
+        {
+          "label": "(Recommended) 参加数学建模竞赛的学生或学术研究人员，核心场景是快速将题目文本转化为数学公式、符号定义和可执行的算法代码。",
+          "impact": "侧重于公式生成的准确性、代码可运行性以及对标准建模步骤的严格遵循。"
+        },
+        {
+          "label": "企业中的数据分析师或算法工程师，核心场景是解决业务中的复杂优化和预测问题，并生成可部署的商业计算方案。",
+          "impact": "侧重于与已有业务数据的对接、多方案对比以及企业级工程化集成。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-24T01:29:52.251Z",
+      "answer": "(Recommended) 参加数学建模竞赛的学生或学术研究人员，核心场景是快速将题目文本转化为数学公式、符号定义和可执行的算法代码。",
+      "answeredAt": "2026-08-24T01:36:59.066Z"
+    },
+    {
+      "id": "q-mt6k5p6r-cx1l",
+      "issueRef": "gap:gap-chk-trust_safety-localfirst-ownership",
+      "gapRef": "gap:gap-chk-trust_safety-localfirst-ownership",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "为了明确信任与安全承诺，请确认：Checklist 标准检查项尚未明确：数据以人类可读的标准文件格式（如 JSON/Markdown）保存在本地，用户完全拥有并可随时迁移导出。",
+      "reason": "Checklist 标准检查项尚未明确：数据以人类可读的标准文件格式（如 JSON/Markdown）保存在本地，用户完全拥有并可随时迁移导出。；若此时不澄清，影响 trust_safety 的完整度闭环。。",
+      "whyNow": "Checklist 标准检查项尚未明确：数据以人类可读的标准文件格式（如 JSON/Markdown）保存在本地，用户完全拥有并可随时迁移导出。；若此时不澄清，影响 trust_safety 的完整度闭环。。",
+      "impact": "影响 trust_safety 的完整度闭环。",
+      "recommendation": "建议先用可验证的首发边界收敛信任与安全承诺，将非必要内容延后。",
+      "recommendationReason": "这能先降低信任与安全承诺的不确定性，而不提前锁定实现方案。",
+      "options": [
+        {
+          "label": "先明确 信任与安全承诺 的首发边界",
+          "impact": "让 MVP 取舍可验证，减少后续返工。"
+        },
+        {
+          "label": "保留为后续方向",
+          "impact": "保留弹性，但不将它视为首发版本承诺。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-24T01:29:13.155Z",
+      "answer": "先明确 信任与安全承诺 的首发边界",
+      "answeredAt": "2026-08-24T01:29:28.628Z"
+    }
+  ],
+  "updatedAt": "2026-08-24T01:37:24.607Z"
+}

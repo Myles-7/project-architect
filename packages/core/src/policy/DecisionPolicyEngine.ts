@@ -4,10 +4,12 @@ import type {
   DecisionItem,
   AssumptionItem,
   ConflictItem,
+  RiskItem,
   DecisionRef,
   TypedRef,
 } from '@project-architect/contracts';
 import { LightweightConflictDetector } from '../conflicts/LightweightConflictDetector.js';
+import { AreaRegistry } from '../areas/AreaRegistry.js';
 
 export type SuggestionRiskLevel = 'low' | 'medium' | 'high';
 
@@ -15,6 +17,8 @@ export interface ProcessedPolicyOutput {
   newCandidates: DecisionItem[];
   newAssumptions: AssumptionItem[];
   newConflicts: ConflictItem[];
+  newRisks: RiskItem[];
+  discardedCounts: Record<string, number>;
 }
 
 export interface DecisionImpactAnalysis {
@@ -143,6 +147,9 @@ export class DecisionPolicyEngine {
   ): ProcessedPolicyOutput {
     const timestamp = new Date().toISOString();
     const lockedDecisions = snapshot.decisions.items.filter((d) => d.status === 'locked');
+    const lockedStatements = new Set(
+      lockedDecisions.map((d) => d.statement.trim().toLowerCase())
+    );
     const existingStatements = new Set(
       snapshot.decisions.items
         .filter((d) => d.status !== 'superseded' && d.status !== 'rejected')
@@ -151,39 +158,71 @@ export class DecisionPolicyEngine {
 
     const newCandidates: DecisionItem[] = [];
     const newAssumptions: AssumptionItem[] = [];
+    const newRisks: RiskItem[] = [];
     const candidateTextsForConflictCheck: string[] = [];
+    const discardedCounts: Record<string, number> = {
+      duplicateCandidates: 0,
+      lockedCollisions: 0,
+      duplicateAssumptions: 0,
+    };
 
     // 1. Ingest explicit AI assumptions
-    for (const asmText of discoveryResult.assumptions || []) {
+    for (const rawAsm of discoveryResult.assumptions || []) {
+      const stmt = rawAsm.statement.trim();
+      if (!stmt) continue;
+
+      if (lockedStatements.has(stmt.toLowerCase())) {
+        discardedCounts.lockedCollisions = (discardedCounts.lockedCollisions ?? 0) + 1;
+        continue;
+      }
+
       const exists = snapshot.assumptions.items.some(
-        (a) => a.statement.trim().toLowerCase() === asmText.trim().toLowerCase() && a.status === 'active'
+        (a) => a.statement.trim().toLowerCase() === stmt.toLowerCase() && a.status === 'active'
       );
       if (!exists) {
+        const area = AreaRegistry.normalize(rawAsm.area);
         newAssumptions.push({
           id: `asm-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
-          statement: asmText,
-          reason: 'B2.1 Discovery low-risk reversible assumption',
+          area,
+          decisionKey: rawAsm.decision_key,
+          statement: stmt,
+          reason: rawAsm.reason,
           status: 'active',
           createdAt: timestamp,
         });
+      } else {
+        discardedCounts.duplicateAssumptions = (discardedCounts.duplicateAssumptions ?? 0) + 1;
       }
     }
 
     // 2. Classify and route candidates
-    for (const candText of discoveryResult.candidates || []) {
-      if (existingStatements.has(candText.trim().toLowerCase())) {
+    for (const rawCand of discoveryResult.candidates || []) {
+      const stmt = rawCand.statement.trim();
+      if (!stmt) continue;
+
+      if (lockedStatements.has(stmt.toLowerCase())) {
+        discardedCounts.lockedCollisions = (discardedCounts.lockedCollisions ?? 0) + 1;
         continue;
       }
 
-      candidateTextsForConflictCheck.push(candText);
-      const risk = this.classifyRisk(candText);
+      if (existingStatements.has(stmt.toLowerCase())) {
+        discardedCounts.duplicateCandidates = (discardedCounts.duplicateCandidates ?? 0) + 1;
+        continue;
+      }
+
+      candidateTextsForConflictCheck.push(stmt);
+      const risk = this.classifyRisk(stmt);
+
+      const area = AreaRegistry.normalize(rawCand.area);
 
       if (risk === 'low') {
         // Low risk -> route to active assumption
         newAssumptions.push({
           id: `asm-auto-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
-          statement: candText,
-          reason: '低风险常规细节自动记录为可逆假设',
+          area,
+          decisionKey: rawCand.decision_key,
+          statement: stmt,
+          reason: rawCand.rationale,
           status: 'active',
           createdAt: timestamp,
         });
@@ -191,18 +230,44 @@ export class DecisionPolicyEngine {
         // Medium / High risk -> propose as candidate
         newCandidates.push({
           id: `cand-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
-          area: 'discovery',
-          statement: candText,
+          area,
+          statement: stmt,
           status: 'candidate',
           origin: 'agent',
           evidenceRefs: [],
+          decisionKey: rawCand.decision_key,
+          rationale: rawCand.rationale,
           createdAt: timestamp,
           updatedAt: timestamp,
         });
       }
     }
 
-    // 3. Locked Immutability & Conflict Detection
+    // 3. Process Risks (Task 2.5)
+    for (const rawRisk of discoveryResult.risks || []) {
+      const stmt = rawRisk.statement.trim();
+      if (!stmt) continue;
+
+      const riskKey = rawRisk.risk_key;
+      const area = AreaRegistry.normalize(rawRisk.area);
+      const severity = rawRisk.severity;
+      const impact = rawRisk.impact;
+
+      newRisks.push({
+        id: `rsk-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        riskKey,
+        area,
+        statement: stmt,
+        description: stmt,
+        severity,
+        impact,
+        status: 'identified',
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      });
+    }
+
+    // 4. Locked Immutability & Conflict Detection
     const detectedConflicts = this.conflictDetector.detectConflicts(
       lockedDecisions,
       candidateTextsForConflictCheck
@@ -222,6 +287,8 @@ export class DecisionPolicyEngine {
       newCandidates,
       newAssumptions,
       newConflicts,
+      newRisks,
+      discardedCounts,
     };
   }
 

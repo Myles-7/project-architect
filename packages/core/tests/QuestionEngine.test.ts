@@ -67,7 +67,7 @@ describe('QuestionEngine Unit Tests (Phase 2.2)', () => {
     };
   }
 
-  it('1. Critical/High Budget: strictly enforces 1 primary question even when multiple critical gaps exist', () => {
+  it('1. B3 initial batch returns independent high-priority questions together', () => {
     const snapshot = createBaseSnapshot();
     const gaps: GapItem[] = [
       { id: 'gap-01', area: 'target_user', severity: 'critical', reason: '目标用户不明确', impact: '范围失焦', dependency: 'none', shouldAskUser: true, status: 'open' },
@@ -77,7 +77,7 @@ describe('QuestionEngine Unit Tests (Phase 2.2)', () => {
 
     const result = engine.generateQuestions(gaps, snapshot);
 
-    expect(result.questions.length).toBe(1);
+    expect(result.questions.length).toBe(3);
     const primaryQ = result.questions[0]!;
     expect(primaryQ.importance).toBe('critical');
     // Follows product-first priority: target_user outranks mvp_scope.
@@ -87,7 +87,7 @@ describe('QuestionEngine Unit Tests (Phase 2.2)', () => {
     expect(primaryQ.options.length).toBeGreaterThan(0);
   });
 
-  it('2. Normal Batch Budget: returns at most 2 related questions from top normal area', () => {
+  it('2. B3 initial batch keeps distinct normal decisions up to the stage budget', () => {
     const snapshot = createBaseSnapshot();
     const gaps: GapItem[] = [
       { id: 'gap-01', area: 'ux_ui', severity: 'medium', reason: '暗黑模式适配偏好', impact: '视觉体验', dependency: 'none', shouldAskUser: true, status: 'open' },
@@ -97,9 +97,10 @@ describe('QuestionEngine Unit Tests (Phase 2.2)', () => {
 
     const result = engine.generateQuestions(gaps, snapshot);
 
-    expect(result.questions.length).toBe(2);
+    expect(result.questions.length).toBe(3);
     expect(result.questions[0]?.importance).toBe('normal');
     expect(result.questions[1]?.importance).toBe('normal');
+    expect(result.questions[2]?.importance).toBe('normal');
   });
 
   it('3. Low Risk Auto-Assumption: emits 0 questions and produces AssumptionItem proposals', () => {

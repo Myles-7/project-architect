@@ -34,6 +34,22 @@ The following defaults are actively assumed for implementation. If you discover 
 ## 4. Coding Agent Implementation Rules
 
 1. **Capability Before Mechanism**: Focus on fulfilling confirmed functional capabilities before introducing complex extra dependencies.
-2. **Local Data First**: Preserve user data ownership and file-based state integrity.
+2. **Boundary Adherence**: Strictly respect the platform, data, and runtime boundaries defined in `docs/TECHNICAL_GUIDE.md`.
 3. **No Phantom Scope**: Strictly stick to the MVP Scope defined in `docs/PRODUCT.md`. Do NOT add unapproved features.
-4. **Verification Requirement**: All newly added code must be verified with automated unit or integration tests.
+4. **Verification Requirement**: All newly added code must be verified with automated unit or integration tests as defined in `docs/ACCEPTANCE.md`.
+
+---
+
+## 5. Recommended Reading & Development Order
+
+Coding agents should read project documents in the following sequence:
+
+1. `AGENTS.md` (This file — Core boundary, identity & locked decisions)
+2. `docs/PROJECT.md` (Overall vision, goals, and problem definition)
+3. `docs/PRODUCT.md` (MVP scope, user value, and explicit non-goals)
+4. `docs/USER_FLOWS.md` (Step-by-step user journeys and edge cases)
+5. `docs/UX_UI_SPEC.md` (Layout structure, UI principles, and interactions)
+6. `docs/TECHNICAL_GUIDE.md` (Lightweight technical boundaries & delegated freedom)
+7. `docs/DEVELOPMENT_PLAN.md` (Phased development roadmap & milestones)
+8. `docs/ACCEPTANCE.md` (Definition of Done & verification criteria)
+9. `docs/specs/*` (Domain-specific specifications, if present)

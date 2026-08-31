@@ -1,5 +1,7 @@
 # Project Architect V1：产品边界与架构原则
 
+> B3 更新：Discovery 运行时与问题预算以 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md) 为准；本文中的 B2.1 引用仅为历史背景。
+
 > 文档状态：Phase 1.1 Blueprint  
 > 范围：产品使命、V1 边界、行为约束与职责划分。  
 > 非范围：具体实现方案、界面视觉设计与开发任务细化。
@@ -60,7 +62,7 @@ V1 必须形成一个完整的“想法到开发文档”闭环：
 6. 支持用户通过对话或直接编辑更新项目状态；支持将已确认决定标为 Locked。
 7. 在生成文档前执行 Readiness Review，并由用户最终批准。
 8. 生成核心 Markdown 文档与按项目类型出现的专项文档，作为 Coding Agent 输入。
-9. 使用已冻结的 B2.1 Agent 行为：单一专门 Agent、一次推理调用、结构化输出、产品优先于技术、严格 Conflict 分类。
+9. 使用 B3 Agent 行为：单一专门 Agent、一次推理调用、结构化输出、产品优先于技术、严格 Conflict 分类与自适应独立问题集。
 
 V1 的结构化状态至少覆盖：项目概述、决策、Assumptions、Gaps、Readiness、对话历史和生成文档。Overview 是用户可读的项目窗口；它不应替代规范状态本身。
 

@@ -23,7 +23,7 @@
 import type { TypedRef, DecisionRef, GapRef, AssumptionRef } from './refs.js';
 import type { ProjectStage } from './project.js';
 import type { SectionMaturity } from './overview.js';
-import type { ReadinessStatus, UserDisposition } from './readiness.js';
+import type { ReadinessStatus, UserDisposition, ReadinessCoverageMetric } from './readiness.js';
 import type { DocumentType, DocumentStatus } from './documents.js';
 
 // ============================================================================
@@ -85,7 +85,25 @@ export interface ReadinessIssueView {
   isAcknowledged: boolean;
 }
 
+export interface ReadinessActionView {
+  disposition: UserDisposition;
+  label: string;
+  description: string;
+  enabled: boolean;
+  requiredAcknowledgementRefs: string[];
+  blockedReasons: string[];
+}
+
 export interface ReadinessView {
+  basisRevision: number;
+  currentRevision: number;
+  isStale: boolean;
+  coverage: ReadinessCoverageMetric;
+  credibilityScore: number;
+  areas: ReadinessAreaView[];
+  actions: ReadinessActionView[];
+
+  // Compatibility fields
   sourceStateRevision: number;       // Explicit source version
   projectId: string;
   level: 1 | 2 | 3 | 4 | 5;          // Readiness score level (Level 1 to 5)
@@ -93,7 +111,6 @@ export interface ReadinessView {
   status: ReadinessStatus;           // 'ready' | 'ready-with-warnings' | 'not-ready'
   isReadyForDocs: boolean;
   userDisposition: UserDisposition;  // 'pending' | 'approved' | etc.
-  areas: ReadinessAreaView[];
   blockingIssues: ReadinessIssueView[];
   warnings: string[];
   activeAssumptions: {
@@ -170,4 +187,22 @@ export interface TimelineView {
   projectId: string;
   totalEvents: number;
   events: TimelineEvent[];
+}
+
+// ============================================================================
+// 5. Discovery Progress View Model
+// ============================================================================
+
+export interface DiscoveryProgressView {
+  sourceStateRevision: number;
+  projectId: string;
+  blockingDecisionCount: number;
+  openGapCount: number;
+  deferredGapCount: number;
+  activeBatchQuestionCount: number;
+  answeredBatchQuestionCount: number;
+  dismissedBatchQuestionCount: number;
+  remainingBatchQuestionCount: number;
+  canGenerateNextBatch: boolean;
+  nextAction: 'answer' | 'dismiss' | 'organize' | 'review-readiness';
 }

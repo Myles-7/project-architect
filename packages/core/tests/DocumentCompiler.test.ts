@@ -182,4 +182,17 @@ describe('Document Compiler & Template Engine Unit Tests (Phase 4.3 & 4.4)', () 
     const agentsContent = await storage.readText(join(projectDir, 'AGENTS.md'));
     expect(agentsContent).toContain('Local Markdown Editor');
   });
+
+  it('5. Supports render-only compilation so the orchestrator cannot publish before revision commit', async () => {
+    const snapshot = createValidSnapshot();
+    const projectDir = join(tempBaseDir, 'proj-render-only');
+    await storage.ensureDir(projectDir);
+
+    const result = await compiler.compile(projectDir, snapshot, 5, false);
+
+    expect(result.renderedFiles.length).toBeGreaterThan(0);
+    expect(await storage.exists(join(projectDir, 'AGENTS.md'))).toBe(false);
+    expect(await storage.exists(join(projectDir, 'documents.json'))).toBe(false);
+    expect(await storage.exists(join(projectDir, 'documents', 'manifest.json'))).toBe(false);
+  });
 });

@@ -1,5 +1,6 @@
 # Project Architect V1：运行时配置与基线参数
 
+> B3 更新：生产 Discovery 运行时参数与阶段自适应预算以 [12_B3_ADAPTIVE_DISCOVERY.md](../12_B3_ADAPTIVE_DISCOVERY.md) 为唯一权威生产契约；下文 B2.1 实测基线保留为历史演进参考。
 > 文档状态：Phase 0 Engineering Blueprint  
 > 范围：全系统运行时可调节配置表、默认值及监控基线。  
 > 原则：参数集中化管理，严禁在业务代码中散落硬编码数值。
@@ -87,9 +88,9 @@ export const DEFAULT_RUNTIME_CONFIG: AppRuntimeConfig = {
 
 ---
 
-## 3. B2.1 Benchmark 实测观测基线 (Baseline Reference)
+## 3. B2.1 Benchmark 实测观测基线 (历史参考)
 
-以下数值来自 10 大完整测试用例在 B2.1 验证运行中的平均值（见 `experiments/agent-benchmark/reports/B2_1_FULL_VALIDATION_REPORT.md`）：
+> 历史归档：以下数值来自 10 大完整测试用例在 B2.1 验证运行中的平均值（见 `experiments/agent-benchmark/reports/B2_1_FULL_VALIDATION_REPORT.md`），作为历史演进参考。生产运行时指标以 B3 基准报告为准。
 
 | 观测指标 | B2.1 实测平均值 | 作用与解释 |
 | :--- | :---: | :--- |
@@ -100,3 +101,16 @@ export const DEFAULT_RUNTIME_CONFIG: AppRuntimeConfig = {
 | **单次执行耗时 (Duration)** | **37.8 秒** | 正常调用耗时基准；45 秒为界面加载提示线，90 秒为硬超时。 |
 
 > **注意**：上述基线作为系统性能与成本的健康度观察参考，严禁作为硬编码的逻辑截断依据。
+
+---
+
+## 4. B3 自适应发现运行时与发布基线
+
+| 观测与管控指标 | B3 运行时发布门槛 | 作用与解释 |
+| :--- | :---: | :--- |
+| **Question Context 字符预算** | **≤ 12,000 字符** | 严格裁剪非相关 Area 决策与旧卡片，防止上下文膨胀。 |
+| **p50 执行耗时** | **≤ 30.0 秒** | 典型单轮推演响应中位数时延。 |
+| **p95 执行耗时** | **≤ 60.0 秒** | 复杂多阶段或高 Gap 场景的 95 分位响应时延。 |
+| **单次调用约束** | **严格 1 次** | 单个用户操作最多触发一次主要 Provider 调用，严禁链式隐藏调用。 |
+| **结构化成功率** | **100%** | 输出 100% 符合 `b3-discovery.schema.json` 规范。 |
+| **Prompt Cache 行为** | **真实上报** | 稳定前缀分离；有命中上报 `observed`，无命中上报 `unknown`，不伪造缓存。 |

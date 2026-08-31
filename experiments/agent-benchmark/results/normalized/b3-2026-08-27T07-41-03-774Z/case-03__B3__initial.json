@@ -1,0 +1,500 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-03",
+  "stage": "initial",
+  "name": "complete-study-planner",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 53246,
+  "output": {
+    "assumptions": [
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "desktop_only_resolution",
+        "reason": "符合首版只支持桌面浏览器的硬性限制，降低了排版复杂度。",
+        "statement": "假设目标用户在备考期间主要使用笔记本或台式电脑进行学习计划的管理，因此桌面端排版不需要过度考虑小屏适配。"
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "email_verification_necessity",
+        "reason": "简化MVP阶段的注册流程，降低第三方服务对接成本。",
+        "statement": "假设首版邮箱注册无需进行极度严格的验证码拦截，仅需基本的邮箱格式校验和密码即可登录。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "core_features",
+        "decision_key": "plan_adjustment_policy",
+        "rationale": "为了在MVP阶段快速交付并验证核心计划管理的价值，避免在首版中开发过于复杂的级联重算算法。",
+        "statement": "首版计划调整采用手动重新分配模式，不引入复杂的自动顺延算法。"
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "subject_customization_scope",
+        "rationale": "确保系统生成的复习计划具有较高的标准性和准确度，并缩短开发周期。",
+        "statement": "首版仅支持系统内置的标准考研科目，不支持自定义科目。"
+      },
+      {
+        "area": "core_features",
+        "decision_key": "postpone_limitation_policy",
+        "rationale": "防止考研学生产生过度拖延的心理，帮助其达成“连续两周完成任务”的目标。",
+        "statement": "对任务延后次数进行次数限制，并在延后时给予合理警示。"
+      }
+    ],
+    "confirmed": [
+      "目标用户为准备考研的中国大学生",
+      "首版仅支持中文和桌面浏览器",
+      "首次进入需选择考试日期、科目、每周可学习时长和当前基础",
+      "系统按周生成可调整的复习计划",
+      "主页显示本周任务、完成进度和距离考试的倒计时",
+      "任务详情页可标记完成、延后或拆分",
+      "用户可以用邮箱注册，数据保存在云端并支持多台电脑登录",
+      "UI风格安静、鼓励但不幼稚，类似日历和待办结合",
+      "MVP不包含社交、课程市场、AI聊天或移动端",
+      "验证指标为首批20名试用同学连续两周完成任务的比例"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "core_features",
+        "decision_key": "plan_adjustment_policy",
+        "depends_on": [],
+        "impact": "直接决定核心算法的逻辑以及用户的交互流。",
+        "reason": "需要决定在用户延后或拆分任务时，系统如何处理未完成任务。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "subject_customization_scope",
+        "depends_on": [],
+        "impact": "这决定了计划数据库的初始化工作量，以及对备考小众科目学生的覆盖度。",
+        "reason": "确定系统是只提供公共课和热门专业课的标准计划，还是支持自定义科目。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "foundation_assessment_method",
+        "depends_on": [],
+        "impact": "自评非常快速但可能不够准，结构化测试评估更精准但会增加用户的使用摩擦。",
+        "reason": "决定如何在用户首次进入时评估其“当前基础”，这直接关系到用户对生成计划的信任度。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "postpone_limitation_policy",
+        "depends_on": [],
+        "impact": "如果允许无限延后，计划可能会形同虚设；如果过度限制，可能会增加用户的精神压力。",
+        "reason": "防止拖延症是帮助用户完成两周目标的关键，需要确定是否有防止拖延的机制。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "plan_generation_timing",
+        "depends_on": [],
+        "impact": "一次性生成能给用户宏观掌控感但面对计划变动调整繁琐；动态每周生成能减缓焦虑但缺乏全局感。",
+        "reason": "需要明确计划是一次性生成完整备考周期的计划，还是动态每周生成。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "task_splitting_mechanism",
+        "depends_on": [],
+        "impact": "自由创建子任务灵活性强但交互多；自动等分操作快但适用性差。",
+        "reason": "用户拆分任务时的具体形式需要明确。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "data_privacy_and_retention",
+        "depends_on": [],
+        "impact": "提供重置/导出功能可以给学生安全感，但会增加MVP开发工作量。",
+        "reason": "由于是云端同步，对于因复习脱轨想要“重来”或导出数据的用户，系统应提供何种数据自主权。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "exam_date_modification_policy",
+        "depends_on": [],
+        "impact": "允许修改并重算能应对现实变更，但增加了重算逻辑的开发。",
+        "reason": "考研官方大纲和具体考试日期公布前，用户可能会输入预估日期，需要确定是否允许修改。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "task_completion_confirmation",
+        "depends_on": [],
+        "impact": "记录实际用时有利于用户复盘并提高完成率，但增加了日常打卡的操作成本。",
+        "reason": "确定任务完成的标记是否包含反思或记录实际用时。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "encouragement_feedback_style",
+        "depends_on": [],
+        "impact": "数据可视化展示更专业理智，勋章/打卡天数趣味性更强但可能显得低龄。",
+        "reason": "确定“安静、鼓励但不幼稚”的UI设计如何呈现进度反馈。",
+        "severity": "medium",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "plan_adjustment_policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "不开发复杂的级联顺延算法，首版交付时间可缩短约1-2周；用户对计划有绝对控制权，但当积压任务较多时，手动调整会带来一定的操作负担。",
+            "key": "manual",
+            "label": "手动分配模式：未完成的任务放入“待整理箱”，由用户自行拖拽或选择放入本周或后续某周",
+            "reversibility": "moderate",
+            "tradeoffs": "降低技术复杂度，但增加了用户调整计划时的点击操作。"
+          },
+          {
+            "impact": "需要设计并开发一套支持多科目的级联滚动排程算法，开发周期延长2周以上；调整过程完全自动化，极具科技感，但若用户连续落后进度，后期任务量会自动暴增，容易给用户造成极大的焦虑感并导致放弃。",
+            "key": "automatic",
+            "label": "自动重算模式：未完成的任务自动推迟，系统根据距离考试的剩余时间，重新分摊并调整后续所有周的任务量",
+            "reversibility": "hard",
+            "tradeoffs": "提升了自动化体验，但增加了算法难度和用户后期的任务积压压力。"
+          }
+        ],
+        "question": "当用户未能按期完成任务，或者选择延后/拆分任务时，系统应该如何调整计划？",
+        "reason": "这决定了核心复习计划的生成和演进逻辑，直接关系到开发复杂度和用户的核心使用体验。",
+        "recommendation": "(推荐) 采用手动分配模式，由用户决定未完成任务的去处。",
+        "recommendation_reason": "作为首版MVP，手动调整开发成本低，且能培养用户的自主计划管理能力，避免因为算法顺延导致后续任务堆积爆表而让用户彻底放弃。",
+        "recommended_option_key": "manual"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "subject_customization_scope",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "只需维护一份静态的科目知识点大纲数据库，首版上线快；用户勾选即可生成专业计划，但对于考小众专业课的学生，首版将无法使用该工具。",
+            "key": "predefined_only",
+            "label": "仅支持预设科目：提供考研数学、英语、政治以及若干热门专业课，任务大纲由系统内置",
+            "reversibility": "easy",
+            "tradeoffs": "缩短大纲维护工作量，但牺牲了小众学科考生的覆盖率。"
+          },
+          {
+            "impact": "需要设计通用的自定义知识点层级录入界面，开发周期增加约1周；任何考生的任何科目都能使用，但首次使用时用户需要花15-30分钟手动录入大纲，录入成本高可能导致新用户流失。",
+            "key": "custom_allow",
+            "label": "支持自定义科目：用户可以自己新建科目，并手动录入章节、参考书或知识点",
+            "reversibility": "moderate",
+            "tradeoffs": "实现全学科覆盖，但大幅增加了用户的初始化录入门槛。"
+          }
+        ],
+        "question": "首版系统应该支持哪些科目？是否允许用户完全自定义科目？",
+        "reason": "科目范围决定了后台数据字典的准备工作量，也直接影响到用户首次进入时的计划生成准确性。",
+        "recommendation": "(推荐) 仅支持预设的考研公共课与常见专业课，暂不支持完全自定义。",
+        "recommendation_reason": "在20人小规模试用阶段，通过预设科目可以为用户提供结构化的高质量计划模板，从而更容易达成“连续两周完成”的目标。",
+        "recommended_option_key": "predefined_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "foundation_assessment_method",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "只需几秒钟即可完成评估，进入主页阻力极小；由于是主观判断，生成的计划任务量可能与用户的真实水平存在偏差，需要用户在后续自行微调。",
+            "key": "subjective_self_rating",
+            "label": "主观自评：用户在“零基础”、“基础一般”、“已复习过一轮”等选项中为每个科目进行单选",
+            "reversibility": "easy",
+            "tradeoffs": "提升了新手引导的转化率，但可能降低初始计划的精确度。"
+          },
+          {
+            "impact": "用户需要花3-5分钟回忆并填写多项客观指标，可能产生疲劳感；系统能根据更客观的指标推荐更精准的备考进度和初始任务量。",
+            "key": "structured_questionnaire",
+            "label": "结构化信息录入：用户输入四六级成绩、大学期末绩点、已看过的教材和做过的真题集",
+            "reversibility": "moderate",
+            "tradeoffs": "提高了初始计划的贴合度，但增加了首次进入的流失风险。"
+          }
+        ],
+        "question": "在首次进入引导中，系统应该如何评估用户的“当前基础”？",
+        "reason": "当前基础是生成个性化周计划的关键输入之一，评估方式直接影响用户完成引导的概率和计划的准确度。",
+        "recommendation": "(推荐) 采用粗粒度的用户主观自评。",
+        "recommendation_reason": "在MVP阶段，应当尽量简化首次登录的步骤，快速让用户看到计划主体，避免冗长的测试导致用户在试用前就流失。",
+        "recommended_option_key": "subjective_self_rating"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "postpone_limitation_policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "使用压力极小，用户感觉自由；用户极其容易因为反复延后而导致任务大量堆积，最终放弃计划，难以达成连续两周完成任务的目标。",
+            "key": "unlimited",
+            "label": "无限制延后：用户可以无限制地将任务往后拖延，系统不做任何限制或警示",
+            "reversibility": "easy",
+            "tradeoffs": "给用户最大的自由度，但极大降低了计划的约束力和完成率。"
+          },
+          {
+            "impact": "为用户设定了明确的心理底线，量化提示能起到安静的督促作用；需要维护任务的延后次数状态，并开发简单的周工时重新分摊估算逻辑（约需2天时间）。",
+            "key": "warn_and_limit",
+            "label": "限制与警示：同一任务最多允许延后2次，延后时显示“若延后，后续每周需增加X小时学习”的量化警示",
+            "reversibility": "moderate",
+            "tradeoffs": "起到了温和的督促作用，但会给用户带来一定的心理紧迫感。"
+          }
+        ],
+        "question": "为了促成“连续两周完成任务”这一成功指标，系统应该对任务延后次数进行何种程度的限制？",
+        "reason": "如果无限制允许延后，考生很容易产生拖延心理，导致计划崩溃；但若限制过死，又违背了“安静、鼓励”的初衷。",
+        "recommendation": "(推荐) 允许延后，但对同一任务限制最多延后2次，且在延后时提示备考压力变化。",
+        "recommendation_reason": "既能保留调整的灵活性，又能在关键时刻通过数据变动对学生进行“安静的警示”，促使其正视复习进度。",
+        "recommended_option_key": "warn_and_limit"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "plan_generation_timing",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "用户既能看到长期的复习宏观路线图，又不会被海量待办吓倒；系统需要在首次加载时计算出几十周的任务节点，对初始计划生成算法的吞吐量有一定要求。",
+            "key": "full_plan_with_focused_view",
+            "label": "全程计划+局部聚焦：一次性计算出直至考试的所有周任务，但界面默认收起远期任务，仅突出本周和下周",
+            "reversibility": "moderate",
+            "tradeoffs": "兼顾了全局安全感与日常专注，但增加了初始计划数据加载的体量。"
+          },
+          {
+            "impact": "界面始终保持极其干净，用户只需关注眼前的任务，几乎没有远期焦虑；用户无法提前得知未来的备考路线和每个阶段（如真题阶段、冲刺阶段）的开始时间，容易感到心里没底。",
+            "key": "dynamic_weekly_generation",
+            "label": "动态每周生成：仅生成本周和下周计划，每周日晚上根据本周完成情况，动态生成下一周的新任务",
+            "reversibility": "moderate",
+            "tradeoffs": "降低了长期计划变动的维护成本，但削弱了考生的宏观安全感。"
+          }
+        ],
+        "question": "系统在首次初始化时，应该直接生成完整的考研全程计划，还是按周动态生成？",
+        "reason": "考研是一个漫长的过程，计划呈现的宏观度会直接影响考生的安全感与日常专注度。",
+        "recommendation": "(推荐) 首次生成完整全程计划，但默认仅展示本周和下周的细节。",
+        "recommendation_reason": "全程计划可以给考生掌控全局的踏实感，而默认聚焦于两周任务则能减少焦虑，符合“安静、鼓励”的UI定位。",
+        "recommended_option_key": "full_plan_with_focused_view"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "task_splitting_mechanism",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "符合真实的备考习惯（例如把“背单词500个”拆成“早上背300个”和“晚上复习200个”）；需要设计任务与子任务的父子关系表结构及UI界面，开发工作量增加1-2天。",
+            "key": "custom_subtasks",
+            "label": "自定义拆分：用户点击拆分后，可在当前任务下手动添加若干个具体的子任务名称，并勾选完成",
+            "reversibility": "easy",
+            "tradeoffs": "更贴合考生的实际拆分场景，但增加了用户打字录入的步骤。"
+          },
+          {
+            "impact": "操作极其简单，一键搞定；拆分出的子任务名称死板，无法体现实际复习的具体内容（如到底是看哪几页或哪几题），实用性较差。",
+            "key": "automatic_half_split",
+            "label": "快速一键等分：系统自动将任务一分为二（如：任务A-第1部分，任务A-第2部分），无需用户打字",
+            "reversibility": "easy",
+            "tradeoffs": "交互路径极短，但无法满足精细化、场景化的备考拆分需求。"
+          }
+        ],
+        "question": "当用户认为本周某项任务过大需要拆分时，系统应该提供怎样的拆分操作？",
+        "reason": "拆分是用户日常管理复杂任务的常用功能，其操作链条会直接影响任务详情页的交互繁琐度。",
+        "recommendation": "(推荐) 允许用户自定义输入子任务的名称和权重。",
+        "recommendation_reason": "考研专业课或英语真题的拆分往往具有逻辑性（如按年份、按章节），系统自动等分很难符合实际复习场景。",
+        "recommended_option_key": "custom_subtasks"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "data_privacy_and_retention",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "给予考生犯错和重新开始的机会，减缓焦虑，同时历史数据的保留能让他们看到自己的备考轨迹；需要设计历史计划的归档存储逻辑，增加约2天开发时间。",
+            "key": "soft_reset_with_history",
+            "label": "软重置：允许一键清空当前所有未完成计划并重新走一遍 onboarding 流程生成新计划，但之前的打卡天数和完成率历史作为“过往足迹”予以保留",
+            "reversibility": "moderate",
+            "tradeoffs": "有效安抚焦虑情绪并保留用户心血，但增加了数据库状态管理的复杂度。"
+          },
+          {
+            "impact": "逻辑最简单，只需提供一个彻底物理删除账号/计划数据的接口；用户彻底失去所有历史痕迹，如果只是想调整计划，代价过大，容易让用户彻底放弃该工具。",
+            "key": "hard_reset_only",
+            "label": "硬重置/销户：仅提供删除整个账号或完全抹除所有数据的选项，让用户以全新身份重新注册",
+            "reversibility": "hard",
+            "tradeoffs": "技术实现最简单，但容易导致用户彻底流失。"
+          }
+        ],
+        "question": "在云端同步的基础上，对于因复习严重脱轨而想要“推倒重来”的用户，系统应该提供怎样的政策或功能？",
+        "reason": "考研学生在备考过程中极易产生“复习计划崩盘、想重新开始”的焦虑心态，提供合理的重置政策能挽救挣扎在流失边缘的用户。",
+        "recommendation": "(推荐) 提供一键“清空并重新生成计划”的功能，但保留历史统计数据以供对比。",
+        "recommendation_reason": "给焦虑的用户一个“一键重启”的安全阀，同时保留之前的努力印记，符合“鼓励”的产品调性。",
+        "recommended_option_key": "soft_reset_with_history"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "exam_date_modification_policy",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "完美应对官方考试日期的公布或调整，体验丝滑；需开发“基于当前进度与新时间区间的任务重新分摊”逻辑，需额外开发1天。",
+            "key": "modify_and_recalculate",
+            "label": "允许修改并重算：用户可随时更改考试日期，系统保留已完成任务，并自动重新分摊剩余所有任务到新的时间区间",
+            "reversibility": "easy",
+            "tradeoffs": "能应对外部政策变化，但增加了计划重排的边缘情况处理。"
+          },
+          {
+            "impact": "无需编写中途修改时间的重排逻辑，开发非常简单；哪怕考试时间只推迟或提前了几天，用户也必须删除计划重新录入，体验较差。",
+            "key": "locked_date_or_restart",
+            "label": "禁止直接修改日期：考试日期一经设定不可直接修改，若改动必须重新生成整个计划",
+            "reversibility": "moderate",
+            "tradeoffs": "极大地简化了系统状态，但牺牲了用户在官方公布时间时的便利性。"
+          }
+        ],
+        "question": "如果用户在备考期间需要修改目标考试日期，系统应该如何处理已有的复习计划？",
+        "reason": "考研具体日期通常在每年8、9月份才由官方正式公布，用户在此之前填写的往往是估算日期，必须考虑修改场景。",
+        "recommendation": "(推荐) 允许修改日期，并根据剩余天数等比例缩放或重新分配未完成任务。",
+        "recommendation_reason": "顺应官方政策的调整，为考生提供无缝的计划过渡，避免因日期变更导致旧计划完全失效。",
+        "recommended_option_key": "modify_and_recalculate"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "task_completion_confirmation",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "没有任何干扰，符合极简的待办清单体验；用户可能会为了进度条好看而快速勾选，无法促成深度的备考反思。",
+            "key": "direct_only",
+            "label": "纯复选框勾选：点击即标记完成，不提供任何额外记录或弹窗",
+            "reversibility": "easy",
+            "tradeoffs": "保证了最低的点击成本，但流失了收集备考质量数据的机会。"
+          },
+          {
+            "impact": "不强制要求填写，想记录的学生可以随手写几句，不想写的直接无视，保持安静；需要在任务表结构中增加一个笔记字段及输入UI，增加1天工作量。",
+            "key": "direct_with_optional_note",
+            "label": "勾选完成+选填复盘：勾选时在侧边或任务详情页静默出现一个选填的“今日心得/错题简记”文本框，字数不限",
+            "reversibility": "easy",
+            "tradeoffs": "为想沉淀备考心得的用户提供了空间，同时不增加普通用户的操作成本。"
+          }
+        ],
+        "question": "用户在主页或详情页勾选“完成”任务时，系统是否需要引导其进行复盘记录？",
+        "reason": "这决定了考生的日常交互负担，也关系到能否收集到有价值的真实反馈数据来提升连续两周完成率。",
+        "recommendation": "(推荐) 默认单选框直接标记完成，但在详情页提供选填的“复盘笔记”区域。",
+        "recommendation_reason": "保持极简安静的打卡体验，不强制增加负担，但为有深度复盘习惯的学生提供无压力的记录空间。",
+        "recommended_option_key": "direct_with_optional_note"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "encouragement_feedback_style",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "界面呈现出类似日历和专业待办的专注感，无任何花哨打扰，极易沉浸；需要引入或开发一套极简的图表组件，视觉细节调整要求高。",
+            "key": "academic_data_visualization",
+            "label": "学术风数据可视化：使用极简的周进度环、连续打卡天数折线、已复习章节比例等清爽图表，并在完成周目标时显示一句安静的问候语",
+            "reversibility": "easy",
+            "tradeoffs": "非常符合静音沉浸的气质，但对于自控力极差、需要强烈情绪刺激的用户来说，激励感稍弱。"
+          },
+          {
+            "impact": "趣味性更强，具有即时的情绪奖励；容易显得幼稚，甚至可能让部分学生产生“为了拿勋章而刷任务”的焦虑，违背了“安静”的原则。",
+            "key": "light_gamification",
+            "label": "轻度游戏化勋章：引入通关式的关卡徽章（如“一轮复习达人”、“政治刷题能手”）和生动的打卡动效",
+            "reversibility": "moderate",
+            "tradeoffs": "能提供较强的即时满足感，但容易破坏界面的安静沉浸感，并被部分用户觉得幼稚。"
+          }
+        ],
+        "question": "为了体现“安静、鼓励但不幼稚”的定位，主页的进度展示与反馈应该采用哪种风格？",
+        "reason": "UI的视觉和文案风格直接决定了产品的气质，对于高压备考的考研大学生来说，反馈机制的轻重非常敏感。",
+        "recommendation": "(推荐) 采用清爽的学术风数据可视化，搭配安静的阶段里程碑提示。",
+        "recommendation_reason": "考研学生是心智成熟的成年人，清爽的进度条、折线图和安静的里程碑提示能给予他们理性的掌控感，比花哨的勋章更符合其复习状态。",
+        "recommended_option_key": "academic_data_visualization"
+      }
+    ],
+    "risks": [
+      {
+        "area": "core_features",
+        "impact": "这直接导致试用用户的留存率降低，无法达到“连续两周完成任务”的成功指标。",
+        "risk_key": "procrastination_leads_to_failure",
+        "severity": "high",
+        "statement": "用户因计划被打乱、任务堆积而产生挫败感，最终放弃使用工具。"
+      },
+      {
+        "area": "mvp_scope",
+        "impact": "导致考生觉得生成的计划没有参考价值，影响工具的可用性信誉。",
+        "risk_key": "standard_plans_mismatch",
+        "severity": "medium",
+        "statement": "系统生成的计划与考生的实际备考节奏或院校自主命题专业课大纲不匹配。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "桌面浏览器的静音沉浸设计与需要强提醒督促学习之间的张力。",
+        "reason": "考研学生需要一个安静无干扰的学习环境（不希望频繁被打扰），但同时又容易产生拖延症，需要工具在关键时刻给予进度警示或鼓励。"
+      },
+      {
+        "description": "MVP阶段快速验证价值（仅20人试用）与计划生成模板精准度之间的张力。",
+        "reason": "要让这20名学生能连续两周完成任务，生成的计划必须极其贴合他们的实际情况，但为所有科目制定精细的智能计划模板在MVP阶段的开发成本极高。"
+      }
+    ],
+    "unknowns": [
+      "系统内置学科任务大纲的数据来源与版权归属",
+      "20名试用同学的具体招募渠道与备考科目分布"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-03__B3__initial.json",
+  "usage": {
+    "input_tokens": 56985,
+    "output_tokens": 22671,
+    "thinking_tokens": 15656,
+    "total_tokens": 79656,
+    "cache_read_tokens": 0
+  },
+  "b3": {
+    "stage": "initial",
+    "question_count": 10,
+    "candidates_count": 3,
+    "assumptions_count": 2,
+    "gaps_count": 10,
+    "unique_decision_keys": 10,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [initial]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

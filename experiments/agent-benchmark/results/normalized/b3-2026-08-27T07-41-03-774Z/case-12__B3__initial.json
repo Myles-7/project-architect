@@ -1,0 +1,502 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-12",
+  "stage": "initial",
+  "name": "question-dependency-chain",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 44136,
+  "output": {
+    "assumptions": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "assume_responsive_web_first",
+        "reason": "Web端具有零下载门槛、开发速度快、易于分享传播等特点，非常适合MVP（最小可行性产品）阶段。",
+        "statement": "项目初期将优先以自适应网页（Web）端进行开发测试，暂不开发原生App客户端。"
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "assume_simplified_chinese_only",
+        "reason": "这符合用户当前的文字表述习惯，且有利于在单一语境下优先跑通社区文化与讨论氛围。",
+        "statement": "首发版本仅支持简体中文界面，主要面向中文社群用户。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "target_user",
+        "decision_key": "candidate_positioning",
+        "rationale": "垂类兴趣社区相较于泛社交或职场社交，用户黏性建立门槛较低，内容生产也更容易冷启动。",
+        "statement": "初期社区定位为垂类兴趣小组，以轻度图文发帖和评论为主要内容媒介。"
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "candidate_access_mode",
+        "rationale": "这既能利用内容公开带来的外部搜索引擎曝光和分享链接增长，又可以通过申请门槛维持初期的内容调性与秩序。",
+        "statement": "采用“公开浏览，审核准入”的半公开模式作为核心访问机制。"
+      },
+      {
+        "area": "core_features",
+        "decision_key": "candidate_governance_rules",
+        "rationale": "降低早期运营人员的内容审核压力，同时提升核心用户对社区事务的参与感和忠诚度。",
+        "statement": "采用“平台底线红线 + 用户自治版块”的内容治理架构。"
+      }
+    ],
+    "confirmed": [
+      "用户计划开发一款社区类产品。",
+      "用户尚未确定社区的核心目标用户群体。",
+      "用户尚未确定社区的公开与私密范围。",
+      "用户尚未确定社区的内容治理规则。"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "target_user",
+        "decision_key": "community_positioning",
+        "depends_on": [],
+        "impact": "导致界面风格、讨论版块设置以及推广方式无从着手，极易偏离实际需求。",
+        "reason": "用户明确表示“不知道服务谁”，没有确定目标人群，就无法针对性地设计功能和基调。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "access_privacy_model",
+        "depends_on": [],
+        "impact": "这直接决定了用户注册流、内容检索可见性以及内容防泄漏安全边界的系统设计。",
+        "reason": "用户在“公开还是私密”之间摇摆未决。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "governance_model",
+        "depends_on": [],
+        "impact": "不确定的审核与惩罚规则会让用户在发表内容时缺乏边界感，或者因为过度审核降低发言意愿。",
+        "reason": "用户表示“还没决定内容治理方式”，治理方式是社区活力的生命线。",
+        "severity": "critical",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "community_positioning",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "获得：明确的话题分类和高互动的讨论氛围；失去：建立广泛社会网络和职业背书的能力。",
+            "key": "interest_based",
+            "label": "兴趣与爱好分享（如读书、运动、游戏等）",
+            "reversibility": "moderate",
+            "tradeoffs": "早期容易聚集高粘性用户，但规模化扩张需要不断开拓新兴趣版块。"
+          },
+          {
+            "impact": "获得：高质量的专业内容沉淀和高价值的用户属性；失去：大众娱乐性的互动和轻松随意的氛围。",
+            "key": "professional_knowledge",
+            "label": "职业与知识交流（如行业探讨、技能提升等）",
+            "reversibility": "moderate",
+            "tradeoffs": "对内容质量和专业背书要求高，用户发布内容的门槛较高，但用户生命周期价值（LTV）更高。"
+          },
+          {
+            "impact": "获得：极高的信任度和隐私安全感；失去：通过公开传播实现爆发式增长的可能。",
+            "key": "relationship_bond",
+            "label": "熟人或半熟人关系网（如班级、兴趣小组、企业内部等）",
+            "reversibility": "hard",
+            "tradeoffs": "用户粘性极强，但受限于现实关系链，用户规模上限较低。"
+          }
+        ],
+        "question": "社区的核心定位和人群主要面向哪类连接？",
+        "reason": "定位决定了社区的氛围、功能偏好以及运营策略，是所有后续设计的基础。",
+        "recommendation": "(推荐) 兴趣与爱好分享。",
+        "recommendation_reason": "兴趣驱动的社区更容易在早期通过垂直话题吸引种子用户，相比宽泛的职业或熟人社交，启动成本和运营难度较低。",
+        "recommended_option_key": "interest_based"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "access_privacy_model",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "获得：极快的传播速度和极低的用户获取成本；失去：对不良内容和垃圾广告的控制力，用户发言的隐私感较低。",
+            "key": "fully_public",
+            "label": "完全公开（任何人可自由浏览、注册和发言）",
+            "reversibility": "easy",
+            "tradeoffs": "有利于快速做大规模，但需要投入极大的内容治理成本。"
+          },
+          {
+            "impact": "获得：可观的外部曝光度，同时保留了对核心互动人群的质量控制；失去：部分即兴参与的冲动型用户。",
+            "key": "semi_public",
+            "label": "半公开（内容对所有人开放浏览，但注册、发言或加入特定圈子需审核/邀请）",
+            "reversibility": "moderate",
+            "tradeoffs": "在传播性与质量保障之间达到了平衡，是多数垂直社区的起步选择。"
+          },
+          {
+            "impact": "获得：极高的用户安全感、隐私保护和独特归属感；失去：所有公开流量和自然增长机会。",
+            "key": "fully_private",
+            "label": "完全私密（非成员不可浏览，必须邀请码或管理员批准才能加入）",
+            "reversibility": "hard",
+            "tradeoffs": "内容氛围极纯粹，但完全依赖老用户邀请或线下渠道拉新，增长缓慢。"
+          }
+        ],
+        "question": "社区的访问和准入机制是怎样的？",
+        "reason": "这决定了内容的可见性、传播效率以及用户在社区内的安全感。",
+        "recommendation": "(推荐) 半公开模式（内容公开浏览，加入或发言需要申请/审核）。",
+        "recommendation_reason": "半公开模式兼顾了外部传播，同时能通过准入门槛过滤低质量或恶意用户，保障社区内部氛围。",
+        "recommended_option_key": "semi_public"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "governance_model",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "获得：对社区氛围和法律合规的绝对控制；失去：高昂的人力成本和较慢的内容发布响应速度。",
+            "key": "platform_centralized",
+            "label": "平台集中式治理（完全由官方管理员/先审后发/官方全权处理违规）",
+            "reversibility": "easy",
+            "tradeoffs": "保障平台绝对安全，但容易让用户感到压抑，且早期运营成本高。"
+          },
+          {
+            "impact": "获得：极高的社区活跃度和用户自主性，显著降低官方管理成本；失去：极端情况下版块失控或管理标准不一的风险。",
+            "key": "co_governance",
+            "label": "社区共治机制（由平台制定底线规则，日常版块由推选的版主/核心成员自主管理）",
+            "reversibility": "moderate",
+            "tradeoffs": "激发社区自治活力，但需要设计合理的版主权限与监督机制。"
+          },
+          {
+            "impact": "获得：高度自动化的治理流程，减少人为主观干预的争议；失去：对人际冲突或灰色地带内容治理的细腻度。",
+            "key": "reputation_based",
+            "label": "信誉分与算法驱动（基于用户赞同/反对、信用积分自动降权或禁言）",
+            "reversibility": "moderate",
+            "tradeoffs": "客观公平，但算法模型的设计与调整复杂度较高，且在社区初期样本量不足时效果较差。"
+          }
+        ],
+        "question": "社区的内容治理和秩序维护采用什么方式？",
+        "reason": "内容治理直接关系到平台合规风险、社区氛围维持以及运营人力的投入。",
+        "recommendation": "(推荐) 官方规则指引 + 社区用户共治。",
+        "recommendation_reason": "引入用户共治（如版主机制、举报众包）能有效降低平台的运营成本，并提高用户对社区的归属感和责任感。",
+        "recommended_option_key": "co_governance"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "user_identity_model",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "获得：极高的信息可信度和极低的恶意发言概率；失去：用户发表敏感、隐私或放松内容的意愿。",
+            "key": "real_name",
+            "label": "实名或强实名认证显示（展示真实姓名、职业背书或实名社交圈）",
+            "reversibility": "hard",
+            "tradeoffs": "适用于专业性、招聘类或交易类社区，但用户发言心理门槛很高。"
+          },
+          {
+            "impact": "获得：平衡了隐私保护与长期人际关系的建立；失去：无法利用现实中的真实熟人关系链进行快速扩散。",
+            "key": "pseudonymous_persistent",
+            "label": "唯一昵称与化名（可自定义昵称，且每个账号有唯一的身份印记与成就体系）",
+            "reversibility": "moderate",
+            "tradeoffs": "是大多数讨论型社区的标准配置，支持用户塑造“数字人设”。"
+          },
+          {
+            "impact": "获得：用户最真实的内心表达、高爆料和高情感释放；失去：难以追踪恶意用户，极易滋生谩骂与对立氛围。",
+            "key": "anonymous_allowed",
+            "label": "支持匿名或无痕发言（允许在特定版块或全局以匿名身份发言）",
+            "reversibility": "easy",
+            "tradeoffs": "互动率极高，但对审核和秩序维护的要求是灾难性的。"
+          }
+        ],
+        "question": "用户在社区中展现怎样的身份状态？",
+        "reason": "身份真实度直接影响人际交往的信任度与用户的发言意愿。",
+        "recommendation": "(推荐) 唯一昵称与自主形象（允许使用化名，但社区内身份具有延续性）。",
+        "recommendation_reason": "这既保护了用户的隐私，又确保了其在社区内建立长期信用和个人品牌，有利于沉淀关系链。",
+        "recommended_option_key": "pseudonymous_persistent"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "primary_content_format",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "获得：利于信息沉淀、检索和异步深度探讨；失去：即时互动的新鲜感和感官刺激。",
+            "key": "rich_text",
+            "label": "图文帖子（传统论坛发帖、博客式长文或卡片式短图文）",
+            "reversibility": "easy",
+            "tradeoffs": "适合知识和故事分享，但需要引导用户克服长文写作障碍。"
+          },
+          {
+            "impact": "获得：极强的即时互动感、高频回馈和活跃氛围；失去：内容沉淀价值，非实时在线用户难以融入。",
+            "key": "instant_chat",
+            "label": "即时聊天群组（类似频道、实时文字室或聊天群）",
+            "reversibility": "moderate",
+            "tradeoffs": "活跃度高但信息噪音极大，新用户进入历史聊天记录较难获取系统化知识。"
+          },
+          {
+            "impact": "获得：强烈的视觉/听觉冲击力，高娱乐性，对年轻群体吸引力大；失去：文字逻辑性深度探讨的可能性，且审核成本增加。",
+            "key": "multimedia_first",
+            "label": "多媒体优先（如短视频、纯图片墙或语音频道）",
+            "reversibility": "hard",
+            "tradeoffs": "极易碎片化传播，但用户创作多媒体的工具门槛和流量成本较高。"
+          }
+        ],
+        "question": "社区中用户互动和内容表达的主要媒介形式是什么？",
+        "reason": "不同的内容形式决定了用户的阅读门槛、创作难度以及界面的视觉走向。",
+        "recommendation": "(推荐) 图文发帖与讨论组（长短图文结合）。",
+        "recommendation_reason": "图文格式创作门槛适中，便于搜索引擎索引，且支持深度的观点表达与轻度的日常分享。",
+        "recommended_option_key": "rich_text"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "content_creation_permission",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "获得：最大限度地鼓励用户产出，降低内容冷启动难度；失去：首页充斥低质量、灌水内容的风险。",
+            "key": "all_members",
+            "label": "全员平等创作（任何注册用户均有完全相同的内容发布权限）",
+            "reversibility": "easy",
+            "tradeoffs": "内容量大，但信息杂乱，需要配合强大的推荐算法或人工筛选。"
+          },
+          {
+            "impact": "获得：有效防止低成本小号刷屏，引导用户逐步提高创作水平；失去：新用户第一时间的创作激情。",
+            "key": "all_members_with_tier",
+            "label": "分级创作（普通用户可回复，达成一定活跃度或等级后方可发主帖）",
+            "reversibility": "easy",
+            "tradeoffs": "对秩序保护好，但容易让新用户感到被排斥，需做好等级引导。"
+          },
+          {
+            "impact": "获得：极高的内容权威度与版面整洁度；失去：大众用户对社区的强主人翁感。",
+            "key": "creator_focused",
+            "label": "专栏创作者模式（仅限官方认证的创作者/专家发帖，普通用户仅能评论互动）",
+            "reversibility": "moderate",
+            "tradeoffs": "类似媒体平台，专业度极高，但互动率较低，运营上需持续签约或维护头部创作者。"
+          }
+        ],
+        "question": "社区的创作权限如何分配？",
+        "reason": "这决定了内容消费端与生产端的比例（即“人人皆可创作”还是“专家创作/大众消费”的架构）。",
+        "recommendation": "(推荐) 全员可创，但通过算法或勋章机制对高质量创作者进行倾斜。",
+        "recommendation_reason": "在社区早期，全员创作能最大化内容丰富度，配合激励机制可以过滤出优质创作者，避免社区冷启动失败。",
+        "recommended_option_key": "all_members_with_tier"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "growth_discovery_mode",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "获得: 高精度、高留存的长尾用户；失去: 初期增长速度可能较慢，需要持续有干货内容产出。",
+            "key": "topic_driven",
+            "label": "话题与搜索驱动（内容对外部搜索引擎开放，利用优质内容自然吸引精准受众）",
+            "reversibility": "easy",
+            "tradeoffs": "适合沉淀知识型社区，需要做好搜索引擎优化和分享机制。"
+          },
+          {
+            "impact": "获得: 基于人际信任的高转化率和极佳的社区认同感；失去: 突破原有圈子层级的难度。",
+            "key": "social_referral",
+            "label": "人际邀请与圈子裂变（依赖已有用户的邀请、人脉引荐或老带新活动）",
+            "reversibility": "moderate",
+            "tradeoffs": "早期圈层纯粹，但面临突破圈层瓶颈的挑战，容易触及用户增长天花板。"
+          },
+          {
+            "impact": "获得: 极短时间内的用户量爆发式增长；失去: 大量与社区调性不符的无效用户，容易稀释核心氛围。",
+            "key": "viral_loop",
+            "label": "病毒式传播与激励分享（通过积分奖励、活动海报等利益引导用户在社交媒体分享）",
+            "reversibility": "easy",
+            "tradeoffs": "数据增长好看，但用户流失率极高，需建立强有力的留存引导机制。"
+          }
+        ],
+        "question": "社区初期依靠什么方式吸引新用户和分发内容？",
+        "reason": "增长策略影响社区的裂变机制以及新用户的期望管理。",
+        "recommendation": "(推荐) 依靠垂直话题与内容分发。",
+        "recommendation_reason": "这能吸引真正对主题感兴趣的精准用户，比盲目的社交裂变更能维持社区氛围。",
+        "recommended_option_key": "topic_driven"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "monetization_direction",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "获得：最低的用户使用门槛，商业化空间与用户规模呈线性相关；失去：纯净的界面视觉体验和部分高品质用户对广告的容忍度。",
+            "key": "ad_supported",
+            "label": "广告与流量变现（免费使用，积累规模后通过展示广告或赞助内容变现）",
+            "reversibility": "easy",
+            "tradeoffs": "需要极大的流量支撑才能实现盈利，且会对界面美观与内容流畅度造成一定破坏。"
+          },
+          {
+            "impact": "获得：稳定且健康的现金流，用户筛选度高；失去：这部分付费墙会阻碍部分用户的深度融入。",
+            "key": "premium_subscriptions",
+            "label": "付费会员与订阅（部分高价值板块、功能或无广告体验需要订阅）",
+            "reversibility": "moderate",
+            "tradeoffs": "需要持续提供高价值的独家功能或内容，会员权益必须感知度极高。"
+          },
+          {
+            "impact": "获得：在保障大众体验的同时，从小部分硬核用户处获得收入；失去：商业化爆发性弱，高度依赖产品内道具或工具的设计。",
+            "key": "value_added_services",
+            "label": "增值服务与社群工具（基本讨论免费，针对特定社群工具、虚拟礼物或认证收费）",
+            "reversibility": "easy",
+            "tradeoffs": "对社区氛围伤害最小，但需要精细的产品设计来挖掘用户的消费动因。"
+          }
+        ],
+        "question": "社区在规划中倾向于哪种商业化和收入模式？",
+        "reason": "商业化规划会倒逼产品结构（如是否加入广告位、是否设计付费专区）做出调整。",
+        "recommendation": "(推荐) 增值服务与社群工具。",
+        "recommendation_reason": "这能在不破坏核心用户体验的前提下探索营收，且比直接插播广告更容易让社区用户接受。",
+        "recommended_option_key": "value_added_services"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "primary_platform_context",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "获得：最高的留存率、更强的通知触达能力以及完美的流畅度；失去：用户下载安装的高门槛，以及高昂的跨系统开发与应用商店审核成本。",
+            "key": "native_mobile",
+            "label": "独立手机客户端（App）",
+            "reversibility": "hard",
+            "tradeoffs": "体验最好，但获客成本高、开发周期长，不建议在MVP验证阶段首选。"
+          },
+          {
+            "impact": "获得：极高的分享传播效率，利于搜索引擎检索，开发速度最快；失去：对手机硬件接口调用的局限性，以及消息通知的到达率较低。",
+            "key": "responsive_web",
+            "label": "自适应网页（Web网站，手机与电脑浏览器均可访问）",
+            "reversibility": "easy",
+            "tradeoffs": "最适合验证概念，但在手机端缺少通知常驻，需要通过邮件或三方工具拉回用户。"
+          },
+          {
+            "impact": "获得：在国内生态中极易裂变分享，无需下载即可享有接近App的体验；失去：对其他平台用户的覆盖力，且受制于大平台的审核规范和封禁风险。",
+            "key": "mini_program",
+            "label": "微信/社交平台小程序",
+            "reversibility": "moderate",
+            "tradeoffs": "裂变极快，但生态封闭，且国内内容审核政策变化极易导致被下架。"
+          }
+        ],
+        "question": "用户通常在什么终端和场景下使用该社区？",
+        "reason": "决定首发平台是App、Web网站还是小程序，这极大地影响了开发成本与用户的触达效率。",
+        "recommendation": "(推荐) 自适应网页（Responsive Web）。",
+        "recommendation_reason": "无需用户下载即可在手机和电脑上无缝访问，开发维护成本低，利于早期通过链接快速分享扩散。",
+        "recommended_option_key": "responsive_web"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "community_scale_density",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "获得：热闹、信息量大、容易产生全社区共同关注的热点话题；失去：小众爱好的私密交流空间，以及深厚人际关系的建立。",
+            "key": "grand_plaza",
+            "label": "大广场模式（所有用户在一个或少数几个大列表里互动）",
+            "reversibility": "easy",
+            "tradeoffs": "适合泛娱乐或资讯类社区，但用户关系较疏离。"
+          },
+          {
+            "impact": "获得：兼顾了全站热点曝光与垂直话题的沉淀，方便用户按图索骥；失去：相对而言不够极简的界面结构。",
+            "key": "plaza_with_subforums",
+            "label": "主广场 + 多话题板块（有统一的首页推荐，但有明确的版块划分）",
+            "reversibility": "moderate",
+            "tradeoffs": "结构中规中矩，能容纳多样化用户，但需要持续激发各子版块的创作者活力。"
+          },
+          {
+            "impact": "获得：极高的归属感和安全感，人际关系紧密；失去：跨社群交流和平台统一运营调控的抓手。",
+            "key": "decentralized_cells",
+            "label": "去中心化微型社区（由用户自发创建独立小房间/小社群，群组之间默认隔离）",
+            "reversibility": "hard",
+            "tradeoffs": "隐私度极高，适合小众硬核玩家，但极难进行全局拉新与流量分发。"
+          }
+        ],
+        "question": "你希望用户在社区中感受到怎样的空间和社交密度？",
+        "reason": "这会决定整个产品架构是趋向于“大广场”式的统一分发，还是“小院落”式的自治隔离。",
+        "recommendation": "(推荐) 主广场 + 多话题板块。",
+        "recommendation_reason": "既能汇聚全社区的人气，又给用户提供了找到同频伙伴的垂直小空间，具备较好的成长弹性。",
+        "recommended_option_key": "plaza_with_subforums"
+      }
+    ],
+    "risks": [
+      {
+        "area": "core_features",
+        "impact": "如果缺乏有效的先发过滤或用户快速举报机制，一旦产生违法违规内容，可能面临应用下架或平台封禁的严重后果。",
+        "risk_key": "compliance_and_moderation_risk",
+        "severity": "critical",
+        "statement": "社区内容治理不当可能导致合规风险或氛围迅速恶化。"
+      },
+      {
+        "area": "delivery_plan",
+        "impact": "新用户进入一个空无一人的社区会迅速流失，导致无法验证核心交互玩法和价值主张。",
+        "risk_key": "cold_start_engagement_risk",
+        "severity": "high",
+        "statement": "社区初期面临无内容、无活跃用户的“冷启动”困境。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "快速获取用户规模与维持高质量、纯净讨论氛围之间的张力",
+        "reason": "越是公开和无门槛的社区，增长越快，但也越容易混入灌水和垃圾信息；反之，强审核的私密社区氛围好但极难做大规模。"
+      },
+      {
+        "description": "允许用户匿名发言以宣泄情感，与要求用户对自身言论负责、建立可信人际网络之间的张力",
+        "reason": "匿名能极大释放发帖率，但会瞬间增加管理和合规成本；实名或半实名则相反。"
+      }
+    ],
+    "unknowns": [
+      "具体的社区垂直主题（如：宠物、读书、小众运动等）",
+      "是否包含付费变现功能或商业广告变现通道",
+      "用户是否需要绑定特定的外部社交平台账号进行一键登录"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-12__B3__initial.json",
+  "usage": {
+    "input_tokens": 21068,
+    "output_tokens": 23454,
+    "thinking_tokens": 17775,
+    "total_tokens": 44522,
+    "cache_read_tokens": 0
+  },
+  "b3": {
+    "stage": "initial",
+    "question_count": 10,
+    "candidates_count": 3,
+    "assumptions_count": 2,
+    "gaps_count": 3,
+    "unique_decision_keys": 10,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [initial]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

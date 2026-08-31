@@ -369,12 +369,17 @@ export interface ApiErrorPayload {
   }
   ```
 
+#### 6. 批量跳过建议问题 `POST /api/projects/:id/questions/dismiss`
+- **用途**：用户明确跳过当前批次中的一个或多个未回答问题，不创建 Decision 或 trace。
+- **Request Body**：`{ "questionRefs": ["question:q-01"], "expectedRevision": 11 }`
+- **Response**：`ApiResponse<DismissQuestionsResponse>`，成功后问题状态为 `dismissed`。
+
 ---
 
 ### 2.4 智能推演运行时 (Discovery Intelligence)
 
 #### 1. 执行单轮推演 `POST /api/projects/:id/discovery`
-- **用途**：触发一次受控的 B2.1 Discovery 推演轮次。
+- **用途**：触发一次受控的 B3 Discovery 推演轮次，并按阶段生成最多 12/8/4/2 个独立问题。
 - **约束保障**：单轮推演严格**仅触发 1 次**主要 Provider 调用；100% 通过统一 Schema 结构化提取；AI 输出仅生成 Candidate/Gap/Risk/Tension/Question，严禁越权直接改写事实。
 - **Request Body** (`RunDiscoveryTurnRequest`):
   ```json

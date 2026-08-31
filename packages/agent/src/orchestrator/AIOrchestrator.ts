@@ -11,6 +11,7 @@ import {
   FileStorage,
   GapDetectionEngine,
   QuestionEngine,
+  QuestionBatchPolicy,
   DecisionPolicyEngine,
   DocumentCompiler,
   type CompileDocumentsResult,
@@ -29,6 +30,7 @@ import type {
   AssumptionItem,
   DecisionItem,
   ConflictItem,
+  RiskItem,
   AgentRunTrace,
 } from '@project-architect/contracts';
 import { ErrorCode } from '@project-architect/contracts';
@@ -41,6 +43,12 @@ export interface IntegratedDiscoveryTurnPayload {
   newCandidates: DecisionItem[];
   newAssumptions: AssumptionItem[];
   newConflicts: ConflictItem[];
+  newRisks: RiskItem[];
+  questionBatch: {
+    id: string;
+    stage: import('@project-architect/contracts').QuestionBatchStage;
+    diagnostics: import('@project-architect/core').QuestionSelectionDiagnostics;
+  };
 }
 
 export class AIOrchestrator {
@@ -54,6 +62,7 @@ export class AIOrchestrator {
   private checklistSelector: ChecklistSelector;
   private gapEngine: GapDetectionEngine;
   private questionEngine: QuestionEngine;
+  private questionBatchPolicy: QuestionBatchPolicy;
   private policyEngine: DecisionPolicyEngine;
   private storage: FileStorage;
   private rootDir: string;
@@ -76,11 +85,16 @@ export class AIOrchestrator {
     this.checklistSelector = new ChecklistSelector(join(rootDir, 'checklists'), storage);
     this.gapEngine = new GapDetectionEngine();
     this.questionEngine = new QuestionEngine();
+    this.questionBatchPolicy = new QuestionBatchPolicy();
     this.policyEngine = new DecisionPolicyEngine();
   }
 
   getRootDir(): string {
     return this.rootDir;
+  }
+
+  getProvider(): AIProvider {
+    return this.provider;
   }
 
   /**
@@ -136,7 +150,7 @@ export class AIOrchestrator {
     }
 
     // 3. Assemble profile-based context text
-    const contextText = this.contextManager.buildContextForMode(mode, snapshot, {
+    const baseContextText = this.contextManager.buildContextForMode(mode, snapshot, {
       userMessage: request.userMessage,
       questionAnswer: request.questionAnswer
         ? {
@@ -149,6 +163,8 @@ export class AIOrchestrator {
       inputMaterials,
     });
 
+    const batchPolicy = this.questionBatchPolicy.evaluate(snapshot);
+    const contextText = `${baseContextText}\n\n## B3 Runtime Question Budget\n- Stage: ${batchPolicy.stage}\n- Target: ${batchPolicy.targetMin}-${batchPolicy.maxQuestions} useful independent questions\n- Hard maximum: ${batchPolicy.maxQuestions}\n- Do not add filler when fewer meaningful independent decisions exist.`;
     return { contextText, checklistHints };
   }
 
@@ -157,7 +173,8 @@ export class AIOrchestrator {
    */
   async executeAgentMode(
     mode: AgentMode,
-    contextText: string
+    contextText: string,
+    abortSignal?: AbortSignal
   ): Promise<StructuredResult<DiscoveryResult>> {
     const runtimeProfile = this.runtimeRegistry.getProfile(mode);
     const prompt = await this.promptLoader.buildPromptText(mode);
@@ -172,11 +189,12 @@ export class AIOrchestrator {
       prompt,
       schemaPath,
       contextText,
+      abortSignal,
     });
   }
 
   /**
-   * Step 4: Output Validation (Strict B2.1 Schema & Field Integrity Gate)
+   * Step 4: Output Validation (Strict B3 Schema & Field Integrity Gate)
    */
   validateOutput(result: StructuredResult<DiscoveryResult>): DiscoveryResult {
     if (!result.structuredSuccess || !result.structuredOutput) {
@@ -186,7 +204,9 @@ export class AIOrchestrator {
       err.code =
         result.status === 'timed-out'
           ? ErrorCode.PROVIDER_TIMEOUT
-          : ErrorCode.PROVIDER_PROCESS_FAILED;
+          : result.status === 'cancelled'
+            ? ErrorCode.DISCOVERY_CANCELLED
+            : ErrorCode.PROVIDER_PROCESS_FAILED;
       err.details = { status: result.status, provider: result.provider };
       throw err;
     }
@@ -220,13 +240,10 @@ export class AIOrchestrator {
       }
     }
 
-    // Validate string array fields
+    // Validate simple string array fields
     const stringArrayFields = [
       'confirmed',
-      'candidates',
-      'assumptions',
       'unknowns',
-      'risks',
       'conflicts',
     ] as const;
 
@@ -239,6 +256,91 @@ export class AIOrchestrator {
           err.code = ErrorCode.STATE_VALIDATION_FAILED;
           throw err;
         }
+      }
+    }
+
+    const hasNonEmptyString = (value: unknown): value is string =>
+      typeof value === 'string' && value.trim().length > 0;
+    const hasStringArray = (value: unknown): value is string[] =>
+      Array.isArray(value) && value.every(hasNonEmptyString);
+
+    // Validate strict B3 CandidateSuggestion objects.
+    for (const item of output.candidates || []) {
+      const isObj =
+        typeof item === 'object' &&
+        item !== null &&
+        hasNonEmptyString((item as any).decision_key) &&
+        hasNonEmptyString((item as any).area) &&
+        hasNonEmptyString((item as any).statement) &&
+        hasNonEmptyString((item as any).rationale);
+
+      if (!isObj) {
+        const err: any = new Error(
+          'B3 structured output validation failed: items in "candidates" require decision_key, area, statement, and rationale.'
+        );
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
+      }
+    }
+
+    // Validate strict B3 AssumptionSuggestion objects.
+    for (const item of output.assumptions || []) {
+      const isObj =
+        typeof item === 'object' &&
+        item !== null &&
+        hasNonEmptyString((item as any).decision_key) &&
+        hasNonEmptyString((item as any).area) &&
+        hasNonEmptyString((item as any).statement) &&
+        hasNonEmptyString((item as any).reason);
+
+      if (!isObj) {
+        const err: any = new Error(
+          'B3 structured output validation failed: items in "assumptions" require decision_key, area, statement, and reason.'
+        );
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
+      }
+    }
+
+    // Validate strict B3 RiskSuggestion objects.
+    for (const item of output.risks || []) {
+      const isObj =
+        typeof item === 'object' &&
+        item !== null &&
+        hasNonEmptyString((item as any).risk_key) &&
+        hasNonEmptyString((item as any).area) &&
+        hasNonEmptyString((item as any).statement) &&
+        hasNonEmptyString((item as any).impact) &&
+        ['low', 'medium', 'high', 'critical'].includes((item as any).severity);
+
+      if (!isObj) {
+        const err: any = new Error(
+          'B3 structured output validation failed: items in "risks" require risk_key, area, statement, impact, and severity.'
+        );
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
+      }
+    }
+
+    for (const gap of output.gaps) {
+      if (!hasNonEmptyString(gap.decision_key) || !hasStringArray(gap.depends_on)) {
+        const err: any = new Error('B3 gaps require decision_key and depends_on.');
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
+      }
+    }
+
+    for (const question of output.questions) {
+      if (
+        !hasNonEmptyString(question.decision_key)
+        || !hasStringArray(question.depends_on)
+        || !Array.isArray(question.options)
+        || question.options.length < 2
+        || question.options.length > 3
+      ) {
+        const err: any = new Error('B3 questions require decision_key, depends_on, and 2-3 options.');
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
       }
     }
 
@@ -268,11 +370,12 @@ export class AIOrchestrator {
         !validSeverities.has(gap.severity) ||
         typeof gap.reason !== 'string' ||
         typeof gap.impact !== 'string' ||
-        typeof gap.dependency !== 'string' ||
+        typeof gap.decision_key !== 'string' ||
+        !Array.isArray(gap.depends_on) ||
         typeof gap.should_ask_user !== 'boolean'
       ) {
         const err: any = new Error(
-          'Structured output validation failed: gap items must follow schema with area, severity (low|medium|high|critical), reason, impact, dependency, should_ask_user.'
+          'Structured output validation failed: B3 gaps require decision_key, depends_on, area, severity, reason, impact, and should_ask_user.'
         );
         err.code = ErrorCode.STATE_VALIDATION_FAILED;
         throw err;
@@ -286,6 +389,8 @@ export class AIOrchestrator {
         typeof q !== 'object' ||
         q === null ||
         !validImportances.has(q.importance) ||
+        typeof q.decision_key !== 'string' ||
+        !Array.isArray(q.depends_on) ||
         typeof q.question !== 'string' ||
         typeof q.reason !== 'string' ||
         typeof q.recommendation !== 'string' ||
@@ -293,7 +398,7 @@ export class AIOrchestrator {
         !Array.isArray(q.options)
       ) {
         const err: any = new Error(
-          'Structured output validation failed: question items must follow schema with importance (normal|high|critical), question, reason, recommendation, recommendation_reason, options array.'
+          'Structured output validation failed: B3 questions require decision_key, depends_on, importance, question, reason, recommendation, recommendation_reason, and options.'
         );
         err.code = ErrorCode.STATE_VALIDATION_FAILED;
         throw err;
@@ -309,6 +414,7 @@ export class AIOrchestrator {
         throw err;
       }
 
+      const seenKeys = new Set<string>();
       for (const opt of q.options) {
         if (
           typeof opt !== 'object' ||
@@ -322,6 +428,30 @@ export class AIOrchestrator {
           err.code = ErrorCode.STATE_VALIDATION_FAILED;
           throw err;
         }
+
+        if (typeof opt.key !== 'string' || !opt.key.trim()) {
+          const err: any = new Error(
+            'Structured output validation failed: question option key must be a non-empty string.'
+          );
+          err.code = ErrorCode.STATE_VALIDATION_FAILED;
+          throw err;
+        }
+        if (seenKeys.has(opt.key)) {
+          const err: any = new Error(
+            `Structured output validation failed: duplicate option key "${opt.key}" within question.`
+          );
+          err.code = ErrorCode.STATE_VALIDATION_FAILED;
+          throw err;
+        }
+        seenKeys.add(opt.key);
+      }
+
+      if (typeof q.recommended_option_key !== 'string' || !seenKeys.has(q.recommended_option_key)) {
+        const err: any = new Error(
+          `Structured output validation failed: recommended_option_key "${q.recommended_option_key}" does not match any option key.`
+        );
+        err.code = ErrorCode.STATE_VALIDATION_FAILED;
+        throw err;
       }
     }
 
@@ -342,13 +472,13 @@ export class AIOrchestrator {
       discoveryOutput
     );
 
-    const { questions, autoAssumptions } = this.questionEngine.generateQuestions(
+    const { questions, autoAssumptions, batch } = this.questionEngine.generateQuestions(
       prioritizedGaps,
       snapshot,
       discoveryOutput.questions
     );
 
-    const { newCandidates, newAssumptions, newConflicts } =
+    const { newCandidates, newAssumptions, newConflicts, newRisks } =
       this.policyEngine.processDiscoverySuggestions(snapshot, discoveryOutput);
 
     return {
@@ -359,6 +489,8 @@ export class AIOrchestrator {
       newCandidates,
       newAssumptions,
       newConflicts,
+      newRisks,
+      questionBatch: batch,
     };
   }
 
@@ -398,12 +530,13 @@ export class AIOrchestrator {
   }
 
   /**
-   * Executes the full Unified Discovery Turn pipeline (B2.1 Runtime Profile Workflow).
+   * Executes the full Unified Discovery Turn pipeline (B3 Runtime Profile Workflow).
    */
   async runDiscoveryTurn(
     projectPath: string,
     request: Omit<RunDiscoveryTurnRequest, 'projectId'>,
-    explicitMode?: AgentMode
+    explicitMode?: AgentMode,
+    abortSignal?: AbortSignal
   ): Promise<RunDiscoveryTurnResponse & { activeMode?: AgentMode; runTrace?: AgentRunTrace }> {
     const startedAt = new Date().toISOString();
     let snapshot = await this.stateEngine.getSnapshot(projectPath);
@@ -433,7 +566,7 @@ export class AIOrchestrator {
     const { contextText, checklistHints } = await this.buildContext(activeMode, snapshot, request, projectPath);
 
     // Step 3: Provider Execution (Single Call with specialized prompt & schema)
-    const result = await this.executeAgentMode(activeMode, contextText);
+    const result = await this.executeAgentMode(activeMode, contextText, abortSignal);
 
     // Step 4: Validation
     const discoveryOutput = this.validateOutput(result);
@@ -459,6 +592,14 @@ export class AIOrchestrator {
       durationMs: result.durationMs,
       stateRevisionBefore: revisionBefore,
       stateRevisionAfter: updatedSnapshot.metadata.stateRevision,
+      diagnostics: {
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+        thinkingTokens: result.usage.thinkingTokens,
+        cacheReadTokens: result.usage.cacheReadTokens,
+        cacheObserved: result.usage.cacheReadTokens !== 'unavailable',
+        questionBatch: payload.questionBatch,
+      },
     };
 
     await this.recordTrace(projectPath, runTrace);
@@ -471,6 +612,13 @@ export class AIOrchestrator {
       diagnostics: {
         durationMs: result.durationMs,
         totalTokens: result.usage.totalTokens,
+        cacheReadTokens: result.usage.cacheReadTokens,
+        questionBatch: {
+          id: payload.questionBatch.id,
+          stage: payload.questionBatch.stage,
+          generatedQuestionCount: payload.questions.length,
+          selection: payload.questionBatch.diagnostics,
+        },
       },
     };
   }
@@ -496,7 +644,7 @@ export class AIOrchestrator {
     const targetExpectedRev = expectedRevision ?? snapshot.metadata.stateRevision;
     const nextRevision = snapshot.metadata.stateRevision + 1;
     const compiler = new DocumentCompiler(this.storage);
-    const result = await compiler.compile(projectPath, snapshot, nextRevision);
+    const result = await compiler.compile(projectPath, snapshot, nextRevision, false);
 
     // Atomically commit documents state, write rendered files, and update stage
     await this.stateEngine.completeDocumentCompilation(

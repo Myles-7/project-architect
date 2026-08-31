@@ -26,6 +26,7 @@ export const UploadMaterialModal: React.FC<UploadMaterialModalProps> = ({
   const [textContent, setTextContent] = useState('');
   const [fileBase64, setFileBase64] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [docFormatWarning, setDocFormatWarning] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,6 +43,14 @@ export const UploadMaterialModal: React.FC<UploadMaterialModalProps> = ({
 
     const isImage = file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name);
     const isDoc = /\.(pdf|docx)$/i.test(file.name);
+
+    if (isDoc) {
+      setDocFormatWarning(
+        `检测到 ${file.name.endsWith('.pdf') ? 'PDF' : 'DOCX'} 文档。本地环境不携带外部 OCR 解析器，无法直接分析此文档内容。强烈建议直接从文档复制核心要点，切换为纯文本粘贴！`
+      );
+    } else {
+      setDocFormatWarning(null);
+    }
 
     if (isImage) {
       setKind('image');
@@ -141,6 +150,25 @@ export const UploadMaterialModal: React.FC<UploadMaterialModalProps> = ({
           </div>
         )}
 
+        {docFormatWarning && (
+          <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="leading-relaxed">{docFormatWarning}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setKind('text');
+                setDocFormatWarning(null);
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-200/80 dark:bg-amber-900/80 hover:bg-amber-300 dark:hover:bg-amber-800 text-amber-900 dark:text-amber-100 transition-colors cursor-pointer"
+            >
+              <span>转为手动粘贴纯文本</span>
+            </button>
+          </div>
+        )}
+
         {/* Kind Selector */}
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -215,6 +243,38 @@ export const UploadMaterialModal: React.FC<UploadMaterialModalProps> = ({
             required
           />
         </div>
+
+        {/* Pre-upload Inspection Preview */}
+        {filename && (
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800/80 space-y-2 text-xs animate-in fade-in">
+            <div className="font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-between">
+              <span>文件解析与上下文预检</span>
+              <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                .{filename.split('.').pop()?.toLowerCase() || 'unknown'}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="p-2 rounded-lg bg-white dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/60">
+                <span className="text-zinc-400 block mb-0.5">文本提取能力</span>
+                <span className={`font-semibold ${kind === 'text' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-600 dark:text-zinc-400'}`}>
+                  {kind === 'text' ? '✓ 可完整提取纯文本' : '✗ 二进制仅保存附件'}
+                </span>
+              </div>
+              <div className="p-2 rounded-lg bg-white dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/60">
+                <span className="text-zinc-400 block mb-0.5">纳入 AI 推演上下文</span>
+                <span className={`font-semibold ${kind === 'text' ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-400'}`}>
+                  {kind === 'text' ? '✓ 自动纳入上下文' : '✗ 仅本地归档参考'}
+                </span>
+              </div>
+            </div>
+            {kind === 'image' && (
+              <div className="p-2 rounded-lg bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/40 text-[11px] text-amber-900 dark:text-amber-300 flex items-start gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                <span>重要告知：图片素材当前仅作为原型草图保存在项目本地目录，不会送入大模型推演上下文进行分析。</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Content Area */}
         {kind === 'text' ? (

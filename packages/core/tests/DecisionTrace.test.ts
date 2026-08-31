@@ -33,7 +33,7 @@ describe('Decision trace', () => {
         recommendationReason: 'A narrow user makes the MVP testable.', options: [], allowFreeInput: true,
         status: 'shown', createdAt: '2026-08-23T00:00:00.000Z',
       }],
-      autoAssumptions: [], newCandidates: [], newAssumptions: [], newConflicts: [],
+      autoAssumptions: [], newCandidates: [], newAssumptions: [], newConflicts: [], newRisks: [],
     }, created.metadata.stateRevision);
 
     expect(withQuestion.gaps.gaps.find((gap) => gap.id === 'gap-user')?.status).toBe('open');

@@ -1,0 +1,492 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-01",
+  "stage": "initial",
+  "name": "vague-cleaner",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 60790,
+  "output": {
+    "assumptions": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "cleanup_mechanism",
+        "reason": "使用系统标准 API 是最安全且兼容性最好的方式，能避免损坏磁盘或造成系统崩溃。",
+        "statement": "软件将使用操作系统标准的文件系统删除 API（而非低级磁盘扇区操作）来安全地擦除文件。"
+      },
+      {
+        "area": "delivery_plan",
+        "decision_key": "distribution_channel",
+        "reason": "官网直接分发没有审核延迟，便于快速迭代 MVP，且能绕过应用商店对系统工具类软件的严格沙盒权限限制。",
+        "statement": "软件首发将通过官方网站直接提供下载安装包（如 .exe 或 .dmg），后续再考虑上架微软或苹果应用商店。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "branding_identity",
+        "rationale": "目前市面上主流的清理软件普遍存在弹窗多、捆绑严重的现象，主打清爽绿色的品牌形象能够直击用户痛点，形成口碑传播。",
+        "statement": "产品定位为“无广告、无残留、极速响应”的绿色空间净化器，与市面上臃肿的管家类软件形成鲜明对比。"
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "scan_speed_optimization",
+        "rationale": "扫描速度是用户对清理软件的第一感官，快速反馈能够显著提升第一印象。",
+        "statement": "MVP 阶段即引入文件系统 MFT（主文件表）读取或多线程并发扫描技术，确保全盘扫描在 10 秒内完成。"
+      }
+    ],
+    "confirmed": [
+      "用户希望开发一款电脑空间清理软件。"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "target_platform",
+        "depends_on": [],
+        "impact": "无法启动软件的底层技术架构设计和前端 UI 技术栈选型。",
+        "reason": "目标平台未确定，将直接影响架构设计、前端 UI 技术栈选择及底层系统 API 的适配。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "target_user",
+        "decision_key": "target_user_group",
+        "depends_on": [],
+        "impact": "产品经理和设计师无法规划符合用户技术水平的交互界面，可能导致软件过于复杂或过于简陋。",
+        "reason": "目标用户群不明确，导致界面的易用性与功能的复杂性设计缺乏基准线。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "mvp_cleanup_focus",
+        "depends_on": [],
+        "impact": "产品范围可能无限扩大，导致首发时间严重延迟，研发成本失控。",
+        "reason": "MVP 版本的核心清理目标不明确，开发团队无法估算工期，且面临项目范围蔓延风险。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "cleanup_safety_policy",
+        "depends_on": [],
+        "impact": "开发人员无法设计核心的清理状态机，可能在清理过程中引入高误删风险。",
+        "reason": "防误删的安全逻辑与用户交互路径未确定，无法建立扫描结果预览与清理的完整用户旅程。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "data_recovery_promise",
+        "depends_on": [],
+        "impact": "如果未实现数据保护，误删文件可能会对用户造成不可逆的灾难，导致严重的售后纠纷和公关危机。",
+        "reason": "数据恢复机制（回收站还是备份还原）未定义，会影响核心操作的原子性设计。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "delivery_plan",
+        "decision_key": "monetization_model",
+        "depends_on": [],
+        "impact": "如果后期才考虑收费，可能需要重构整个应用以添加繁琐的订阅控制、支付系统和账户模块。",
+        "reason": "商业化模式尚未确定，这会影响 MVP 阶段是否需要集成第三方支付、账户系统及收费墙逻辑。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "scanning_privacy_policy",
+        "depends_on": [],
+        "impact": "不明确隐私保护可能会让用户对全盘扫描感到警惕，降低软件的安装率，甚至违反相关隐私法规。",
+        "reason": "用户数据的联网与隐私边界不清晰，可能会引发平台审核或合规性问题。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "visual_style",
+        "depends_on": [],
+        "impact": "如果界面方向偏离用户喜好，可能导致产品体验较差，用户觉得不够现代或过于复杂。",
+        "reason": "视觉呈现倾向未确定，直接影响设计师的出图风格及原型开发。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "execution_mode",
+        "depends_on": [],
+        "impact": "若需要在后台常驻，开发和测试系统资源占用的成本将显著上升，且增加了杀毒软件误杀的概率。",
+        "reason": "常态化运行方式不明确，影响后台进程常驻、自启动及通知预警机制的设计。",
+        "severity": "high",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "target_platform",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "可以深挖 Windows 特有的系统垃圾（如注册表和预取文件），开发难度低，首发版本预计可在 1 个月内交付。但无法获取 macOS 用户。",
+            "key": "windows_only",
+            "label": "首发仅支持 Windows 系统",
+            "reversibility": "moderate",
+            "tradeoffs": "放弃早期 macOS 市场份额"
+          },
+          {
+            "impact": "针对 Mac 沙盒环境优化，用户付费意愿强，单客价值高。但苹果的沙盒限制较严，某些系统清理功能可能需要额外的越权授权，且用户基数小于 Windows。",
+            "key": "macos_only",
+            "label": "首发仅支持 macOS 系统",
+            "reversibility": "moderate",
+            "tradeoffs": "目标受众规模较小，获取管理员权限门槛高"
+          },
+          {
+            "impact": "能同时获取两大平台的用户，市场规模最大。但开发工作量将增加一倍，需要维护两套完全不同的清理逻辑，首发交付时间预计延长至 3 个月以上。",
+            "key": "cross_platform",
+            "label": "同时支持 Windows 和 macOS",
+            "reversibility": "hard",
+            "tradeoffs": "开发周期长，团队多平台维护精力分散"
+          }
+        ],
+        "question": "该清理软件首发将运行在哪个操作系统平台上？",
+        "reason": "操作系统决定了清理的底层接口、系统垃圾的存储位置以及分发渠道。Windows和macOS的文件系统和清理机制有巨大差异。",
+        "recommendation": "优先支持 Windows 平台。",
+        "recommendation_reason": "考虑到您当前使用的是 Windows 系统，且 Windows 用户基数庞大，各类软件产生的缓存和残留问题更为普遍，开发 Windows 客户端能更快触达目标用户并验证 MVP。",
+        "recommended_option_key": "windows_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "target_user_group",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "界面设计将极其简单，只提供一键式傻瓜操作，自动识别并清理。这能让软件快速普及，但产品将放弃极客用户所需的深度手动控制功能。",
+            "key": "average_user",
+            "label": "面向普通大众用户",
+            "reversibility": "moderate",
+            "tradeoffs": "缺乏对极客用户的吸引力，无法提供高级定制选项"
+          },
+          {
+            "impact": "支持精细的自定义清理规则（如清理 build 目录、编译缓存等）和正则过滤。但这会让普通用户觉得门槛太高而流失，界面设计也会更复杂。",
+            "key": "power_user",
+            "label": "面向程序员与技术极客",
+            "reversibility": "moderate",
+            "tradeoffs": "放弃了庞大的普通大众市场，操作门槛较高"
+          }
+        ],
+        "question": "该软件主要面向哪类用户群体？",
+        "reason": "用户的技术水平决定了软件的交互复杂度、清理的安全级别以及提示信息的直观程度。",
+        "recommendation": "面向普通大众用户（非技术人员）。",
+        "recommendation_reason": "普通用户更容易遇到“电脑卡顿”、“空间不足”却不知如何清理的痛点，提供傻瓜式的操作能帮助该软件快速获取大量用户。",
+        "recommended_option_key": "average_user"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "mvp_cleanup_focus",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "解决最日常的磁盘红条和卡顿问题，开发逻辑最成熟，误删风险低，能在 2 周内快速交付基础清理模块。但它无法定位用户自己保存的大文件。",
+            "key": "system_and_app_cache",
+            "label": "系统临时文件与常用应用缓存清理",
+            "reversibility": "easy",
+            "tradeoffs": "无法快速解决由于下载了大文件而导致的空间严重短缺问题"
+          },
+          {
+            "impact": "能够通过找出几个几吉字节（GB）的视频或压缩包来快速释放大量空间。但由于大文件属于用户个人资料，必须设计繁琐的预览确认流程，无法自动一键删除。",
+            "key": "large_and_duplicate_files",
+            "label": "大文件扫描与重复文件清理",
+            "reversibility": "easy",
+            "tradeoffs": "交互链路长，需要用户花费精力逐个核对是否删除"
+          },
+          {
+            "impact": "能清除软件卸载后遗留在深层目录中的文件夹和注册表，保持系统清爽。但需要针对各种常用软件单独编写识别和卸载脚本，开发和后期维护的成本极高。",
+            "key": "app_uninstaller",
+            "label": "软件彻底卸载与残留文件清理",
+            "reversibility": "moderate",
+            "tradeoffs": "技术难度最高，软件兼容性适配成本极大"
+          }
+        ],
+        "question": "在 MVP（最小可行产品）版本中，最核心的清理功能是什么？",
+        "reason": "电脑垃圾种类繁多，明确首要清理目标能够降低开发周期，让产品更快推向市场。",
+        "recommendation": "系统临时文件与常用应用缓存清理。",
+        "recommendation_reason": "这是最普遍的痛点，且技术实现成熟，误删风险相对可控。用户能直观看到清理出来的空间，体验反馈最直接。",
+        "recommended_option_key": "system_and_app_cache"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "cleanup_safety_policy",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "在保障数据安全的前提下，尽可能减少用户点击次数，提供流畅的“一键清理”体验。但需要开发团队在后台维护一套高精度的垃圾安全分级库。",
+            "key": "smart_selection",
+            "label": "智能勾选安全垃圾，高风险项提示确认",
+            "reversibility": "easy",
+            "tradeoffs": "需要持续维护垃圾库白名单规则，增加软件规则库的更新维护成本"
+          },
+          {
+            "impact": "绝对安全，软件完全不承担因“误删”导致数据丢失的赔偿或舆论风险。但操作流程繁琐，可能会让非技术用户觉得产品不够智能。",
+            "key": "fully_manual_preview",
+            "label": "仅列出扫描结果，由用户逐项手动勾选后再清理",
+            "reversibility": "easy",
+            "tradeoffs": "严重影响“快速清理”的用户体验，操作成本极高"
+          },
+          {
+            "impact": "清理流程极其简单快捷，省去用户的思考时间。但极易发生误删纠纷，一旦将用户重要的工作文档或游戏存档抹除，将造成无法挽回的恶评。",
+            "key": "fully_automatic",
+            "label": "扫描后直接在后台一键自动清理，不展示列表",
+            "reversibility": "hard",
+            "tradeoffs": "数据安全风险极大，缺乏用户确认环节"
+          }
+        ],
+        "question": "软件扫描完成后，执行清理的交互策略是什么？",
+        "reason": "清理垃圾存在误删用户重要数据的风险（如未保存的草稿、重要浏览器 Cookie 等），安全策略直接决定了用户的信任度和软件的易用性。",
+        "recommendation": "智能勾选安全垃圾，高风险项提示确认。",
+        "recommendation_reason": "既保留了“一键清理”的便捷性，又通过防误删机制规避了严重的数据丢失风险，平衡了效率和安全。",
+        "recommended_option_key": "smart_selection"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "data_recovery_promise",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "提供低成本的“后悔药”。如果不小心误删了文件，用户可以去回收站一键还原。这能把客服申诉和差评率降低 90% 以上。但如果清理大文件，回收站仍会占用硬盘空间，用户需要二次清空回收站才能真正释放空间。",
+            "key": "recycle_bin_first",
+            "label": "默认移至系统回收站",
+            "reversibility": "easy",
+            "tradeoffs": "清理大文件时无法立即真正减少硬盘物理空间占用"
+          },
+          {
+            "impact": "磁盘空间释放一步到位，清理效果立竿见影。但备份文件本身会临时占用磁盘，且需要开发一套备份与还原引擎，增加大约 1-2 周的开发量。",
+            "key": "permanent_deletion_after_backup",
+            "label": "直接永久删除，但高风险项目清理前自动备份",
+            "reversibility": "moderate",
+            "tradeoffs": "临时占用磁盘空间，备份还原逻辑开发较重"
+          },
+          {
+            "impact": "磁盘释放最彻底，软件运行速度最快，不需要开发任何备份还原的后台逻辑。但在发生误删时，用户将永远失去数据，极易引发公关危机。",
+            "key": "force_permanent_deletion",
+            "label": "不留备份，直接从硬盘上永久抹除",
+            "reversibility": "hard",
+            "tradeoffs": "误删后完全无法挽回，抗风险能力为零"
+          }
+        ],
+        "question": "软件清理的文件如何处理？是否提供防误删的“后悔药”机制？",
+        "reason": "被删除的文件如果无法恢复，一旦发生误删，会对用户造成不可逆的损失。",
+        "recommendation": "默认移至系统回收站。",
+        "recommendation_reason": "移至回收站是成本最低且最符合用户直觉的“后悔药”机制，既不额外占用软件自身的空间，又给用户留了退路。",
+        "recommended_option_key": "recycle_bin_first"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "monetization_model",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "通过免费扫描和常规清理快速吸引用户下载，积累口碑；再通过大文件清理、自动清理等功能引导用户付费。但需要额外开发用户账号、授权激活和支付系统，首发时间可能增加 2 周。",
+            "key": "freemium",
+            "label": "免费版+付费升级高级功能",
+            "reversibility": "moderate",
+            "tradeoffs": "需开发配套的账户和计费系统，首发周期稍有延长"
+          },
+          {
+            "impact": "商业模式非常纯粹，用户没有持续付费压力，适合做口碑极佳的小而美工具。但在产品发布后期难以获得持续的资金流来维护规则库的在线更新。",
+            "key": "one_time_purchase",
+            "label": "限时免费试用，完整版一次性买断",
+            "reversibility": "moderate",
+            "tradeoffs": "难以获取持续现金流以支持规则库的长期维护更新"
+          },
+          {
+            "impact": "用户没有任何付费阻碍，下载转化率最高，不需要接入支付系统。但清理类软件如果频繁弹窗广告或捆绑安装其他软件，极易引起用户反感，被杀毒软件误杀的概率也会翻倍。",
+            "key": "pure_free_ads",
+            "label": "软件完全免费，通过内置广告或软件推荐变现",
+            "reversibility": "hard",
+            "tradeoffs": "极大折损用户体验，且极易被杀毒软件误报为流氓程序"
+          }
+        ],
+        "question": "该软件计划采用怎样的商业化变现模式？",
+        "reason": "商业模式决定了产品的设计方向。例如，免费带广告需要预留广告位，而付费订阅则需要构建精细的收费墙和功能分级。",
+        "recommendation": "免费版+付费升级高级功能（Freemium）。",
+        "recommendation_reason": "清理类软件市场竞争激烈，完全收费会导致新用户流失；完全免费则难以为继。免费体验加高级增值服务是目前最容易被用户接受的策略。",
+        "recommended_option_key": "freemium"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "scanning_privacy_policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "用户的任何文件路径、文件名均不会上传到云端，最大限度保护隐私，能够直接在隐私声明中作为主打卖点，极易建立用户信任。但软件只能依靠本地已有的清理规则，对新发布软件的识别可能会滞后。",
+            "key": "local_scan_only",
+            "label": "100% 纯本地离线扫描",
+            "reversibility": "easy",
+            "tradeoffs": "无法自动匹配云端最新的第三方应用临时文件特征"
+          },
+          {
+            "impact": "当遇到本地无法识别的临时文件时，上传文件特征或路径到云端查询，清理规则更新非常及时，识别率更高。但必须编写严格的隐私条款并建设云端查询服务器，增加服务器租用和带宽成本。",
+            "key": "cloud_assisted_scan",
+            "label": "云端数据库辅助扫描",
+            "reversibility": "moderate",
+            "tradeoffs": "面临较高的用户隐私疑虑以及云端服务器维护成本"
+          }
+        ],
+        "question": "软件在扫描垃圾文件时，对于数据隐私和联网策略是如何定义的？",
+        "reason": "清理软件需要扫描用户的整个硬盘，这涉及极高的隐私敏感度。联网策略将直接影响用户对软件安全性的信任。",
+        "recommendation": "100% 纯本地离线扫描，仅在更新清理规则库时联网。",
+        "recommendation_reason": "电脑清理工具如果频繁上传用户文件路径或数据，极易被杀毒软件拦截或被用户质疑窃取隐私。纯本地扫描能给用户最强的安全感。",
+        "recommended_option_key": "local_scan_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "visual_style",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "视觉清爽现代，用户只需要点一下就能完成操作，使用难度为零。但这会隐藏底层文件的路径和细节，可能会让部分专业用户觉得软件功能单一、缺乏掌控感。",
+            "key": "minimalist_dashboard",
+            "label": "极简仪表盘风格，突出“一键清理”大按钮",
+            "reversibility": "easy",
+            "tradeoffs": "屏蔽了底层清理细节，不适合追求深度掌控的用户"
+          },
+          {
+            "impact": "展示极度丰富的数据，大文件、零碎缓存的分布一目了然，专业感强，适合喜欢手动排查空间的用户。但密密麻麻的条目和数据图表可能会让普通大众用户感到操作焦虑和困惑。",
+            "key": "detailed_list_view",
+            "label": "类似磁盘树状图/列表风格，显示具体文件占比",
+            "reversibility": "easy",
+            "tradeoffs": "界面复杂度高，容易增加普通用户的认知负荷"
+          }
+        ],
+        "question": "软件的用户界面（UI）呈现和交互风格倾向于哪种？",
+        "reason": "界面风格直接决定了用户对软件专业度或易用性的第一印象。",
+        "recommendation": "极简仪表盘风格，突出“一键清理”大按钮。",
+        "recommendation_reason": "这种风格直观、现代，最适合普通大众用户，能让人一眼看懂电脑的健康状况并快速操作。",
+        "recommended_option_key": "minimalist_dashboard"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "execution_mode",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "极致轻量，完全不占用后台的 CPU 和内存资源，不会给用户电脑造成任何额外负担，树立极好的良心口碑。但无法在电脑空间不足时主动向用户发出预警或进行自动静默清理。",
+            "key": "on_demand_only",
+            "label": "仅在用户主动打开时运行，关闭后无后台残留",
+            "reversibility": "easy",
+            "tradeoffs": "无法在磁盘空间变红时进行主动实时的预警提示"
+          },
+          {
+            "impact": "能够在空间低于一定阈值（如小于 10%）时，主动弹窗提醒用户清理，或者在闲时自动清理，产品黏性高。但需要维持后台服务运行，容易引起用户对“后台耗电和卡顿”的顾虑。",
+            "key": "background_monitor",
+            "label": "常驻后台，实时监控磁盘空间并在不足时提示",
+            "reversibility": "moderate",
+            "tradeoffs": "常驻进程会占用少量内存，并增加杀毒软件误报风险"
+          }
+        ],
+        "question": "软件的常态化运行方式是怎样的？",
+        "reason": "这决定了软件是做成一个召之即来挥之即去的“单次工具”，还是需要常驻后台的“系统守护者”。",
+        "recommendation": "仅在用户主动打开时运行，不常驻后台。",
+        "recommendation_reason": "很多清理软件因为常驻后台、频繁弹窗报警而被用户视作“流氓软件”。不做后台驻留能带给用户极致的轻量、无感体验，建立优秀的品牌口碑。",
+        "recommended_option_key": "on_demand_only"
+      }
+    ],
+    "risks": [
+      {
+        "area": "technical_boundary",
+        "impact": "用户可能会因为软件提示“权限不足”或扫描不彻底而给出差评。",
+        "risk_key": "os_permission_denial",
+        "severity": "high",
+        "statement": "由于操作系统安全权限收紧，软件可能会在扫描或删除某些系统目录或隐私文件时失败。"
+      },
+      {
+        "area": "core_features",
+        "impact": "导致用户对产品失去信任，并在社交媒体或应用商店发表严重负面评价，甚至带来法律索赔。",
+        "risk_key": "accidental_deletion_dispute",
+        "severity": "critical",
+        "statement": "如果清理规则不够完善，误删了用户的核心系统文件或重要个人文档（如未保存的代码、游戏存档），可能导致数据丢失。"
+      },
+      {
+        "area": "technical_boundary",
+        "impact": "导致用户无法正常下载、安装或使用软件，极大地阻碍新用户的获取和留存。",
+        "risk_key": "antivirus_false_positive",
+        "severity": "high",
+        "statement": "清理软件频繁执行删除、扫描等高敏感操作，极易被第三方杀毒软件（如 Windows Defender、火绒等）误报为木马或流氓软件。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "极简一键清理与专业深度控制之间的张力。",
+        "reason": "普通用户希望一键搞定，不想看懂什么是 Temp 文件夹；而极客用户则希望看清每一个文件的路径，并且自由定制忽略清单。在界面和策略设计上，需要在两者的平衡中寻找折中。"
+      },
+      {
+        "description": "清理彻底度与安全边界之间的张力。",
+        "reason": "清理越彻底，释放的空间就越多，用户的爽感越强；但同时误删有价值文件的概率也成倍上升。追求彻底会降低安全性，追求绝对安全则可能显得清理效果不明显。"
+      }
+    ],
+    "unknowns": [
+      "软件的目标盈利预期与开发预算上限",
+      "是否需要支持多语言以面向全球市场",
+      "是否需要适配 Windows 以外的特殊系统（如 Linux 或国产操作系统）"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-01__B3__initial.json",
+  "usage": {
+    "input_tokens": 41503,
+    "output_tokens": 25827,
+    "thinking_tokens": 18959,
+    "total_tokens": 67330,
+    "cache_read_tokens": 20421
+  },
+  "b3": {
+    "stage": "initial",
+    "question_count": 9,
+    "candidates_count": 2,
+    "assumptions_count": 2,
+    "gaps_count": 9,
+    "unique_decision_keys": 9,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [initial]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

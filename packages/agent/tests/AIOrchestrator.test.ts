@@ -42,6 +42,9 @@ describe('AIOrchestrator & Agent Layer Tests', () => {
     expect(response.snapshot.questions.items.length).toBeGreaterThan(0);
     expect(response.snapshot.decisions.items.some((d) => d.status === 'candidate')).toBe(true);
     expect(response.snapshot.assumptions.items.some((a) => a.status === 'active')).toBe(true);
+    expect(response.discoveryResult.risks).toHaveLength(1);
+    expect(response.snapshot.risks.items).toHaveLength(1);
+    expect(response.snapshot.risks.items[0]?.statement).toContain('File permission');
   });
 
   it('persists a user question answer as a decision trace before the single discovery call', async () => {
@@ -61,7 +64,7 @@ describe('AIOrchestrator & Agent Layer Tests', () => {
         reason: 'The first workflow depends on it.', recommendation: 'Start narrow.',
         recommendationReason: 'A narrow MVP is testable.', options: [], allowFreeInput: true, status: 'shown', createdAt: '',
       }],
-      autoAssumptions: [], newCandidates: [], newAssumptions: [], newConflicts: [],
+      autoAssumptions: [], newCandidates: [], newAssumptions: [], newConflicts: [], newRisks: [],
     }, created.snapshot.metadata.stateRevision);
 
     const response = await orchestrator.runDiscoveryTurn(testProjectDir, {
@@ -73,5 +76,35 @@ describe('AIOrchestrator & Agent Layer Tests', () => {
       questionRef: 'question:q-user',
       userAnswer: 'Independent developers',
     });
+  });
+
+  it('rejects legacy string suggestions at the production B3 runtime boundary', async () => {
+    const created = await engine.createProject({
+      name: 'Strict B3 project', idea: 'Strict structured output', projectPath: testProjectDir,
+    });
+    const invalidProvider = {
+      name: 'invalid-b3-provider',
+      complete: async () => ({
+        status: 'success', structuredSuccess: true,
+        structuredOutput: {
+          confirmed: [], candidates: ['legacy candidate'], assumptions: [], unknowns: [],
+          risks: [], conflicts: [], tensions: [], gaps: [], questions: [],
+        },
+        rawEnvelope: null, stderr: null, exitCode: 0, durationMs: 1,
+        usage: { inputTokens: 1, outputTokens: 1, thinkingTokens: 0, totalTokens: 2, cacheReadTokens: 0 },
+        provider: 'invalid-b3-provider',
+      }),
+      healthCheck: async () => ({
+        status: 'ready', providerName: 'invalid', inferenceLocation: 'unknown',
+        sendsProjectContextOffDevice: 'unknown', structuredOutput: 'unknown', promptCache: 'unknown',
+        checkedAt: new Date().toISOString(),
+      }),
+    } as any;
+    const strictOrchestrator = new AIOrchestrator(invalidProvider, engine, process.cwd(), storage);
+
+    await expect(strictOrchestrator.runDiscoveryTurn(testProjectDir, {
+      userMessage: 'test strict validation',
+      expectedRevision: created.snapshot.metadata.stateRevision,
+    })).rejects.toThrow(/candidates.*B3|B3.*candidates/i);
   });
 });

@@ -38,8 +38,8 @@ describe('Schema Profile System Unit Tests (Phase 3.5.2)', () => {
     }
   });
 
-  it('2. Falls back to b2-unified schema if unknown mode is requested', async () => {
+  it('2. Always resolves the active B3 schema for unknown modes', async () => {
     const fallbackPath = await schemaResolver.resolveSchemaPath('unknown-mode' as any);
-    expect(fallbackPath).toContain('b2-unified.schema.json');
+    expect(fallbackPath).toContain('b3-discovery.schema.json');
   });
 });

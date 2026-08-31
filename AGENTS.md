@@ -10,9 +10,10 @@
 1. **技术蓝图与工程契约**：
    - 总体架构与数据模型：`docs/blueprint/01_PRODUCT_BOUNDARY.md` 至 `11_CHECKLIST_ENGINE.md`
    - 正式实现契约：`docs/blueprint/implementation/`（包含 API、Error、Contracts、Test Strategy、Config 等）
-2. **冻结的 Discovery Agent**：
-   - 提示词宪法：`experiments/agent-benchmark/prompts/constitution-b2-1.md`
-   - 统一输出契约：`experiments/agent-benchmark/schemas/b2-unified.schema.json`
+2. **活动的 B3 Discovery Agent**：
+   - 提示词宪法：`experiments/agent-benchmark/prompts/constitution-b3.md`
+   - 统一输出契约：`experiments/agent-benchmark/schemas/b3-discovery.schema.json`
+   - 自适应问题集规范：`docs/blueprint/12_B3_ADAPTIVE_DISCOVERY.md`（与旧文档冲突时以此为准）
 3. **权威 Provider 证据**：
    - `experiments/agent-benchmark/src/antigravity-provider.mjs`
 
@@ -20,8 +21,9 @@
 
 ## 2. 绝对不可违背的开发铁律 (Absolute Rules)
 
-1. **保持 B2.1 冻结**：
-   - 严禁修改 `constitution-b2-1.md`，严禁擅自扩展或弱化 `b2-unified.schema.json` 字段。
+1. **保持 B3 契约完整**：
+   - B3 是唯一生产运行时；B2.1 资产只作为历史实验记录，不得重新接入运行时回退。
+   - 问题数量必须由 Core 的本地阶段预算决定，同批问题必须使用唯一 `decision_key` 且互不依赖。
    - 严禁引入 Multi-Agent、角色轮流讨论或自监督流水线。
 2. **严格单次调用与结构化输出**：
    - 一个用户操作对应的 `discovery-turn` 最多触发一次主要 Provider 调用。

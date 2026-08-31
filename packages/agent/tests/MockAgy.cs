@@ -3,6 +3,12 @@ using System.Threading;
 
 class MockAgy {
     static void Main(string[] args) {
+        if (args.Length < 2 || args[0] != "-p") {
+            Console.Error.WriteLine("Mock agy requires prompt to be passed with -p.");
+            Environment.Exit(2);
+            return;
+        }
+
         string mode = Environment.GetEnvironmentVariable("MOCK_AGY_MODE") ?? "default";
         if (mode == "hang") {
             Thread.Sleep(60000);

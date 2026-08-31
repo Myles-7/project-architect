@@ -25,6 +25,8 @@ export interface AIProviderRequest {
   schemaPath: string;
   contextText: string;
   timeoutMs?: number;
+  /** Allows local background jobs to stop a no-longer-relevant provider run. */
+  abortSignal?: AbortSignal;
 }
 
 export interface AgentRunTrace {
@@ -63,37 +65,46 @@ export interface StructuredResult<T = unknown> {
   provider: string;
 }
 
+import type { CandidateSuggestion, AssumptionSuggestion, RiskSuggestion } from './discovery.js';
+
 /**
- * Exact structure produced by b2-unified.schema.json in discovery-turn
+ * Active structure produced by b3-discovery.schema.json in discovery-turn.
  */
 export interface DiscoveryResult {
   confirmed: string[];
-  candidates: string[];
-  assumptions: string[];
+  candidates: CandidateSuggestion[];
+  assumptions: AssumptionSuggestion[];
   unknowns: string[];
-  risks: string[];
+  risks: RiskSuggestion[];
   conflicts: string[];
   tensions: Array<{
     description: string;
     reason: string;
   }>;
   gaps: Array<{
+    decision_key: string;
+    depends_on: string[];
     area: string;
     severity: SeverityLevel;
     reason: string;
     impact: string;
-    dependency: string;
     should_ask_user: boolean;
   }>;
   questions: Array<{
+    decision_key: string;
+    depends_on: string[];
     importance: QuestionImportance;
     question: string;
     reason: string;
     recommendation: string;
     recommendation_reason: string;
+    recommended_option_key: string;
     options: Array<{
+      key: string;
       label: string;
       impact: string;
+      tradeoffs?: string;
+      reversibility?: 'easy' | 'moderate' | 'hard';
     }>;
     allow_free_input: boolean;
   }>;
@@ -116,4 +127,19 @@ export interface DocumentPlanResult {
   };
   coverage_warnings: string[];
   unresolved_markers: string[];
+}
+
+export interface ProviderHealthView {
+  status: 'ready' | 'degraded' | 'unavailable';
+  providerName: string;
+  modelName?: string;
+  inferenceLocation: 'local' | 'remote' | 'unknown';
+  sendsProjectContextOffDevice: boolean | 'unknown';
+  structuredOutput: 'supported' | 'unsupported' | 'unknown';
+  promptCache: 'supported' | 'observed' | 'unsupported' | 'unknown';
+  checkedAt: string;
+  executable?: string;
+  lastSuccessAt?: string;
+  lastFailureCode?: string;
+  guidance?: string;
 }

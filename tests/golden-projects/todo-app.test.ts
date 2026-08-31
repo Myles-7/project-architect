@@ -75,9 +75,10 @@ describe('Golden Project Case 1: Simple Todo App (Phase 3.6)', () => {
     });
 
     const s1 = res1.snapshot;
-    // Assertion 1: Question budget strictly bounded to 1
-    expect(s1.questions.items.length).toBe(1);
-    expect(['critical', 'high']).toContain(s1.questions.items[0]?.importance);
+    // Assertion 1: B3 initial question set is useful, unique, and bounded to 12.
+    expect(s1.questions.items.length).toBeGreaterThan(0);
+    expect(s1.questions.items.length).toBeLessThanOrEqual(12);
+    expect(new Set(s1.questions.items.map((question) => question.decisionKey)).size).toBe(s1.questions.items.length);
 
     // Assertion 2: Low-risk defaults cleanly captured as active assumptions
     expect(s1.assumptions.items.length).toBeGreaterThanOrEqual(2);

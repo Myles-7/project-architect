@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1787597412825",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "可以概括为一套 “Agent 负责判断，Tool 负责执行，Human 负责关键决策，Orchestrator 负责流程” 的人机协同数学建模系统。\n\n角色\t暂时设定\t核心职责\nOrchestrator\t总控\t管理流程、状态、阶段跳转、暂停、回退，不做专业建模决策\nProblem Analyst\t问题分析 Agent\t读题、提取目标/约束、拆分子问题、建立问题依赖关系\nData Analyst\t数据 Agent\t判断所需数据、调用工具获取数据、清洗、EDA、解释数据特征\nModel Advisor\t模型顾问 Agent\t给出多个候选模型、比较优缺点、风险、适用条件和推荐度\nModel Builder\t数学建模 Agent\t将选定方案转化为变量、假设、公式、目标函数和约束\nSolver Engineer\t求解 Agent\t将已确认模型实现为代码，调用求解器运行、调参、记录实验\nValidator / Critic\t验证与批判 Agent\t检查误差、过拟合、稳健性、敏感性、逻辑漏洞，并提出改进方向\nAnalyst / Writer\t结果与写作 Agent\t解释结果、提炼结论、组织图表和论文正文\nReviewer\t审稿 Agent\t从评委视角检查逻辑、公式、数据、图表、结论和论文一致性\n\n其中三类角色的边界暂时这样定：\n\nAgent 负责“需要理解、判断、比较、质疑和解释”的工作，例如读题、模型推荐、公式设计、结果解释。Agent 不应该直接替人完成重大选择。\n\nTool 负责“确定性的执行工作”，例如文件解析、Web/API 数据获取、Python、pandas、sklearn、statsmodels、OR-Tools、CVXPY、Pyomo、pymoo、绘图和论文文件生成。原则是：能可靠用程序完成的事情，优先做 Tool，不额外造 Agent。\n\nHuman 负责关键方向决策，例如确认题意、修改子问题、选择数据源、决定异常值处理、选择模型、确认模型假设、决定是否接受验证结果，以及最终论文审核。\n\n整体工作方式暂时是：\n\nOrchestrator 调度 Agent → Agent 调用 Skill / Tool → 生成结构化结果和可视化 → Human 做关键决策 → 写入共享状态 → Orchestrator 决定继续、修改或回退。\n\n因此目前最核心的设计原则可以压缩成四句话：\n\nOrchestrator 管流程。\nAgent 管思考。\nTool 管执行。\nHuman 管决策。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-24T18:50:12.825Z",
+      "updatedAt": "2026-08-24T18:50:12.825Z"
+    }
+  ],
+  "traces": [],
+  "updatedAt": "2026-08-24T18:50:12.825Z"
+}

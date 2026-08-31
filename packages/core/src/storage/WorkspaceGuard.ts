@@ -5,6 +5,7 @@ import { DEFAULT_RUNTIME_CONFIG, ErrorCode } from '@project-architect/contracts'
 export class WorkspaceGuard {
   readonly workspaceRoot: string;
   readonly projectsDir: string;
+  readonly trashDir: string;
 
   constructor(workspaceRoot?: string) {
     this.workspaceRoot = resolve(
@@ -14,6 +15,7 @@ export class WorkspaceGuard {
         resolve(process.cwd(), '.workspace')
     );
     this.projectsDir = join(this.workspaceRoot, DEFAULT_RUNTIME_CONFIG.workspace.projectsSubdir || 'projects');
+    this.trashDir = join(this.workspaceRoot, '.trash');
   }
 
   /**
@@ -98,6 +100,23 @@ export class WorkspaceGuard {
     const cleanId = this.validateProjectId(projectId);
     const target = join(this.projectsDir, cleanId);
     return this.assertContained(this.projectsDir, target, 'Project directory');
+  }
+
+  /**
+   * Resolves a trash directory target path: <workspaceRoot>/.trash/<projectId>-<timestamp>.
+   */
+  resolveTrashPath(projectId: string, timestamp: number | string): string {
+    const cleanId = this.validateProjectId(projectId);
+    const cleanTimestamp = String(timestamp).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const target = join(this.trashDir, `${cleanId}-${cleanTimestamp}`);
+    return this.assertContained(this.trashDir, target, 'Trash directory');
+  }
+
+  /**
+   * Asserts that a target trash path is strictly contained within the workspace .trash folder.
+   */
+  assertTrashContained(targetPath: string): string {
+    return this.assertContained(this.trashDir, targetPath, 'Trash item');
   }
 
   /**

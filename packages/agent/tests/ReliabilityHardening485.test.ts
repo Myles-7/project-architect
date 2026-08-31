@@ -9,7 +9,7 @@ import { SchemaResolver } from '../src/schemas/SchemaResolver.js';
 import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import type { DiscoveryResult } from '@project-architect/contracts';
 
-describe('Phase 4.8.5 Reliability Hardening: Frozen B2.1 Runtime & Output Gate', () => {
+describe('B3 Runtime & Output Gate', () => {
   let tempBaseDir: string;
   let storage: FileStorage;
   let stateEngine: ProjectStateEngine;
@@ -21,7 +21,7 @@ describe('Phase 4.8.5 Reliability Hardening: Frozen B2.1 Runtime & Output Gate',
 
   beforeEach(async () => {
     tempBaseDir = await mkdtemp(join(tmpdir(), 'pa-hardening-485-'));
-    projectPath = join(tempBaseDir, 'b2-test-project');
+    projectPath = join(tempBaseDir, 'b3-test-project');
     storage = new FileStorage();
     stateEngine = new ProjectStateEngine(storage);
     mockProvider = new MockAIProvider();
@@ -34,26 +34,27 @@ describe('Phase 4.8.5 Reliability Hardening: Frozen B2.1 Runtime & Output Gate',
     await rm(tempBaseDir, { recursive: true, force: true });
   });
 
-  it('1. Constitution & Prompt Integrity: Final Prompt strictly includes frozen B2.1 constitution and mandatory rules', async () => {
+  it('1. Constitution & Prompt Integrity: Final Prompt includes B3 constitution and mandatory rules', async () => {
     const promptText = await promptLoader.buildPromptText('broad-pass');
 
-    // Must contain core sections of frozen constitution
-    expect(promptText).toContain('Project Architect Constitution — B2.1 Final Candidate');
-    expect(promptText).toContain('Capability Before Mechanism — Strict Discovery Gate');
-    expect(promptText).toContain('Evidence and Assumption Governance');
-    expect(promptText).toContain('Conflict Strict Mode');
+    expect(promptText).toContain('Project Architect Constitution — B3 Adaptive Question Sets');
+    expect(promptText).toContain('Capability Before Mechanism');
+    expect(promptText).toContain('Evidence and State Authority');
+    expect(promptText).toContain('Strict Conflict Classification');
+    expect(promptText).toContain('Language and Readability');
+    expect(promptText).toContain('Each option `impact`');
 
     // Must contain injected mandatory runtime rules
-    expect(promptText).toContain('Mandatory B2.1 Rules');
+    expect(promptText).toContain('Mandatory B3 Rules');
     expect(promptText).toContain('Single Agent Runtime: Single primary provider call per turn');
     expect(promptText).toContain('User Authorization SSOT: Only user confirmation makes facts authoritative');
   });
 
-  it('2. Unified Schema: SchemaResolver always resolves strictly to b2-unified.schema.json', async () => {
+  it('2. Unified Schema: SchemaResolver always resolves strictly to b3-discovery.schema.json', async () => {
     const modes = ['broad-pass', 'deep-dive', 'quick-clarification', 'assumption-challenge'] as const;
     for (const mode of modes) {
       const resolvedPath = await schemaResolver.resolveSchemaPath(mode);
-      expect(resolvedPath.replace(/\\/g, '/')).toContain('experiments/agent-benchmark/schemas/b2-unified.schema.json');
+      expect(resolvedPath.replace(/\\/g, '/')).toContain('experiments/agent-benchmark/schemas/b3-discovery.schema.json');
     }
   });
 
@@ -103,7 +104,7 @@ describe('Phase 4.8.5 Reliability Hardening: Frozen B2.1 Runtime & Output Gate',
           ] as any,
         },
       })
-    ).toThrow(/gap items must follow schema/);
+    ).toThrow(/B3 gaps require/);
 
     // C. Invalid Question importance enum or invalid types
     expect(() =>
@@ -135,7 +136,7 @@ describe('Phase 4.8.5 Reliability Hardening: Frozen B2.1 Runtime & Output Gate',
           ] as any,
         },
       })
-    ).toThrow(/question items must follow schema/);
+    ).toThrow(/B3 questions require/);
   });
 
   it('4. State Protection: When provider output fails validation, stateRevision remains unchanged', async () => {

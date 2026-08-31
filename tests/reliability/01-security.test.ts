@@ -46,9 +46,9 @@ describe('Reliability Suite 1: Security Safeguards', () => {
       task: 'discovery-turn',
       mode: 'broad-pass',
       promptProfile: 'default',
-      schemaProfile: 'b2-unified',
+      schemaProfile: 'b3-discovery',
       prompt: 'System prompt',
-      schemaPath: join(process.cwd(), 'experiments', 'agent-benchmark', 'schemas', 'b2-unified.schema.json'),
+      schemaPath: join(process.cwd(), 'experiments', 'agent-benchmark', 'schemas', 'b3-discovery.schema.json'),
       contextText: maliciousPayload,
       timeoutMs: 3000,
     });

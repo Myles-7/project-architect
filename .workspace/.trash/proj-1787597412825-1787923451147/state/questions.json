@@ -1,0 +1,415 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1787597412825",
+  "items": [
+    {
+      "id": "q-mt7ldb7s-lavx",
+      "issueRef": "gap:gap-ai-trust_safety-db7q",
+      "gapRef": "gap:gap-ai-trust_safety-db7q",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "How should the system execute Solver and Data Analyst scripts locally?",
+      "reason": "Arbitrary code execution on the user's host machine is a major security risk.",
+      "whyNow": "Arbitrary code execution on the user's host machine is a major security risk.",
+      "impact": "Affects application containerization requirements and installation difficulty.",
+      "recommendation": "(Recommended) Host Execution with User Review: Preview code and filesystem modifications before running locally on the user's machine.",
+      "recommendationReason": "Provides the lowest barrier to setup for local-first execution while maintaining user awareness of actions.",
+      "options": [
+        {
+          "label": "Host Execution with User Review: Preview code and filesystem modifications before running locally on the user's machine.",
+          "impact": "Easy setup but relies on the user to catch security/infinite loop issues."
+        },
+        {
+          "label": "Sandboxed/Containerized Execution: Run all Python/Solver scripts inside a lightweight Docker container or virtual sandbox.",
+          "impact": "Guarantees local host safety, but requires Docker/sandbox dependencies installed on the user system."
+        },
+        {
+          "label": "Implicit Execution: Run scripts silently in the background to minimize user input prompts.",
+          "impact": "Lowest friction, but highest security risk if agents produce hazardous code."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.088Z",
+      "decisionKey": "code_execution_safety_boundary",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7s-o6ak",
+      "issueRef": "gap:gap-ai-target_user-db7q",
+      "gapRef": "gap:gap-ai-target_user-db7q",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "At what granularity should the Orchestrator halt and request human validation?",
+      "reason": "Defines the fundamental interaction model: too many prompts cause user fatigue; too few prompts allow error propagation.",
+      "whyNow": "Defines the fundamental interaction model: too many prompts cause user fatigue; too few prompts allow error propagation.",
+      "impact": "Orchestration state machine logic cannot be finalized without knowing the gating mechanism.",
+      "recommendation": "(Recommended) Stage-Gated Milestones: The orchestrator runs complete phases (e.g., Problem Analysis) and pauses for approval before starting the next.",
+      "recommendationReason": "Strikes the best balance between autonomous agent progress and early error prevention.",
+      "options": [
+        {
+          "label": "Stage-Gated Milestones: Pause only after major phases (e.g., formulation, coding, validation) for structured sign-offs.",
+          "impact": "Provides structured UX checkpoints but might require rollbacks if early errors went unnoticed during a phase."
+        },
+        {
+          "label": "Step-by-Step Approval: Pause after every agent action (e.g., model suggestion, file parsing) for real-time validation.",
+          "impact": "High user fatigue but ensures maximum correctness and fine-grained oversight."
+        },
+        {
+          "label": "Post-Execution Batch Review: Run full end-to-end flow to draft paper/code, then let user modify specific parts later.",
+          "impact": "Low friction, but high probability of wasted API calls and compounding errors."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.088Z",
+      "decisionKey": "human_decision_granularity",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7s-70m3",
+      "issueRef": "gap:gap-ai-mvp_scope-db7q",
+      "gapRef": "gap:gap-ai-mvp_scope-db7q",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "How configurable should the agent roles and workflows be?",
+      "reason": "Determines product complexity: a rigid structure is easier to refine, while a dynamic one accommodates custom tasks.",
+      "whyNow": "Determines product complexity: a rigid structure is easier to refine, while a dynamic one accommodates custom tasks.",
+      "impact": "Affects configurability requirements and configuration parser complexity.",
+      "recommendation": "(Recommended) Preset Roles with Prompt Templates: Predefine the 9 roles, but allow editing system prompts via local config files.",
+      "recommendationReason": "Ensures the system remains easy to use out of the box while allowing prompt tuning for advanced users.",
+      "options": [
+        {
+          "label": "Editable Preset Roles: Fixed 9-agent role map, but users can edit system prompts and supply custom tool scripts in a folder.",
+          "impact": "Low friction, high stability; prompts can be tailored by users."
+        },
+        {
+          "label": "Fully Dynamic Graph: Users define arbitrary agents, system prompts, and task dependencies in a configuration file.",
+          "impact": "Maximum flexibility for generic multi-agent coordination, but higher setup complexity."
+        },
+        {
+          "label": "Closed Presets: Fixed agent descriptions, prompts, and tools to maintain optimal and verified behavior.",
+          "impact": "Easiest to support and optimize, but restricts customization."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.088Z",
+      "decisionKey": "agent_customization_level",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7s-kt68",
+      "issueRef": "gap:gap-ai-target_user-db7q",
+      "gapRef": "gap:gap-ai-target_user-db7q",
+      "importance": "high",
+      "priority": "high",
+      "question": "How should the human apply modifications to intermediate agent outputs?",
+      "reason": "Affects UI design and state mutation logic (direct source edits vs chat-based regeneration).",
+      "whyNow": "Affects UI design and state mutation logic (direct source edits vs chat-based regeneration).",
+      "impact": "Frontend complexity and orchestrator state update logic are highly dependent on this choice.",
+      "recommendation": "(Recommended) Hybrid Editing: Allow the human to directly edit text/formulas/code, or provide natural language feedback for agents to rebuild.",
+      "recommendationReason": "Ensures minor fixes are fast (direct edit), while complex adjustments are handled easily via agent reasoning (chat feedback).",
+      "options": [
+        {
+          "label": "Hybrid (Direct Edit & Chat Feedback): User can directly edit any file or state key OR enter text chat to request changes.",
+          "impact": "Provides maximum flexibility but requires robust synchronization to prevent conflicts between human edits and agent state."
+        },
+        {
+          "label": "Chat/Prompt Only: User cannot edit state directly; all changes must be requested through natural language prompts.",
+          "impact": "Guarantees state consistency managed by the agents, but can be frustrating for simple syntax fixes."
+        },
+        {
+          "label": "Direct File Edits Only: The UI is a viewer and code/text files are modified strictly through external editors.",
+          "impact": "Simplifies the UI to a dashboard but lacks integrated agent modification workflows."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.088Z",
+      "decisionKey": "human_intervention_mechanism",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7s-jzuw",
+      "issueRef": "gap:gap-ai-user_flows-db7q",
+      "gapRef": "gap:gap-ai-user_flows-db7q",
+      "importance": "high",
+      "priority": "high",
+      "question": "What is the primary document compilation target for the Analyst/Writer agent?",
+      "reason": "Determines the generation templates and required local compiler dependencies.",
+      "whyNow": "Determines the generation templates and required local compiler dependencies.",
+      "impact": "Affects the requirements of the Analyst/Writer agent and compiler tools.",
+      "recommendation": "(Recommended) LaTeX compilation from structured Markdown source files.",
+      "recommendationReason": "LaTeX is standard for math competitions and ensures publication-quality mathematical formulas.",
+      "options": [
+        {
+          "label": "Markdown to LaTeX/PDF: Write in Markdown with embedded math, compiling to professional PDF via local LaTeX template.",
+          "impact": "Excellent for math rendering; requires local TeX compiler setup (or cloud compiler API)."
+        },
+        {
+          "label": "Microsoft Word (docx): Generate structured Word files with tables and embedded figures.",
+          "impact": "Easier for non-technical or corporate sharing, but inferior math typesetting."
+        },
+        {
+          "label": "Jupyter Notebook (ipynb): Output executable notebooks containing explanations, code, and figures.",
+          "impact": "Great for interactive data science, but not suitable for formal paper submission."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.088Z",
+      "decisionKey": "paper_generation_format",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-lu29",
+      "issueRef": "gap:gap-01",
+      "gapRef": "gap:gap-01",
+      "importance": "high",
+      "priority": "high",
+      "question": "为了明确目标用户，请确认：项目初始创建，核心目标用户细分画像尚待明确。",
+      "reason": "项目初始创建，核心目标用户细分画像尚待明确。；若此时不澄清，影响后续 MVP 核心功能优先级。。",
+      "whyNow": "项目初始创建，核心目标用户细分画像尚待明确。；若此时不澄清，影响后续 MVP 核心功能优先级。。",
+      "impact": "影响后续 MVP 核心功能优先级。",
+      "recommendation": "建议先用可验证的首发边界收敛目标用户，将非必要内容延后。",
+      "recommendationReason": "这能先降低目标用户的不确定性，而不提前锁定实现方案。",
+      "options": [
+        {
+          "label": "先明确 目标用户 的首发边界",
+          "impact": "让 MVP 取舍可验证，减少后续返工。"
+        },
+        {
+          "label": "保留为后续方向",
+          "impact": "保留弹性，但不将它视为首发版本承诺。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "target_user:primary_audience",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-auxh",
+      "issueRef": "gap:gap-ai-trust_safety-db7q",
+      "gapRef": "gap:gap-ai-trust_safety-db7q",
+      "importance": "high",
+      "priority": "high",
+      "question": "What is the trust policy for API keys and data sharing?",
+      "reason": "Important for compliance with competition rules or corporate data protection.",
+      "whyNow": "Important for compliance with competition rules or corporate data protection.",
+      "impact": "Affects LLM routing architecture, model optimizations (local vs cloud API), and user privacy promises.",
+      "recommendation": "(Recommended) BYOK Local Key Storage: User supplies keys locally, system talks directly to provider APIs.",
+      "recommendationReason": "Provides cost efficiency, flexibility of models, and direct trust without middleman servers.",
+      "options": [
+        {
+          "label": "BYOK Local Key: Users store their own API keys locally (OpenAI, Anthropic, Google) to communicate directly with model providers.",
+          "impact": "Requires user setup and active API accounts; data is sent to model provider APIs."
+        },
+        {
+          "label": "Fully Local/Offline LLM: Run local models (e.g., Llama 3 via Ollama) locally on the host machine.",
+          "impact": "100% private and offline-capable, but requires powerful local hardware (GPU) and models might have lower reasoning capabilities."
+        },
+        {
+          "label": "Hosted Subscription: Centralized API endpoints managed by the system provider.",
+          "impact": "No setup friction, but introduces subscription cost and middleman trust boundaries."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "llm_connectivity_and_privacy",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-iz4i",
+      "issueRef": "gap:gap-ai-product_market_fit-db7q",
+      "gapRef": "gap:gap-ai-product_market_fit-db7q",
+      "importance": "high",
+      "priority": "high",
+      "question": "Who is the primary target user segment for this mathematical modeling system?",
+      "reason": "Determines whether we optimize for academic/competition constraints (LaTeX, rapid draft, standard models) or industry workflows (custom databases, production deployment, long-term state).",
+      "whyNow": "Determines whether we optimize for academic/competition constraints (LaTeX, rapid draft, standard models) or industry workflows (custom databases, production deployment, long-term state).",
+      "impact": "Delays in defining core features like document templates and enterprise integration hooks.",
+      "recommendation": "(Recommended) Competition Students: High emphasis on rapid iteration, LaTeX paper template compilation, and standard science libraries.",
+      "recommendationReason": "Modeling competitions have rigid workflows and strict deadlines where agent coordination and paper templating add the highest value.",
+      "options": [
+        {
+          "label": "Competition Students: Optimizes for rapid turnaround, LaTeX paper template compilation, and standard Python solvers.",
+          "impact": "Simplifies target tools but limits viability for enterprise production environments."
+        },
+        {
+          "label": "Industry Practitioners: Optimizes for long-term project persistence, enterprise database connectors, custom domain models, and high security environments.",
+          "impact": "Increases integration and security overhead, requiring longer time-to-market."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "target_user_segment",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-9qry",
+      "issueRef": "gap:gap-ai-user_flows-db7q",
+      "gapRef": "gap:gap-ai-user_flows-db7q",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "How should the Data Analyst obtain datasets and external literature?",
+      "reason": "Defines the API integrations and data storage capabilities needed in the system.",
+      "whyNow": "Defines the API integrations and data storage capabilities needed in the system.",
+      "impact": "Affects agent tool integration scope and API dependency requirements.",
+      "recommendation": "(Recommended) Local Upload + Web Search: User uploads datasets locally, and agents search the web for missing parameters/facts.",
+      "recommendationReason": "Modeling challenges are usually centered around user-provided datasets, while web search handles supplemental info.",
+      "options": [
+        {
+          "label": "Local Upload & Web Search: Clean user-supplied files and supplement via generic web searches.",
+          "impact": "Flexible and fits most competition setups; web search tools must be robust to noise."
+        },
+        {
+          "label": "Local Files Only: Disable external web retrieval to maintain complete isolation and avoid search API dependency.",
+          "impact": "Very secure and fast, but limits the agent's ability to find parameter values or external references."
+        },
+        {
+          "label": "Structured Database Connectors: Native integrations with SQL databases, Kaggle, or academic repository APIs.",
+          "impact": "Powerful for professional environments, but overkill for MVP."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "data_retrieval_capability",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-z9qs",
+      "issueRef": "gap:gap-chk-technical_boundary-univ-platform-choice",
+      "gapRef": "gap:gap-chk-technical_boundary-univ-platform-choice",
+      "importance": "high",
+      "priority": "high",
+      "question": "为了明确技术约束，请确认：Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。",
+      "reason": "Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。；若此时不澄清，影响 technical_boundary 的完整度闭环。。",
+      "whyNow": "Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。；若此时不澄清，影响 technical_boundary 的完整度闭环。。",
+      "impact": "影响 technical_boundary 的完整度闭环。",
+      "recommendation": "建议先用可验证的首发边界收敛技术约束，将非必要内容延后。",
+      "recommendationReason": "这能先降低技术约束的不确定性，而不提前锁定实现方案。",
+      "options": [
+        {
+          "label": "先明确 技术约束 的首发边界",
+          "impact": "让 MVP 取舍可验证，减少后续返工。"
+        },
+        {
+          "label": "保留为后续方向",
+          "impact": "保留弹性，但不将它视为首发版本承诺。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "checklist:chk-univ-platform-choice",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-mbu1",
+      "issueRef": "gap:gap-ai-state_management-db7q",
+      "gapRef": "gap:gap-ai-state_management-db7q",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "What level of granularity is required for state rollback and versioning?",
+      "reason": "Impacts how the state database or folder structure stores step history.",
+      "whyNow": "Impacts how the state database or folder structure stores step history.",
+      "impact": "Influences local file structures and history storage design.",
+      "recommendation": "(Recommended) Milestone Snapshots: Save snapshots only at human approval checkpoints to roll back to major phases.",
+      "recommendationReason": "Corresponds to the natural workflow of modeling and prevents minor agent errors from causing full resets.",
+      "options": [
+        {
+          "label": "Milestone Snapshots: Revert to the start of any completed/approved phase, discarding subsequent state keys.",
+          "impact": "Keeps history clean and manageable, matching the natural human decision gate cycle."
+        },
+        {
+          "label": "Fine-Grained Transaction History: Save every agent turn, enabling Git-like diffs, branching, and rewinding to any point.",
+          "impact": "High complexity and disk storage; potentially overwhelming user experience."
+        },
+        {
+          "label": "Linear Undo/Redo: Simple single-step rollbacks without version management.",
+          "impact": "Simple to implement, but limits user ability to jump back several steps to re-explore a model variant."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "state_rollback_scope",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    },
+    {
+      "id": "q-mt7ldb7t-8wlb",
+      "issueRef": "gap:gap-ai-execution_tools-db7q",
+      "gapRef": "gap:gap-ai-execution_tools-db7q",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "Which solver stacks should be pre-integrated and supported out-of-the-box?",
+      "reason": "Determines target modeling capabilities (e.g. Optimization, Simulation, Statistics) and local installation requirements.",
+      "whyNow": "Determines target modeling capabilities (e.g. Optimization, Simulation, Statistics) and local installation requirements.",
+      "impact": "Affects standard environment setup scripts and target problem domains.",
+      "recommendation": "(Recommended) Standard Scientific Python Stack: SciPy, pandas, CVXPY, OR-Tools, and NetworkX.",
+      "recommendationReason": "Covers standard modeling domains (linear, non-linear, networks, data) with open-source tools that don't require commercial licenses.",
+      "options": [
+        {
+          "label": "Standard Python Stack: Bundled support for SciPy, pandas, statsmodels, CVXPY, and Google OR-Tools.",
+          "impact": "Zero cost, covers most academic problems, easy local pip installation."
+        },
+        {
+          "label": "Commercial Solver Hooks: Integrate configs to link with Gurobi, CPLEX, or MATLAB.",
+          "impact": "Unlocks high-performance optimization, but requires users to manage external licenses."
+        },
+        {
+          "label": "Mathematical Formulation Only: Agents only formulate math models; code execution is entirely up to the human.",
+          "impact": "Minimizes environment dependencies, but reduces system capability significantly."
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "proposed",
+      "createdAt": "2026-08-24T18:50:54.089Z",
+      "decisionKey": "solver_scope",
+      "dependsOn": [],
+      "batchId": "batch-1-mt7ldb7t",
+      "batchStage": "initial",
+      "basisRevision": 1
+    }
+  ],
+  "updatedAt": "2026-08-24T18:50:54.118Z"
+}

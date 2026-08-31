@@ -5,29 +5,40 @@ import {
   HelpCircle,
   AlertTriangle,
   Flame,
-  AlertCircle,
   ChevronDown,
   ChevronUp,
+  ArrowDownCircle,
+  Tag,
+  ShieldAlert,
 } from 'lucide-react';
-import type { DiscoveryResult } from '@project-architect/contracts';
+import type { DiscoveryResult, TypedRef } from '@project-architect/contracts';
+import { TechnicalDetails } from '../../components/common/TechnicalDetails.js';
 
 interface DiscoveryResultCardProps {
   discoveryResult: DiscoveryResult;
   timestamp?: string;
+  projectName?: string;
   diagnostics?: {
     durationMs?: number;
     totalTokens?: number | 'unavailable';
   };
-  onConfirmCandidate?: (candidate: string) => void;
-  onConfirmAssumption?: (assumption: string) => void;
+  onConfirmCandidate?: (candidateRef: TypedRef, statement: string) => void;
+  onConfirmAssumption?: (assumptionRef: TypedRef, statement: string) => void;
+  findCandidateRef?: (statement: string, decisionKey?: string) => TypedRef | undefined;
+  findAssumptionRef?: (statement: string, decisionKey?: string) => TypedRef | undefined;
+  onScrollToQuestions?: () => void;
 }
 
 export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
   discoveryResult,
   timestamp,
+  projectName,
   diagnostics,
   onConfirmCandidate,
   onConfirmAssumption,
+  findCandidateRef,
+  findAssumptionRef,
+  onScrollToQuestions,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [activeTab, setActiveTab] = useState<
@@ -40,39 +51,79 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
   const gapsCount = discoveryResult.gaps?.length || 0;
   const risksCount = discoveryResult.risks?.length || 0;
   const conflictsCount = (discoveryResult.conflicts?.length || 0) + (discoveryResult.tensions?.length || 0);
+  const questionsCount = discoveryResult.questions?.length || 0;
+
+  // Derive smart architecture tags from result statements
+  const allStatements = [
+    ...(discoveryResult.confirmed || []),
+    ...(discoveryResult.candidates || []),
+    ...(discoveryResult.assumptions || []),
+  ].join(' ');
+
+  const tags: string[] = [];
+  if (/windows|win32|pc/i.test(allStatements)) tags.push('Windows 本地');
+  if (/离线|offline|local-first/i.test(allStatements)) tags.push('离线优先');
+  if (/单次|单轮|结构化|b3/i.test(allStatements)) tags.push('结构化推演');
+  if (/零数据库|无数据库|本地文件|json/i.test(allStatements)) tags.push('无数据库/文件状态');
+  if (/audio|tagger|flac|mp3/i.test(allStatements)) tags.push('音频元数据');
+  if (/cli|command/i.test(allStatements)) tags.push('CLI 工具');
+  if (/api|rest|express/i.test(allStatements)) tags.push('REST API');
+  if (tags.length === 0) tags.push('本地架构', '规范推演');
 
   return (
-    <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#17181D] overflow-hidden shadow-2xs space-y-0">
+    <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#17181D] overflow-hidden shadow-xs space-y-0">
       {/* Header */}
-      <div className="p-4 sm:p-5 bg-zinc-50/70 dark:bg-[#15161A]/70 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-orange-100 dark:bg-orange-950/80 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-50/70 via-zinc-50/50 to-zinc-50/70 dark:from-orange-950/20 dark:via-[#15161A]/70 dark:to-[#15161A]/70 border-b border-zinc-200 dark:border-zinc-800 flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-xs shrink-0 mt-0.5">
             <Sparkles className="w-4 h-4" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-xs sm:text-[13px] font-bold text-zinc-900 dark:text-zinc-100">
-                Agent 结构化推演分析
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                AI 构思透视与架构推演
               </h3>
-              <span className="text-[10px] font-mono px-2 py-0.2 rounded bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
-                B2.1 Single Agent
+              <span className="text-[10px] px-2 py-0.2 rounded-full bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 font-medium">
+                智能推演总结
               </span>
+              {projectName && (
+                <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium hidden sm:inline">
+                  · {projectName}
+                </span>
+              )}
             </div>
-            {diagnostics && diagnostics.durationMs !== undefined && (
-              <div className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 mt-0.5">
-                耗时 {diagnostics.durationMs}ms · 消耗 Token: {diagnostics.totalTokens ?? 'N/A'}
-              </div>
-            )}
+
+            <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              AI 已为您提炼出 <span className="font-semibold text-zinc-800 dark:text-zinc-200">{candidatesCount}</span> 项候选建议、
+              <span className="font-semibold text-purple-700 dark:text-purple-300"> {assumptionsCount}</span> 项技术假设，并识别出
+              <span className="font-semibold text-amber-700 dark:text-amber-300"> {gapsCount}</span> 项待决缺口。
+            </p>
+
+            {/* Architecture Tags */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-1">
+              <Tag className="w-3 h-3 text-zinc-400" />
+              {tags.map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-2 py-0.2 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/60"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {timestamp && (
-            <span className="text-xs text-zinc-400 font-mono hidden sm:inline">{timestamp}</span>
+            <span className="text-[11px] text-zinc-400 font-mono hidden md:inline">{timestamp}</span>
           )}
           <button
+            type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            title={isExpanded ? '收起分析看板' : '展开分析看板'}
           >
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
@@ -84,6 +135,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
           {/* Category Tabs */}
           <div className="px-4 py-2 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-zinc-50/30 dark:bg-zinc-900/20 text-xs">
             <button
+              type="button"
               onClick={() => setActiveTab('all')}
               className={`px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                 activeTab === 'all'
@@ -95,6 +147,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             </button>
             {candidatesCount > 0 && (
               <button
+                type="button"
                 onClick={() => setActiveTab('candidates')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'candidates'
@@ -108,6 +161,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             )}
             {assumptionsCount > 0 && (
               <button
+                type="button"
                 onClick={() => setActiveTab('assumptions')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'assumptions'
@@ -121,6 +175,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             )}
             {gapsCount > 0 && (
               <button
+                type="button"
                 onClick={() => setActiveTab('gaps')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'gaps'
@@ -134,6 +189,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             )}
             {conflictsCount > 0 && (
               <button
+                type="button"
                 onClick={() => setActiveTab('conflicts')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'conflicts'
@@ -147,6 +203,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             )}
             {risksCount > 0 && (
               <button
+                type="button"
                 onClick={() => setActiveTab('risks')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'risks'
@@ -160,6 +217,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             )}
             {confirmedCount > 0 && (
               <button
+                type="button"
                 onClick={() => setActiveTab('confirmed')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'confirmed'
@@ -212,25 +270,47 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                   <span>建议方案 (Candidate Proposals - 需用户确认)</span>
                 </div>
                 <div className="space-y-2">
-                  {discoveryResult.candidates.map((cand, idx) => (
-                    <div
-                      key={`cand-${idx}`}
-                      className="p-3 rounded-xl bg-orange-50/40 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/60 flex items-start justify-between gap-3 text-xs"
-                    >
-                      <div className="text-zinc-900 dark:text-zinc-100 leading-relaxed flex-1">
-                        {cand}
+                  {discoveryResult.candidates.map((cand, idx) => {
+                    const isObj = typeof cand === 'object' && cand !== null;
+                    const stmt = isObj ? cand.statement : String(cand);
+                    const decisionKey = isObj ? cand.decision_key : undefined;
+                    const area = isObj ? cand.area : undefined;
+                    const rationale = isObj ? cand.rationale : undefined;
+                    const ref = findCandidateRef ? findCandidateRef(stmt, decisionKey) : undefined;
+
+                    return (
+                      <div
+                        key={`cand-${idx}`}
+                        className="p-3 rounded-xl bg-orange-50/40 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/60 flex items-start justify-between gap-3 text-xs"
+                      >
+                        <div className="space-y-1 flex-1">
+                          <div className="text-zinc-900 dark:text-zinc-100 leading-relaxed font-medium">
+                            {stmt}
+                          </div>
+                          {rationale && (
+                            <div className="text-[11px] text-orange-900/70 dark:text-orange-300/70">
+                              依据: {rationale}
+                            </div>
+                          )}
+                          {area && (
+                            <span className="inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400">
+                              {area}
+                            </span>
+                          )}
+                        </div>
+                        {onConfirmCandidate && ref && (
+                          <button
+                            type="button"
+                            onClick={() => onConfirmCandidate(ref, stmt)}
+                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-orange-600 hover:bg-orange-700 text-white transition-colors cursor-pointer shadow-2xs"
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>采纳</span>
+                          </button>
+                        )}
                       </div>
-                      {onConfirmCandidate && (
-                        <button
-                          onClick={() => onConfirmCandidate(cand)}
-                          className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-orange-600 hover:bg-orange-700 text-white transition-colors cursor-pointer shadow-2xs"
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>采纳</span>
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -240,28 +320,50 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-purple-800 dark:text-purple-300 flex items-center gap-1.5">
                   <HelpCircle className="w-3.5 h-3.5 text-purple-500" />
-                  <span>推断假设 (Assumptions)</span>
+                  <span>推断假设 (Inferred Assumptions)</span>
                 </div>
                 <div className="space-y-2">
-                  {discoveryResult.assumptions.map((asm, idx) => (
-                    <div
-                      key={`asm-${idx}`}
-                      className="p-3 rounded-xl bg-purple-50/40 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/60 flex items-start justify-between gap-3 text-xs"
-                    >
-                      <div className="text-zinc-900 dark:text-zinc-100 leading-relaxed flex-1">
-                        {asm}
+                  {discoveryResult.assumptions.map((asm, idx) => {
+                    const isObj = typeof asm === 'object' && asm !== null;
+                    const stmt = isObj ? asm.statement : String(asm);
+                    const decisionKey = isObj ? asm.decision_key : undefined;
+                    const area = isObj ? asm.area : undefined;
+                    const reason = isObj ? asm.reason : undefined;
+                    const ref = findAssumptionRef ? findAssumptionRef(stmt, decisionKey) : undefined;
+
+                    return (
+                      <div
+                        key={`asm-${idx}`}
+                        className="p-3 rounded-xl bg-purple-50/40 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/60 flex items-start justify-between gap-3 text-xs"
+                      >
+                        <div className="space-y-1 flex-1">
+                          <div className="text-zinc-900 dark:text-zinc-100 leading-relaxed font-medium">
+                            {stmt}
+                          </div>
+                          {reason && (
+                            <div className="text-[11px] text-purple-900/70 dark:text-purple-300/70">
+                              原因: {reason}
+                            </div>
+                          )}
+                          {area && (
+                            <span className="inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400">
+                              {area}
+                            </span>
+                          )}
+                        </div>
+                        {onConfirmAssumption && ref && (
+                          <button
+                            type="button"
+                            onClick={() => onConfirmAssumption(ref, stmt)}
+                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-purple-600 hover:bg-purple-700 text-white transition-colors cursor-pointer shadow-2xs"
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>转为决策</span>
+                          </button>
+                        )}
                       </div>
-                      {onConfirmAssumption && (
-                        <button
-                          onClick={() => onConfirmAssumption(asm)}
-                          className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-purple-600 hover:bg-purple-700 text-white transition-colors cursor-pointer shadow-2xs"
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>转为决策</span>
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -305,18 +407,41 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
             {(activeTab === 'all' || activeTab === 'risks') && risksCount > 0 && (
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+                  <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
                   <span>已知架构与交付风险 (Identified Risks)</span>
                 </div>
                 <div className="space-y-2">
-                  {discoveryResult.risks.map((risk, idx) => (
-                    <div
-                      key={`risk-${idx}`}
-                      className="p-3 rounded-xl bg-rose-50/40 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-900 dark:text-rose-200 leading-relaxed"
-                    >
-                      {risk}
-                    </div>
-                  ))}
+                  {discoveryResult.risks.map((risk, idx) => {
+                    const isObj = typeof risk === 'object' && risk !== null;
+                    const stmt = isObj ? risk.statement : String(risk);
+                    const severity = isObj ? risk.severity : 'medium';
+                    const impact = isObj ? risk.impact : undefined;
+                    const area = isObj ? risk.area : undefined;
+
+                    return (
+                      <div
+                        key={`risk-${idx}`}
+                        className="p-3 rounded-xl bg-rose-50/40 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-900 dark:text-rose-200 leading-relaxed space-y-1"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium text-zinc-900 dark:text-zinc-100">{stmt}</span>
+                          <span className="font-mono text-[10px] px-1.5 py-0.2 rounded uppercase font-semibold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                            {severity}
+                          </span>
+                        </div>
+                        {impact && (
+                          <div className="text-[11px] text-rose-700 dark:text-rose-300">
+                            影响: {impact}
+                          </div>
+                        )}
+                        {area && (
+                          <span className="inline-block text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                            {area}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -341,7 +466,31 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Progressive Technical Details Disclosure */}
+            <TechnicalDetails
+              durationMs={diagnostics?.durationMs}
+              tokens={diagnostics?.totalTokens}
+              title="查看本轮推演技术细节 (B3 & 诊断)"
+            />
           </div>
+
+          {/* Bottom Guidance Action to Question Wizard */}
+          {questionsCount > 0 && onScrollToQuestions && (
+            <div className="p-3 bg-zinc-50/60 dark:bg-zinc-900/40 border-t border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                已提炼核心架构，现有 {questionsCount} 项待决分歧需要您拍板
+              </span>
+              <button
+                type="button"
+                onClick={onScrollToQuestions}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-xs font-medium transition-colors cursor-pointer shadow-xs"
+              >
+                <span>前往回答关键问题</span>
+                <ArrowDownCircle className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

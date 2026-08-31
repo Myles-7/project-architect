@@ -11,7 +11,7 @@ export class AgentRuntimeRegistry {
         {
           mode: 'idea-analysis',
           promptProfile: 'idea-analysis',
-          schemaProfile: 'idea-analysis',
+          schemaProfile: 'b3-discovery',
           contextProfile: 'idea-analysis',
           policyProfile: 'default',
           task: 'discovery-turn',
@@ -22,7 +22,7 @@ export class AgentRuntimeRegistry {
         {
           mode: 'gap-analysis',
           promptProfile: 'gap-analysis',
-          schemaProfile: 'gap-analysis',
+          schemaProfile: 'b3-discovery',
           contextProfile: 'gap-analysis',
           policyProfile: 'default',
           task: 'discovery-turn',
@@ -33,7 +33,7 @@ export class AgentRuntimeRegistry {
         {
           mode: 'question-generation',
           promptProfile: 'question-generation',
-          schemaProfile: 'question-generation',
+          schemaProfile: 'b3-discovery',
           contextProfile: 'question-generation',
           policyProfile: 'question-budget',
           task: 'discovery-turn',
@@ -44,7 +44,7 @@ export class AgentRuntimeRegistry {
         {
           mode: 'decision-review',
           promptProfile: 'decision-review',
-          schemaProfile: 'decision-review',
+          schemaProfile: 'b3-discovery',
           contextProfile: 'decision-review',
           policyProfile: 'impact-conflict',
           task: 'discovery-turn',
@@ -55,7 +55,7 @@ export class AgentRuntimeRegistry {
         {
           mode: 'readiness-review',
           promptProfile: 'readiness-review',
-          schemaProfile: 'readiness-review',
+          schemaProfile: 'b3-discovery',
           contextProfile: 'readiness-review',
           policyProfile: 'readiness-gate',
           task: 'discovery-turn',
@@ -66,7 +66,7 @@ export class AgentRuntimeRegistry {
         {
           mode: 'document-compile',
           promptProfile: 'document-compile',
-          schemaProfile: 'document-compile',
+          schemaProfile: 'b3-discovery',
           contextProfile: 'document-compile',
           policyProfile: 'compile-strict',
           task: 'discovery-turn',
@@ -83,7 +83,7 @@ export class AgentRuntimeRegistry {
       this.profiles.get(mode) || {
         mode,
         promptProfile: 'gap-analysis',
-        schemaProfile: 'gap-analysis',
+        schemaProfile: 'b3-discovery',
         contextProfile: 'gap-analysis',
         policyProfile: 'default',
         task: 'discovery-turn',

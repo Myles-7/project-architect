@@ -23,9 +23,10 @@ import type {
 } from '@project-architect/contracts';
 
 export const ReadinessView: React.FC = () => {
-  const { state, apiClient, refreshSnapshot, setActiveTab } = useProjectSession();
+  const { state, apiClient, refreshSnapshot, setActiveTab, jumpToFix } = useProjectSession();
   const { snapshot, activeProjectId, stateRevision } = state;
   const { success, error } = useToast();
+
 
   const [readiness, setReadiness] = useState<ReadinessViewModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -191,7 +192,10 @@ export const ReadinessView: React.FC = () => {
                     Level {readiness.level} · {readiness.status}
                   </span>
                   <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                    准备度得分: {readiness.score} / 100
+                    可信度得分: {readiness.credibilityScore ?? readiness.score} / 100
+                  </span>
+                  <span className="text-xs text-zinc-400">
+                    · 领域覆盖: {readiness.coverage ? `${readiness.coverage.satisfied}/${readiness.coverage.total}` : '8/8'}
                   </span>
                 </div>
                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
@@ -217,6 +221,26 @@ export const ReadinessView: React.FC = () => {
                 </span>
               </div>
             </div>
+
+            {/* Stale Warning Banner */}
+            {readiness.isStale && (
+              <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <AlertOctagon className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>
+                    <strong>准备度评估已失效 (Stale)</strong>：当前评估基于 rev.{readiness.basisRevision}，而项目状态已变更为 rev.{readiness.currentRevision}。任何新决策或缺口变动均需重新评估后方可授权。
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRunReview}
+                  disabled={isReviewing}
+                  className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium shrink-0 cursor-pointer text-xs"
+                >
+                  {isReviewing ? '正在评估...' : '重新评估'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 8 Core Required Areas Grid */}
@@ -245,15 +269,28 @@ export const ReadinessView: React.FC = () => {
                     </span>
                   </div>
 
-                  <span
-                    className={`font-mono text-[10px] px-1.5 py-0.2 rounded font-medium ${
-                      area.isSatisfied
-                        ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300'
-                        : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300'
-                    }`}
-                  >
-                    {area.isSatisfied ? '已闭环' : '待补充'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`font-mono text-[10px] px-1.5 py-0.2 rounded font-medium ${
+                        area.isSatisfied
+                          ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300'
+                      }`}
+                    >
+                      {area.isSatisfied ? '已闭环' : '待补充'}
+                    </span>
+                    {!area.isSatisfied && (
+                      <button
+                        type="button"
+                        onClick={() => jumpToFix({ tab: 'chat', sectionId: area.areaId })}
+                        className="inline-flex items-center gap-0.5 text-[11px] text-orange-600 dark:text-orange-400 font-medium hover:underline cursor-pointer"
+                        title={`前往完善 ${area.title}`}
+                      >
+                        <span>去完善</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -270,26 +307,37 @@ export const ReadinessView: React.FC = () => {
                 {readiness.blockingIssues.map((issue) => (
                   <div
                     key={issue.id}
-                    className="p-3.5 rounded-xl bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-xs space-y-1.5"
+                    className="p-3.5 rounded-xl bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-xs space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-red-900 dark:text-red-200">
                         {issue.id} · {issue.severity.toUpperCase()}
                       </span>
-                      <label className="flex items-center gap-1.5 text-[11px] text-red-800 dark:text-red-300 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={!!acknowledgedIssues[issue.id]}
-                          onChange={(e) =>
-                            setAcknowledgedIssues((prev) => ({
-                              ...prev,
-                              [issue.id]: e.target.checked,
-                            }))
-                          }
-                          className="rounded border-red-300 text-red-600 focus:ring-red-500"
-                        />
-                        <span>已知悉并承担此风险</span>
-                      </label>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => jumpToFix({ tab: 'chat', questionId: issue.id, itemRef: (issue as any).targetRef })}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer shadow-2xs"
+                          title="前往对话解决或澄清该阻断性问题"
+                        >
+                          <span>前往澄清</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                        <label className="flex items-center gap-1.5 text-[11px] text-red-800 dark:text-red-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={!!acknowledgedIssues[issue.id]}
+                            onChange={(e) =>
+                              setAcknowledgedIssues((prev) => ({
+                                ...prev,
+                                [issue.id]: e.target.checked,
+                              }))
+                            }
+                            className="rounded border-red-300 text-red-600 focus:ring-red-500"
+                          />
+                          <span>已知悉并承担此风险</span>
+                        </label>
+                      </div>
                     </div>
                     <p className="text-red-800 dark:text-red-300 text-[11px] leading-relaxed">
                       {issue.message}
@@ -311,9 +359,9 @@ export const ReadinessView: React.FC = () => {
                 {readiness.activeAssumptions.map((asm) => (
                   <div
                     key={asm.ref}
-                    className="p-3 rounded-xl bg-purple-50/40 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/60 text-xs flex items-center justify-between"
+                    className="p-3 rounded-xl bg-purple-50/40 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/60 text-xs flex items-center justify-between gap-3"
                   >
-                    <div className="space-y-0.5">
+                    <div className="space-y-0.5 min-w-0 flex-1">
                       <div className="text-zinc-900 dark:text-zinc-100 font-medium">
                         {asm.statement}
                       </div>
@@ -323,14 +371,26 @@ export const ReadinessView: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <span className="font-mono text-[10px] text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 px-1.5 py-0.2 rounded shrink-0">
-                      {asm.ref}
-                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-mono text-[10px] text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 px-1.5 py-0.2 rounded">
+                        {asm.ref}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => jumpToFix({ tab: 'chat', itemRef: asm.ref })}
+                        className="inline-flex items-center gap-1 px-2 py-0.8 rounded-lg text-[10px] font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-300 dark:border-purple-800 transition-colors cursor-pointer"
+                        title="在 Overview 中查看并转为正式决策"
+                      >
+                        <span>转为决策</span>
+                        <ArrowRight className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
 
           {/* User Final Approval Section (郑重的最终授权) */}
           <div className="p-5 rounded-2xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs space-y-4">
@@ -351,76 +411,69 @@ export const ReadinessView: React.FC = () => {
                 选择准入签署结论 (Disposition)
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedDisposition('approved')}
-                  className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                    selectedDisposition === 'approved'
-                      ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-200'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-zinc-600 dark:text-zinc-400'
-                  }`}
-                >
-                  <div className="font-semibold">完全批准 (Approved)</div>
-                  <div className="text-[10px] opacity-80 mt-0.5">核心定义完备无阻断</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedDisposition('approved-with-warnings')}
-                  className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                    selectedDisposition === 'approved-with-warnings'
-                      ? 'border-amber-500 bg-amber-50/40 dark:bg-amber-950/30 text-amber-950 dark:text-amber-200'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-zinc-600 dark:text-zinc-400'
-                  }`}
-                >
-                  <div className="font-semibold">带警示批准 (Warnings)</div>
-                  <div className="text-[10px] opacity-80 mt-0.5">接受暂定假设与已知警示</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedDisposition('approved-with-known-issues')}
-                  className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                    selectedDisposition === 'approved-with-known-issues'
-                      ? 'border-orange-500 bg-orange-50/40 dark:bg-orange-950/30 text-orange-950 dark:text-orange-200'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-zinc-600 dark:text-zinc-400'
-                  }`}
-                >
-                  <div className="font-semibold">已知问题批准 (Issues)</div>
-                  <div className="text-[10px] opacity-80 mt-0.5">知悉高优缺口并授权开工</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedDisposition('approved-with-critical-conflicts')}
-                  className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                    selectedDisposition === 'approved-with-critical-conflicts'
-                      ? 'border-red-500 bg-red-50/40 dark:bg-red-950/30 text-red-950 dark:text-red-200'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-zinc-600 dark:text-zinc-400'
-                  }`}
-                >
-                  <div className="font-semibold">关键冲突批准 (Conflicts)</div>
-                  <div className="text-[10px] opacity-80 mt-0.5">知悉硬性冲突并承担风险</div>
-                </button>
+                {(readiness.actions || []).filter((a) => a.disposition !== 'return-to-discovery').map((act) => {
+                  const isSelected = selectedDisposition === act.disposition;
+                  return (
+                    <button
+                      key={act.disposition}
+                      type="button"
+                      disabled={!act.enabled}
+                      onClick={() => setSelectedDisposition(act.disposition)}
+                      className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                        !act.enabled
+                          ? 'opacity-40 bg-zinc-100/50 dark:bg-zinc-900/20 border-zinc-200/50 dark:border-zinc-800/50 cursor-not-allowed'
+                          : isSelected
+                          ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/30 text-emerald-950 dark:text-emerald-200 cursor-pointer shadow-xs'
+                          : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 cursor-pointer'
+                      }`}
+                      title={act.blockedReasons.join('; ')}
+                    >
+                      <div className="font-semibold flex items-center justify-between">
+                        <span>{act.label}</span>
+                        {!act.enabled && <Lock className="w-3 h-3 text-zinc-400" />}
+                      </div>
+                      <div className="text-[10px] opacity-80 mt-0.5 leading-snug">
+                        {act.description}
+                      </div>
+                      {act.blockedReasons.length > 0 && (
+                        <div className="text-[9px] text-amber-600 dark:text-amber-400 mt-1 leading-tight">
+                          {act.blockedReasons[0]}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
               <div className="text-[11px] text-zinc-400">
-                {readiness.canGenerateDocs
+                {readiness.isStale
+                  ? '当前评估已失效，请先点击顶部“重新评估”后再签署。'
+                  : readiness.canGenerateDocs
                   ? '已具备文档生成条件，签署后可直接生成蓝图。'
-                  : '请先完成核心领域决策或已知晓阻断问题后再签署。'}
+                  : '请先完成核心领域决策或按需确认阻断缺陷后再签署。'}
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleApprove}
-                  disabled={isApproving}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+                  disabled={isApproving || readiness.isStale}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl transition-colors shadow-xs ${
+                    isApproving || readiness.isStale
+                      ? 'bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed'
+                      : 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 cursor-pointer'
+                  }`}
                 >
                   <FileCheck2 className="w-3.5 h-3.5" />
-                  <span>{isApproving ? '正在签署...' : '签署准入批准'}</span>
+                  <span>
+                    {isApproving
+                      ? '正在签署...'
+                      : readiness.isStale
+                      ? '评估已过期不可签署'
+                      : '签署准入批准'}
+                  </span>
                 </button>
 
                 {readiness.canGenerateDocs && (

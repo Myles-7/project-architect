@@ -39,29 +39,30 @@ export class PromptLoader {
       'experiments',
       'agent-benchmark',
       'prompts',
-      'constitution-b2-1.md'
+      'constitution-b3.md'
     );
 
     let systemPrompt = '';
     if (await this.storage.exists(constitutionPath)) {
       systemPrompt = await this.storage.readText(constitutionPath);
     } else {
-      systemPrompt = `# Discovery Agent Constitution (B2.1)\nYou are a strict Discovery Agent helping the user define software architecture. Follow Capability Before Mechanism, Strict Conflict, and Explicit Assumption rules.`;
+      throw new Error(`B3 constitution is missing at ${constitutionPath}`);
     }
 
-    const b2Rules = [
+    const mandatoryRules = [
       'Single Agent Runtime: Single primary provider call per turn.',
       'Capability Before Mechanism: Focus on product capabilities, not concrete frameworks/databases.',
       'User Authorization SSOT: Only user confirmation makes facts authoritative.',
       'Locked Decision Protection: Never overwrite locked decisions without explicit user intervention.',
-      'Bounded Question Budget: Critical=1, Normal<=2, Low=0 (convert to assumption).',
+      'B3 Adaptive Batch: Obey the runtime stage budget and return only mutually independent questions.',
+      'Stable Decision Keys: Every gap and question includes decision_key and depends_on.',
     ];
 
     const profile: PromptProfile = {
       mode,
       systemPrompt,
       taskInstruction,
-      b2Rules,
+      mandatoryRules,
     };
 
     this.cachedProfiles.set(mode, profile);
@@ -73,11 +74,11 @@ export class PromptLoader {
    */
   async buildPromptText(mode: AgentMode): Promise<string> {
     const profile = await this.loadPromptProfile(mode);
-    const rulesList = profile.b2Rules.map((r) => `- ${r}`).join('\n');
-    return `${profile.systemPrompt}\n\n## Mandatory B2.1 Rules\n${rulesList}\n\n---\n\n${profile.taskInstruction}`;
+    const rulesList = profile.mandatoryRules.map((r) => `- ${r}`).join('\n');
+    return `${profile.systemPrompt}\n\n## Mandatory B3 Rules\n${rulesList}\n\n---\n\n${profile.taskInstruction}`;
   }
 
   private getFallbackInstruction(mode: AgentMode): string {
-    return `# Mode Profile: ${mode}\nOperate strictly under B2.1 Constitution rules for mode: ${mode}.`;
+    return `# Mode Profile: ${mode}\nOperate strictly under the B3 Constitution for mode: ${mode}.`;
   }
 }

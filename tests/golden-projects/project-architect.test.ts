@@ -90,9 +90,10 @@ describe('Golden Project Case 3: Project Architect (Self-Hosting Complexity) (Ph
     expect(s.decisions.items.some((d) => d.statement.includes('四层架构'))).toBe(true);
     expect(s.assumptions.items.some((a) => a.statement.includes('单次主要 Provider 推理'))).toBe(true);
 
-    // 2. Critical Gap and Question generated
-    expect(s.questions.items.length).toBe(1);
-    expect(s.questions.items[0]?.importance).toBe('critical');
+    // 2. B3 independent question set includes at least one critical decision.
+    expect(s.questions.items.length).toBeGreaterThan(0);
+    expect(s.questions.items.length).toBeLessThanOrEqual(12);
+    expect(s.questions.items.some((question) => question.importance === 'critical')).toBe(true);
 
     // 3. Diagnostics and Token metric logging
     expect(res.diagnostics.totalTokens).toBeDefined();

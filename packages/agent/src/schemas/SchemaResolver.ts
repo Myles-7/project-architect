@@ -11,7 +11,7 @@ export class SchemaResolver {
 
   /**
    * Resolves the absolute path to the JSON Schema.
-   * In B2.1, b2-unified.schema.json is the sole authoritative Single Source of Truth.
+   * B3 discovery schema is the sole active runtime contract.
    * All agent modes strictly conform to this unified contract without schema drift.
    */
   async resolveSchemaPath(_mode?: AgentMode): Promise<string> {
@@ -20,7 +20,7 @@ export class SchemaResolver {
       'experiments',
       'agent-benchmark',
       'schemas',
-      'b2-unified.schema.json'
+      'b3-discovery.schema.json'
     );
   }
 }

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1787705812508",
+  "gaps": [
+    {
+      "id": "gap-ai-acceptance-0ssm",
+      "area": "acceptance",
+      "decisionKey": "acceptance_completion_signal",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "尚未明确一个可被直观验证的完成信号或验收标准，这是衡量 MVP 首发版本是否完工的标准。",
+      "impact": "影响测试用例的编写和质量保障的测试范围。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 75,
+      "priority": "high"
+    },
+    {
+      "id": "gap-ai-acceptance-yjkt",
+      "area": "acceptance",
+      "decisionKey": "acceptance_criteria",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "当前尚未明确可被直观验证的完成信号或验收标准。",
+      "impact": "决定了系统在何种情况下被视为成功交付了用户的建模任务，直接关系到用户对生成论文质量的心理预期和平台的计费依据。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-chk-acceptance-univ-success-signal",
+      "area": "acceptance",
+      "decisionKey": "checklist:chk-univ-success-signal",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "Checklist 标准检查项尚未明确：项目有一项可被直观验证的完成信号或验收标准。",
+      "impact": "影响 acceptance 的完整度闭环。",
+      "shouldAskUser": false,
+      "status": "open",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 58,
+      "priority": "medium"
+    }
+  ],
+  "conflicts": [],
+  "tensions": [
+    {
+      "id": "tns-1787705854484-mxun",
+      "description": "完全自动化的建模体验与高准确率要求之间的张力",
+      "reason": "自动化程度越高，用户越容易一键获得结果，但大模型的幻觉以及缺乏人类干预会导致建模细节错误频发，降低结果可用性。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787705854484-zxtd",
+      "description": "本地优先（Local-First）的安全架构与开箱即用（Zero-Config）之间的张力",
+      "reason": "本地运行能最大程度保护用户的学术隐私与数据安全，但需要用户自行配置本地 Python 运行环境与 LaTeX 编译器，大幅提高了软件的使用门槛。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731134389-kmyr",
+      "description": "双栏对照展示（左公式，右代码）与一键式全自动生成（用户直接拿到最终论文与代码）的体验张力。",
+      "reason": "一键全自动生成意味着用户在生成过程中不需要关注公式和代码的生成细节，而双栏对照展示则偏向交互式协作，如何在纯自动生成场景下合理展示双栏内容是一个体验张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731134390-nzu7",
+      "description": "使用场景覆盖范围广（技术边界与用户流程首发版本覆盖更多场景）与首发版本先采用边界清晰方案的范围张力。",
+      "reason": "在首发版本中，既想覆盖更多建模比赛和题目场景，又需要保持边界清晰、全流程自动生成，这给模型泛化能力和系统鲁棒性带来了很大挑战。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731239634-8gez",
+      "description": "一键式全自动生成与多 Agent 协同的响应耗时折中",
+      "reason": "多 Agent（建模师、程序员、写作手）在进行复杂的数学建模、代码编写、安全沙箱运行以及 Word 论文排版时，整体执行链路非常长。一键式生成的等待时间可能长达数分钟，这与用户对即时反馈的体验预期存在张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787731239634-ee97",
+      "description": "双栏对照展示与纯本地 Word 交付的体验对齐",
+      "reason": "系统在 UI 上提供双栏对照（左公式、右代码）以方便用户在生成过程中实时查看，但最终交付物仅为 Word 格式（.docx）。这意味着用户在界面上看到的精美交互对照排版，在导出为 Word 时需要转换为符合学术论文规范的单栏或特定排版，二者在排版表现上存在体验不对齐的张力。",
+      "status": "open"
+    }
+  ],
+  "updatedAt": "2026-08-26T08:00:39.634Z"
+}

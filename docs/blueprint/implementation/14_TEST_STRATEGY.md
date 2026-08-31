@@ -2,7 +2,7 @@
 
 > 文档状态：Phase 0 Engineering Blueprint  
 > 范围：指导开发各里程碑的测试金字塔与验收门控。  
-> 目标：确保确定性状态引擎 100% 可靠、AI 行为符合 B2.1 宪法、多轮交互无漂移。
+> 目标：确保确定性状态引擎可靠、AI 行为符合 B3 宪法、自适应问题集无重复或依赖冲突。
 
 ---
 
@@ -11,7 +11,7 @@
 ```text
 ┌─────────────────────────────────────────────────────────────┐
 │ 4. Agent Regression Tests (experiments/agent-benchmark)    │
-│    - 10 大固定用例，B2.1 宪法遵从性，无技术泄漏门控       │
+│    - 10 大固定用例 + 4 个 B3 问题集用例，独立性与预算门控 │
 ├─────────────────────────────────────────────────────────────┤
 │ 3. Multi-turn Flow Tests (多轮状态流转集成测试)            │
 │    - Idea → Clarify → Lock → Conflict → Next Turn           │
@@ -74,7 +74,7 @@ sequenceDiagram
     participant System as Project Architect
 
     User->>System: Turn 1: 提交初始模糊 Idea ("做个本地剪贴板工具")
-    System-->>User: 返回首次理解分析 + 首个关键 Question (是否支持图片/大文件历史)
+    System-->>User: 返回首次理解分析 + 8~12 个独立关键问题
     
     User->>System: Turn 2: 回答问题 ("仅支持纯文本，暂不支持富媒体")
     System-->>User: 状态更新为 Confirmed，生成下一问 (关于保留历史条数与快捷键)
@@ -101,9 +101,13 @@ sequenceDiagram
 
 保留 `experiments/agent-benchmark/` 作为**不可变黄金基准库**：
 
-- **基准资产**：`fixtures/case-01.json` ~ `case-10.json`，`prompts/constitution-b2-1.md`，`schemas/b2-unified.schema.json`。
-- **执行命令**：`npm run smoke` 或 `npm run run`。
-- **回归门控**：
+- **活动基准资产**：既有 14 个 Initial 用例 + 4 个 Explore/Converge/Readiness 多阶段用例、`prompts/constitution-b3.md`、`schemas/b3-discovery.schema.json`。
+- **执行命令**：`pnpm --dir experiments/agent-benchmark run b3:validate`。
+- **发布回归门控**：
   - 结构化输出成功率必须 = 100%。
   - `Capability Before Mechanism` 零违规（无未授权的数据库、框架、机制泄漏）。
   - Strict Conflict 分类准确率符合预期。
+  - 问题数量严格符合 12/8/4/2 阶段上限，同批无重复 `decision_key` 或未解决依赖。
+  - 推荐 Option Key 必须在 `options` 列表中 100% 存在且对应。
+  - 每个 Case 必须提供两份带证据引用的真实独立评审；五个维度各自平均分均 ≥ 4.0/5.0，任何单项不得低于 3.0。
+  - 缺少人工证据或完整时延样本时发布门禁必须失败，禁止自动生成评分或硬编码 PASS。

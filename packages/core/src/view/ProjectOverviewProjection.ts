@@ -1,3 +1,4 @@
+import { AreaRegistry } from '../areas/AreaRegistry.js';
 import type {
   ProjectSnapshot,
   ProjectOverviewView,
@@ -31,10 +32,10 @@ export function projectOverviewProjection(snapshot: ProjectSnapshot): ProjectOve
   }
 
   const sections: OverviewSectionView[] = (snapshot.overview?.sections || []).map((section) => {
-    // Find active decisions matching this section either by itemRefs or by matching area
+    // Find active decisions matching this section either by itemRefs or by matching canonical area
     const sectionDecisions = decisions.filter(
       (d) =>
-        (section.itemRefs.includes(`decision:${d.id}`) || d.area === section.id) &&
+        (section.itemRefs.includes(`decision:${d.id}`) || AreaRegistry.normalize(d.area) === section.id) &&
         (d.status === 'candidate' || d.status === 'confirmed' || d.status === 'locked')
     );
 
@@ -65,7 +66,7 @@ export function projectOverviewProjection(snapshot: ProjectSnapshot): ProjectOve
       };
     });
 
-    const openGapsForSection = openGaps.filter((g) => g.area === section.id);
+    const openGapsForSection = openGaps.filter((g) => AreaRegistry.normalize(g.area) === section.id);
 
     return {
       id: section.id,

@@ -119,7 +119,12 @@ describe('Full Multi-Turn Discovery Closed Loop (Phase 3.4)', () => {
     const s2 = res1.snapshot;
     expect(s2.metadata.stateRevision).toBe(3);
     expect(s2.questions.items.length).toBeGreaterThan(0);
-    const userQuestion = s2.questions.items[0]!;
+    const userQuestion = [...s2.questions.items].reverse().find(
+      (question) =>
+        (question.status === 'proposed' || question.status === 'shown') &&
+        question.importance === 'critical'
+    )!;
+    expect(userQuestion).toBeDefined();
     expect(userQuestion.importance).toBe('critical');
 
     // User answers Question and confirms decision

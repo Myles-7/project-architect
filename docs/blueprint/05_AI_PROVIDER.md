@@ -1,5 +1,7 @@
 # Project Architect V1：AI Provider 架构
 
+> B3 更新：Provider 生产请求只使用 `constitution-b3.md` 与 `b3-discovery.schema.json`；B2.1 资产仅保留为历史基准。
+
 > 文档状态：Phase 1.5 Blueprint  
 > 依据：[02_SYSTEM_ARCHITECTURE.md](02_SYSTEM_ARCHITECTURE.md)、[03_AGENT_RUNTIME.md](03_AGENT_RUNTIME.md)  
 > 范围：Provider 抽象、统一输入输出、Antigravity 默认适配与未来替换边界。  
@@ -9,7 +11,7 @@
 
 AI Provider Layer 将 Agent Runtime 的一次结构化推理请求交给具体推理能力，并把结果以统一形式返回给 AI Orchestrator。
 
-V1 默认使用 Antigravity CLI。Project Architect 的产品语义、Task、Project State 和 B2.1 行为不依赖 Antigravity 的专有响应格式。
+V1 默认使用 Antigravity CLI。Project Architect 的产品语义、Task、Project State 和 B3 行为不依赖 Antigravity 的专有响应格式。
 
 Provider 抽象必须保证：
 
@@ -57,7 +59,7 @@ complete(request) → structured result
 | `task` | 当前 Task 类型、版本、完成条件和调用约束。 | AI Orchestrator。 | 不自行改为其他 Task。 |
 | `context` | Context Manager 选择的最小相关用户输入、状态摘要、材料摘录和阶段信息。 | Context Manager / State Engine。 | 不补充完整历史或无关材料。 |
 | `schema` | 当前 Task 的 JSON Schema，用于要求结构化输出。 | Agent Runtime。 | 不弱化字段语义或用普通文本替代。 |
-| `prompt` | 冻结 Constitution 与当前 Task Prompt 组合后的请求文本。 | AI Orchestrator。 | 不注入改变 B2.1 行为的额外策略。 |
+| `prompt` | B3 Constitution 与当前 Task Prompt 组合后的请求文本。 | AI Orchestrator。 | 不注入绕开 B3 状态保护的额外策略。 |
 | `callConstraints` | 单次调用、超时、取消、诊断与成本保护约束。 | AI Orchestrator。 | 不隐藏重试或自行扩大调用规模。 |
 | `requestId` | 一次调用的可追溯标识。 | Backend。 | 不复用于其他用户动作。 |
 
@@ -121,7 +123,7 @@ Antigravity 是当前默认 Provider，不是 Project Architect 的产品定义�
 
 | Provider 类型 | 可接入条件 | 必须保持不变 |
 | --- | --- | --- |
-| OpenAI | 能接收 Task、最小 Context 和 Schema，并返回可校验结构化结果。 | B2.1 Constitution、Task 语义、状态校验与用户授权。 |
+| OpenAI | 能接收 Task、最小 Context 和 Schema，并返回可校验结构化结果。 | B3 Constitution、Task 语义、状态校验与用户授权。 |
 | Claude | 能提供一次任务调用、结构化结果和足够诊断信息。 | 同一 Task Schema 与单次调用约束。 |
 | Local Model | 能在本地执行并满足结构化输出、错误报告与成本/性能观察的最小要求。 | Project State 语义、Context 最小化和结构化结果规则。 |
 
@@ -137,7 +139,7 @@ Antigravity 是当前默认 Provider，不是 Project Architect 的产品定义�
 | 保留调用诊断并明确失败。 | 直接写 Project State 或将推荐升级为 Confirmed。 |
 | 隔离 Provider 差异。 | 通过重试、多角色或替代输出掩盖失败。 |
 
-Provider 成功只说明执行层完成；状态变更仍须经过 Runtime Schema Validation、B2.1 行为校验、用户授权检查和 State Engine 的状态转换规则。
+Provider 成功只说明执行层完成；状态变更仍须经过 B3 Schema、问题独立性、用户授权和 State Engine 状态转换校验。
 
 ## 8. 失败与降级原则
 
@@ -147,7 +149,18 @@ Provider 成功只说明执行层完成；状态变更仍须经过 Runtime Schem
 - Provider 返回的 usage 缺失时，使用 `unavailable`，不得估算。
 - Provider 不能以普通文本内容替代缺失的 `structuredOutput`。
 
-## 9. 本阶段结论
+## 9. Prompt Cache 与稳定前缀优化
+
+1. **稳定前缀与动态后缀分离**：
+   - 稳定前缀：固定 B3 Constitution 提示词宪法、全局 Schema 说明及统一领域规则。
+   - 动态后缀：当前阶段预算、项目基本背景、相关 Locked 决策与当前 Turn 输入。
+   - 该分离可最大化利用底层 Provider 的 Prompt Cache 命中率，降低冷启动 Token 与时延。
+
+2. **真实缓存指标上报**：
+   - Provider 仅在上游真实返回 `cache_read_tokens` > 0 时将 `promptCache` 标记为 `observed`。
+   - 未观测到时标记为 `unknown` 或 `unsupported`，严禁在应用层伪造缓存命中或硬编码 `supported`。
+
+## 10. 本阶段结论
 
 V1 以 Antigravity CLI 作为已验证的默认 Provider，同时通过 `AIProvider Request → Structured Result` 契约保持 Provider 可替换性。
 

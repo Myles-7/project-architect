@@ -1,5 +1,7 @@
 # Project Architect V1：Development Roadmap
 
+> B3 更新：Discovery 开发与验收改用 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md)；旧 B2.1 冻结要求不再适用于生产运行时。
+
 > 文档状态：Phase 1.8 Blueprint  
 > 依据：[01_PRODUCT_BOUNDARY.md](01_PRODUCT_BOUNDARY.md) 至 [07_DOCUMENT_SYSTEM.md](07_DOCUMENT_SYSTEM.md)  
 > 范围：V1 自用闭环的里程碑、验收门槛与主要风险。  
@@ -23,7 +25,7 @@ flowchart LR
 
 - **自用优先。** 先支持单个开发者稳定完成自己的项目定义，不增加团队、组织、账户、计费或运营面板。
 - **状态优先。** Project State 是事实来源；任何 UI、AI 结果和文档都不能维护独立事实。
-- **B2.1 冻结。** 不在开发过程中重新设计 Constitution 或增加多 Agent。Agent 集成必须保持单 Agent、单次主要调用和结构化输出。
+- **B3 契约完整。** 保持单 Agent、单次主要调用、结构化输出和自适应独立问题集，不增加 Multi-Agent。
 - **本地优先。** 项目材料、状态、历史和文档围绕本地项目闭环工作。
 - **先验证再扩展。** 每个 Milestone 完成后都应执行与其风险相匹配的验收，不为赶进度跳过状态、结构化输出或用户授权检查。
 
@@ -71,18 +73,18 @@ Milestone 1 完成后，必须能在不调用 AI 的情况下用受控测试数�
 
 ### 目标
 
-将已冻结的 B2.1 Agent Runtime 接入 Core Engine，使复杂理解、Gap 发现、推荐与问题生成能安全地返回 Project State 建议。
+将 B3 Agent Runtime 接入 Core Engine，使复杂理解、Gap 发现、推荐与独立问题集能安全地返回 Project State 建议。
 
 ### 功能
 
 - 实现 [05_AI_PROVIDER.md](05_AI_PROVIDER.md) 定义的统一 Provider Request 与 Structured Result 契约。
 - 接入 Antigravity CLI 作为 V1 默认 Provider，保留未来 Adapter 的抽象边界。
 - 使用 `structured_output` 作为唯一状态相关结果来源，保留原始封套与可用调用指标。
-- 接入冻结的 B2.1 Constitution 与三大 Task Mode：`discovery-turn`、`readiness-review`、`document-plan`。
+- 接入 B3 Constitution 与三大 Task Mode：`discovery-turn`、`readiness-review`、`document-plan`。
 - 实现 Context Manager 的 Relevant Context Selection、长度预算和任务级上下文裁剪。
-- 将 Agent 结果经过 Schema、B2.1 分类、用户授权和 Locked 检查后映射为建议状态变更。
+- 将 Agent 结果经过 B3 Schema、依赖门控、用户授权和 Locked 检查后映射为建议状态变更。
 - 实现 Provider 失败、超时、结构化缺失和异常成本的可见处理；失败时状态不变。
-- 将现有 B2.1 Benchmark 作为 Agent 行为回归证据，而不是重新引入 Prompt 探索。
+- 将 B3 Benchmark 作为 Agent 行为和问题集质量的回归证据。
 
 ### 验收标准
 
@@ -92,7 +94,7 @@ Milestone 1 完成后，必须能在不调用 AI 的情况下用受控测试数�
 - 对模糊 Idea，首次分析先输出理解状态，不直接生成问卷。
 - 对真实硬约束矛盾，结果能保留 Conflict；普通风险、复杂度和取舍不会被程序错误升级为 Conflict。
 - 输出与调用失败均可追溯；失败、超时或结构化缺失不改变 Project State。
-- 集成验证保持 B2.1 的产品先于技术、Capability Before Mechanism 与单次调用行为。
+- 集成验证保持 B3 的产品先于技术、Capability Before Mechanism、问题独立性与单次调用行为。
 
 ### 主要风险
 
@@ -100,7 +102,7 @@ Milestone 1 完成后，必须能在不调用 AI 的情况下用受控测试数�
 | --- | --- | --- |
 | Provider 版本或本地环境差异。 | 调用失败或结构化结果变化。 | 通过 Provider Adapter 隔离；记录原始封套、退出状态和可用用量。 |
 | Token 或耗时异常。 | 自用体验不稳定，成本不可控。 | 任务级最小上下文、单次调用、指标记录与异常成本保护。 |
-| Prompt 或 Schema 在集成中漂移。 | 已验证的 B2.1 行为退化。 | 版本化冻结资产；用现有 Regression fixtures 验证关键行为。 |
+| Prompt 或 Schema 在集成中漂移。 | 已验证的 B3 行为退化。 | 版本化活动资产；用 B3 Regression fixtures 验证关键行为。 |
 | Agent 结果污染状态。 | 用户信任和后续文档可靠性受损。 | Schema、来源、分类、授权和 Locked 五层校验后再写入。 |
 
 ### 完成门槛
@@ -203,7 +205,7 @@ V1 达成的不是“功能列表全部出现”，而是以下自用闭环可�
 
 1. 用户可创建和恢复本地项目。
 2. 用户可用文本、文件或图片开始项目理解。
-3. B2.1 能以结构化、单次推理方式发现关键 Gap 并提出产品级问题。
+3. B3 能以结构化、单次推理方式发现关键 Gap 并提出自适应独立问题集。
 4. 用户可查看、确认、编辑、锁定和追踪项目定义。
 5. Readiness 能清楚说明是否存在重要未决事项。
 6. 用户可在明确批准后得到可靠、可追溯的 Markdown 开发文档。

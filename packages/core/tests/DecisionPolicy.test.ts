@@ -105,8 +105,13 @@ describe('DecisionPolicyEngine Unit Tests (Phase 2.3)', () => {
     const snapshot = createBaseSnapshot();
     const discoveryResult: DiscoveryResult = {
       confirmed: [],
-      candidates: ['Default logging buffer size is 100 entries', 'Support dark theme toggle'],
-      assumptions: ['Auto save every 60 seconds'],
+      candidates: [
+        { decision_key: 'logging_buffer', area: 'technical_boundary', statement: 'Default logging buffer size is 100 entries', rationale: 'Test fixture' },
+        { decision_key: 'dark_theme', area: 'ux_ui', statement: 'Support dark theme toggle', rationale: 'Test fixture' },
+      ],
+      assumptions: [
+        { decision_key: 'auto_save', area: 'core_features', statement: 'Auto save every 60 seconds', reason: 'Test fixture' },
+      ],
       unknowns: [],
       risks: [],
       conflicts: [],
@@ -126,7 +131,9 @@ describe('DecisionPolicyEngine Unit Tests (Phase 2.3)', () => {
     const snapshot = createBaseSnapshot();
     const discoveryResult: DiscoveryResult = {
       confirmed: [],
-      candidates: ['Support exporting document to PDF format'],
+      candidates: [
+        { decision_key: 'pdf_export', area: 'core_features', statement: 'Support exporting document to PDF format', rationale: 'Test fixture' },
+      ],
       assumptions: [],
       unknowns: [],
       risks: [],
@@ -184,7 +191,9 @@ describe('DecisionPolicyEngine Unit Tests (Phase 2.3)', () => {
     const snapshot = createBaseSnapshot();
     const discoveryResult: DiscoveryResult = {
       confirmed: [],
-      candidates: ['Auto cloud sync to remote storage on edit'],
+      candidates: [
+        { decision_key: 'cloud_sync', area: 'technical_boundary', statement: 'Auto cloud sync to remote storage on edit', rationale: 'Test fixture' },
+      ],
       assumptions: [],
       unknowns: [],
       risks: [],

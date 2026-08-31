@@ -1,5 +1,6 @@
 # Project Architect V1：Project State 数据模型
 
+> B3 更新：自适应多问题集与生产运行时以 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md) 为权威生产契约；旧 B2.1 引用仅为历史背景。
 > 文档状态：Phase 1.4 Blueprint  
 > 依据：[01_PRODUCT_BOUNDARY.md](01_PRODUCT_BOUNDARY.md)、[02_SYSTEM_ARCHITECTURE.md](02_SYSTEM_ARCHITECTURE.md)、[03_AGENT_RUNTIME.md](03_AGENT_RUNTIME.md)  
 > 范围：本地文件状态、状态生命周期、结构化写入与用户确认。  
@@ -244,7 +245,7 @@ Overview 保存用户看到的 Section 结构、成熟度和对规范记录的�
 
 ### 5.5 `state/gaps.json`
 
-`gaps.json` 集中保存缺口及其容易被混淆的相邻分类。这样可以保留 B2.1 的 Strict Conflict 证据，而不把所有问题叫作 Conflict。
+`gaps.json` 集中保存缺口及其容易被混淆的相邻分类。这样可以保留 Strict Conflict 证据，而不把所有问题叫作 Conflict。
 
 ```json
 {
@@ -474,7 +475,7 @@ Assumption 被用户确认时，不应直接改名为 Confirmed。System 必须�
 ```mermaid
 flowchart LR
     AO["Agent structured_output"] --> SV["Schema Validation"]
-    SV --> PV["B2.1 与状态策略校验"]
+    SV --> PV["B3 与状态策略校验"]
     PV --> MM["Mutation Mapping\n建议状态变更"]
     MM --> UA["检查用户授权与 Locked"]
     UA --> SE["Project State Engine"]
@@ -555,4 +556,4 @@ flowchart LR
 
 V1 通过清晰、独立的本地 JSON 文件保存项目状态：`decisions.json` 维护事实与授权，`overview.json` 提供用户视图，`gaps.json` 与 `risks.json` 保留未决和风险，`questions.json` 连接提问与回答，`readiness.json` 记录准备度，`documents/` 保存可追溯的派生文档。
 
-该模型使 B2.1 的结构化推理能够安全进入项目状态，同时把最终控制权保留给用户。
+该模型使自适应 Discovery Agent 的结构化推理能够安全进入项目状态，同时把最终控制权保留给用户。

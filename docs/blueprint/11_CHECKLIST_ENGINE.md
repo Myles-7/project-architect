@@ -1,5 +1,6 @@
 # Project Architect V1：Checklist Engine 设计
 
+> B3 更新：自适应 Discovery 运行时与多问题集预算以 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md) 为唯一权威生产契约；本文中的旧 B2.1 描述仅为历史背景。
 > 文档状态：Phase 0 Blueprint Finalization  
 > 依据：[01_PRODUCT_BOUNDARY.md](01_PRODUCT_BOUNDARY.md)、[02_SYSTEM_ARCHITECTURE.md](02_SYSTEM_ARCHITECTURE.md)、[03_AGENT_RUNTIME.md](03_AGENT_RUNTIME.md)  
 > 范围：Universal 与 Type Checklists 的结构定义、合并选择算法、与 `discovery-turn` 的 Context 交互边界。  
@@ -188,5 +189,5 @@ flowchart LR
 ```
 
 - **Checklist 不是问卷**：Checklist 条目不直接作为问题展示给用户，而是作为 **Agent 审查视角的提示词（Review Lens）**。
-- **Agent 执行综合仲裁**：Agent 结合用户的实际材料与 Checklist Hints，判断哪些是当前最紧迫的 Gap，并按照 B2.1 Constitution 转换为符合预算的高价值 Question 与 Recommendation。
+- **Agent 执行综合仲裁**：Agent 结合用户的实际材料与 Checklist Hints，判断哪些是当前最紧迫的 Gap，并按照 B3 Constitution（参见 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md)）转换为符合预算的高价值 Question 与 Recommendation。
 - **严禁过度设计**：V1 坚决不引入 DAG 拓扑排序、不引入有向无环依赖图、不引入追踪矩阵。简单的标签匹配 + 优先级截断足以支撑个人开发者的自用闭环。

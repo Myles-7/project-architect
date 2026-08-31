@@ -1,0 +1,493 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-13",
+  "stage": "initial",
+  "name": "duplicate-question-pressure",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 48439,
+  "output": {
+    "assumptions": [
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "default_language",
+        "reason": "用户使用中文描述需求，目标市场和首批测试用户大概率以中文用户为主。该决定非常容易修改和扩展多语言支持。",
+        "statement": "首发版本界面语言使用简体中文。"
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "user_feedback_channel",
+        "reason": "MVP版本需要快速收集用户反馈，且放置一个简单的意见反馈按钮开发成本极低，随时可以调整或下线。",
+        "statement": "在设置页面提供一个简单的意见反馈入口。"
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "dark_mode_support",
+        "reason": "深色模式虽然能提升夜间使用体验，但在MVP阶段会成倍增加UI适配和设计测试的工作量，优先保障浅色模式的视觉与功能，后续再进行设计迭代是低风险且完全可逆的。",
+        "statement": "首发版本暂不提供系统级的深色模式切换，仅使用浅色主题。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "core_features",
+        "decision_key": "use_gamification_elements",
+        "rationale": "待办工具流失率高，游戏化反馈可以增强多巴胺分泌，提升日常开启率和任务完成率，是一个值得尝试的产品方向。",
+        "statement": "引入“完成任务获得积分或勋章”的轻量化游戏化机制，激励用户持续记录。"
+      },
+      {
+        "area": "core_features",
+        "decision_key": "weekly_summary_report",
+        "rationale": "帮助用户复盘一周得失是效率管理的重要一环，可视化报告不仅能增强用户成就感，还能促进社交分享，带来自然的用户拉新。",
+        "statement": "每周日自动为用户生成本周“任务完成与时间分布”的可视化复盘报告。"
+      }
+    ],
+    "confirmed": [
+      "做一个待办工具",
+      "不清楚给个人还是团队",
+      "不清楚核心用户是谁，也不知道主要使用者"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "target_user",
+        "decision_key": "target_user_focus",
+        "depends_on": [],
+        "impact": "若不决定，将无法设计任何关于任务指派、分享、协作或者纯个人化的效率特色功能。",
+        "reason": "用户明确表示不清楚是给个人还是团队使用，需要在此处做出核心定位选择。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "primary_platform",
+        "depends_on": [],
+        "impact": "不同的设备（手机端 vs 电脑网页端）需要完全不同的交互界面设计与研发技术栈选型。",
+        "reason": "尚未定义首发针对的核心终端设备。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "task_input_mode",
+        "depends_on": [],
+        "impact": "影响到用户录入一个任务所需的点击次数和时间，直接关系到留存率。",
+        "reason": "记录是待办工具的第一个核心步骤，其输入流程尚未确定。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "task_organization",
+        "depends_on": [],
+        "impact": "影响到产品是否能够提供比普通记事本更高效的价值主张。",
+        "reason": "任务列表如何组织以避免积压尚未决定。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "reminder_policy",
+        "depends_on": [],
+        "impact": "影响用户的核心留存率和应用召回机制，同时涉及是否产生短信等运营费用。",
+        "reason": "系统触发用户关注任务过期的推送机制尚未明确。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "offline_sync_strategy",
+        "depends_on": [],
+        "impact": "影响无网或弱网下的可用性体验，且直接决定了后端同步逻辑的技术研发工期。",
+        "reason": "网络异常环境下的可用性保障策略尚不明确。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "data_privacy_hosting",
+        "depends_on": [],
+        "impact": "直接决定了云端服务器的硬性运维成本以及数据合规性防线。",
+        "reason": "数据的安全归属与托管模式尚未决定。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "task_cleanup_policy",
+        "depends_on": [],
+        "impact": "影响产品是否能支持用户进行长期的复盘与成就回顾，且会影响数据库长期的容量规划。",
+        "reason": "历史任务的保留与归档机制尚未确定。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "external_integration",
+        "depends_on": [],
+        "impact": "若集成本地或三方日历，将引入复杂的外部授权和双向同步冲突逻辑，可能拖慢上线速度。",
+        "reason": "首发版本是否集成外部生态接口尚未定义。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "task_complexity",
+        "depends_on": [],
+        "impact": "影响界面排版布局以及用户对于复杂任务的处理能力。",
+        "reason": "单个任务支持的内容信息维度尚未明确。",
+        "severity": "high",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "target_user_focus",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "可以省去团队协作（如评论、指派、权限管理）的开发，降低首版研发成本约50%，缩短上线时间；但无法直接切入企业或多人协作的付费市场。",
+            "key": "personal_productivity",
+            "label": "专注个人日常与工作效率管理",
+            "reversibility": "moderate",
+            "tradeoffs": "放弃了团队协作市场的溢价空间，换取更快的上线速度和更低的研发成本。"
+          },
+          {
+            "impact": "需要设计多用户权限、任务指派、动态通知与评论系统，系统复杂度显著上升，研发周期将延长1倍以上；但能直接面向团队提供订阅服务，商业化潜力更大。",
+            "key": "team_collaboration",
+            "label": "专注团队多方协作与任务跟进",
+            "reversibility": "hard",
+            "tradeoffs": "承担更高的初始研发成本和系统复杂度，以换取直接面向B端企业团队收费的机会。"
+          }
+        ],
+        "question": "待办工具的核心使用场景定位是什么？",
+        "reason": "决定了工具的设计是侧重于个人效率提升，还是团队协作沟通，这是所有后续功能设计的基石。",
+        "recommendation": "(Recommended) 建议首发版本专注于个人效率管理。",
+        "recommendation_reason": "作为一个新项目，个人效率市场更容易通过差异化的单点功能切入，且不需要建设复杂的团队权限和多端同步冲突处理，开发成本和上线周期更短。团队协作工具面临来自Jira、钉钉等成熟竞品的强力竞争，研发门槛较高。",
+        "recommended_option_key": "personal_productivity"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "primary_platform",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "优先优化单手快速录入、振动反馈和系统级通知提醒，适合碎片化场景；但对于大批量任务编辑和复杂看板视图的展示效率较低。",
+            "key": "mobile_first",
+            "label": "移动端优先（微信小程序或移动App）",
+            "reversibility": "moderate",
+            "tradeoffs": "优化了移动端高频记录和触屏体验，但牺牲了大屏幕下批量编辑任务的便利性。"
+          },
+          {
+            "impact": "适合在电脑前专注工作的场景，支持快捷键批量录入、多栏看板和复杂筛选；但无法随时随地记录，且移动端体验仅提供基础浏览。",
+            "key": "desktop_web",
+            "label": "桌面网页端/电脑客户端优先",
+            "reversibility": "moderate",
+            "tradeoffs": "优化了专业办公桌前的深度整理效率，但牺牲了移动场景下的即时捕捉能力。"
+          }
+        ],
+        "question": "首发版本主要针对什么设备平台进行优化？",
+        "reason": "待办工具的输入和查看频率极高，不同平台的交互逻辑（如手机的触屏手势 vs 电脑的键盘快捷键）完全不同，首发平台决定了核心UX（用户体验）的设计方向。",
+        "recommendation": "(Recommended) 建议首发选择移动端（如微信小程序或移动App）。",
+        "recommendation_reason": "待办事项往往需要在移动中记录和接收提醒，移动端能提供随时随地的记录体验和系统级推送，更贴合高频记录和即时消费的诉求。",
+        "recommended_option_key": "mobile_first"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "task_input_mode",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "用户只需一行文字即可完成创建，系统自动识别时间、标签等信息，输入体验极佳；但对输入解析的算法要求较高，若识别不准可能需要用户二次修改。",
+            "key": "natural_language",
+            "label": "快速文本/自然语言智能输入",
+            "reversibility": "easy",
+            "tradeoffs": "提供极简的录入体验，但可能因为自然语言解析误差导致分类不够绝对精确。"
+          },
+          {
+            "impact": "用户需要手动选择截止日期、优先级、所属清单等字段，确保任务属性清晰、分类准确，方便后续筛选；但输入步骤较多，可能导致用户在灵感瞬间流失。",
+            "key": "structured_form",
+            "label": "结构化表单精确输入",
+            "reversibility": "easy",
+            "tradeoffs": "保证了任务数据的条理性和规范度，但增加了用户的单次输入成本。"
+          }
+        ],
+        "question": "用户添加新待办任务时的主要交互方式是什么？",
+        "reason": "记录门槛的高低直接决定了用户的流失率，需要明确是追求“快速无感记录”还是“结构化精确分类”。",
+        "recommendation": "(Recommended) 建议选择文本自然语言输入。",
+        "recommendation_reason": "待办工具的生命线在于“快”。通过自然语言解析（如输入“明天下午3点开会”自动提取时间和内容）可以极大降低记录负担，避免用户被繁琐的表单劝退。",
+        "recommended_option_key": "natural_language"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "task_organization",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "提供最灵活、最低门槛的任务归档方式，用户按自己习惯分类；但当任务变多时，容易失去条理，无法自动突出最核心的任务。",
+            "key": "simple_list",
+            "label": "自由创建清单与标签分类",
+            "reversibility": "easy",
+            "tradeoffs": "极高的灵活性，但缺乏对任务轻重缓急的科学引导。"
+          },
+          {
+            "impact": "强制引导用户评估任务价值，自动将任务划分到不同的执行优先级，减少选择焦虑；但用户需要多一步评估成本，对不习惯此方法的用户有一定门槛。",
+            "key": "matrix_prioritization",
+            "label": "采用四象限法（重要/紧急）等效率框架",
+            "reversibility": "easy",
+            "tradeoffs": "提供清晰的行动指导，但强加了一套效率理论，增加了初学者的学习成本。"
+          }
+        ],
+        "question": "工具如何帮助用户对任务进行组织和决定执行顺序？",
+        "reason": "简单的待办列表容易变成“任务垃圾场”，需要定义产品采用何种效率方法论来帮助用户消化任务。",
+        "recommendation": "(Recommended) 建议选择轻量级清单与四象限分类。",
+        "recommendation_reason": "四象限（重要-紧急）能直观引导用户做决策，同时清单分类能把工作和生活区隔开，上手难度低且效果明显，能有效防止任务积压。",
+        "recommended_option_key": "matrix_prioritization"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "reminder_policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "提醒即时送达，用户点击可直接跳转应用，体验流畅且通道免费；但需要用户授权，且在部分系统上可能被屏蔽或折叠。",
+            "key": "native_push",
+            "label": "移动端系统原生推送/微信小程序订阅消息",
+            "reversibility": "easy",
+            "tradeoffs": "零通道费且跳转流畅，但受限于用户的系统推送权限授权。"
+          },
+          {
+            "impact": "即使应用未运行或未授权也能触达用户，适合极其重要的备忘；但短信需要支付第三方通道费用，邮件提醒时效性相对较低。",
+            "key": "email_sms",
+            "label": "邮件或短信提醒",
+            "reversibility": "easy",
+            "tradeoffs": "覆盖面广、强制性强，但带来了持续的通道运营成本，且有被拦截为垃圾信息的风险。"
+          }
+        ],
+        "question": "系统如何向用户发送任务到期提醒？",
+        "reason": "提醒是促使用户回到应用并完成任务的关键闭环，不同的提醒通道直接影响用户的留存和触达率。",
+        "recommendation": "(Recommended) 建议选择系统/平台原生推送或微信小程序消息。",
+        "recommendation_reason": "原生通道即时性最强且无额外短信费用成本，能保证在任务到期时立刻触达用户，是效率类应用的标配。",
+        "recommended_option_key": "native_push"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "offline_sync_strategy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "任何网络下都能秒开和记录，数据绝不丢失，体验极佳；但技术实现上需要处理多端修改导致的冲突，增加了同步逻辑的研发复杂度。",
+            "key": "local_first",
+            "label": "本地优先，离线可用，联网后后台自动同步",
+            "reversibility": "hard",
+            "tradeoffs": "获得了无懈可击的用户体验，但显着增加了底层同步算法和冲突解决的开发工期。"
+          },
+          {
+            "impact": "服务端作为唯一数据源，无需处理本地冲突，开发速度最快、成本最低；但在无网或弱网环境下应用将完全无法使用。",
+            "key": "cloud_always_online",
+            "label": "云端实时存取，要求必须联网使用",
+            "reversibility": "hard",
+            "tradeoffs": "极地降低了开发成本和周期，但牺牲了地下室、地铁等弱网场景下的用户体验。"
+          }
+        ],
+        "question": "应用在网络不稳定或无网状态下的可用性策略是什么？",
+        "reason": "待办工具经常在地铁、电梯、飞机等弱网或无网环境下使用，离线体验直接影响产品的可靠性信任感。",
+        "recommendation": "(Recommended) 建议选择本地优先，联网后自动同步。",
+        "recommendation_reason": "待办属于高频且容错率极低的应用，如果因为没网打不开或无法记录，用户会立刻卸载。本地优先能提供秒开和绝对可靠的体验。",
+        "recommended_option_key": "local_first"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "data_privacy_hosting",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "支持无缝的多端数据同步，便于开发云端智能助手等增值功能；但用户必须信任运营方的数据安全保护，且需要持续承担云服务器运维成本。",
+            "key": "standard_cloud_encrypted",
+            "label": "云端数据库统一托管，传输与存储加密",
+            "reversibility": "hard",
+            "tradeoffs": "提供了完美的多端同步与云端智能潜力，但需要承担数据合规责任与持续的云成本。"
+          },
+          {
+            "impact": "开发者完全不接触用户数据，隐私安全性最高，且免去了服务器运营成本；但无法提供跨平台（如iOS与Android间）的便捷同步，也无法进行集中式数据分析。",
+            "key": "local_only_or_icloud",
+            "label": "纯本地存储或仅支持个人云盘（如iCloud/WebDAV）同步",
+            "reversibility": "hard",
+            "tradeoffs": "零服务器成本和极高隐私保障，但放弃了跨平台无缝体验与云端分析能力。"
+          }
+        ],
+        "question": "用户数据的存储归属和隐私策略如何定义？",
+        "reason": "待办事项通常包含用户的个人日常隐私或公司商业机密，数据存储方式决定了安全防线与合规承诺。",
+        "recommendation": "(Recommended) 建议选择标准云端加密托管。",
+        "recommendation_reason": "对于大多数主流用户，多端同步是硬性需求，云端托管是保障多端体验的基石，通过传输和存储加密即可满足大众的隐私要求。",
+        "recommended_option_key": "standard_cloud_encrypted"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "task_cleanup_policy",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "用户可以随时检索过去的工作成果，支持生成周报/月报，提升产品粘性；但随着历史数据增长，需要进行数据库性能优化和数据分页处理。",
+            "key": "permanent_archive",
+            "label": "永久保留已完成任务，提供归档和历史复盘视图",
+            "reversibility": "easy",
+            "tradeoffs": "提供了复盘数据资产价值，但需要持续优化数据库存储以应对历史数据膨胀。"
+          },
+          {
+            "impact": "数据库体积小，界面极简，强调“只关注当下”的理念；但用户无法追溯历史，不适合需要复盘或作为工作凭证的场景。",
+            "key": "ephemeral_clear",
+            "label": "任务完成后即刻或定期清理，保持界面绝对清爽",
+            "reversibility": "easy",
+            "tradeoffs": "保持了极致的轻量与性能，但剥夺了用户回顾成就和历史检索的权利。"
+          }
+        ],
+        "question": "用户完成或删除任务后，系统对历史数据的处理策略是什么？",
+        "reason": "决定了产品是作为一个单纯的“今日事今日毕”的临时便签，还是一个支持复盘与数据分析的个人/团队历史数据库。",
+        "recommendation": "(Recommended) 建议选择保留完整历史记录并支持归档。",
+        "recommendation_reason": "许多高频效率工具用户都有“每周复盘”或“工作总结”的需求，能够查看过去完成的事情能给用户带来极大的成就感，也是粘性的关键来源。",
+        "recommended_option_key": "permanent_archive"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "external_integration",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "研发周期缩短，排除外部接口不稳定的风险；但用户需要手动在不同效率软件间切换，无法自动导入日程。",
+            "key": "standalone_only",
+            "label": "独立运行，不与任何外部系统同步",
+            "reversibility": "easy",
+            "tradeoffs": "降低了首发的技术门槛，但要求用户忍受多系统间无法联动的碎片化体验。"
+          },
+          {
+            "impact": "任务会自动同步到手机自带日历中，提供统一的时间视图；但需要申请各平台特殊权限，且处理复杂的双向同步冲突会增加约2-3周的开发时间。",
+            "key": "two_way_calendar_sync",
+            "label": "支持与系统日历（如iOS/Android日历）双向同步",
+            "reversibility": "moderate",
+            "tradeoffs": "实现了日程的无缝集成，但为首发版引入了繁重的适配和API调试成本。"
+          }
+        ],
+        "question": "首发版本是否需要与外部日历或效率工具进行联动？",
+        "reason": "用户往往已经在使用系统日历或企业邮箱，是否打通这些外部生态会直接改变首发MVP的研发边界。",
+        "recommendation": "(Recommended) 建议首发版本保持独立运行，暂不整合外部日历。",
+        "recommendation_reason": "外部日历API同步协议繁琐，且双向同步容易出现时区和冲突问题。MVP阶段应专注把待办本身的录入和提醒体验做好，验证核心玩法后再做集成。",
+        "recommended_option_key": "standalone_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "task_complexity",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "界面干净整洁，用户无认知负担，创建和完成任务都极快；但无法应对需要详细步骤或长文字说明的复杂任务。",
+            "key": "simple_memo",
+            "label": "极简备忘，仅支持标题与截止日期",
+            "reversibility": "easy",
+            "tradeoffs": "追求极致的极简设计，但对复杂任务无能为力。"
+          },
+          {
+            "impact": "用户可以对大任务进行步骤拆解，添加背景补充信息，实用性大增；但在交互设计上需要处理详情页展开，增加了前端界面的层次复杂度。",
+            "key": "subtasks_and_notes",
+            "label": "支持备注说明及单层子任务拆解",
+            "reversibility": "easy",
+            "tradeoffs": "满足了深度任务管理需求，但增加了一定的界面层级和操作复杂度。"
+          }
+        ],
+        "question": "单条待办任务所支持的细分属性和内容复杂度如何定位？",
+        "reason": "决定了待办任务是作为一句话的简易备忘，还是支持复杂项目拆解的容器。",
+        "recommendation": "(Recommended) 建议选择支持备注说明及单层子任务拆解。",
+        "recommendation_reason": "单纯的一句话备忘往往不够用，但引入富文本或多级子任务又会使界面过于臃肿。支持一级子任务和备注是平衡简洁与实用性的最佳方案。",
+        "recommended_option_key": "subtasks_and_notes"
+      }
+    ],
+    "risks": [
+      {
+        "area": "target_user",
+        "impact": "产品将失去独特卖点（USP），在与已有海量成熟待办应用的竞争中无法吸引首批核心死忠粉，导致推广受阻。",
+        "risk_key": "undefined_target_user_leakage",
+        "severity": "high",
+        "statement": "由于核心用户群体定义不清晰，导致产品功能设计过于宽泛，沦为平庸的“大杂烩”。"
+      },
+      {
+        "area": "mvp_scope",
+        "impact": "导致开发周期严重拉长，系统架构过度设计，首期MVP版发布遥遥无期，错失快速推向市场验证的时机。",
+        "risk_key": "scope_creep_in_mvp",
+        "severity": "critical",
+        "statement": "在未明确核心用户前，试图同时满足个人效率和团队协同的多重功能诉求。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "界面极简主义与功能丰富性之间的冲突。",
+        "reason": "用户希望工具上手即用、界面清爽，但随着深入使用又会提出子任务、分类、统计等复杂需求，产品需要在视觉噪音和功能深度间寻找微妙的平衡点。"
+      },
+      {
+        "description": "记录的极速响应与数据的强一致性/云端安全性的权衡。",
+        "reason": "本地即时录入要求零延迟响应，但若云端同步较慢或出现网络波动，可能导致多设备间数据短暂不一致，这需要在极致体验和数据同步逻辑复杂度之间做出折衷。"
+      }
+    ],
+    "unknowns": [
+      "目标用户的具体付费意愿和商业化变现模式",
+      "是否需要兼容特定的企业合规数据审计要求或特定操作系统（如国产系统）"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-13__B3__initial.json",
+  "usage": {
+    "input_tokens": 21064,
+    "output_tokens": 23933,
+    "thinking_tokens": 18510,
+    "total_tokens": 44997,
+    "cache_read_tokens": 0
+  },
+  "b3": {
+    "stage": "initial",
+    "question_count": 10,
+    "candidates_count": 2,
+    "assumptions_count": 3,
+    "gaps_count": 10,
+    "unique_decision_keys": 10,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [initial]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

@@ -28,7 +28,7 @@ describe('Project State Persistence & Reload Test', () => {
 
     // 2. Perform state mutations
     await engine.addInput(testProjectDir, 'text', 'notes.md', '# Development Notes\nNeed low latency.');
-    await engine.confirmDecision(testProjectDir, 'decision:dec-01', 2);
+    await engine.editOverviewItem(testProjectDir, 'mvp_scope', undefined, 'Local-first offline storage', 2);
     await engine.lockDecision(testProjectDir, 'decision:dec-01', 3);
 
     // 3. Simulate process shutdown by instantiating a completely new StateEngine instance

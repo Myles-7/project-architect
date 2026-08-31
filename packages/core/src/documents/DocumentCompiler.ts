@@ -4,16 +4,17 @@ import { DocumentPlanner } from './DocumentPlanner.js';
 import { DocumentRenderer } from './DocumentRenderer.js';
 import { DocumentValidator } from './DocumentValidator.js';
 import { FileStorage } from '../storage/FileStorage.js';
+import { createHash } from 'node:crypto';
 import type {
   ProjectSnapshot,
-  DocumentsState,
-  DocumentReference,
+  DocumentManifest,
+  DocumentManifestItem,
 } from '@project-architect/contracts';
 import { ErrorCode } from '@project-architect/contracts';
 import type { ReadinessResult } from '../readiness/ReadinessEvaluator.js';
 
 export interface CompileDocumentsResult {
-  manifest: DocumentsState;
+  manifest: DocumentManifest;
   renderedFiles: Array<{ path: string; content: string }>;
   readiness: ReadinessResult;
 }
@@ -39,7 +40,8 @@ export class DocumentCompiler {
   async compile(
     projectPath: string,
     snapshot: ProjectSnapshot,
-    targetRevision?: number
+    targetRevision?: number,
+    persistFiles = true
   ): Promise<CompileDocumentsResult> {
     // 1. Evaluate Readiness Gate & User Disposition via SSOT
     this.readinessGate.validateForDocumentGeneration(snapshot);
@@ -52,12 +54,30 @@ export class DocumentCompiler {
 
     // 3. Render Documents in memory
     const renderedFiles: Array<{ path: string; content: string }> = [];
-    const docReferences: DocumentReference[] = [];
+    const docReferences: DocumentManifestItem[] = [];
+
+    const totalSourceCoverage = {
+      confirmed: 0,
+      locked: 0,
+      assumptions: 0,
+      generatedStructure: 0,
+    };
 
     const now = new Date().toISOString();
     for (const item of plan.documents) {
       const content = await this.renderer.renderDocument(item, snapshot);
       renderedFiles.push({ path: item.path, content });
+
+      const contentHash = createHash('sha256').update(content, 'utf8').digest('hex');
+      const confirmed = (content.match(/\[Confirmed:/g) || []).length;
+      const locked = (content.match(/\[Locked:/g) || []).length;
+      const assumptions = (content.match(/\[Active Assumption\]/g) || []).length;
+      const generatedStructure = (content.match(/^#{1,4}\s+/gm) || []).length;
+
+      totalSourceCoverage.confirmed += confirmed;
+      totalSourceCoverage.locked += locked;
+      totalSourceCoverage.assumptions += assumptions;
+      totalSourceCoverage.generatedStructure += generatedStructure;
 
       docReferences.push({
         id: `doc-${item.type}`,
@@ -67,11 +87,20 @@ export class DocumentCompiler {
         status: 'generated',
         generatedAt: now,
         sourceRevision,
+        contentHash,
+        sourceStats: {
+          confirmed,
+          locked,
+          assumptions,
+          generatedStructure,
+        },
       });
     }
 
     // 4. Validate Rendered Documents
-    const validation = this.validator.validate(renderedFiles, snapshot);
+    const validation = this.validator.validate(renderedFiles, snapshot, {
+      checkPackageCompleteness: true,
+    });
     if (!validation.valid) {
       const err: any = new Error(
         `Document compilation validation failed:\n${validation.errors.map((e) => `- ${e}`).join('\n')}`
@@ -81,16 +110,24 @@ export class DocumentCompiler {
       throw err;
     }
 
-    // 5. Build documents manifest
-    const manifest: DocumentsState = {
-      schemaVersion: 1,
+    // 5. Build full DocumentManifest
+    const manifest: DocumentManifest = {
+      id: `manifest-${sourceRevision}`,
       projectId: snapshot.metadata.projectId,
+      sourceRevision,
+      readinessReviewId: snapshot.readiness?.current?.id || `rev-${sourceRevision}`,
+      readinessBasisRevision: snapshot.readiness?.current?.basisRevision ?? sourceRevision,
+      generatedAt: now,
+      documents: docReferences,
+      warnings: snapshot.readiness?.current?.warnings || [],
+      sourceCoverage: totalSourceCoverage,
       items: docReferences,
+      schemaVersion: 1,
       updatedAt: now,
     };
 
     // 6. Write to project files if projectPath is an existing directory
-    if (projectPath && (await this.storage.exists(projectPath))) {
+    if (persistFiles && projectPath && (await this.storage.exists(projectPath))) {
       for (const doc of renderedFiles) {
         const targetAbs = join(projectPath, doc.path);
         const targetDir = dirname(targetAbs);
@@ -100,6 +137,11 @@ export class DocumentCompiler {
         await this.storage.writeText(targetAbs, doc.content);
       }
       await this.storage.writeJson(join(projectPath, 'documents.json'), manifest);
+      const manifestDir = join(projectPath, 'documents');
+      if (!(await this.storage.exists(manifestDir))) {
+        await this.storage.ensureDir(manifestDir);
+      }
+      await this.storage.writeJson(join(manifestDir, 'manifest.json'), manifest);
     }
 
     return {

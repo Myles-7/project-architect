@@ -51,7 +51,7 @@ flowchart TD
     CoreVal -->|"失败"| Err1["返回校验错误，状态不变"]
     CoreVal -->|"成功"| AI["2. AI Provider 调用"]
     AI -->|"超时/退出错误"| Err2["返回 PROVIDER_* 错误，状态不变"]
-    AI -->|"成功"| SchemVal["3. Schema & B2.1 分类门控校验"]
+    AI -->|"成功"| SchemVal["3. B3 Schema 与独立性门控校验"]
     SchemVal -->|"校验不通过"| Err3["返回 SCHEMA_VALIDATION_FAILED，记录诊断，状态不变"]
     SchemVal -->|"通过"| Commit["4. 两阶段 State Commit"]
     Commit -->|"I/O 中断"| Rollback["自动回滚至上次完整 Revision"]

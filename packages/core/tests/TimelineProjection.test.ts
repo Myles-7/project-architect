@@ -157,7 +157,7 @@ describe('Phase 4.9.3: Derived Event Timeline Projection', () => {
       mode: 'broad-pass',
       promptProfile: 'default',
       contextProfile: 'default',
-      schemaProfile: 'b2-unified',
+      schemaProfile: 'b3-discovery',
       startedAt: '2026-08-23T08:08:00.000Z',
       completedAt: '2026-08-23T08:09:00.000Z',
       provider: 'antigravity-cli',

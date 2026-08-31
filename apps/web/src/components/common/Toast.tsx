@@ -36,17 +36,22 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
 
   const success = useCallback((msg: string, title?: string) => showToast(msg, 'success', title), [showToast]);
-  const error = useCallback((msg: string, title?: string) => showToast(msg, 'error', title, 6000), [showToast]);
+  const error = useCallback((msg: string, title?: string) => showToast(msg, 'error', title, 15000), [showToast]);
   const warning = useCallback((msg: string, title?: string) => showToast(msg, 'warning', title), [showToast]);
   const info = useCallback((msg: string, title?: string) => showToast(msg, 'info', title), [showToast]);
 
   return (
     <ToastContext.Provider value={{ showToast, success, error, warning, info }}>
       {children}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}
+            role={toast.type === 'error' ? 'alert' : 'status'}
             className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-xl border shadow-lg transition-all transform animate-in slide-in-from-bottom-2 ${
               toast.type === 'success'
                 ? 'bg-emerald-50 dark:bg-emerald-950/90 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100'
@@ -69,7 +74,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-0.5"
+              className="shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer flex items-center justify-center"
               aria-label="关闭提示"
             >
               <X className="w-3.5 h-3.5" />

@@ -23,7 +23,7 @@ project-architect/
 ├── packages/
 │   ├── contracts/                  # [正式] 唯一共享契约库 (TS Types, Schemas, DTOs, Enums)
 │   ├── core/                       # [正式] 确定性核心引擎 (State Engine, Storage, Commit, Checklist)
-│   └── agent/                      # [正式] AI 编排与 Provider 适配器 (B2.1, Context, Adapter)
+│   └── agent/                      # [正式] AI 编排与 Provider 适配器 (B3, Context, Adapter)
 │
 ├── checklists/                     # [正式] 静态规则库 (universal.json & types/*.json)
 │   ├── universal.json
@@ -34,7 +34,7 @@ project-architect/
 │       └── implementation/
 │
 ├── experiments/
-│   └── agent-benchmark/           # [冻结] B2.1 Agent Benchmark 评测基准与历史实验证据
+│   └── agent-benchmark/           # B3 活动基准与 B2.1 历史实验证据
 │
 ├── prototypes/
 │   └── frontend-ui/                # [原型] 原 frontend/ 目录 (作为交互与视觉设计参考)
@@ -68,7 +68,7 @@ project-architect/
 ### 2.3 `packages/agent`（AI 编排与适配包）
 - **职责**：负责 AI 任务编排、最小上下文组装、统一 Provider 适配与结构化解析。
 - **内容**：
-  - `Frozen Assets`：只读引用冻结的 B2.1 Constitution 与 `b2-unified.schema.json`。
+  - `Active Assets`：生产运行时引用 B3 Constitution 与 `b3-discovery.schema.json`；B2.1 资产只读归档。
   - `ContextManager`：Relevant Context Selection 算法、任务级上下文裁剪与 Token 预算控制。
   - `AIOrchestrator`：`discovery-turn`、`readiness-review`、`document-plan` 的单次调度器。
   - `ProviderLayer`：统一 Provider 抽象接口及 Antigravity CLI Adapter 实现。
@@ -94,7 +94,7 @@ project-architect/
 ## 3. 历史资产与外部目录说明
 
 1. **`experiments/agent-benchmark/`**：
-   - **性质**：权威实验资产库。包含已验证通过的 B2.1 Constitution、10 大测试 Case 及评测报告。
+   - **性质**：权威实验资产库。包含 B3 Constitution、14 个测试 Case、评测脚本及历史 B2.1 报告。
    - **保护规则**：不可删除、不可修改既有 Prompt 与历史报告，作为未来任何 Prompt 回归的基准。
 2. **`antigravity-provider-poc/`**：
    - **性质**：早期概念验证代码与历史记录。已被后续 `experiments/agent-benchmark/src/antigravity-provider.mjs` 的成功运行证据所取代。

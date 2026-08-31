@@ -83,16 +83,18 @@ describe('Document Compiler E2E — Todo App (Simple Project)', () => {
     const compileResult = await orchestrator.compileDocuments(projectPath);
 
     expect(compileResult.readiness.ready).toBe(true);
-    expect(compileResult.manifest.items.length).toBe(7);
+    expect(compileResult.manifest.items.length).toBe(9); // 8 core + DESKTOP_SPEC.md
 
-    // Verify all 7 core markdown documents on disk
+    // Verify all 8 core markdown documents on disk
     expect(await storage.exists(join(projectPath, 'AGENTS.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'PROJECT.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'PRODUCT.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'USER_FLOWS.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'UX_UI_SPEC.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'DEVELOPMENT_PLAN.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'docs', 'ACCEPTANCE.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
     expect(await storage.exists(join(projectPath, 'documents.json'))).toBe(true);
 
     // Check AGENTS.md content
@@ -104,6 +106,6 @@ describe('Document Compiler E2E — Todo App (Simple Project)', () => {
     // Verify snapshot stage is documents-generated
     const finalSnapshot = await stateEngine.getSnapshot(projectPath);
     expect(finalSnapshot.metadata.stage).toBe('documents-generated');
-    expect(finalSnapshot.documents?.items.length).toBe(7);
+    expect(finalSnapshot.documents?.items.length).toBe(9);
   });
 });

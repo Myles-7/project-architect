@@ -3,11 +3,11 @@
 > 文档状态：Phase 1.3 Blueprint  
 > 依据：[01_PRODUCT_BOUNDARY.md](01_PRODUCT_BOUNDARY.md)、[02_SYSTEM_ARCHITECTURE.md](02_SYSTEM_ARCHITECTURE.md)  
 > 范围：单一 Agent 的运行组成、任务契约、上下文选择与 Token 控制。  
-> 非范围：重写 B2.1 Prompt、Multi-Agent、Provider 实现和代码设计。
+> B3 变更：自适应多问题集的权威细则见 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md)。旧 B2.1 描述与其冲突时，以 B3 为准。
 
 ## 1. Runtime 目标与不变量
 
-Agent Runtime 让冻结的 B2.1 行为在不同项目阶段稳定运行。它不是新的 Agent，也不改变 B2.1 的 Constitution。
+Agent Runtime 让 B3 行为在不同项目阶段稳定运行，同时由 Core 决定问题预算与独立性门控。
 
 每一次需要 AI 推理的操作都遵守以下不变量：
 
@@ -23,7 +23,7 @@ Runtime 由 Constitution、Task Prompt、Context Manager 和 Schema 共同组成
 
 ```mermaid
 flowchart LR
-    C["B2.1 Constitution\n恒定行为边界"] --> T["Task Prompt\n当前任务目标"]
+    C["B3 Constitution\n恒定行为边界"] --> T["Task Prompt\n当前任务目标"]
     CM["Context Manager\n最小相关上下文"] --> T
     S["Task Schema\n允许的结构化结果"] --> R["一次 Agent Runtime Request"]
     T --> R
@@ -35,7 +35,7 @@ flowchart LR
 
 ### 2.1 Constitution
 
-Constitution 是所有任务共享的行为上限。B2.1 已冻结，本阶段不重写其内容。
+Constitution 是所有任务共享的行为上限。生产运行时只加载 B3 Constitution。
 
 它持续约束所有输出字段：
 
@@ -49,7 +49,7 @@ Constitution 是所有任务共享的行为上限。B2.1 已冻结，本阶段�
 
 Task Prompt 只定义“本次要完成哪一种推理”，不改变 Constitution 的原则。它决定当前任务的输出重点、禁止事项和完成条件。
 
-Task Prompt 不得借任务名称绕开 B2.1。例如，`question-generation` 不能因要提问而主动把具体实现机制作为候选方案；`document-compilation` 也不能把未确认的推断写成事实。
+Task Prompt 不得借任务名称绕开 B3。例如，`question-generation` 不能因要提问而主动把具体实现机制作为候选方案；`document-compilation` 也不能把未确认的推断写成事实。
 
 ### 2.3 Context Manager
 
@@ -67,7 +67,7 @@ V1 Runtime 明确将 AI 推理划分为三类独立任务，避免将 Discovery 
 
 | Task 类型 | 主要阶段 | 目的 | 是否通常面向用户提问 |
 | --- | --- | --- | --- |
-| `discovery-turn` | Idea 输入 / Broad Pass / Deep Dive / 编辑后影响分析 | **Unified Discovery Turn**：基于 B2.1 Constitution 与统一 Schema，单次完成当前理解、Candidate、Assumption、Gap、Conflict、Tension、Risk 及 Question 综合推理与仲裁。 | 是（程序按场景选择呈现重点） |
+| `discovery-turn` | Idea 输入 / Broad Pass / Deep Dive / 编辑后影响分析 | **Unified Discovery Turn**：基于 B3 Constitution 与统一 Schema，单次完成当前理解、Candidate、Assumption、Gap、Conflict、Tension、Risk 及独立 Question Set。 | 是（程序按阶段预算呈现） |
 | `readiness-review` | Prepare for Development | 独立审阅项目产品定义是否达到开发蓝图准备度，输出 Status、Warnings、Issues 与 Assumptions。 | 仅在需要明确关键未决问题时 |
 | `document-plan` | 用户批准 Readiness 后 | 在 Markdown 编译前分析文档覆盖范围与映射建议，推荐动态专项文档清单。 | 否 |
 
@@ -77,25 +77,19 @@ V1 Runtime 明确将 AI 推理划分为三类独立任务，避免将 Discovery 
 
 ### 4.1 `discovery-turn`（Unified Discovery Turn）
 
-`discovery-turn` 是 Discovery 阶段的唯一核心推理任务，完全对齐已验证的 B2.1 Benchmark 规范。
+`discovery-turn` 是 Discovery 阶段的唯一核心推理任务，遵循 B3 Benchmark 规范。
 
 | 项目 | 设计 |
 | --- | --- |
 | **输入 Context** | 当前用户输入、相关材料提取摘录（`ready` 状态）、当前阶段、相关 Confirmed / Locked 决定、现有 Open Gap / Risk / Tension / Conflict、适用 Checklist 条目提示。 |
-| **Prompt 体系** | 冻结的 B2.1 Constitution（`constitution-b2-1.md`） + Discovery Context。执行：提取证据 → 决策分类 → 过滤纯技术项 → 压力测试 → 排序 Gap → 生成高价值问题与推荐。 |
-| **Schema 契约** | `b2-unified.schema.json`（严格包含 `confirmed`、`candidates`、`assumptions`、`unknowns`、`risks`、`gaps`、`conflicts`、`tensions`、`questions`）。 |
-| **State 影响** | 由 State Engine 进行 Schema 校验、B2.1 分类门控、用户授权检查与 Locked 保护后，映射为候选变更：用户明确陈述进入 `decisions.json` (Confirmed)；AI 建议进入 Candidate/Gaps/Risks/Tensions/Assumptions；生成的问题进入 `questions.json`。 |
+| **Prompt 体系** | B3 Constitution（`constitution-b3.md`）+ Discovery Context + 本地阶段预算。 |
+| **Schema 契约** | `b3-discovery.schema.json`，Gap/Question 额外要求 `decision_key` 与 `depends_on`。 |
+| **State 影响** | 由 State Engine 进行 B3 Schema、独立性、用户授权与 Locked 保护校验后，映射为候选变更。 |
 | **呈现策略** | • **首次输入 (Initial Idea)**：Frontend 优先呈现结构化项目理解 (Confirmed/Candidate/Unknown/Risk) 与 Overview 投影，生成的首个高价值 Question 作为下一步引导保留。<br>• **后续迭代 (Broad Pass / Deep Dive)**：Frontend 聚焦呈现 Question 卡片、推荐方向与选项影响，并同步更新 Overview。 |
 
-#### 绑定的问题预算（B2.1 Frozen Budget）
+#### B3 自适应问题预算
 
-V1 以 B2.1 Benchmark 验证通过的预算为唯一权威，前端或调用层不得放宽：
-
-- **Critical / High：** 通常一次 1 个问题；仅当第一个回答无法使推荐可执行时，最多增加 1 个直接依赖问题。
-- **Normal：** 最多 2 个紧密相关问题。
-- **Low：** 默认不打扰用户；仅在满足 Assumption Policy 时显式记录为 Assumption，否则不升级为提问。
-
-> 原始产品需求中“普通问题可显示 3–5 个”仅代表前端 UI 的容量上限，不是 V1 Runtime 的生成预算。任何预算变更均属于 B2.1 行为修改，必须重新进行 Agent Benchmark 回归。
+问题预算为 `initial=12`、`explore=8`、`converge=4`、`readiness=2`。同批只允许互不依赖的唯一决策主题；Low-risk 仍优先保留为显式 Assumption。完整规则见 B3 权威规范。
 
 ### 4.2 `readiness-review`
 
@@ -187,7 +181,7 @@ Context Manager 必须有整体长度上限，并对数组数量、单条文本�
 - 对结构化失败、超时或异常成本，保留原始结果并把失败明确交给上层处理。
 - 成本保护使用历史正常范围识别异常，而不通过删减关键产品上下文来制造低成本结果。
 
-## 7. B2.1 原则在 Runtime 中的执行位置
+## 7. B3 原则在 Runtime 中的执行位置
 
 | 原则 | Runtime 执行位置 | 不允许的绕过方式 |
 | --- | --- | --- |
@@ -199,6 +193,6 @@ Context Manager 必须有整体长度上限，并对数组数量、单条文本�
 
 ## 8. 本阶段结论
 
-Project Architect V1 的 Agent Runtime 将 B2.1 作为稳定的行为底座，并以任务契约和最小上下文使其适应首次理解、Gap 发现、提问、Readiness 与文档生成阶段。
+Project Architect 的 Agent Runtime 将 B3 作为稳定的行为底座，并以任务契约、阶段预算和最小上下文适应首次理解、Gap 发现、批次提问、Readiness 与文档生成阶段。
 
 它保留一个 Agent、一次主要调用和结构化结果的简单架构；复杂性由程序的状态管理、上下文选择和校验承担，而不是由额外 Agent 或完整历史 Prompt 承担。

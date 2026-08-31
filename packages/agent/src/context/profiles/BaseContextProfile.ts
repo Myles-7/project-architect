@@ -59,9 +59,10 @@ export abstract class BaseContextProfile {
     return `## Current Turn Input\n${parts.join('\n')}`;
   }
 
-  protected truncateToBudget(text: string): string {
-    if (text.length > this.config.context.maxTotalContextChars) {
-      return text.slice(0, this.config.context.maxTotalContextChars) + '\n\n... [Context truncated to stay within character budget]';
+  protected truncateToBudget(text: string, maxChars = this.config.context.maxTotalContextChars): string {
+    if (text.length > maxChars) {
+      const marker = '\n\n... [Context truncated to stay within character budget]';
+      return text.slice(0, Math.max(0, maxChars - marker.length)) + marker;
     }
     return text;
   }

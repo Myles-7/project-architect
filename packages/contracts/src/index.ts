@@ -13,4 +13,6 @@ export * from './api.js';
 export * from './checklists.js';
 export * from './config.js';
 export * from './views.js';
+export * from './areas.js';
+export * from './discovery.js';
 

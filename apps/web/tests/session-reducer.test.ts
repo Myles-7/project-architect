@@ -145,4 +145,111 @@ describe('Phase 5.1: ProjectSession Reducer Unit Tests', () => {
     state = projectSessionReducer(state, { type: 'TOGGLE_LEFT_SIDEBAR' });
     expect(state.uiState.isLeftSidebarCollapsed).toBe(true);
   });
+
+  it('5. Reconstructs discovery result from snapshot on SET_ACTIVE_PROJECT and handles SET_LATEST_DISCOVERY', () => {
+    const snapshotWithData: ProjectSnapshot = {
+      ...dummySnapshot,
+      decisions: {
+        schemaVersion: 1,
+        projectId: 'proj-123',
+        items: [
+          {
+            id: 'dec-1',
+            area: 'mvp',
+            statement: 'Pure local audio tagging without database',
+            status: 'candidate',
+            origin: 'ai',
+            createdAt: '2026-08-23T00:00:00Z',
+            updatedAt: '2026-08-23T00:00:00Z',
+          },
+          {
+            id: 'dec-2',
+            area: 'platform',
+            statement: 'Windows desktop utility',
+            status: 'confirmed',
+            origin: 'user',
+            createdAt: '2026-08-23T00:00:00Z',
+            updatedAt: '2026-08-23T00:00:00Z',
+          },
+        ],
+        traces: [],
+        updatedAt: '2026-08-23T00:00:00Z',
+      },
+      assumptions: {
+        schemaVersion: 1,
+        projectId: 'proj-123',
+        items: [
+          {
+            id: 'asm-1',
+            statement: 'Target audio formats include FLAC and MP3',
+            status: 'active',
+            source: 'ai',
+            createdAt: '2026-08-23T00:00:00Z',
+            updatedAt: '2026-08-23T00:00:00Z',
+          },
+        ],
+        updatedAt: '2026-08-23T00:00:00Z',
+      },
+      gaps: {
+        schemaVersion: 1,
+        projectId: 'proj-123',
+        gaps: [
+          {
+            id: 'gap-1',
+            area: 'target_user',
+            severity: 'high',
+            reason: 'Target audience needs clarification',
+            impact: 'Determines UX simplicity',
+            shouldAskUser: true,
+            status: 'open',
+          },
+        ],
+        conflicts: [],
+        tensions: [
+          {
+            id: 'ten-1',
+            description: 'Offline vs cloud lookup',
+            reason: 'High accuracy metadata tagging needs online lookup vs offline privacy',
+            status: 'open',
+          },
+        ],
+        updatedAt: '2026-08-23T00:00:00Z',
+      },
+    };
+
+    const state = projectSessionReducer(initialProjectSessionState, {
+      type: 'SET_ACTIVE_PROJECT',
+      payload: { projectId: 'proj-123', snapshot: snapshotWithData },
+    });
+
+    expect(state.latestDiscoveryResult).toBeDefined();
+    expect(state.latestDiscoveryResult?.candidates.map((item) => item.statement)).toContain('Pure local audio tagging without database');
+    expect(state.latestDiscoveryResult?.confirmed).toContain('Windows desktop utility');
+    expect(state.latestDiscoveryResult?.assumptions.map((item) => item.statement)).toContain('Target audio formats include FLAC and MP3');
+    expect(state.latestDiscoveryResult?.gaps.length).toBe(1);
+    expect(state.latestDiscoveryResult?.tensions.length).toBe(1);
+
+    // Test explicit SET_LATEST_DISCOVERY
+    const updatedState = projectSessionReducer(state, {
+      type: 'SET_LATEST_DISCOVERY',
+      payload: {
+        discoveryResult: {
+          confirmed: ['Explicitly confirmed'],
+          candidates: ['Explicit candidate'],
+          assumptions: [],
+          unknowns: [],
+          risks: ['File corruption risk'],
+          conflicts: [],
+          tensions: [],
+          gaps: [],
+          questions: [],
+        },
+        diagnostics: { durationMs: 1200, totalTokens: 450 },
+      },
+    });
+
+    expect(updatedState.latestDiscoveryResult?.confirmed).toEqual(['Explicitly confirmed']);
+    expect(updatedState.latestDiscoveryResult?.risks).toEqual(['File corruption risk']);
+    expect(updatedState.latestDiscoveryDiagnostics?.durationMs).toBe(1200);
+  });
 });

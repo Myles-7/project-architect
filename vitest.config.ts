@@ -12,6 +12,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    testTimeout: 20000,
+    hookTimeout: 20000,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        maxForks: 2,
+      },
+    },
     include: ['packages/*/tests/**/*.test.ts', 'apps/*/tests/**/*.test.ts', 'tests/**/*.test.ts'],
   },
 });

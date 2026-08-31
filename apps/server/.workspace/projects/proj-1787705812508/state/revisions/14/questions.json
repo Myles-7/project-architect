@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1787705812508",
+  "items": [
+    {
+      "id": "q-mt9dwphh-3bs4",
+      "issueRef": "gap:gap-ai-trust_safety-wphg",
+      "gapRef": "gap:gap-ai-trust_safety-wphg",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "在 Local-First 架构下，用户上传的题目与私有数据集的隐私如何保护？",
+      "reason": "学术科研与保密竞赛的数据非常敏感。定义明确的数据隐私政策，是决定产品技术路线和用户信任的关键。",
+      "whyNow": "学术科研与保密竞赛的数据非常敏感。定义明确的数据隐私政策，是决定产品技术路线和用户信任的关键。",
+      "impact": "纯本地模式下数据只在本地与直连的 API 之间传输，隐私极佳，但限制了多人协同建模等网络特性。",
+      "recommendation": "(推荐) 纯本地存储与直连 LLM，数据绝不上传统一服务器",
+      "recommendationReason": "最大化发挥 Local-First 的优势，打消用户对代码、方案和科研数据被平台挪用或泄露的顾虑，建立高度的安全信任。",
+      "options": [
+        {
+          "label": "纯本地运行模式（所有数据仅留在用户本地，直连 LLM API）",
+          "impact": "隐私性最强，符合开源和本地化软件的安全预期，但无法提供云端备份、多端同步或团队协作功能。"
+        },
+        {
+          "label": "混合模式（数据默认在本地，用户可选择同步到云端进行多人协作）",
+          "impact": "支持团队分工建模，但需要平台建设云端存储，并且需要处理复杂的权限控制和数据脱敏问题。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "data_privacy_policy",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "纯本地运行模式（所有数据仅留在用户本地，直连 LLM API）",
+      "answeredAt": "2026-08-26T07:50:21.413Z"
+    },
+    {
+      "id": "q-mt9dwphh-wtft",
+      "issueRef": "gap:gap-ai-target_user-wphg",
+      "gapRef": "gap:gap-ai-target_user-wphg",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "在建模过程中，用户与多智能体系统如何进行交互？",
+      "reason": "数学建模极度依赖人类的主观判断与方向修正。完全自动化的“一键黑盒生成”往往难以达到实际交付标准，必须定义合理的干预机制。",
+      "whyNow": "数学建模极度依赖人类的主观判断与方向修正。完全自动化的“一键黑盒生成”往往难以达到实际交付标准，必须定义合理的干预机制。",
+      "impact": "决定了系统架构中是否需要支持复杂的异步任务挂起、恢复和上下文微调机制。",
+      "recommendation": "(推荐) 阶段性节点确认模式（在建模方向、代码大纲、论文框架等关键节点暂停并等待确认）",
+      "recommendationReason": "在保持高自动化的同时，给用户关键步骤的控制权，避免 Agent 沿着错误的方向一直推进，显著提高最终产出的可用性。",
+      "options": [
+        {
+          "label": "一键式全自动生成（用户输入题目，系统直接输出完整论文与代码）",
+          "impact": "用户操作最简单，但生成质量不可控，一旦中间步骤出错，用户很难进行局部修正。"
+        },
+        {
+          "label": "阶段性节点确认模式（关键步骤暂停，用户确认或修改后再继续）",
+          "impact": "在效率与可控性之间达到最佳平衡，用户可以引导建模方向，但开发时需要设计复杂的工作流暂停与恢复机制。"
+        },
+        {
+          "label": "对话式共创模式（类似聊天，用户通过对话下达指令，逐步引导 Agent 深入）",
+          "impact": "控制力最强，但对用户的专业建模水平和 Prompt 撰写能力要求极高，全流程的自动化体验较弱。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "human_interaction_mode",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "一键式全自动生成（用户输入题目，系统直接输出完整论文与代码）",
+      "answeredAt": "2026-08-26T07:57:27.863Z"
+    },
+    {
+      "id": "q-mt9dwphh-07x2",
+      "issueRef": "gap:gap-ai-mvp_scope-wphg",
+      "gapRef": "gap:gap-ai-mvp_scope-wphg",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "MVP（最简可行产品）阶段需要覆盖数学建模的哪些环节？",
+      "reason": "数学建模流程冗长，明确首发版本的边界能显著缩短开发周期并集中精力优化最核心、最痛点的环节。",
+      "whyNow": "数学建模流程冗长，明确首发版本的边界能显著缩短开发周期并集中精力优化最核心、最痛点的环节。",
+      "impact": "决定 MVP 的研发成本与发布时间。裁剪掉低频或高不确定性的环节能显著降低开发风险。",
+      "recommendation": "(推荐) 覆盖‘模型建立+代码编写+结果绘图+论文撰写’，暂不包含复杂的自动化数据清洗和外部文献检索",
+      "recommendationReason": "这是建模过程中最消耗时间和精力、也最容易被 Agent 自动化处理的黄金环节，剔除外部检索和不确定性高的数据清洗有助于保障首个版本的稳定交付。",
+      "options": [
+        {
+          "label": "全流程覆盖（从题目解析、文献检索、数据清洗、建模、编程到论文生成）",
+          "impact": "产品能力最完整，但开发复杂度极高，需要对接多个外部搜索与数据处理工具，MVP交付周期较长。"
+        },
+        {
+          "label": "核心流程覆盖（模型建立、代码求解、结果绘图与论文大纲生成）",
+          "impact": "能快速交付核心价值，用户需要自行准备干净的数据和参考资料，开发难度与交付周期适中。"
+        },
+        {
+          "label": "单点工具聚焦（仅做模型代码生成与绘图，不生成论文）",
+          "impact": "开发周期最短，但用户仍需花费大量时间撰写论文，产品的全流程痛点解决不够彻底。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "mvp_workflow_scope",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "核心流程覆盖（模型建立、代码求解、结果绘图与论文大纲生成）",
+      "answeredAt": "2026-08-26T07:57:32.509Z"
+    },
+    {
+      "id": "q-mt9dwphh-cgnx",
+      "issueRef": "gap:gap-01",
+      "gapRef": "gap:gap-01",
+      "importance": "high",
+      "priority": "high",
+      "question": "关于目标用户，需要你确认：项目初始创建，核心目标用户细分画像尚待明确。",
+      "reason": "项目初始创建，核心目标用户细分画像尚待明确。；如果现在不明确，影响后续 MVP 核心功能优先级。。",
+      "whyNow": "项目初始创建，核心目标用户细分画像尚待明确。；如果现在不明确，影响后续 MVP 核心功能优先级。。",
+      "impact": "影响后续 MVP 核心功能优先级。",
+      "recommendation": "建议先用可验证的首发边界收敛目标用户，将非必要内容延后。",
+      "recommendationReason": "这能先降低目标用户的不确定性，而不提前锁定实现方案。",
+      "options": [
+        {
+          "label": "首发版本先采用边界清晰的方案",
+          "impact": "会缩小目标用户的首发范围，减少交付时间和返工，但暂时不覆盖复杂场景。"
+        },
+        {
+          "label": "首发版本覆盖更多使用场景",
+          "impact": "会扩大目标用户的首发范围，但也会增加工作量、验证难度和延期风险。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "target_user:primary_audience",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "首发版本先采用边界清晰的方案",
+      "answeredAt": "2026-08-26T07:58:08.432Z"
+    },
+    {
+      "id": "q-mt9dwphh-fjdt",
+      "issueRef": "gap:gap-ai-产品定位_(product_positioning)-wphg",
+      "gapRef": "gap:gap-ai-产品定位_(product_positioning)-wphg",
+      "importance": "critical",
+      "priority": "critical",
+      "question": "该数学建模多智能体系统主要面向哪类目标用户服务？",
+      "reason": "不同用户群体对模型的严谨性、论文格式和工具链的熟悉度有很大差异。定位清晰有助于我们设计符合其核心痛点的工作流。",
+      "whyNow": "不同用户群体对模型的严谨性、论文格式和工具链的熟悉度有很大差异。定位清晰有助于我们设计符合其核心痛点的工作流。",
+      "impact": "影响核心工作流和论文排版模板的选择，可能导致产品在竞赛和科研场景下两头不讨好。",
+      "recommendation": "(推荐) 面向数学建模竞赛（如国赛、美赛）的参赛学生",
+      "recommendationReason": "竞赛流程标准且时效性极强（通常3-4天内完成），用户对使用智能体加速建模、编程和论文排版的全流程痛点最强烈，且对生成工具的包容度较高。",
+      "options": [
+        {
+          "label": "面向数学建模竞赛（如国赛、美赛）的参赛学生",
+          "impact": "系统将紧密围绕经典竞赛的三阶段（建模、编程、论文撰写）设计流水线，提供常用竞赛的 LaTeX 排版模板与公式规范。"
+        },
+        {
+          "label": "面向高校科研人员或研究生",
+          "impact": "系统将更侧重于公式推导的数学严谨性、最新学术论文的文献检索与对比，以及代码的严格复现性，对生成质量的要求极高。"
+        },
+        {
+          "label": "面向工业界的算法工程师或数据分析师",
+          "impact": "系统将侧重于实际业务问题的定义、大规模数据集的处理、算法的部署可行性以及商业报告的产出，而非学术论文排版。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "target_user_profile",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "面向数学建模竞赛（如国赛、美赛）的参赛学生",
+      "answeredAt": "2026-08-26T07:57:58.423Z"
+    },
+    {
+      "id": "q-mt9dwphh-2dyf",
+      "issueRef": "gap:gap-chk-user_flows-univ-primary-flow",
+      "gapRef": "gap:gap-chk-user_flows-univ-primary-flow",
+      "importance": "high",
+      "priority": "high",
+      "question": "关于核心流程，需要你确认：Checklist 标准检查项尚未明确：核心端到端主流程有明确的输入、关键处理分支与交付产物闭环。",
+      "reason": "Checklist 标准检查项尚未明确：核心端到端主流程有明确的输入、关键处理分支与交付产物闭环。；如果现在不明确，影响 user_flows 的完整度闭环。。",
+      "whyNow": "Checklist 标准检查项尚未明确：核心端到端主流程有明确的输入、关键处理分支与交付产物闭环。；如果现在不明确，影响 user_flows 的完整度闭环。。",
+      "impact": "影响 user_flows 的完整度闭环。",
+      "recommendation": "建议先用可验证的首发边界收敛核心流程，将非必要内容延后。",
+      "recommendationReason": "这能先降低核心流程的不确定性，而不提前锁定实现方案。",
+      "options": [
+        {
+          "label": "首发版本先采用边界清晰的方案",
+          "impact": "会缩小核心流程的首发范围，减少交付时间和返工，但暂时不覆盖复杂场景。"
+        },
+        {
+          "label": "首发版本覆盖更多使用场景",
+          "impact": "会扩大核心流程的首发范围，但也会增加工作量、验证难度和延期风险。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "checklist:chk-univ-primary-flow",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "首发版本覆盖更多使用场景",
+      "answeredAt": "2026-08-26T07:57:49.503Z"
+    },
+    {
+      "id": "q-mt9dwphh-7i8s",
+      "issueRef": "gap:gap-ai-技术边界与安全_(execution_sandbox)-wphg",
+      "gapRef": "gap:gap-ai-技术边界与安全_(execution_sandbox)-wphg",
+      "importance": "high",
+      "priority": "high",
+      "question": "Agent 生成的计算与绘图代码应该在哪里运行？",
+      "reason": "数学建模需要实际运行代码来计算数值并生成图表。执行环境决定了系统的安全性、服务器成本以及用户的配置难度。",
+      "whyNow": "数学建模需要实际运行代码来计算数值并生成图表。执行环境决定了系统的安全性、服务器成本以及用户的配置难度。",
+      "impact": "本地执行符合 Local-First 理念但要求用户有环境配置能力；云端沙箱无配置障碍但平台运维成本昂贵且有运行限制。",
+      "recommendation": "(推荐) 本地环境执行（Local-First，通过软件引导或在本地环境下自动运行）",
+      "recommendationReason": "完美契合 Local-First（本地优先）标签，数据不离本地，避免平台搭建昂贵且受限的云端沙箱，同时使用户能够自由读取本地大型数据集。",
+      "options": [
+        {
+          "label": "本地环境执行（由用户在本地配置并由软件调用 Python 运行）",
+          "impact": "零云端服务器算力成本，数据隐私安全性极高，但用户需要自行在本地电脑安装 Python 环境和科学计算包。"
+        },
+        {
+          "label": "云端安全沙箱环境执行（如平台提供托管的 Jupyter-like 容器环境）",
+          "impact": "即开即用，用户无需安装任何本地环境，但平台面临高额的计算与维护成本，且沙箱有运行资源与库的限制。"
+        },
+        {
+          "label": "只生成代码，不提供执行（由用户手动复制到外部环境运行）",
+          "impact": "开发最简单，完全无安全和计算成本风险，但用户需要频繁在软件和编辑器之间切换，体验不够连贯。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "code_execution_env",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "云端安全沙箱环境执行（如平台提供托管的 Jupyter-like 容器环境）",
+      "answeredAt": "2026-08-26T07:57:44.047Z"
+    },
+    {
+      "id": "q-mt9dwphh-j7j1",
+      "issueRef": "gap:gap-chk-technical_boundary-univ-platform-choice",
+      "gapRef": "gap:gap-chk-technical_boundary-univ-platform-choice",
+      "importance": "high",
+      "priority": "high",
+      "question": "关于技术约束，需要你确认：Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。",
+      "reason": "Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。；如果现在不明确，影响 technical_boundary 的完整度闭环。。",
+      "whyNow": "Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。；如果现在不明确，影响 technical_boundary 的完整度闭环。。",
+      "impact": "影响 technical_boundary 的完整度闭环。",
+      "recommendation": "建议先用可验证的首发边界收敛技术约束，将非必要内容延后。",
+      "recommendationReason": "这能先降低技术约束的不确定性，而不提前锁定实现方案。",
+      "options": [
+        {
+          "label": "首发版本先采用边界清晰的方案",
+          "impact": "会缩小技术约束的首发范围，减少交付时间和返工，但暂时不覆盖复杂场景。"
+        },
+        {
+          "label": "首发版本覆盖更多使用场景",
+          "impact": "会扩大技术约束的首发范围，但也会增加工作量、验证难度和延期风险。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "checklist:chk-univ-platform-choice",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "首发版本覆盖更多使用场景",
+      "answeredAt": "2026-08-26T07:57:37.260Z"
+    },
+    {
+      "id": "q-mt9dwphh-esr4",
+      "issueRef": "gap:gap-ai-输出交付物_(deliverables_format)-wphg",
+      "gapRef": "gap:gap-ai-输出交付物_(deliverables_format)-wphg",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "系统生成的建模论文应该以什么格式提供给用户？",
+      "reason": "不同应用场景对文档格式有特定要求。例如数学建模美赛（MCM/ICM）强制要求 LaTeX 排版，而一些国内比赛或初稿可能接受 Word。",
+      "whyNow": "不同应用场景对文档格式有特定要求。例如数学建模美赛（MCM/ICM）强制要求 LaTeX 排版，而一些国内比赛或初稿可能接受 Word。",
+      "impact": "LaTeX 格式公式排版极度专业但需要本地或云端编译器；Word 格式便于大众修改但排版粗糙且不符合多数专业数学竞赛标准。",
+      "recommendation": "(推荐) 同时输出 LaTeX 源码包与 PDF 预览",
+      "recommendationReason": "LaTeX 是学术界和美赛的事实标准。生成 LaTeX 源码不仅方便用户微调公式，还能保证排版符合最严苛的学术审美。配合 PDF 预览能提供最好的直观体验。",
+      "options": [
+        {
+          "label": "仅生成 Word 格式文档（.docx）",
+          "impact": "修改门槛低，适合不熟悉 LaTeX 的用户，但复杂的数学公式排版可能不够精美，且不符合美赛等国际竞赛的标准。"
+        },
+        {
+          "label": "生成 LaTeX 源码包（包含 .tex 源码、图片和样式文件）",
+          "impact": "排版专业，公式呈现完美，用户拥有完全的微调能力，但用户需要安装 LaTeX 编译器或依赖云端工具进行查看。"
+        },
+        {
+          "label": "Markdown 格式预览，支持导出 LaTeX 和 PDF",
+          "impact": "在软件内部预览最友好，编辑方便，导出格式灵活，但开发时需要处理 Markdown 与 LaTeX 公式转换的兼容性。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "paper_output_format",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "仅生成 Word 格式文档（.docx）",
+      "answeredAt": "2026-08-26T07:57:20.693Z"
+    },
+    {
+      "id": "q-mt9dwphh-u224",
+      "issueRef": "gap:gap-ai-商业与运行成本_(business_&_operational_cost)-wphg",
+      "gapRef": "gap:gap-ai-商业与运行成本_(business_&_operational_cost)-wphg",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "系统的大语言模型（LLM）API 费用和额度如何解决？",
+      "reason": "多 Agent 建模流程长、调用频繁，会消耗大量的 Token。API 接入方式直接决定了产品的商业模式和用户的上手门槛。",
+      "whyNow": "多 Agent 建模流程长、调用频繁，会消耗大量的 Token。API 接入方式直接决定了产品的商业模式和用户的上手门槛。",
+      "impact": "自备 Key (BYOK) 模式零平台成本但用户门槛高；平台统一代理模式体验流畅但面临高额的商业与技术运营开支。",
+      "recommendation": "(推荐) 自备 Key 模式（BYOK，用户输入自己的 API Key）",
+      "recommendationReason": "非常符合 Local-First 软件的调性，平台没有任何 Token 成本压力，用户可以自由选择自己信赖的提供商、模型版本及本地代理网络。",
+      "options": [
+        {
+          "label": "自备 Key 模式（Bring Your Own Key）",
+          "impact": "平台运营成本为零，用户隐私度高，但对于没有 API 密钥获取渠道的普通学生来说使用门槛较高。"
+        },
+        {
+          "label": "平台统一提供（按量收费或包月订阅）",
+          "impact": "用户体验极佳，扫码即可使用，但平台需要搭建计费系统和防刷机制，且需要承担高额的 LLM 账单风险。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "llm_api_source",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "平台统一提供（按量收费或包月订阅）",
+      "answeredAt": "2026-08-26T07:50:34.176Z"
+    },
+    {
+      "id": "q-mt9dwphh-zwzf",
+      "issueRef": "gap:gap-ai-核心系统架构_(agent_architecture)-wphg",
+      "gapRef": "gap:gap-ai-核心系统架构_(agent_architecture)-wphg",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "在建模流程中，系统内建的多智能体角色应该如何划分？",
+      "reason": "角色的精细程度决定了系统生成结果的质量和交互的复杂度。角色太多会增加 Token 消耗和通信延迟，角色太少则无法体现多 Agent 的分工优势。",
+      "whyNow": "角色的精细程度决定了系统生成结果的质量和交互的复杂度。角色太多会增加 Token 消耗和通信延迟，角色太少则无法体现多 Agent 的分工优势。",
+      "impact": "直接影响多 Agent 编排框架的设计难度与系统运行速度。",
+      "recommendation": "(推荐) 经典三角色划分：建模专家（负责方案与公式设计）、编程专家（负责写代码与画图）、写作专家（负责写论文与排版）",
+      "recommendationReason": "对应数学建模比赛中常见的三人组队分工，极易被用户理解，且职责清晰，能有效减少 Agent 之间的冗余通信，降低开发难度。",
+      "options": [
+        {
+          "label": "经典三角色（建模师、程序员、写作手）",
+          "impact": "开发复杂度低，完美契合现实竞赛分工，交互逻辑简单明了。"
+        },
+        {
+          "label": "细分角色阵列（包含审题官、文献检索员、建模师、程序员、代码测试员、润色师、格式校对员等）",
+          "impact": "生成质量理论上更精细，但系统运行慢，Token 消耗量极大，且调试 Agent 之间的通信会变得异常复杂。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "agent_roles_definition",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "经典三角色（建模师、程序员、写作手）",
+      "answeredAt": "2026-08-26T07:50:30.009Z"
+    },
+    {
+      "id": "q-mt9dwphh-abkg",
+      "issueRef": "gap:gap-ai-ux_ui-wphg",
+      "gapRef": "gap:gap-ai-ux_ui-wphg",
+      "importance": "normal",
+      "priority": "normal",
+      "question": "对于生成的数学模型（如方程、算法），系统在界面上如何呈现给用户？",
+      "reason": "数学建模不仅是写代码，更重要的是数学公式的推导和物理意义。良好的呈现形式有助于用户理解和微调模型本身。",
+      "whyNow": "数学建模不仅是写代码，更重要的是数学公式的推导和物理意义。良好的呈现形式有助于用户理解和微调模型本身。",
+      "impact": "双栏对照排版直观但界面适配要求高；流式 Notebook（交互式笔记本）混排容易实现但会削弱数学模型的结构化展示。",
+      "recommendation": "(推荐) 数学公式（LaTeX渲染）与代码实现（如Python）双栏对照展示",
+      "recommendationReason": "建模的核心是公式，求解的核心是代码。对照展示能让用户直观地看到公式是如何被转化为代码进行计算的，方便校验模型的正确性。",
+      "options": [
+        {
+          "label": "双栏对照展示（左公式，右代码）",
+          "impact": "对建模人员和编程人员都非常友好，极易进行对齐校验，但对界面响应式排版要求较高。"
+        },
+        {
+          "label": "流式文档展示（公式与代码混排，类似 Jupyter Notebook）",
+          "impact": "符合主流数据科学家的阅读习惯，开发相对容易，但可能不够突出数学模型的结构化地位。"
+        }
+      ],
+      "allowFreeInput": true,
+      "status": "answered",
+      "createdAt": "2026-08-26T00:57:34.469Z",
+      "decisionKey": "model_representation_type",
+      "dependsOn": [],
+      "batchId": "batch-1-mt9dwphh",
+      "batchStage": "initial",
+      "basisRevision": 1,
+      "answer": "双栏对照展示（左公式，右代码）",
+      "answeredAt": "2026-08-26T07:50:26.180Z"
+    }
+  ],
+  "updatedAt": "2026-08-26T07:58:08.432Z"
+}

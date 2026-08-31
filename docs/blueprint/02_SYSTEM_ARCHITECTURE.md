@@ -1,5 +1,7 @@
 # Project Architect V1：系统总体架构
 
+> B3 更新：活动 Prompt、Schema 与自适应问题集以 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md) 为准。
+
 > 文档状态：Phase 1.2 Blueprint  
 > 依据：[01_PRODUCT_BOUNDARY.md](01_PRODUCT_BOUNDARY.md)  
 > 范围：模块职责、边界与数据流。  
@@ -124,7 +126,7 @@ flowchart LR
 
 - 根据当前项目阶段和用户意图选择 Task Mode（`discovery-turn`、`readiness-review` 或 `document-plan`）。
 - 从 Project State Engine 取得当前任务真正需要的上下文，执行上下文预算和优先级筛选。
-- 应用冻结的 B2.1 Constitution、对应任务契约和 JSON Schema。
+- 应用 B3 Constitution、对应任务契约和 JSON Schema。
 - 发起一次主要 Provider 调用，接收 structured output，并返回状态更新建议。
 - 保留调用的诊断信息，供可靠性与成本观察使用。
 
@@ -142,7 +144,7 @@ flowchart LR
 - 只使用一个专门的 Project Architect Agent；不创建 Multi-Agent 工作流。
 - 每个 AI 推理操作最多一次主要调用；失败不能以隐藏重试改变用户对结果的理解。
 - 不直接持久化或覆盖状态；所有变更必须回到 State Engine 校验。
-- 不得绕过 B2.1 的产品先于技术、严格 Conflict 与用户授权规则。
+- 不得绕过 B3 的产品先于技术、严格 Conflict 与用户授权规则。
 
 ### 3.5 Document Compiler
 
@@ -285,4 +287,4 @@ sequenceDiagram
 
 V1 的总体架构以一个可审阅的 Project State 为中心：Frontend 收集和呈现，Backend 协调，State Engine 守护事实与授权，AI Orchestrator 负责单次结构化推理，Provider Layer 负责适配，Document Compiler 负责从已批准状态输出开发文档。
 
-这种分工既保留了 B2.1 的产品推理能力，也确保系统本身对状态、校验、保存和编译保持确定性控制。
+这种分工既保留了 B3 的产品推理能力，也确保系统本身对状态、校验、保存和编译保持确定性控制。

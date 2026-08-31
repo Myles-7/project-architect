@@ -1,0 +1,509 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-10",
+  "stage": "initial",
+  "name": "delegated-decisions",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 43104,
+  "output": {
+    "assumptions": [
+      {
+        "area": "target_user",
+        "decision_key": "designer_working_hours",
+        "reason": "网页端应用在联网环境下运行是最常见和基本的假设，首期暂不考虑 Service Worker 离线计时同步等复杂技术方案。",
+        "statement": "假设自由职业设计师是在联网的桌面浏览器环境工作，无需考虑离线离网状态下的极端同步场景。"
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "default_ui_theme",
+        "reason": "用户已授权由 AI 决定配色等 UI 细节，极简清爽的效率风格最适合时间管理工具，不易干扰设计师的注意力。",
+        "statement": "默认采用现代极简、高对比度的深浅主题自适应，界面以清爽的工作效率风格为主。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "use_local_storage_for_mvp",
+        "rationale": "作为桌面端极简网页，采用本地存储可实现免注册即开即用，开发成本低，能以最快速度交付 MVP（最简化可行产品）供用户验证核心需求。",
+        "statement": "首期采用浏览器 LocalStorage（浏览器本地存储技术，类似于把数据存放在当前浏览器的抽屉里，不需要服务器）存储数据，不设计后端服务。"
+      },
+      {
+        "area": "page_structure",
+        "decision_key": "weekly_view_page_layout",
+        "rationale": "由于功能高度聚焦且界面在桌面浏览器运行，SPA（单页网页应用，整个网页加载一次后，日常操作无需刷新跳转）布局可以减少跳转，让用户在同一个画面中完成“计时 -> 查看本周 -> 导出”的闭环流程。",
+        "statement": "采用单页应用布局，左侧为实时计时与客户选择，右侧为本周工时柱状图/列表及导出按钮。"
+      },
+      {
+        "area": "core_features",
+        "decision_key": "export_format_csv_bom",
+        "rationale": "设计师在使用 Excel 打开 CSV 时，如果编码不带 BOM，中文客户名极易出现乱码。采用 UTF-8 with BOM 编码可以确保在 Windows Excel 中默认双击打开不乱码。",
+        "statement": "导出格式采用标准 CSV，字符编码采用 UTF-8 with BOM。"
+      }
+    ],
+    "confirmed": [
+      "目标用户为自由职业设计师",
+      "核心功能包括开始/暂停计时、按客户查看本周工时、导出 CSV",
+      "平台首发为桌面端浏览器网页",
+      "界面细节（如配色、空状态文案等）由 AI 负责决策并直接实现"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "data_storage_mode",
+        "depends_on": [],
+        "impact": "影响整个后端架构决策及用户注册登录流程的设计。",
+        "reason": "缺少明确的数据存储和同步策略，无法开始数据库或本地存储的技术设计。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "time_tracking_granularity",
+        "depends_on": [],
+        "impact": "影响计时界面的输入表单设计以及工时数据模型。",
+        "reason": "需要明确工时是仅按客户还是按客户+项目双重维度划分。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "manual_time_edit",
+        "depends_on": [],
+        "impact": "影响用户在使用过程中的纠错流设计，关乎数据容错体验。",
+        "reason": "缺少对漏记、错记工时如何修正的产品定义。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "timer_concurrency",
+        "depends_on": [],
+        "impact": "直接影响计时的交互逻辑和计时器状态机的设计。",
+        "reason": "需要明确当启动新计时器时，前一个计时器的状态流转规则。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "history_view_range",
+        "depends_on": [],
+        "impact": "影响主面板上的日期切换组件和历史报表卡片的设计。",
+        "reason": "页面不仅要展示本周工时，还需要明确如何让用户回顾或查看历史周期。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "closed_browser_timer_behavior",
+        "depends_on": [],
+        "impact": "影响本地存储的时间戳恢复逻辑和计时器组件的前端鲁棒性。",
+        "reason": "需要定义当用户强关浏览器标签页后，计时的生命周期和数据恢复机制。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "client_management_mode",
+        "depends_on": [],
+        "impact": "影响客户管理的界面复杂度，以及输入组件是自动完成（AutoComplete）还是下拉选择（Select）。",
+        "reason": "需要决定客户名称是作为自由文本录入，还是需要一个正规的主子表管理。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "hourly_rate_tracking",
+        "depends_on": [],
+        "impact": "影响报表界面中是否展示金钱维度，以及 CSV 导出的字段内容。",
+        "reason": "需要明确是否需要将工时自动换算成应收账款金额。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "time_display_format",
+        "depends_on": [],
+        "impact": "影响工时计算和导出的格式化工具有用性。",
+        "reason": "需要确定工时在界面与 CSV 中的精度和格式标准。",
+        "severity": "low",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "csv_export_scope",
+        "depends_on": [],
+        "impact": "影响导出按钮的数据过滤逻辑。",
+        "reason": "需要决定导出 CSV 时的默认数据过滤策略。",
+        "severity": "medium",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "data_storage_mode",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "用户打开网页即可直接计时，体验最流畅；但若用户清理浏览器缓存或更换电脑，数据将会丢失。开发成本极低，可快速上线。",
+            "key": "local_only",
+            "label": "纯本地存储（无需注册，数据存在当前浏览器中）",
+            "reversibility": "moderate",
+            "tradeoffs": "牺牲了跨设备同步的能力和数据绝对安全性，换取了极快的上线时间和极佳的无感上手体验。"
+          },
+          {
+            "impact": "用户数据永久保存，支持多端登录同步。但用户必须先注册账号才能开始使用，这会增加流失率，且开发和服务器维护成本显著增加。",
+            "key": "cloud_sync",
+            "label": "云端账户存储（需要注册登录，数据同步至服务器）",
+            "reversibility": "moderate",
+            "tradeoffs": "确保了数据安全和未来扩展性，但会增加用户使用门槛，并使 MVP 的交付时间大幅延长。"
+          }
+        ],
+        "question": "您的工时数据应该存储在本地浏览器，还是需要通过账号云端同步？",
+        "reason": "这决定了用户是否需要注册登录，以及数据在浏览器清理缓存或换电脑时是否会丢失，直接影响 MVP 的开发复杂度和用户的使用安全感。",
+        "recommendation": "(推荐) 首期采用纯本地浏览器存储 (LocalStorage)",
+        "recommendation_reason": "作为针对桌面端的极简 MVP，纯本地存储可以让用户即开即用，无需繁琐的注册流程，且首期开发速度最快。等验证了核心计时功能后，再迭代账号体系。",
+        "recommended_option_key": "local_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "time_tracking_granularity",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "计时界面和统计报表非常纯粹简单。但如果为同一客户做多个项目，设计师只能在备注里手动区分，难以进行结构化统计。",
+            "key": "client_only",
+            "label": "仅关联到客户（如：客户 A - 2小时）",
+            "reversibility": "easy",
+            "tradeoffs": "最大程度简化了交互界面，但可能无法满足设计师精细化管理和对账的实际工作需求。"
+          },
+          {
+            "impact": "用户能清晰归类每笔工时。数据统计和导出的 CSV 会更加规整，方便设计师进行项目结项分析，但计时前需要先选择或输入项目名称。",
+            "key": "client_project",
+            "label": "支持客户与项目两级（如：客户 A - 官网改版项目 - 2小时）",
+            "reversibility": "moderate",
+            "tradeoffs": "略微增加了计时的初始操作步骤，但极大地提升了工时统计的实用价值。"
+          }
+        ],
+        "question": "在记录时间时，您需要支持“客户 - 具体项目”两级分类，还是只需直接关联到“客户”即可？",
+        "reason": "自由职业设计师通常会为同一个客户进行多个不同的项目（例如为客户A做网页设计、也做画册设计），这决定了计时界面的输入结构和本周工时的展示维度。",
+        "recommendation": "(推荐) 支持“客户”与“项目”两级分类",
+        "recommendation_reason": "虽然单级客户最简单，但多项目是设计师的真实高频场景。支持项目分类能让工时记录更精准，导出的 CSV 数据也更有商业实用价值（如用于向客户汇报进度或请款）。",
+        "recommended_option_key": "client_project"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "manual_time_edit",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "系统逻辑和界面最简单，用户只需关注当前计时状态。但一旦忘点暂停导致计时过长，或忘点开始导致漏记，将无法修正，数据容错率为零。",
+            "key": "timer_only",
+            "label": "仅支持实时计时（只允许通过开始/暂停产生记录，不可修改）",
+            "reversibility": "easy",
+            "tradeoffs": "降低了页面交互和状态管理的复杂度，但可能会因数据无法修正而让用户放弃使用该工具。"
+          },
+          {
+            "impact": "用户可以随时修正错误的时间记录，或者直接手动填入今天干了多久。需要增加“编辑/补录工时”的弹窗或表单，开发量略微增加。",
+            "key": "allow_edit",
+            "label": "支持手动补录与记录编辑（可自由增删改工时数据）",
+            "reversibility": "easy",
+            "tradeoffs": "增加了编辑状态下的交互界面开发，但极大地提升了数据容错率，确保统计结果始终准确。"
+          }
+        ],
+        "question": "如果设计师忘记点击启动或暂停计时，是否需要支持手动补记和修改历史工时？",
+        "reason": "这决定了系统是仅作为一个“秒表计时器”，还是需要一套完整的“工时台账编辑”逻辑，影响核心用户流的容错率。",
+        "recommendation": "(推荐) 支持手动补记与修改已记录的工时",
+        "recommendation_reason": "遗忘启动/关闭计时是真实使用中的高频失误。如果不允许补记或修改，一旦发生失误，本周统计和导出的 CSV 就会失效，这会严重降低产品的实用性。",
+        "recommended_option_key": "allow_edit"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "timer_concurrency",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "确保任意时间点只有一个项目在计时，工时记录永远不重叠，用户体验自然、符合直觉。",
+            "key": "auto_pause_previous",
+            "label": "自动暂停前一个（新计时启动时，正在运行的计时自动转为暂停）",
+            "reversibility": "easy",
+            "tradeoffs": "限制了可能存在的“一心二用”或“多开计时”场景，但保障了工时数据的真实性与合理性。"
+          },
+          {
+            "impact": "允许用户同时为多个任务计时（例如渲染图纸的同时为另一个客户改稿）。但极易因为忘记关闭导致数据异常，且增加了本周工时重叠的统计复杂度。",
+            "key": "allow_parallel",
+            "label": "允许并行计时（多个计时器可以同时走字，互不干扰）",
+            "reversibility": "easy",
+            "tradeoffs": "提供了最大自由度，但显著增加了数据错乱的风险和多计时器状态管理的开发成本。"
+          }
+        ],
+        "question": "当已经有一个项目在计时，用户启动另一个项目的计时器时，系统应该如何处理？",
+        "reason": "这定义了计时的互斥逻辑。大多数情况下人无法同时做两项工作，但需要明确交互层面的限制。",
+        "recommendation": "(推荐) 自动暂停当前正在运行的计时器",
+        "recommendation_reason": "这符合人类单线程工作的常理，且能省去用户手动去暂停上一个计时的操作，保证工时数据不会因为“忘记关闭前一个”而重叠膨胀。",
+        "recommended_option_key": "auto_pause_previous"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "history_view_range",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "界面极其简单，只需展示一个本周看板。但到了下周一，上周的数据就会在页面上不可见，用户若想查看必须依赖之前导出的 CSV。",
+            "key": "current_week_only",
+            "label": "仅查看当前自然周（不提供历史切换，只展示本周）",
+            "reversibility": "easy",
+            "tradeoffs": "追求极致简单的界面和开发成本，但极大地限制了用户在网页内进行历史复盘的能力。"
+          },
+          {
+            "impact": "用户可以翻看过去的工时记录，方便核对上周或上上周的工作。需要设计简单的周切换交互，稍微增加数据查询的逻辑。",
+            "key": "weekly_paging",
+            "label": "支持按周翻页查看历史（提供“前一周/后一周”切换）",
+            "reversibility": "moderate",
+            "tradeoffs": "稍微增加了界面导航控件，但让工时回顾变得极为方便，体验更完整。"
+          },
+          {
+            "impact": "用户可以统计任意时间段（如上个月15号到这个月10号）的工时。这需要引入日历组件和复杂的范围筛选逻辑，开发成本最高。",
+            "key": "custom_date_range",
+            "label": "支持完全自定义时间段（如日历选择任意起止日期）",
+            "reversibility": "moderate",
+            "tradeoffs": "满足了最极端的报表定制需求，但交互和开发复杂度对于 MVP 阶段而言过重。"
+          }
+        ],
+        "question": "除了“本周工时”，用户是否需要切换查看历史周、历史月，或者自定义时间段的统计？",
+        "reason": "这决定了报表页面的设计，是只做一个固定展示本周的卡片，还是需要一个带日期选择器、能翻页查看历史数据的统计模块。",
+        "recommendation": "(推荐) 支持按周翻页查看历史（提供“前一周/后一周”切换）",
+        "recommendation_reason": "自由职业者通常以“周”为单位向客户汇报或结算。仅看本周会限制回顾历史工时的能力，而自定义日期选择器又太复杂。提供简易的“按周翻页”是性价比最高的方案。",
+        "recommended_option_key": "weekly_paging"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "closed_browser_timer_behavior",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "最符合直觉，用户可以安心关闭网页去专注工作，开网页时依然在计。需要本地持久化记录计时的“开始时间戳”而非仅记录秒数。",
+            "key": "simulate_continuous",
+            "label": "模拟持续计时（再次打开时，根据时间差自动加上网页关闭期间的时间）",
+            "reversibility": "easy",
+            "tradeoffs": "需要更严谨的时间戳比对逻辑，但极大提升了计时工具在浏览器环境下的鲁棒性。"
+          },
+          {
+            "impact": "开发最简单。但用户如果关闭了网页继续工作，再次打开时数据就漏记了，容易造成用户挫败感。",
+            "key": "freeze_on_close",
+            "label": "冻结在关闭时刻（再次打开时，计时器停留在关闭那一刻的数值）",
+            "reversibility": "easy",
+            "tradeoffs": "降低了状态恢复逻辑的复杂度，但会给用户带来“不能关闭网页”的使用心理负担。"
+          }
+        ],
+        "question": "如果用户在计时器运行期间关闭了网页标签页，再次打开时计时器应该如何表现？",
+        "reason": "浏览器环境常有意外关闭或误操作，确定此时的系统行为直接关乎数据可靠性体验。",
+        "recommendation": "(推荐) 模拟持续计时（再次打开时自动补齐关闭期间经过的时间）",
+        "recommendation_reason": "最符合用户的预期。因为即使关闭了网页，设计师也依然在工作。记录下关闭时的系统时间，再次打开时通过当前时间差补算，能提供最顺畅的“无缝计时”体验。",
+        "recommended_option_key": "simulate_continuous"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "client_management_mode",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "计时流程极快，无需打断去“新建客户”。数据表中会直接存储客户名称。对于起步阶段的设计师来说体验非常轻量。",
+            "key": "text_input_with_auto_suggest",
+            "label": "直接输入客户名（系统自动联想历史客户，无需提前创建）",
+            "reversibility": "easy",
+            "tradeoffs": "没有客户详情管理，且拼写错误会导致统计出两个不同的客户，容错略低，但使用门槛降到最低。"
+          },
+          {
+            "impact": "保证了数据的准确和规范性，避免因打字拼错产生重复的客户实体。但需要多带带设计创建客户的表单或页面，增加了操作步骤。",
+            "key": "explicit_client_management",
+            "label": "先创建后选择（必须在下拉框中选择已有客户，若没有需先创建）",
+            "reversibility": "moderate",
+            "tradeoffs": "保障了后台数据结构的严谨性，但在计时阶段增加了操作阻力。"
+          }
+        ],
+        "question": "在为新计时指定客户时，是直接输入客户名字（自动联想），还是必须先在列表里创建客户？",
+        "reason": "这决定了是否需要一个独立的“客户管理”页面或表单，影响用户创建计时任务时的流畅度。",
+        "recommendation": "(推荐) 直接输入文本并支持历史输入联想",
+        "recommendation_reason": "对于自由职业者，客户数量通常在个位数。直接打字输入客户名字，同时系统自动联想历史输入过的客户，既不需要多带带做一个客户管理模块，又保证了计时的快捷性。",
+        "recommended_option_key": "text_input_with_auto_suggest"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "hourly_rate_tracking",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "产品保持纯粹的时间日志属性，界面没有敏感资金数据，首期开发最轻量。",
+            "key": "hours_only",
+            "label": "仅记录时间（只统计时长，不涉及金额计算）",
+            "reversibility": "easy",
+            "tradeoffs": "用户需要导出 CSV 后手动在表格软件中乘以时薪来计算报酬，网页内无法直观看到收益。"
+          },
+          {
+            "impact": "用户在网页内就能直观看到这周赚了多少钱，更有成就感。但需要设计单价配置界面，并在报表和 CSV 中增加金额列。",
+            "key": "rate_and_amount",
+            "label": "支持设置每小时单价（输入时薪，自动算出应收金额）",
+            "reversibility": "moderate",
+            "tradeoffs": "提升了财务直观性，但增加了数值计算逻辑和单价管理界面的复杂度。"
+          }
+        ],
+        "question": "您的工时记录是否需要支持设置时薪并自动计算本周预计收入金额？",
+        "reason": "自由职业者记录工时的最终目的往往是为了算账请款。确定是否需要在网页中进行时薪乘以工时的金额换算，影响数据模型和报表展示。",
+        "recommendation": "(推荐) 仅记录工时，首期不计算金额",
+        "recommendation_reason": "作为 MVP，最核心的目标是“时间记录”。时薪计算会引入汇率、不同项目不同单价、未付款/已付款状态等复杂业务逻辑。首期专注于提供精准的工时数据，让用户导出 CSV 后自己在 Excel 中计算更灵活。",
+        "recommended_option_key": "hours_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "time_display_format",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "适合阅读和日常核对，不容易产生认知偏差。但导出到 CSV 后，用户无法直接在 Excel 中用公式对该列进行求和或乘法运算。",
+            "key": "human_readable",
+            "label": "纯时:分格式（如 2小时15分钟，或 02:15）",
+            "reversibility": "easy",
+            "tradeoffs": "保障了界面阅读的流畅度，但给需要深度二次处理数据的用户带来了计算不便。"
+          },
+          {
+            "impact": "非常适合直接结算和 Excel 计算。但在日常看的时候，0.4 小时是几分钟（24分钟）不够直观，对人类来说阅读不够自然。",
+            "key": "decimal_hours",
+            "label": "纯十进制小时格式（如 2.25 小时）",
+            "reversibility": "easy",
+            "tradeoffs": "偏向结算和统计机器的逻辑，稍微牺牲了日常记录时的瞬时可读性。"
+          },
+          {
+            "impact": "完美兼顾日常查看与结算统计。网页上直观显示 2小时15分，导出的 CSV 中多带带提供一列 2.25h 和一列 02:15:00，灵活性最高。",
+            "key": "hybrid_format",
+            "label": "混合模式（网页显示“时:分”，导出 CSV 包含两种格式列）",
+            "reversibility": "easy",
+            "tradeoffs": "略微增加了 CSV 数据拼装的代码逻辑，但为用户提供了最佳的双端体验。"
+          }
+        ],
+        "question": "本周工时展示和导出 CSV 时，时间数值应该以“时:分”还是“小数小时”格式呈现？",
+        "reason": "“2小时30分钟”在界面上最符合人类直觉，但设计师去向客户请款或做 Excel 统计时，“2.5小时”可以直接参与乘法运算。这决定了报表和导出数据的格式标准。",
+        "recommendation": "(推荐) 界面显示“时:分”，但导出的 CSV 包含两种格式列",
+        "recommendation_reason": "这兼顾了日常阅读的直观性以及后续数据处理的便利性。在界面上让用户看着舒服，在导出的 CSV 里提供原始秒数、时分格式和十进制小时，让用户无需二次转换。",
+        "recommended_option_key": "hybrid_format"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "csv_export_scope",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "符合“所见即所得”直觉，导出的文件量小，最适合快速发送给客户对账。",
+            "key": "export_current_view",
+            "label": "导出当前视图范围（例如当前看本周，就导出本周数据）",
+            "reversibility": "easy",
+            "tradeoffs": "如果用户需要导出整月，必须先切换视图范围到整月才能导出。"
+          },
+          {
+            "impact": "不管页面显示什么，点击就下载包含所有历史记录的文件。用户需要自己去 Excel 筛选本周或本月。开发逻辑极简。",
+            "key": "export_all_always",
+            "label": "始终导出完整历史数据",
+            "reversibility": "easy",
+            "tradeoffs": "给用户增加了在 Excel 中进行二次筛选过滤的麻烦，但保证了导出数据的完整性。"
+          }
+        ],
+        "question": "导出 CSV 时，是默认导出当前查看的时间范围（如本周），还是直接导出历史上的所有数据？",
+        "reason": "这决定了导出按钮的交互行为以及导出的数据筛选逻辑。",
+        "recommendation": "(推荐) 导出当前所选的查看范围",
+        "recommendation_reason": "“所见即所得”最符合用户心理。如果页面正显示着本周，点击导出拿到的就是本周数据，用来发给客户对账最方便。",
+        "recommended_option_key": "export_current_view"
+      }
+    ],
+    "risks": [
+      {
+        "area": "technical_boundary",
+        "impact": "可能导致设计师丢失数周的工时记录，产生严重的客诉和信任危机。",
+        "risk_key": "local_data_loss",
+        "severity": "high",
+        "statement": "若采用纯本地存储，用户在清理浏览器缓存、重装浏览器或更换设备时，数据将会永久丢失。"
+      },
+      {
+        "area": "technical_boundary",
+        "impact": "可能导致本周工时统计与实际工作时间偏差，影响与客户的账目核对。",
+        "risk_key": "timezone_deviation",
+        "severity": "low",
+        "statement": "若设计师跨时区出差，本地系统时间变化可能会导致工时折算和“本周工时”统计跨天错乱。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "极简计时操作与严谨工时对账之间的张力。",
+        "reason": "设计师希望计时操作尽可能一键完成、无阻碍，但为了向客户请款对账，又需要输入精确的客户、项目甚至备注信息。我们需要在输入门槛和数据完整度之间取得平衡。"
+      },
+      {
+        "description": "免登录的即开即用体验与数据易丢失风险之间的张力。",
+        "reason": "使用 LocalStorage 可以实现零门槛即开即用，但浏览器清理缓存极易导致用户宝贵的历史工时丢失。我们需要在用户体验便捷度与数据安全承诺之间做抉择。"
+      }
+    ],
+    "unknowns": [
+      "设计师是否习惯在移动端辅助记录时间？",
+      "是否需要为特定客户设置不同的工时结算周期（如双周结、按月结）？",
+      "导出的 CSV 是否需要直接用于特定的第三方记账或发票系统？"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-10__B3__initial.json",
+  "usage": {
+    "input_tokens": 21101,
+    "output_tokens": 19723,
+    "thinking_tokens": 13653,
+    "total_tokens": 40824,
+    "cache_read_tokens": 0
+  },
+  "b3": {
+    "stage": "initial",
+    "question_count": 10,
+    "candidates_count": 3,
+    "assumptions_count": 2,
+    "gaps_count": 10,
+    "unique_decision_keys": 10,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [initial]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

@@ -1,35 +1,23 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, afterAll } from 'vitest';
 import { AntigravityCliProvider } from '../src/provider/AntigravityCliProvider.js';
 import { resolve } from 'node:path';
-import { execSync } from 'node:child_process';
-import { unlinkSync, existsSync } from 'node:fs';
 
 describe('AntigravityCliProvider Hardening Tests (Phase 4.8.1)', () => {
-  const schemaPath = resolve(process.cwd(), 'experiments/agent-benchmark/schemas/b2-unified.schema.json');
-  const csSourcePath = resolve(__dirname, 'MockAgy.cs');
-  const mockExePath = resolve(__dirname, 'mock-agy.exe');
-
-  beforeAll(() => {
-    if (process.platform === 'win32' && !existsSync(mockExePath)) {
-      execSync(
-        `powershell -NoProfile -Command "Add-Type -Path '${csSourcePath}' -OutputAssembly '${mockExePath}' -OutputType ConsoleApplication"`,
-        { stdio: 'ignore' }
-      );
-    }
-  });
+  const schemaPath = resolve(process.cwd(), 'experiments/agent-benchmark/schemas/b3-discovery.schema.json');
+  const mockScriptPath = resolve(__dirname, 'MockAgy.mjs');
+  const createProvider = (maxBufferBytes?: number) => new AntigravityCliProvider(
+    process.execPath,
+    maxBufferBytes,
+    [mockScriptPath]
+  );
 
   afterAll(() => {
     delete process.env.MOCK_AGY_MODE;
-    if (existsSync(mockExePath)) {
-      try {
-        unlinkSync(mockExePath);
-      } catch {}
-    }
   });
 
   it('1. Shell Metacharacters: Prompts containing &, |, quotes, and shell variables do not execute as shell commands', async () => {
     process.env.MOCK_AGY_MODE = 'default';
-    const provider = new AntigravityCliProvider(mockExePath);
+    const provider = createProvider();
     const dangerousPrompt = 'Dangerous Prompt & echo INJECTED | whoami ; "quoted" `pwd` %PATH% $HOME';
 
     const result = await provider.complete<any>({
@@ -49,7 +37,7 @@ describe('AntigravityCliProvider Hardening Tests (Phase 4.8.1)', () => {
 
   it('2. Timeout Handling: Hanging child process is terminated and returns safe timed-out status', async () => {
     process.env.MOCK_AGY_MODE = 'hang';
-    const provider = new AntigravityCliProvider(mockExePath);
+    const provider = createProvider();
 
     const result = await provider.complete<any>({
       requestId: 'req-timeout-test',
@@ -71,7 +59,7 @@ describe('AntigravityCliProvider Hardening Tests (Phase 4.8.1)', () => {
   it('3. Buffer Overflow Protection: Output exceeding maxBufferBytes safely fails without crashing or unbounded memory', async () => {
     process.env.MOCK_AGY_MODE = 'flood';
     // Set maxBufferBytes to 16KB (16384 bytes)
-    const provider = new AntigravityCliProvider(mockExePath, 16384);
+    const provider = createProvider(16384);
 
     const result = await provider.complete<any>({
       requestId: 'req-buffer-test',
@@ -92,7 +80,7 @@ describe('AntigravityCliProvider Hardening Tests (Phase 4.8.1)', () => {
 
   it('4. Invalid or non-JSON output returns safe failed status without throwing unhandled exceptions', async () => {
     process.env.MOCK_AGY_MODE = 'invalid_json';
-    const provider = new AntigravityCliProvider(mockExePath);
+    const provider = createProvider();
 
     const result = await provider.complete<any>({
       requestId: 'req-invalid-json',

@@ -57,7 +57,10 @@ describe('Workflow Trace Persistence Unit Tests (Phase 3.5.4)', () => {
           reason: 'Need user',
           recommendation: 'Developers',
           recommendation_reason: 'Simple',
-          options: [{ label: 'Devs', impact: 'Fast' }],
+          options: [
+            { label: 'Developers', impact: 'Keeps the workflow technical and fast' },
+            { label: 'General users', impact: 'Requires a simpler guided workflow' },
+          ],
           allow_free_input: true,
         },
       ],
@@ -74,10 +77,12 @@ describe('Workflow Trace Persistence Unit Tests (Phase 3.5.4)', () => {
     expect(res1.activeMode).toBe('idea-analysis');
     expect(res1.runTrace).toBeDefined();
     expect(res1.runTrace?.promptProfile).toBe('idea-analysis');
-    expect(res1.runTrace?.schemaProfile).toBe('idea-analysis');
+    expect(res1.runTrace?.schemaProfile).toBe('b3-discovery');
     expect(res1.runTrace?.contextProfile).toBe('idea-analysis');
     expect(res1.runTrace?.stateRevisionBefore).toBe(1);
     expect(res1.runTrace?.stateRevisionAfter).toBe(2);
+    expect(res1.runTrace?.diagnostics?.cacheReadTokens).toBe(0);
+    expect(res1.diagnostics.cacheReadTokens).toBe(0);
 
     // Turn 2
     const res2 = await orchestrator.runDiscoveryTurn(projectPath, {

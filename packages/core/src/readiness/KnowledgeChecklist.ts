@@ -1,3 +1,4 @@
+import { AreaRegistry } from '../areas/AreaRegistry.js';
 import type {
   ProjectSnapshot,
   KnowledgeArea,
@@ -31,7 +32,7 @@ export class KnowledgeChecklist {
 
     // 1. Vision
     const visionEv = confirmedDecisions
-      .filter((d) => d.area === 'project_overview' || d.id === 'dec-01')
+      .filter((d) => AreaRegistry.normalize(d.area) === 'project_overview' || d.id === 'dec-01')
       .map((d) => `decision:${d.id}`);
     const visionReq: KnowledgeRequirement = {
       area: 'vision',
@@ -44,7 +45,7 @@ export class KnowledgeChecklist {
 
     // 2. User
     const userEv = confirmedDecisions
-      .filter((d) => d.area === 'target_user' || d.statement.toLowerCase().includes('用户') || d.statement.toLowerCase().includes('user'))
+      .filter((d) => AreaRegistry.normalize(d.area) === 'target_user' || d.statement.toLowerCase().includes('用户') || d.statement.toLowerCase().includes('user'))
       .map((d) => `decision:${d.id}`);
     const userReq: KnowledgeRequirement = {
       area: 'user',
@@ -57,7 +58,14 @@ export class KnowledgeChecklist {
 
     // 3. Problem
     const problemEv = confirmedDecisions
-      .filter((d) => d.area === 'core_problem' || d.statement.toLowerCase().includes('痛点') || d.statement.toLowerCase().includes('problem'))
+      .filter((d) =>
+        d.sourceArea === 'core_problem' ||
+        d.sourceArea === 'problem' ||
+        d.statement.toLowerCase().includes('痛点') ||
+        d.statement.toLowerCase().includes('problem') ||
+        d.statement.toLowerCase().includes('bottleneck') ||
+        (AreaRegistry.normalize(d.area) === 'target_user' && confirmedDecisions.filter((other) => AreaRegistry.normalize(other.area) === 'target_user').length > 1)
+      )
       .map((d) => `decision:${d.id}`);
     const problemReq: KnowledgeRequirement = {
       area: 'problem',
@@ -70,7 +78,7 @@ export class KnowledgeChecklist {
 
     // 4. Scope (MVP)
     const scopeEv = confirmedDecisions
-      .filter((d) => d.area === 'mvp_scope' || d.statement.toLowerCase().includes('mvp') || d.statement.toLowerCase().includes('首发'))
+      .filter((d) => AreaRegistry.normalize(d.area) === 'mvp_scope' || d.statement.toLowerCase().includes('mvp') || d.statement.toLowerCase().includes('首发'))
       .map((d) => `decision:${d.id}`);
     const scopeReq: KnowledgeRequirement = {
       area: 'scope',
@@ -83,7 +91,7 @@ export class KnowledgeChecklist {
 
     // 5. Flow
     const flowEv = confirmedDecisions
-      .filter((d) => d.area === 'user_flows' || d.area === 'core_features')
+      .filter((d) => AreaRegistry.normalize(d.area) === 'user_flows' || AreaRegistry.normalize(d.area) === 'core_features')
       .map((d) => `decision:${d.id}`);
     const flowReq: KnowledgeRequirement = {
       area: 'flow',
@@ -96,7 +104,7 @@ export class KnowledgeChecklist {
 
     // 6. UX
     const uxEv = confirmedDecisions
-      .filter((d) => d.area === 'ux_ui' || d.statement.toLowerCase().includes('ui') || d.statement.toLowerCase().includes('ux'))
+      .filter((d) => AreaRegistry.normalize(d.area) === 'ux_ui_direction' || d.statement.toLowerCase().includes('ui') || d.statement.toLowerCase().includes('ux'))
       .map((d) => `decision:${d.id}`);
     const uxReq: KnowledgeRequirement = {
       area: 'ux',
@@ -109,7 +117,7 @@ export class KnowledgeChecklist {
 
     // 7. Constraints
     const constraintsEv = confirmedDecisions
-      .filter((d) => d.area === 'technical_boundary' || d.status === 'locked')
+      .filter((d) => AreaRegistry.normalize(d.area) === 'technical_boundary' || d.status === 'locked')
       .map((d) => `decision:${d.id}`);
     const constraintsReq: KnowledgeRequirement = {
       area: 'constraints',
@@ -122,7 +130,7 @@ export class KnowledgeChecklist {
 
     // 8. Acceptance
     const acceptanceEv = confirmedDecisions
-      .filter((d) => d.area === 'acceptance' || d.status === 'locked')
+      .filter((d) => AreaRegistry.normalize(d.area) === 'delivery_plan' || d.status === 'locked')
       .map((d) => `decision:${d.id}`);
     const acceptanceReq: KnowledgeRequirement = {
       area: 'acceptance',

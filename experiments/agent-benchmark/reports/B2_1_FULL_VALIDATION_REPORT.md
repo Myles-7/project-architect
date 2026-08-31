@@ -1,5 +1,7 @@
 # B2.1 Full Validation Report
 
+> 历史归档：本文记录 B2.1 阶段实现，不属于当前生产运行时契约。当前唯一活动契约见 `docs/blueprint/12_B3_ADAPTIVE_DISCOVERY.md`。
+
 ## Executive Summary
 
 **Passed.** Run b2-1-full-validation-1 executed all ten existing fixtures once,

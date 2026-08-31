@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   FileText,
+
   Sparkles,
   Copy,
   Check,
@@ -10,6 +11,8 @@ import {
   Eye,
   ShieldAlert,
   Compass,
+  Download,
+  Terminal,
 } from 'lucide-react';
 import { useProjectSession } from '../../state/ProjectSessionContext.js';
 import { MarkdownRenderer } from '../../components/common/MarkdownRenderer.js';
@@ -18,6 +21,8 @@ import { EmptyState } from '../../components/common/EmptyState.js';
 import { CardSkeleton } from '../../components/common/LoadingSkeleton.js';
 import { useToast } from '../../components/common/Toast.js';
 import { ApiClientError } from '../../api/client.js';
+import { downloadZip, type ZipFileEntry } from './exportZip.js';
+import { AgentPromptModal } from './AgentPromptModal.js';
 import type {
   DocumentListView as DocumentListViewModel,
   DocumentItemView,
@@ -31,6 +36,9 @@ export const DocumentsView: React.FC = () => {
   const [documentList, setDocumentList] = useState<DocumentListViewModel | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+
 
   // Document Reader State
   const [selectedDocPath, setSelectedDocPath] = useState<string>('AGENTS.md');
@@ -106,7 +114,7 @@ export const DocumentsView: React.FC = () => {
       if (selectedDocPath) {
         await loadDocumentContent(selectedDocPath);
       }
-      success('成功编译生成 AGENTS.md 与 8 份工程开发蓝图！', '蓝图生成完成');
+      success('成功编译生成包含 AGENTS.md 在内的 8 份核心工程蓝图！', '蓝图生成完成');
     } catch (err: any) {
       if (err instanceof ApiClientError && err.statusCode === 409) {
         setIsConflictModalOpen(true);
@@ -126,6 +134,38 @@ export const DocumentsView: React.FC = () => {
     setCopied(true);
     success('已复制 Markdown 内容到剪贴板', '复制成功');
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadAllZip = async () => {
+    if (!activeProjectId || !documentList || documentList.items.length === 0 || isDownloadingZip) return;
+    setIsDownloadingZip(true);
+    try {
+      const entries: ZipFileEntry[] = [];
+      for (const item of documentList.items) {
+        try {
+          const res = await apiClient.readDocument(activeProjectId, {
+            projectId: activeProjectId,
+            docPath: item.path,
+          });
+          entries.push({ path: item.path, content: res.content });
+        } catch (err) {
+          console.error(`Failed to read doc ${item.path} for zip:`, err);
+        }
+      }
+
+      if (entries.length === 0) {
+        error('无法读取到有效文档内容进行打包', '打包失败');
+        return;
+      }
+
+      const cleanProjectName = (snapshot?.metadata?.name || 'project').replace(/[^\w\u4e00-\u9fa5_-]/g, '_');
+      downloadZip(`${cleanProjectName}-blueprints.zip`, entries);
+      success(`已成功打包并下载 ${entries.length} 份蓝图文档 (ZIP)`, '下载成功');
+    } catch (err: any) {
+      error(err.message || '打包下载失败', '操作中断');
+    } finally {
+      setIsDownloadingZip(false);
+    }
   };
 
   if (!activeProjectId) {
@@ -151,7 +191,7 @@ export const DocumentsView: React.FC = () => {
   return (
     <div className="max-w-5xl w-full mx-auto space-y-6">
       {/* Top Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             <FileText className="w-4 h-4 text-emerald-500" />
@@ -162,18 +202,51 @@ export const DocumentsView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {documentList?.hasCompiledDocs && (
+            <>
+              <button
+                type="button"
+                onClick={() => setIsPromptModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-2xs"
+                title="生成并复制面向 Cursor / Claude Code / Antigravity 的启动提示词"
+              >
+                <Terminal className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                <span>复制 Agent 启动词</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadAllZip}
+                disabled={isDownloadingZip}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-2xs"
+                title="将 AGENTS.md 与 docs/ 目录一键打包为 ZIP 下载"
+              >
+                <Download className={`w-3.5 h-3.5 ${isDownloadingZip ? 'animate-bounce text-orange-500' : 'text-emerald-500'}`} />
+                <span>{isDownloadingZip ? '正在打包...' : '一键打包下载 (ZIP)'}</span>
+              </button>
+            </>
+          )}
+
           <button
+            type="button"
             onClick={handleGenerateDocuments}
             disabled={isGenerating || !isApproved}
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
             title={!isApproved ? '需先在 Readiness 页面完成用户批准后方可生成' : '一键编译生成完整文档包'}
           >
             <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-            <span>{isGenerating ? '正在编译蓝图...' : '一键编译生成完整文档包'}</span>
+            <span>
+              {isGenerating
+                ? '正在编译蓝图...'
+                : documentList?.hasCompiledDocs
+                ? '重新编译文档包'
+                : '一键编译生成完整文档包'}
+            </span>
           </button>
         </div>
       </div>
+
 
       {/* Manifest Stale Warning if any */}
       {documentList?.isManifestStale && (
@@ -341,6 +414,18 @@ export const DocumentsView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Coding Agent Prompt Modal */}
+      <AgentPromptModal
+        isOpen={isPromptModalOpen}
+        onClose={() => setIsPromptModalOpen(false)}
+        projectName={snapshot?.metadata?.name || 'MyProject'}
+        stateRevision={snapshot?.metadata?.stateRevision}
+        warnings={snapshot?.readiness?.current?.warnings}
+        assumptions={snapshot?.assumptions?.items?.filter((a) => a.status === 'active').map((a) => a.statement)}
+        knownIssues={snapshot?.readiness?.current?.knownIssueAcknowledgements}
+        documentsCount={documentList?.items?.length}
+      />
 
       {/* Concurrency Conflict Modal */}
       <ConflictModal

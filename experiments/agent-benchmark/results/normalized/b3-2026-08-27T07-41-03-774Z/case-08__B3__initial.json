@@ -1,0 +1,545 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-08",
+  "stage": "initial",
+  "name": "local-first-notes",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 71662,
+  "output": {
+    "assumptions": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "default_local_storage_limit",
+        "reason": "纯文本笔记占用的磁盘空间极小，在现代个人电脑或移动设备上基本可以忽略不计。",
+        "statement": "假设每个用户设备上的本地存储空间是充裕的，可以无压力保存纯文本的笔记内容。"
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "connectivity_restoration",
+        "reason": "团队协作笔记的属性决定了用户依然有对齐内容的需求，长期的离线可能会导致合并冲突过于庞大而难以理清。",
+        "statement": "假设用户在离线编辑后，会在几天内重新连接网络进行同步，而不是永久处于离线状态。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "target_user",
+        "decision_key": "target_user_definition",
+        "rationale": "本地优先的协作模式非常契合需要高可靠性、对断网零容忍，同时又需要团队信息对齐的办公协作场景。",
+        "statement": "目标用户主要是经常需要在多变网络环境下进行会议记录、团队协作的企业团队与项目小组成员。"
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "core_merging_ux",
+        "rationale": "用户需要对文档的改变有安全感，既要看到最新的合并内容，又要清楚知道哪些部分被改动了，以此来兑现不轻易覆盖他人修改的承诺。",
+        "statement": "当检测到网络恢复并完成合并后，应用界面会以一种非侵入式的视觉高亮方式提示用户发生了哪些改动。"
+      }
+    ],
+    "confirmed": [
+      "这是一个团队会议笔记应用。",
+      "应用采用本地优先（local-first）的设计，笔记默认存储在用户本地设备。",
+      "支持离线编辑（无网环境下亦可正常编辑笔记）。",
+      "当网络恢复后，团队成员应能看到合并后的笔记内容。",
+      "合并规则必须保证不能轻易覆盖其他团队成员的修改。"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "target_user",
+        "decision_key": "target_platform",
+        "depends_on": [],
+        "impact": "如果定位不准，可能导致开发成本翻倍（如网页端的离线存储极其受限，而移动端的文字录入效率低）。",
+        "reason": "首发支持的平台类型直接决定了用户的使用场景（桌面端、移动端或网页端），也极大影响本地文件读写的开发方式。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "conflict_policy",
+        "depends_on": [],
+        "impact": "冲突策略直接影响团队对数据的信任度。自动合并能减少阻断，但手动选择更安全。",
+        "reason": "离线合并是本地优先的核心技术难点，必须明确多人在同一段落进行不同修改时的业务妥协策略。",
+        "severity": "critical",
+        "should_ask_user": true
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "synchronization_security",
+        "depends_on": [],
+        "impact": "端到端加密将限制网页端预览和数据恢复，而常规加密更有利于多端轻量化展示。",
+        "reason": "需要明确数据的隐私与安全级别，这决定了应用是否需要提供端到端加密，还是采用常规同步。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "target_user",
+        "decision_key": "user_authentication",
+        "depends_on": [],
+        "impact": "强制在线登录会提升安全和协同准确性，但也违背了极致的本地优先体验；本地离线账号则会增加同步时的关联复杂度。",
+        "reason": "离线优先的产品要求对用户身份识别流程做出合理定义，避免无网时无法使用应用。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "rich_media_policy",
+        "depends_on": [],
+        "impact": "如果不加限制，大量音视频会导致离线数据库迅速膨胀，引起多端同步极度缓慢甚至超时失败。",
+        "reason": "需要明确 MVP 阶段是否限制大文件 and 音视频，这对于本地存储空间的管理至关重要。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "sync_frequency",
+        "depends_on": [],
+        "impact": "秒级实时同步对网络和冲突解决库要求极高，容易产生频繁冲突；而段落/保存时同步则更稳定且适合离线优先架构。",
+        "reason": "网络正常时的同步频率决定了系统是在线文档式的协同还是段落/文章式的异步协同。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "page_structure",
+        "decision_key": "notes_organization",
+        "depends_on": [],
+        "impact": "扁平时间线直观快速，但对于大型项目的会议管理稍弱；树状目录便于归档，但增加了录入时的阻碍。",
+        "reason": "会议笔记的组织方式（时间线、目录树、双链标签）直接决定了主界面的结构设计和首发用户的认知负担。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "personal_multi_device_sync",
+        "depends_on": [],
+        "impact": "如果必须支持个人多端同步，会引入个人云盘和自动对齐问题，增加首发版本的开发复杂度。",
+        "reason": "明确个人跨设备同步的边界，决定了同步服务是否需要维护两套完全不同的同步策略（个人多端同步 vs 团队多用户协作）。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "version_history_granularity",
+        "depends_on": [],
+        "impact": "过细的版本历史会占用大量本地空间，而无历史或过粗的粒度会让用户在误合并后无法挽回损失。",
+        "reason": "版本历史的记录粒度直接关系到“不轻易覆盖他人修改”这一承诺的安全感体验与本地数据库的大小。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "merge_notification_ux",
+        "depends_on": [],
+        "impact": "如果通知太强，会频繁打扰打字；如果没有任何提示，用户会觉得数据突然多出来或改变了，产生恐慌。",
+        "reason": "在本地优先应用中，当后台默默将离线内容与他人合并后，如何告知用户有新改动是决定产品交互流畅度的关键。",
+        "severity": "medium",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "target_platform",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "首发支持 Windows 和 macOS 桌面客户端。用户可获得完整的本地存储和卓越的录入体验，但需下载安装。",
+            "key": "desktop",
+            "label": "桌面端应用（Windows/macOS）",
+            "reversibility": "hard",
+            "tradeoffs": "提供最佳的本地性能和稳定性，但跨平台开发和发布成本相对较高，且用户需要主动下载安装客户端。"
+          },
+          {
+            "impact": "首发基于 Web 网页版。用户即开即用、无需安装，但受限于浏览器的本地存储容量限制，且断网离线编辑稳定性较差。",
+            "key": "web",
+            "label": "网页端应用（Web App）",
+            "reversibility": "moderate",
+            "tradeoffs": "部署和试用成本最低，能跨设备访问，但在完全离线时对海量本地存储和断网读写支持有限。"
+          },
+          {
+            "impact": "首发基于移动端 App。便携性极高，但受限于手机屏幕和键盘输入效率，不适合作为高强度会议记录的主力工具。",
+            "key": "mobile",
+            "label": "移动端 App（iOS/Android）",
+            "reversibility": "hard",
+            "tradeoffs": "便携度最高，适合外出开会或碎片化查阅，但在开会时做高频长文本记录的输入体验较差。"
+          }
+        ],
+        "question": "您的应用首发时，主要面向什么平台提供服务？",
+        "reason": "会议笔记的记录往往需要在会议中快速输入，不同平台（如桌面端、移动端或网页端）对本地优先的存储支持和用户的录入习惯大不相同。",
+        "recommendation": "(推荐) 优先支持桌面客户端（Windows/macOS）",
+        "recommendation_reason": "桌面端拥有完整的本地文件读写权限，不受浏览器存储容量限制，且用户在会议中使用实体键盘的录入效率最高，最适合本地优先的会议记录场景。",
+        "recommended_option_key": "desktop"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "conflict_policy",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "重新联网后自动将双方修改合并进文档，并用视觉高亮标出冲突段落。确保数据不丢失，用户在阅读时可顺手整理。",
+            "key": "auto_merge_highlight",
+            "label": "自动智能合并并高亮标记冲突（保留双方内容）",
+            "reversibility": "moderate",
+            "tradeoffs": "保证数据零丢失且无需立刻打断写作，但笔记排版可能会暂时变得混乱，需要人工二次整理。"
+          },
+          {
+            "impact": "合并过程完全静默，只保留最后提交人的内容，操作最流畅。但被覆盖人的修改可能会暂时消失，需去版本历史找回。",
+            "key": "latest_wins_history",
+            "label": "最后一次修改生效（覆盖他人，但提供版本历史回溯）",
+            "reversibility": "easy",
+            "tradeoffs": "协作页面干净整洁，但可能会在不知情的情况下暂时覆盖别人的努力，哪怕历史版本里还能找回来，也会降低安全感。"
+          },
+          {
+            "impact": "强制要求用户手动比对两个版本并选择保留哪个版本，在解决冲突前无法进行其他编辑，确保文档排版干净一致。",
+            "key": "manual_resolution",
+            "label": "阻断式手动对比（由第一位提交人或管理员选择保留的版本）",
+            "reversibility": "moderate",
+            "tradeoffs": "内容一致性最高，但阻断了多人即时协作的顺畅感，体验较为繁琐。"
+          }
+        ],
+        "question": "当多人在断网期间编辑了同一篇笔记的相同部分，重新联网时应用应采取什么合并策略？",
+        "reason": "离线编辑必然会遇到冲突，这是本地优先协作中最核心的规则，我们需要定义一个符合非技术用户直觉且不丢数据的合并逻辑。",
+        "recommendation": "(推荐) 自动智能合并并高亮标记冲突（保留双方内容，由用户后续手动修剪）",
+        "recommendation_reason": "这种方式最符合“不能轻易覆盖他人修改”的要求，既不丢失任何一方的输入，又不会在联网的瞬间用弹窗阻断团队的协作流程。",
+        "recommended_option_key": "auto_merge_highlight"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "synchronization_security",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "数据在云端和传输中均加密，但在需要时支持网页免客户端预览、第三方集成及忘记密码时的数据恢复。",
+            "key": "standard_encryption",
+            "label": "标准的云端加密同步（兼顾便捷性）",
+            "reversibility": "hard",
+            "tradeoffs": "用户管理方便，支持网页快速预览，但运营方在合规和技术支持时有解密能力，安全上限低于端到端加密。"
+          },
+          {
+            "impact": "只有团队成员持有的密钥才能解密数据，云端仅存储无法读取的密文。如果丢失密钥，数据永久无法恢复，且无法网页预览。",
+            "key": "end_to_end_encryption",
+            "label": "端到端加密同步（零知识证明，服务器无法查看内容）",
+            "reversibility": "hard",
+            "tradeoffs": "提供极致的数据安全性，但会失去忘记密码重置、云端只读网页免客户端分享等便利功能。"
+          },
+          {
+            "impact": "数据只在局域网内或企业自建服务器上同步，不流向任何公有云服务器。跨地域出差时无法直接在外网进行同步。",
+            "key": "local_network_only",
+            "label": "纯局域网同步/支持私有部署（数据不出企业内网）",
+            "reversibility": "moderate",
+            "tradeoffs": "完全掌控数据流向，适合敏感科研或特定内网部门，但跨异地协同成本高，需要自行架设中转站。"
+          }
+        ],
+        "question": "在团队数据同步和备份时，对于数据的安全与隐私等级有何要求？",
+        "reason": "会议记录往往涉及企业机密，我们需要定义数据隐私与用户使用便利性（如网页版预览、忘记密码恢复）之间的权衡。",
+        "recommendation": "(推荐) 标准的云端传输与存储加密（运营方有受限的安全访问权限）",
+        "recommendation_reason": "这种模式在保障常规数据安全的前提下，可以支持未来的网页端只读分享、全局搜索以及更流畅的协同邀请，是便利性与安全性的平衡选择。",
+        "recommended_option_key": "standard_encryption"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "user_authentication",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "用户安装即可在本地建表记录，无需联网注册，仅在需要进行团队同步或加入他人项目协作时才需要绑定账号。",
+            "key": "offline_first_anonymous",
+            "label": "允许直接离线使用（仅在加入协作或同步时绑定账号）",
+            "reversibility": "easy",
+            "tradeoffs": "开箱即用体验最好，但如果用户长期不绑定账号，更换设备时本地笔记的迁移可能会比较麻烦。"
+          },
+          {
+            "impact": "用户首次打开应用必须连网注册登录（如通过手机号或企业单点登录），才能生成本机的用户标识，离线将无法首次启动。",
+            "key": "enforced_initial_login",
+            "label": "首次运行必须联网注册登录（绑定企业账号）",
+            "reversibility": "moderate",
+            "tradeoffs": "有利于合规审查和协作成员识别，但大大增加了试用门槛，且违背了极致无网可用的直觉。"
+          }
+        ],
+        "question": "用户在无网环境下首次打开应用时，是否需要强制联网登录？",
+        "reason": "为了让用户拥有真正的“开箱即用、没网也可编辑”体验，我们需要定义首次登录的流程设计。",
+        "recommendation": "(推荐) 允许免登录直接离线建表记录，同步时再要求注册绑定账号",
+        "recommendation_reason": "这样可以让用户一键开始工作，不被注册阻断，最大化呈现本地优先的“即时反应”优势，同时在有协作需求时自然过渡到联网账号。",
+        "recommended_option_key": "offline_first_anonymous"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "rich_media_policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "支持插入常规图片与中短录音附件，并设定单文件限制（如 50MB）。既保证信息完整性，又避免本地磁盘过快占满。",
+            "key": "limited_media",
+            "label": "支持图片和限额录音附件（设置单文件最大限制如 50MB）",
+            "reversibility": "easy",
+            "tradeoffs": "在记录完整性与本地存储压力、同步速度间做到了最佳平衡，但无法作为通用的企业云盘使用。"
+          },
+          {
+            "impact": "仅允许记录纯文本与 Markdown，不存储任何图片和录音附件。多端同步可实现秒级瞬间完成，完全不占用本机空间。",
+            "key": "text_only",
+            "label": "仅支持纯文本与 Markdown（不保存任何多媒体附件）",
+            "reversibility": "easy",
+            "tradeoffs": "开发极其快速、同步瞬间完成，但在现代多媒体会议记录需求下显得功能较为单薄。"
+          },
+          {
+            "impact": "全面支持大视频、高清录音、超大 PDF 等，无任何文件大小限制。能够完全保留所有会议资料，但本地存储压力极大。",
+            "key": "unlimited_media",
+            "label": "全面支持大文件（包括超长会议录像、高清音频等，无限制）",
+            "reversibility": "moderate",
+            "tradeoffs": "功能覆盖最全，但极易造成用户本机存储吃紧，且离线大文件合并和断网断点续传的开发难度极大。"
+          }
+        ],
+        "question": "应用在首发版本中，对会议中常用的附件和多媒体（如录音、现场照片、白板）支持到什么程度？",
+        "reason": "会议记录往往伴随录音或图片，但本地优先应用的所有附件默认需要离线缓存至本机，大文件的同步会成为极大的技术和体验瓶颈。",
+        "recommendation": "(推荐) 支持图片和限额录音附件（设置单文件最大限制如 50MB）",
+        "recommendation_reason": "这既能满足日常会议中拍照、录音的基本协作诉求，又能避免海量视频或超大文件直接压垮用户的本地磁盘 and 同步带宽。",
+        "recommended_option_key": "limited_media"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "sync_frequency",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "当用户输入完一段或停顿几秒后，在后台静默打包同步，既降低冲突发生概率，又不会引起界面光标的高频抖动。",
+            "key": "paragraph_level_sync",
+            "label": "段落级同步（输入完一段或停顿3秒后，在后台静默同步）",
+            "reversibility": "moderate",
+            "tradeoffs": "既保留了协同的临场感，又保护了网络带宽和本地解析性能，只是无法像协作文档一样看着对方打出每一个字。"
+          },
+          {
+            "impact": "网络正常时进行字符级毫秒级同步，能实时看到他人的打字光标。但在无网重连后，容易产生大量琐碎繁琐的冲突。",
+            "key": "real_time_char_sync",
+            "label": "字符级实时同步（毫秒级同步，能看到他人实时打字的光标）",
+            "reversibility": "hard",
+            "tradeoffs": "协同体验爽快，但网络开销极大，离线重连后的微小冲突合并算法极度复杂，容易引起合并失败。"
+          },
+          {
+            "impact": "仅在手动保存或关闭笔记时才触发同步，将数据控制权完全交还用户，但无法在会议进行中实现实时协同编辑。",
+            "key": "manual_save_sync",
+            "label": "手动保存或关闭笔记时才同步（偏向异步协作）",
+            "reversibility": "easy",
+            "tradeoffs": "无网编辑和有网编辑的逻辑完全一致，系统最稳定，但失去了会议过程中的实时内容对齐功能。"
+          }
+        ],
+        "question": "在网络状况良好时，团队成员共同编辑同一篇笔记，应用应以什么频率进行内容同步？",
+        "reason": "同步频率直接影响多人协作的感官体验和冲突发生的概率，我们需要定位是做一个“准实时看板”还是“纯异步整理”应用。",
+        "recommendation": "(推荐) 段落级同步（输入完一段或停顿3秒后，在后台静默同步）",
+        "recommendation_reason": "对于本地优先应用，避开按键级别的超高频网络请求能大幅减少断网重连时的微小冲突，同时对用户而言，段落级更新既能看清修改，又不易引起界面光标抖动。",
+        "recommended_option_key": "paragraph_level_sync"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "notes_organization",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "按时间顺序呈现会议流，支持用户打标签聚合，极大降低新建笔记时的整理负担，但对历史久远的无标签笔记较难归档。",
+            "key": "timeline_with_tags",
+            "label": "基于扁平时间线与日历（按会议发生时间展现，支持打标签）",
+            "reversibility": "easy",
+            "tradeoffs": "降低了用户新建文件时的整理负担，但对多项目混合交织的大型企业用户来说，仅按时间查找会稍显凌乱，需依赖强大的全局搜索。"
+          },
+          {
+            "impact": "用户需要手动创建文件夹和项目，将笔记归入特定的目录树中。分类清晰严谨，但增加了记录时的脑力负担。",
+            "key": "directory_folders",
+            "label": "基于传统的文件夹与多级项目树（按部门或项目手动归档）",
+            "reversibility": "easy",
+            "tradeoffs": "归档井井有条，但对离线快速记录的流线型体验有一定损耗，增加了脑力分类负担。"
+          },
+          {
+            "impact": "通过在笔记中提及人物、项目关键词自动织网，无须手动整理。非常先进，但普通会议记录者学习门槛较高。",
+            "key": "bi_directional_graph",
+            "label": "基于双向链接与人物关联（通过参会人、关键词自动织网）",
+            "reversibility": "moderate",
+            "tradeoffs": "非常先进的关联查找方式，但在快节奏、低认知负荷的会议记录场景下，可能显得过于复杂。"
+          }
+        ],
+        "question": "在主界面中，会议笔记应该采用怎样的主要结构进行分类与组织？",
+        "reason": "主界面结构决定了用户查找和管理过往笔记的习惯，我们需要设计一套最符合会议记录特性的组织结构。",
+        "recommendation": "(推荐) 基于扁平时间线与日历（按会议发生时间展现，支持打标签）",
+        "recommendation_reason": "会议最核心的属性是召开时间。按时间顺序呈现最契合人们对“哪天开了什么会”的自然记忆，同时利用轻量级标签进行项目标记，既快捷又省去了维护复杂目录的麻烦。",
+        "recommended_option_key": "timeline_with_tags"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "personal_multi_device_sync",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "开发链路极度聚焦，只需处理多人协作时的合并逻辑，产品上线快；但用户无法在手机上实时同步自己未同步的电脑个人草稿。",
+            "key": "team_collaboration_only",
+            "label": "仅支持单设备本地存储 + 团队多人协作同步",
+            "reversibility": "moderate",
+            "tradeoffs": "研发周期短、质量更易控制，但牺牲了个人跨端续写的连贯体验。"
+          },
+          {
+            "impact": "支持同一用户多台设备（手机、电脑、平板）的无缝同步，体验极佳，但会大幅增加同步数据库与合并逻辑的开发成本。",
+            "key": "personal_multi_device_sync",
+            "label": "同时支持个人多设备云同步（电脑、手机、平板无缝切换）",
+            "reversibility": "hard",
+            "tradeoffs": "提供了更完整的使用生态，但需要多做一套个人专属设备的自动同步逻辑，容易分散首发版本的开发资源。"
+          }
+        ],
+        "question": "在首发 MVP 版本中，除了支持“团队多人协作同步”外，是否还需要支持“单个用户的个人多设备同步”？",
+        "reason": "我们需要明确首发版本的边界。由于个人多设备同步与团队多人协作在本地冲突处理逻辑上有些许差异，明确该边界有助于聚焦核心功能。",
+        "recommendation": "(推荐) 仅支持单设备本地存储 + 团队多人协作同步",
+        "recommendation_reason": "大多数会议记录者在单次会议中只会使用一台首选设备（通常是电脑）进行录入。将精力集中在解决多人协作冲突上，能让核心技术方案更加稳健、更快上线。",
+        "recommended_option_key": "team_collaboration_only"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "version_history_granularity",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "每次成功联网同步或用户重大修改时自动生成快照备份。提供清晰的安全回退点，存储开销在合理可控的范围内。",
+            "key": "milestone_versions",
+            "label": "按网络同步与保存节点记录的里程碑版本",
+            "reversibility": "moderate",
+            "tradeoffs": "能解决 95% 以上的误覆盖或合并失误问题，但如果是毫秒级的打字遗失则无法找回。"
+          },
+          {
+            "impact": "记录每次键盘输入或每分钟自动保存。能找回极度细微的文字修改，但会导致本地数据库历史文件无限膨胀。",
+            "key": "fine_grained_snapshots",
+            "label": "细粒度版本（精确到段落修改或每分钟自动保存的版本历史）",
+            "reversibility": "hard",
+            "tradeoffs": "提供了极致的容错和细节追踪，但极易造成本地数据文件的无限膨胀，严重影响老旧设备运行效率。"
+          },
+          {
+            "impact": "平时不做版本备份，仅在联网发生内容冲突合并的瞬间，留存合并前的前置版本。极大精简本地存储，但无法处理日常误删。",
+            "key": "merge_backup_only",
+            "label": "仅在发生冲突合并时备份（平时不保存版本历史，只在合并时留存前置版本）",
+            "reversibility": "easy",
+            "tradeoffs": "系统最干净、读写损耗降到最低，但对除合并之外的日常误删操作没有任何回滚保障。"
+          }
+        ],
+        "question": "在合并和防覆盖机制中，应用需要为用户保留何种精细度的版本历史？",
+        "reason": "当多人编辑重连产生合并时，万一合并结果不符合预期，版本历史是唯一的“安全网”，我们需要在这个安全网的精细度与系统开销间做出选择。",
+        "recommendation": "(推荐) 按网络同步与保存节点记录的里程碑版本",
+        "recommendation_reason": "这能在不显著增加本地存储负担的情况下，确保用户能够一键回退到任何一次网络同步前或一小时前的状态，提供足够的防覆写保障。",
+        "recommended_option_key": "milestone_versions"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "merge_notification_ux",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "新合并的内容或被修改段落旁附带柔和的颜色条提示，用户在浏览完毕后颜色自动褪去。视觉无打扰，协作对齐感强。",
+            "key": "progressive_highlight",
+            "label": "渐进式段落视觉高亮（新改动辅以颜色标识，阅读后自动褪去）",
+            "reversibility": "easy",
+            "tradeoffs": "交互现代且高雅，但需要编写精细的交互逻辑来跟踪段落的已读/未读状态并触发褪色动效。"
+          },
+          {
+            "impact": "合并后在应用侧边栏或顶部弹出显式通知，用户点击后可查看清晰的双栏合并对比图。最为稳妥保险，但频繁打扰写作。",
+            "key": "explicit_popup_notification",
+            "label": "显式变更通知（在侧边栏或顶部弹出通知，点击查看详细差异对比）",
+            "reversibility": "easy",
+            "tradeoffs": "确认机制极其保险，避免漏看任何一行字，但在多人连续开会发言时，频繁弹出会破坏书写专注度。"
+          },
+          {
+            "impact": "后台合并完成后内容直接插入文本中，不做任何界面高亮提示。最清爽干净，但用户可能因不知情的内容变化感到错愕。",
+            "key": "silent_merge",
+            "label": "静默合并（内容自动更新到文本中，不做任何高亮提示）",
+            "reversibility": "easy",
+            "tradeoffs": "开发代价小，保持编辑界面的纯粹，但对多人同时段落修改时的合并变化感知度极差，有数据可能已被修改的疑惑感。"
+          }
+        ],
+        "question": "当离线编辑的笔记在恢复网络并完成合并后，用户应该在界面上如何被告知这些改动？",
+        "reason": "我们需要找到一种交互方式，既要保证用户能清晰感知“别人改了哪里”，又不能让合并提示成为干扰写作的噪音。",
+        "recommendation": "(推荐) 渐进式段落视觉高亮（新改动辅以颜色标识，阅读后自动褪去）",
+        "recommendation_reason": "这是一种非常优雅的“非侵入式”协作交互。它既给用户带来了极强的数据安全感（清晰看到合并差异），又在编辑过程中保持了界面的干净，不会打断思路。",
+        "recommended_option_key": "progressive_highlight"
+      }
+    ],
+    "risks": [
+      {
+        "area": "core_features",
+        "impact": "可能会降低用户协同工作的体验，甚至导致用户对合并正确性失去信任。",
+        "risk_key": "sync_conflict_fatigue",
+        "severity": "high",
+        "statement": "当多人长时间离线编辑同一篇笔记，恢复网络后可能产生大量需要确认的冲突，导致用户产生“冲突整理疲劳”。"
+      },
+      {
+        "area": "technical_boundary",
+        "impact": "由于数据尚未同步到团队，丢失的本地会议记录将无法通过任何云端手段找回。",
+        "risk_key": "local_data_loss",
+        "severity": "critical",
+        "statement": "在本地数据同步到云端之前，若用户误删应用、发生设备损坏或清理了系统缓存，可能会导致本地数据永久丢失。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "离线编辑的灵活性与多人协作的实时性之间的张力。",
+        "reason": "用户希望恢复网络后团队成员立刻看到合并内容（倾向于实时同步），但同时要求不能轻易覆盖别人修改（倾向于较慢、较谨慎的合并与备份机制）。"
+      },
+      {
+        "description": "本地优先的极致隐私性与云端协作便捷性之间的张力。",
+        "reason": "本地优先天然给用户数据在本地的绝对控制权，但团队协作又要求数据必须流经网络进行分发和合并，这在信任边界上需要平衡。"
+      }
+    ],
+    "unknowns": [
+      "用户对离线协同笔记的并发修改频率有多高，即是否经常会出现多人同一时刻修改同一段落的情况。",
+      "目标企业团队是否有特定的合规与数据安全审查要求（例如禁止数据上传至第三方云服务）。"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-08__B3__initial.json",
+  "usage": {
+    "input_tokens": 55751,
+    "output_tokens": 37791,
+    "thinking_tokens": 23400,
+    "total_tokens": 93542,
+    "cache_read_tokens": 53099
+  },
+  "b3": {
+    "stage": "initial",
+    "question_count": 10,
+    "candidates_count": 2,
+    "assumptions_count": 2,
+    "gaps_count": 10,
+    "unique_decision_keys": 10,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [initial]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

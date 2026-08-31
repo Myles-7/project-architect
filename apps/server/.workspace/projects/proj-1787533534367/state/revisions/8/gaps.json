@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1787533534367",
+  "gaps": [
+    {
+      "id": "gap-ai-user_flows-3xcz",
+      "area": "user_flows",
+      "severity": "high",
+      "reason": "当前未定义如何跨阶段继承和传递定义的数学符号与变量约束。",
+      "impact": "如果前序步骤定义的变量和符号在后序计算步骤中发生漂移，将导致生成的计算代码无法正确运行。",
+      "dependency": "影响多阶段工作流流转的交互逻辑与数据同步设计。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "high"
+      },
+      "priorityScore": 88,
+      "priority": "critical"
+    },
+    {
+      "id": "gap-ai-工作流定义-5p6q",
+      "area": "工作流定义",
+      "severity": "medium",
+      "reason": "当前未定义如何跨阶段继承和传递定义的数学符号与变量约束。",
+      "impact": "如果前序步骤定义的变量和符号在后序计算步骤中发生漂移，将导致生成的计算代码无法正确运行。",
+      "dependency": "步骤间协作规范",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-chk-technical_boundary-univ-platform-choice",
+      "area": "technical_boundary",
+      "severity": "high",
+      "reason": "Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。",
+      "impact": "影响 technical_boundary 的完整度闭环。",
+      "dependency": "none",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "low",
+        "irreversibility": "high",
+        "stageRelevance": "low"
+      },
+      "priorityScore": 58,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-chk-acceptance-univ-success-signal",
+      "area": "acceptance",
+      "severity": "medium",
+      "reason": "Checklist 标准检查项尚未明确：项目有一项可被直观验证的完成信号或验收标准。",
+      "impact": "影响 acceptance 的完整度闭环。",
+      "dependency": "none",
+      "shouldAskUser": false,
+      "status": "open",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "broad-pass",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "low",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 52,
+      "priority": "medium"
+    }
+  ],
+  "conflicts": [],
+  "tensions": [
+    {
+      "id": "tns-1787534953174-3549",
+      "description": "自动求解的便利性与人机交互控制的细粒度之间的权衡。",
+      "reason": "全自动减少了用户工作量但降低了掌控感，步骤级精细干预则会增加用户的操作成本。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787534992269-j38i",
+      "description": "为了保障知识产权和敏感数据的绝对隐私（完全本地处理），需要用户自行承担外部智能服务接入配置的繁琐度以及本地计算环境的搭建难度。",
+      "reason": "用户既希望获得极高的数据安全性，又希望上手即用且免受配置困扰。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787535444607-f7c0",
+      "description": "本地高计算性能要求与断网隐私承诺之间的平衡。",
+      "reason": "用户希望能够快速进行计算和推理，同时在竞赛环境下需要严格的断网和隐私保护，这要求系统必须在本地运行并具备足够的计算处理能力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787593657017-myjk",
+      "description": "在本地执行代码可保证数据隐私和充分利用本地资源，但增加了对用户本地多种操作系统的适配成本；而在在线环境执行虽然简单，但可能面临竞赛现场网络限制和数据隐私敏感性问题。",
+      "reason": "本地执行与在线执行在隐私性、网络依赖及环境准备成本之间的权衡。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787593657017-9vjg",
+      "description": "自动联动同步符号修改能保证数学模型在所有步骤中的一致性，但会增加系统的交互复杂度和用户在修改时的感知负担；不自动同步虽然设计简单，但极易导致后续步骤和生成的代码出现定义冲突。",
+      "reason": "跨阶段数据强一致性维护与步骤间高独立度及灵活度之间的权衡。",
+      "status": "open"
+    }
+  ],
+  "updatedAt": "2026-08-24T17:47:37.017Z"
+}

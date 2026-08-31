@@ -1,3 +1,4 @@
+import { AreaRegistry } from '../areas/AreaRegistry.js';
 import type {
   ProjectSnapshot,
   MergedChecklistHint,
@@ -12,41 +13,15 @@ import type {
  * combines it with the factors that make a missing decision costly to defer.
  */
 const AREA_IMPORTANCE: Record<string, number> = {
-  // 1. Product Identity & Core Problem
-  product_identity: 7,
-  core_problem: 7,
-  product_vision: 7,
   project_overview: 7,
-
-  // 2. Target User
   target_user: 6,
-  user_persona: 6,
-
-  // 3. Core Workflow
   user_flows: 5,
-  user_flow: 5,
-  primary_flow: 5,
   core_features: 5,
-
-  // 4. MVP Scope
   mvp_scope: 4,
-  scope_boundary: 4,
-
-  // 5. Trust / Safety / Data Ownership
-  trust_safety: 3,
-  data_security: 3,
-  data_ownership: 3,
-  privacy: 3,
-
-  // 6. UX / UI Tradeoff
-  ux_ui: 2,
+  technical_boundary: 3,
   ux_ui_direction: 2,
   page_structure: 2,
-
-  // 7. Technical Constraint (Platform / Runtime)
-  technical_boundary: 1,
-  platform: 1,
-  platform_lifecycle: 1,
+  delivery_plan: 1,
 };
 
 const LEVEL_SCORE: Record<SeverityLevel, number> = {
@@ -73,17 +48,32 @@ export class GapDetectionEngine {
       (d) => d.status === 'confirmed' || d.status === 'locked'
     );
 
-    // Identify areas that are already clear or locked in Overview
-    const clearAreas = new Set<string>();
+    // Identify areas that are clear or locked in Overview
+    const clearOrLockedAreas = new Set<string>();
+    const lockedAreas = new Set<string>();
     for (const section of snapshot.overview.sections) {
+      const normSectionId = this.normalizeArea(section.id);
       if (section.maturity === 'clear' || section.maturity === 'locked') {
-        clearAreas.add(section.id);
+        clearOrLockedAreas.add(normSectionId);
+      }
+      if (section.maturity === 'locked') {
+        lockedAreas.add(normSectionId);
       }
     }
-    const confirmedAreas = new Set(
+
+    const confirmedDecisionKeys = new Set(
       confirmedDecisions
-        .filter((decision) => decision.origin === 'user')
-        .map((decision) => this.normalizeArea(decision.area))
+        .filter((d) => d.decisionKey)
+        .map((d) => this.normalizeDecisionKey(d.decisionKey!))
+    );
+
+    const answeredQuestionKeys = new Set(
+      snapshot.questions.items
+        .filter((q) => q.status === 'answered' || q.status === 'dismissed')
+        .flatMap((q) => [
+          ...(q.decisionKey ? [this.normalizeDecisionKey(q.decisionKey)] : []),
+          ...(q.issueRef ? [this.normalizeDecisionKey(q.issueRef.replace(/^gap:/, ''))] : []),
+        ])
     );
 
     const candidateGapsMap = new Map<string, GapItem>();
@@ -91,21 +81,27 @@ export class GapDetectionEngine {
     // 1. Ingest AI-discovered Gaps (Highest semantic richness)
     if (discoveryResult?.gaps) {
       for (const aiGap of discoveryResult.gaps) {
-        if (this.isAreaCoveredByUserEvidence(snapshot, this.normalizeArea(aiGap.area), clearAreas, confirmedAreas)) {
-          // Area is already closed by confirmed/locked decisions
+        const normArea = this.normalizeArea(aiGap.area);
+        const decisionKey = this.normalizeDecisionKey(aiGap.decision_key || `${normArea}:${aiGap.reason}`);
+
+        if (this.isDecisionKeySatisfied(decisionKey, normArea, lockedAreas, confirmedDecisionKeys, answeredQuestionKeys)) {
           continue;
         }
 
-        const normArea = this.normalizeArea(aiGap.area);
-        const gapId = `gap-ai-${normArea}-${Date.now().toString(36).slice(-4)}`;
+        // Avoid repetitive basic target_user question if user already provided specific audience evidence
+        if (normArea === 'target_user' && this.hasSpecificTargetUserEvidence(snapshot)) {
+          continue;
+        }
 
-        candidateGapsMap.set(normArea, {
+        const gapId = `gap-ai-${normArea}-${Date.now().toString(36).slice(-4)}`;
+        candidateGapsMap.set(decisionKey, {
           id: gapId,
           area: normArea,
+          decisionKey,
+          dependsOn: (aiGap.depends_on || []).map((value) => this.normalizeDecisionKey(value)),
           severity: aiGap.severity || 'high',
           reason: aiGap.reason,
           impact: aiGap.impact,
-          dependency: aiGap.dependency || 'none',
           shouldAskUser: aiGap.should_ask_user ?? true,
           status: 'open',
           source: 'ai',
@@ -118,25 +114,39 @@ export class GapDetectionEngine {
     // 2. Ingest Checklist Hints (Safety net for missing core areas)
     for (const hint of checklistHints) {
       const normArea = this.normalizeArea(hint.area);
-      if (this.isAreaCoveredByUserEvidence(snapshot, normArea, clearAreas, confirmedAreas)) {
+      if (clearOrLockedAreas.has(normArea)) {
+        continue;
+      }
+      if (normArea === 'target_user' && this.hasSpecificTargetUserEvidence(snapshot)) {
+        continue;
+      }
+      const hasDecisionInArea = confirmedDecisions.some((d) => this.normalizeArea(d.area) === normArea);
+      if (hasDecisionInArea) {
+        continue;
+      }
+      const checklistKey = this.normalizeDecisionKey(`checklist:${hint.id}`);
+
+      if (this.isDecisionKeySatisfied(checklistKey, normArea, lockedAreas, confirmedDecisionKeys, answeredQuestionKeys)) {
         continue;
       }
 
-      // Check if decisions already satisfy this specific checklist criterion
-      const hasDecisionInArea = confirmedDecisions.some((d) => this.normalizeArea(d.area) === normArea);
+      // Check if specific checklist criterion is already satisfied by decision key or area evidence
+      const hasSpecificDecision = confirmedDecisions.some((d) =>
+        d.decisionKey && this.normalizeDecisionKey(d.decisionKey) === checklistKey
+      );
 
-      if (!hasDecisionInArea) {
-        const existingCandidate = candidateGapsMap.get(normArea);
+      if (!hasSpecificDecision) {
+        const existingCandidate = [...candidateGapsMap.values()].find((gap) => gap.area === normArea);
         if (!existingCandidate) {
-          // Create new checklist-derived gap
           const gapId = `gap-chk-${normArea}-${hint.id.replace(/^chk-/, '')}`;
-          candidateGapsMap.set(normArea, {
+          candidateGapsMap.set(checklistKey, {
             id: gapId,
             area: normArea,
+            decisionKey: checklistKey,
+            dependsOn: [],
             severity: hint.importance === 'critical' ? 'critical' : hint.importance === 'high' ? 'high' : 'medium',
             reason: `Checklist 标准检查项尚未明确：${hint.criterion}`,
             impact: `影响 ${normArea} 的完整度闭环。`,
-            dependency: 'none',
             shouldAskUser: hint.importance === 'critical' || hint.importance === 'high',
             status: 'open',
             source: 'checklist',
@@ -144,7 +154,7 @@ export class GapDetectionEngine {
             stageRelevance: snapshot.metadata.stage,
           });
         } else {
-          // Merge checklist insight into AI gap if AI gap was lower severity
+          // Merge checklist insight into AI gap if checklist has higher severity
           const hintSevScore = LEVEL_SCORE[hint.importance === 'critical' ? 'critical' : hint.importance === 'high' ? 'high' : 'medium'];
           const aiSevScore = LEVEL_SCORE[existingCandidate.severity];
           if (hintSevScore > aiSevScore) {
@@ -154,17 +164,30 @@ export class GapDetectionEngine {
       }
     }
 
-    // 3. Merge with existing open gaps in state
+    // 3. Merge with existing open gaps in state that are not yet satisfied
     for (const oldGap of existingGaps) {
-      if (oldGap.status === 'open' && !this.isAreaCoveredByUserEvidence(snapshot, this.normalizeArea(oldGap.area), clearAreas, confirmedAreas)) {
+      if (oldGap.status === 'open') {
         const normArea = this.normalizeArea(oldGap.area);
-        if (!candidateGapsMap.has(normArea)) {
-          candidateGapsMap.set(normArea, oldGap);
+        if (normArea === 'target_user' && this.hasSpecificTargetUserEvidence(snapshot)) {
+          continue;
+        }
+        if (clearOrLockedAreas.has(normArea) && oldGap.source === 'checklist') {
+          continue;
+        }
+        const decisionKey = this.normalizeDecisionKey(oldGap.decisionKey || `${normArea}:${oldGap.id}`);
+        if (!this.isDecisionKeySatisfied(decisionKey, normArea, lockedAreas, confirmedDecisionKeys, answeredQuestionKeys)) {
+          if (!candidateGapsMap.has(decisionKey)) {
+            candidateGapsMap.set(decisionKey, { ...oldGap, decisionKey, dependsOn: oldGap.dependsOn || [] });
+          }
         }
       }
     }
 
     return this.prioritizeGaps(Array.from(candidateGapsMap.values()), snapshot.metadata.stage);
+  }
+
+  private normalizeDecisionKey(value: string): string {
+    return value.toLowerCase().trim().replace(/[^a-z0-9_:-]+/g, '_');
   }
 
   /**
@@ -273,25 +296,31 @@ export class GapDetectionEngine {
     return gap.source === 'ai' ? 4 : 0;
   }
 
-  /**
-   * Only user-origin facts close a gap. For the initial free-form idea, use a
-   * small lexical check to avoid asking a target-user question the user has
-   * already explicitly answered in that same input.
-   */
-  private isAreaCoveredByUserEvidence(
-    snapshot: ProjectSnapshot,
+  private isDecisionKeySatisfied(
+    decisionKey: string,
     area: string,
-    clearAreas: Set<string>,
-    confirmedAreas: Set<string>,
+    lockedAreas: Set<string>,
+    confirmedDecisionKeys: Set<string>,
+    answeredQuestionKeys: Set<string>,
   ): boolean {
-    if (clearAreas.has(area) || confirmedAreas.has(area)) return true;
-    if (area !== 'target_user') return false;
+    if (lockedAreas.has(area)) return true;
+    const normKey = this.normalizeDecisionKey(decisionKey);
+    return confirmedDecisionKeys.has(normKey) || answeredQuestionKeys.has(normKey);
+  }
+
+  /**
+   * For the initial free-form idea or early stage, use a
+   * small lexical check to avoid asking a redundant generic target-user question
+   * if the user has already explicitly defined specific audience boundaries.
+   */
+  private hasSpecificTargetUserEvidence(snapshot: ProjectSnapshot): boolean {
     const userEvidence = snapshot.decisions.items
       .filter((decision) => decision.origin === 'user' && (decision.status === 'confirmed' || decision.status === 'locked'))
       .map((decision) => decision.statement.toLowerCase())
       .join(' ');
-    const groupMentioned = /用户|学生|开发者|团队|家长|儿童|企业|商家|customer|student|developer|team|parent|child|business/.test(userEvidence);
-    const audienceIsSpecific = /考研|中国|独立|个人|专业|初学|全职|高校|企业级|小白|beginner|independent|professional|enterprise|full.?time/.test(userEvidence);
+    if (!userEvidence) return false;
+    const groupMentioned = /用户|学生|开发者|团队|家长|儿童|企业|商家|情侣|两个人|二人|customer|student|developer|team|parent|child|business|couple/.test(userEvidence);
+    const audienceIsSpecific = /考研|中国|独立|个人|专业|初学|全职|高校|企业级|小白|专属|私密|两口子|beginner|independent|professional|enterprise|full.?time|private/.test(userEvidence);
     return groupMentioned && audienceIsSpecific;
   }
 
@@ -299,28 +328,6 @@ export class GapDetectionEngine {
    * Normalizes area strings to standard categories.
    */
   private normalizeArea(area: string): string {
-    const clean = area.toLowerCase().trim().replace(/[-\s]+/g, '_');
-    if (clean.includes('tech') || clean.includes('platform') || clean.includes('runtime')) {
-      return 'technical_boundary';
-    }
-    if (clean.includes('target') || clean.includes('persona') || (clean.includes('user') && !clean.includes('flow'))) {
-      return 'target_user';
-    }
-    if (clean.includes('flow') || clean.includes('journey') || clean.includes('feature')) {
-      return 'user_flows';
-    }
-    if (clean.includes('mvp') || clean.includes('scope')) {
-      return 'mvp_scope';
-    }
-    if (clean.includes('security') || clean.includes('privacy') || clean.includes('trust') || clean.includes('ownership')) {
-      return 'trust_safety';
-    }
-    if (clean.includes('ux') || clean.includes('ui') || clean.includes('page')) {
-      return 'ux_ui';
-    }
-    if (clean.includes('overview') || clean.includes('vision') || clean.includes('identity') || clean.includes('problem')) {
-      return 'product_identity';
-    }
-    return clean;
+    return AreaRegistry.normalize(area);
   }
 }

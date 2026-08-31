@@ -92,10 +92,12 @@ describe('Golden Document Review 2 — AI Knowledge Base (AI Application)', () =
     // Initial Compilation
     const compileResult = await orchestrator.compileDocuments(projectPath);
     expect(compileResult.readiness.ready).toBe(true);
-    expect(compileResult.manifest.items.length).toBe(8); // 7 core + AI_SPEC.md
+    expect(compileResult.manifest.items.length).toBe(10); // 8 core + AI_SPEC.md + DESKTOP_SPEC.md
 
-    // Verify AI_SPEC.md exists and has source attribution
-    const aiSpecContent = await storage.readText(join(projectPath, 'docs', 'AI_SPEC.md'));
+    // Verify TECHNICAL_GUIDE.md and specs/AI_SPEC.md exists and has source attribution
+    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
+    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
+    const aiSpecContent = await storage.readText(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'));
     expect(aiSpecContent).toContain('AI & Intelligence Specification');
 
     // Simulate state change (User changes target_user to team developers)

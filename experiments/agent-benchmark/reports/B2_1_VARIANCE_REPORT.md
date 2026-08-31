@@ -1,5 +1,7 @@
 # B2.1 Variance Report
 
+> 历史归档：本文记录 B2.1 阶段实现，不属于当前生产运行时契约。当前唯一活动契约见 `docs/blueprint/12_B3_ADAPTIVE_DISCOVERY.md`。
+
 ## Executive Summary
 
 **Passed.** Run b2-1-variance-2 independently reran case-01, case-03, and

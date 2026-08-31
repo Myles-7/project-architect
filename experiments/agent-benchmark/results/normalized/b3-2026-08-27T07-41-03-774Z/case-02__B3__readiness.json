@@ -1,0 +1,203 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-02",
+  "stage": "readiness",
+  "name": "Markdown Knowledge Base (本地双链知识库) [readiness]",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 28024,
+  "output": {
+    "assumptions": [
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "default-editor-mode",
+        "reason": "大多数用户更习惯流畅的富文本阅读与编辑体验，且已有 ProseMirror 双模方案支撑。",
+        "statement": "默认以所见即所得（WYSIWYG）富文本模式打开笔记，同时提供快捷键或按钮一键切换到 Markdown 源码模式。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "indexing-cache-policy",
+        "rationale": "在没有专用数据库的情况下，满足 1000 篇笔记 ≤ 500ms 的冷启动性能要求。",
+        "statement": "采用本地自动更新的缓存机制来加速笔记元数据（双链关系、标签等）的检索。"
+      },
+      {
+        "area": "ux_ui_direction",
+        "decision_key": "link-rendering-style",
+        "rationale": "增强双链笔记的探索感，方便用户在不跳转的情况下预览关联内容。",
+        "statement": "双链链接在编辑器内支持悬浮预览内容卡片，并用不同的颜色区分已创建和未创建的笔记。"
+      }
+    ],
+    "confirmed": [
+      "所有笔记直接以 .md 文本文件存放在本地目录，零专有数据库",
+      "采用标准 Wikilink [[note]] 双向引用语法",
+      "采用 ProseMirror 配合 markdown-it 实现富文本与源码双模",
+      "基于文件修改时间戳与 sha256 比对检测外部修改"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "cold-start-performance",
+        "depends_on": [],
+        "impact": "直接影响首屏加载的用户体验与交付标准（≤ 500ms）。",
+        "reason": "在零专有数据库的硬约束下，需要确保大量笔记时的加载性能。",
+        "severity": "medium",
+        "should_ask_user": false
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "broken-link-creation",
+        "depends_on": [],
+        "impact": "决定了新建笔记的交互方式和本地文件垃圾率。",
+        "reason": "双链知识库中跳转到不存在的笔记是非常核心的用户路径，其行为直接影响用户的编辑体验和本地文件整洁度。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "user_flows",
+        "decision_key": "conflict-resolution-policy",
+        "depends_on": [],
+        "impact": "关系到数据完整性和编辑体验的连续性。",
+        "reason": "本地文件容易受到外部程序修改，特别是在同步场景下，需要明确冲突时的处理策略。",
+        "severity": "high",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "broken-link-creation",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "软件会在内存中模拟该笔记的存在并允许编辑，只有当您录入内容并保存时，才会在本地磁盘写入文件。这能确保本地目录干净，但技术实现相对复杂，且未保存前外部软件无法访问此链接。",
+            "key": "lazy_create",
+            "label": "仅在输入并保存内容后创建文件",
+            "reversibility": "moderate",
+            "tradeoffs": "保障了磁盘的整洁性，但增加了软件内部状态管理的复杂度。"
+          },
+          {
+            "impact": "点击链接后会立即在本地生成一个空白的 Markdown 文件并跳转。这保证了写作流程的绝对连贯，且外部编辑器能立即同步该文件；但如果操作是误触或随后取消，会在本地磁盘留下无内容的文件碎片。",
+            "key": "immediate_create",
+            "label": "点击链接时立即在本地创建空白文件",
+            "reversibility": "easy",
+            "tradeoffs": "提升了跳转的响应速度和连贯性，但牺牲了文件系统的整洁度。"
+          }
+        ],
+        "question": "当您在编辑器中点击一个尚未创建的笔记链接（例如 [[新笔记]]）时，系统应该如何处理？",
+        "reason": "这决定了用户在构建知识网络时的输入流畅度，以及是否会产生无效的空文件。",
+        "recommendation": "(推荐) 仅在输入并保存内容后创建文件",
+        "recommendation_reason": "作为本地知识库，保持本地目录的干净整洁非常重要，避免自动生成大量空白的垃圾 .md 文件更符合用户对文件控制预期的直觉。",
+        "recommended_option_key": "lazy_create"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "conflict-resolution-policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "检测到冲突时会弹窗提醒，您可以清晰对比本地编辑器和磁盘文件的差异并进行合并。这保证了数据绝对安全，但会在冲突发生时打断您的写作心智。",
+            "key": "manual_merge",
+            "label": "弹出窗口，由用户手动选择保留版本或合并",
+            "reversibility": "easy",
+            "tradeoffs": "提供最高的数据掌控度，但增加了冲突发生时的操作步骤。"
+          },
+          {
+            "impact": "系统静默将冲突的磁盘文件重命名为备份（如 文件名.conflict.md），并直接将编辑器内容写入原文件。这不会打断您的写作流程，但会在本地文件夹生成冗余备份，需要您后续手动清理。",
+            "key": "auto_backup",
+            "label": "自动保留两者：将冲突的磁盘文件重命名备份，直接保存当前编辑",
+            "reversibility": "easy",
+            "tradeoffs": "保障了编辑体验的流畅连贯，但需要用户后期承担清理本地冗余文件的成本。"
+          }
+        ],
+        "question": "当检测到本地文件被外部程序修改（例如网盘同步或外部编辑器修改），且当前编辑器也有未保存的编辑时，系统该如何处理冲突？",
+        "reason": "作为本地知识库，用户经常会结合 Git 或同步网盘使用。明确冲突策略能有效保护用户的内容不被意外覆盖。",
+        "recommendation": "(推荐) 弹出窗口，由用户手动选择保留版本或合并",
+        "recommendation_reason": "笔记内容具有高度主观性，自动生成备份文件容易使本地目录变得混乱，手动确认能确保用户清楚知道内容的变化，最大程度避免误覆盖。",
+        "recommended_option_key": "manual_merge"
+      }
+    ],
+    "risks": [
+      {
+        "area": "technical_boundary",
+        "impact": "若检测和冲突处理机制响应不及时，可能导致用户本地未保存的内容被覆盖丢失。",
+        "risk_key": "external-sync-race-condition",
+        "severity": "high",
+        "statement": "当用户使用网盘（如 iCloud、OneDrive）或 Git 进行多设备同步时，可能在编辑过程中发生文件被外部静默覆盖的情况。"
+      },
+      {
+        "area": "technical_boundary",
+        "impact": "影响应用的响应速度和流畅度，降低用户体验。",
+        "risk_key": "large-file-parsing-delay",
+        "severity": "medium",
+        "statement": "本地存在极个别体积超大（例如数万行）的 Markdown 文件，解析双链和生成语法树时造成界面卡顿。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "本地纯文件存储与实时快速检索之间的平衡",
+        "reason": "不使用任何专用数据库虽然保证了文件的完全独立和无锁，但每一次关系图谱的重建或全文检索都需要读取本地文件，这在文件较多时会增加 CPU 和 I/O 负担。"
+      },
+      {
+        "description": "所见即所得富文本编辑与原生 Markdown 源码编辑之间的切换体验",
+        "reason": "富文本模式通过 ProseMirror 屏蔽了复杂的 Markdown 标记，但在切换回源码模式时，需要保证语法高亮、格式排版以及 Wikilink 解析的一致性，增加了前端实现的复杂度。"
+      }
+    ],
+    "unknowns": [
+      "本地已有的 Markdown 文件夹规模以及用户是否偏好特定的文件夹嵌套层级",
+      "除了标准的 Wikilink 语法，用户是否还需要兼容其他双链格式（如 Org-mode 或 Logseq 风格）"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-02__B3__readiness.json",
+  "usage": {
+    "input_tokens": 13121,
+    "output_tokens": 11892,
+    "thinking_tokens": 10095,
+    "total_tokens": 25013,
+    "cache_read_tokens": 8150
+  },
+  "b3": {
+    "stage": "readiness",
+    "question_count": 2,
+    "candidates_count": 2,
+    "assumptions_count": 1,
+    "gaps_count": 3,
+    "unique_decision_keys": 2,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [readiness]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

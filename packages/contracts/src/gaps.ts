@@ -25,7 +25,12 @@ export interface GapItem {
   severity: SeverityLevel;
   reason: string;
   impact: string;
-  dependency: string;
+  /** @deprecated Legacy compatibility input. New B3 writes use dependsOn. */
+  dependency?: string;
+  /** Stable B3 decision topic. */
+  decisionKey?: string;
+  /** Decision topics that must already be confirmed or locked. */
+  dependsOn?: string[];
   shouldAskUser: boolean;
   status: 'open' | 'questioned' | 'addressed' | 'deferred';
   source?: GapSource;
@@ -67,11 +72,17 @@ export interface GapsState {
 
 export interface RiskItem {
   id: string;                       // e.g. "rsk-01"
+  riskKey?: string;                 // Stable deduplication key
+  area?: string;                    // Target architecture area
   description: string;
+  statement?: string;               // Alias or concise statement
   severity: SeverityLevel;
   impact: string;
-  mitigationDirection: string;
+  mitigationDirection?: string;
   status: 'identified' | 'accepted' | 'mitigated' | 'deferred';
+  turnId?: string;                  // Originating Discovery Turn ID
+  createdAt?: string;               // ISO 8601
+  updatedAt?: string;               // ISO 8601
 }
 
 export interface RisksState {

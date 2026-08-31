@@ -7,6 +7,8 @@ import { FilesView } from '../features/files/FilesView.js';
 import { ReadinessView } from '../features/readiness/ReadinessView.js';
 import { DocumentsView } from '../features/documents/DocumentsView.js';
 import { TimelineView } from '../features/timeline/TimelineView.js';
+import { ProviderDiagnosticsPanel } from '../features/settings/ProviderDiagnosticsPanel.js';
+import { ProjectDiagnosticsView } from '../features/settings/ProjectDiagnosticsView.js';
 
 export const WorkspaceView: React.FC = () => {
   const { state } = useProjectSession();
@@ -41,30 +43,13 @@ export const WorkspaceView: React.FC = () => {
 
       case 'settings':
         return (
-          <div className="max-w-3xl w-full mx-auto space-y-6">
-            <div>
-              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">工作台与项目设置</h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                本地存储路径与运行环境参数
-              </p>
-            </div>
+          <div className="max-w-3xl w-full mx-auto space-y-6 pb-8">
+            <ProviderDiagnosticsPanel
+              projectId={snapshot?.metadata?.projectId}
+              projectPath={snapshot?.metadata ? `projects/${snapshot.metadata.projectId}` : undefined}
+            />
 
-            <div className="p-4 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 space-y-4">
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">项目标识 (Project ID)</div>
-                <div className="text-xs font-mono text-zinc-500">{snapshot?.metadata?.projectId || '未载入'}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">当前版本 (State Revision)</div>
-                <div className="text-xs font-mono text-zinc-500">rev.{snapshot?.metadata?.stateRevision ?? 1}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">本地存储架构</div>
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  本项目完全采用本地目录与两阶段 State Commit 存储，不依赖外部数据库与中心化云端服务。
-                </p>
-              </div>
-            </div>
+            {snapshot && <ProjectDiagnosticsView snapshot={snapshot} />}
           </div>
         );
 

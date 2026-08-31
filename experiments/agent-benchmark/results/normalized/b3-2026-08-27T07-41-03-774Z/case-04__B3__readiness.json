@@ -1,0 +1,216 @@
+{
+  "run_id": "b3-2026-08-27T07-41-03-774Z",
+  "variant": "B3",
+  "case": "case-04",
+  "stage": "readiness",
+  "name": "Local-First Todo App (离线优先待办应用) [readiness]",
+  "success": true,
+  "structured_success": true,
+  "calls_per_case": 1,
+  "duration_ms": 38569,
+  "output": {
+    "assumptions": [
+      {
+        "area": "target_user",
+        "decision_key": "target-user-profile",
+        "reason": "由于采用本地单个 tasks.json 的离线存储方案，不设计云端同步或团队多端协作，单人使用最契合其极简的工具属性。",
+        "statement": "目标用户定位为个人效率极客或单人本地开发者。"
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "data-volume-limit",
+        "reason": "在个人待办应用场景中，活跃与历史任务总量通常较小。在此数据量下，Vite + React 在纯前端内存中进行过滤、状态流转和数据读写即可保证极佳性能，无需引入复杂的数据库索引或本地存储优化。",
+        "statement": "假设用户的任务数据总量在 1000 条以内。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "two-phase-commit-strategy",
+        "rationale": "此策略可确保在修改 tasks.json 的瞬间若遇到系统断电或浏览器崩溃，不会导致原数据文件被截断或损坏，最大程度保护本地数据的完整性。",
+        "statement": "本地两阶段原子提交采用“临时文件写入 + 校验成功后重命名覆盖”的策略。"
+      },
+      {
+        "area": "delivery_plan",
+        "decision_key": "single-file-distribution",
+        "rationale": "这能完全符合无数据库纯静态包单文件发布的验收标准，用户只需获取一个 HTML 文件双击即可在本地离线运行，极其轻量且易于分发。",
+        "statement": "最终打包产物采用单 HTML 文件形式发布（所有 JS/CSS 资源均内嵌）。"
+      }
+    ],
+    "confirmed": [
+      "mvp-core: 核心模型为三状态看板",
+      "tech-stack: 采用 Vite + React",
+      "error-recovery: 每次修改即刻同步 localStorage 作为热备，定期刷新 tasks.json",
+      "data-storage: 数据采用本地单个 tasks.json 原子写入"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "file-access-mode",
+        "depends_on": [],
+        "impact": "直接决定了应用的最终部署方式（是否需要依赖本地命令行脚本）以及用户首次使用时的授权交互流程。",
+        "reason": "Vite + React 作为一个纯静态网页，在无数据库后端的情况下读写本地 tasks.json 文件，需要明确具体的访问与授权机制。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "dependency-control-policy",
+        "depends_on": [],
+        "impact": "直接影响用户在看板上管理任务的工作流灵活性，以及依赖关系约束的强弱。",
+        "reason": "看板的自由拖拽行为与任务依赖的先后顺序约束之间存在天然的产品逻辑冲突，需要明确状态限制的严格程度。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "delivery_plan",
+        "decision_key": "acceptance-static-standard",
+        "depends_on": [],
+        "impact": "可能影响发布阶段构建工具（Vite 插件）的配置方案和最终交付物的格式验收。",
+        "reason": "无数据库纯静态包单文件发布的具体技术打包指标（如是否必须将所有资源打包内联到单个 HTML 文件中）尚未定义。",
+        "severity": "low",
+        "should_ask_user": false
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "file-access-mode",
+        "depends_on": [],
+        "importance": "critical",
+        "options": [
+          {
+            "impact": "用户直接在浏览器中打开静态 HTML 网页，首次使用时通过系统弹窗选择本地的 tasks.json 文件或其所在目录，后续修改将由应用自动原子写入该文件。无需安装任何本地环境，但每次重启浏览器或清除缓存后，需要重新点击授权，且在 Safari 或部分移动端浏览器上不被支持。",
+            "key": "browser-api",
+            "label": "(Recommended) 浏览器原生文件读写 (使用 File System Access API)",
+            "reversibility": "moderate",
+            "tradeoffs": "消除了用户的部署和运行环境门槛，实现了真正的“零安装静态网页”运行；但存在浏览器兼容性限制，且首次使用有授权提示。"
+          },
+          {
+            "impact": "提供一个超轻量的本地运行脚本，启动后会在后台运行一个迷你 API服务，自动代理静态页面并读写 tasks.json。前端页面通过本地 API 与其通信。支持所有浏览器且完全免除授权提示，但用户电脑上必须具备 Node.js/Go 运行环境，且每次使用前需要手动在终端中运行命令行启动服务。",
+            "key": "local-helper-server",
+            "label": "本地命令行微服务辅助 (Node.js/Go CLI 脚本)",
+            "reversibility": "hard",
+            "tradeoffs": "消除了浏览器的兼容性限制，读写静默无感；但用户需要配置运行环境，偏离了纯静态包的极简定位。"
+          },
+          {
+            "impact": "完全避开自动读写限制。用户在界面上点击“导入”上传本地 tasks.json 文件加载数据，修改后点击“保存”通过浏览器下载新的 tasks.json 覆盖本地文件。这兼容所有浏览器和设备，完全无安全限制，但每次保存都需要手动下载并移动替换本地文件，无法实现无缝的“修改即自动同步”体验。",
+            "key": "manual-import-export",
+            "label": "手动导入/导出文件 (传统网页备份)",
+            "reversibility": "easy",
+            "tradeoffs": "实现难度最低，兼容性 100%；但完全牺牲了实时原子写入的无缝体验，用户操作繁琐。"
+          }
+        ],
+        "question": "作为一个纯静态的 Vite + React 网页应用，您希望它如何读写本地的 tasks.json 文件？",
+        "reason": "网页浏览器默认处于安全沙箱中，无法直接自由修改电脑上的本地文件。我们需要确定是采用浏览器原生的 File System Access API（用户手动授权目录/文件），还是打包一个本地的微型脚本辅助读写，这决定了您的安装体验和浏览器兼容性。",
+        "recommendation": "推荐采用【浏览器原生文件读写 (File System Access API)】方案。",
+        "recommendation_reason": "此方案最符合您对“无数据库纯静态包单文件发布”的极简定位。用户无需在电脑上安装 Node.js 或运行任何命令行服务，双击打开 HTML 文件并授权一次即可使用。虽然在 Safari 浏览器中支持较弱，但作为个人本地效率工具，Chrome/Edge 的高支持度已足够满足核心需求。",
+        "recommended_option_key": "browser-api"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "dependency-control-policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "系统不限制卡片的拖拽行为，用户可以将任何子任务移动到“进行中”或“已完成”。但如果其前置依赖未完成，卡片上会显示醒目的警告图标，或者在移动时弹出轻量提示。这极具灵活性，适合个人效率工具多变的场景，但在看板上需要设计直观的依赖冲突 UI。",
+            "key": "soft-warning",
+            "label": "(Recommended) 视觉状态警示 (允许自由拖拽但予以警告)",
+            "reversibility": "easy",
+            "tradeoffs": "保留了看板的最大灵活性和流畅体验，但依赖关系不再具有强制约束力，完全依赖用户的自我约束。"
+          },
+          {
+            "impact": "只要前置依赖任务未移动到“已完成”状态，后续的子任务卡片在看板上就会处于置灰锁定状态，用户无法将其拖拽到“进行中”或“已完成”。这强制保证了执行顺序，但在遇到紧急插单或顺序临时变更时，用户必须先手动修改依赖关系才能继续拖拽，操作灵活性较低。",
+            "key": "hard-block",
+            "label": "严格前置阻塞 (硬性锁定未解锁任务)",
+            "reversibility": "easy",
+            "tradeoffs": "强力保障工作流顺序的正确性，但牺牲了看板拖拽的自由度，可能增加突发情况下的操作摩擦。"
+          }
+        ],
+        "question": "当任务之间存在依赖关系（例如任务 B 依赖未完成的任务 A）时，您希望系统在看板上如何限制任务的流转？",
+        "reason": "任务依赖与看板拖拽结合时，需要明确工作流的控制强度。如果限制过死，可能会阻碍用户的临时调整；如果完全不限制，则依赖关系可能沦为摆设，失去原子提交和顺序控制的实际意义。",
+        "recommendation": "推荐采用【视觉状态警示 (允许自由拖拽但予以警告)】方案。",
+        "recommendation_reason": "作为个人待办工具，灵活性通常高于严格的项目流程管理。允许用户拖拽卡片，但通过高亮或图标警示未完成的前置依赖，既能起到提醒作用，又不会在用户因突发情况需要临时跳过前置任务时产生阻碍。这在保持看板流畅拖拽体验的同时，也保留了依赖关系的可视化辅助价值。",
+        "recommended_option_key": "soft-warning"
+      }
+    ],
+    "risks": [
+      {
+        "area": "technical_boundary",
+        "impact": "用户在原子写入时若遭遇系统异常、文件锁或意外断电，可能导致 tasks.json 文件被截断或内容损坏，造成数据丢失。",
+        "risk_key": "local-write-corruption",
+        "severity": "high",
+        "statement": "在往本地 tasks.json 写入数据时发生意外中断，导致数据文件损坏。"
+      },
+      {
+        "area": "technical_boundary",
+        "impact": "Safari 浏览器或部分移动端浏览器不支持 File System Access API，导致用户在这类设备上无法自动同步写入本地 tasks.json 文件。",
+        "risk_key": "safari-compatibility-risk",
+        "severity": "medium",
+        "statement": "若使用浏览器 File System Access API，在 Safari 或旧版浏览器中无法正常工作。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "本地文件自动原子写入的安全可靠性与“零安装”浏览器纯静态运行之间的权衡。",
+        "reason": "如果想要零安装，浏览器沙箱会限制自动静默写入本地文件；如果想要完全静默无缝原子写入，则需要本地命令行环境支持，这会增加用户的安装 and 使用门槛。"
+      },
+      {
+        "description": "看板界面的直观极简拖拽与任务依赖关系复杂性之间的权衡。",
+        "reason": "看板鼓励直观、没有心智负担的随意拖拽，而任务依赖则引入了顺序约束，过于死板的限制会降低效率，过于宽松的限制又会让依赖失去价值。"
+      }
+    ],
+    "unknowns": [
+      "单文件发布后在用户系统中的具体存放路径和使用入口偏好。",
+      "最终发布验收时，对于单 HTML 文件内嵌所有静态资源（CSS/JS）的体积限制要求。"
+    ]
+  },
+  "raw_path": "D:\\桌面\\项目构思\\experiments\\agent-benchmark\\results\\raw\\b3-2026-08-27T07-41-03-774Z\\case-04__B3__readiness.json",
+  "usage": {
+    "input_tokens": 24961,
+    "output_tokens": 17001,
+    "thinking_tokens": 12187,
+    "total_tokens": 41962,
+    "cache_read_tokens": 22540
+  },
+  "b3": {
+    "stage": "readiness",
+    "question_count": 2,
+    "candidates_count": 2,
+    "assumptions_count": 2,
+    "gaps_count": 3,
+    "unique_decision_keys": 2,
+    "duplicate_keys": 0,
+    "intra_batch_dependency_conflicts": 0,
+    "invalid_recommended_option_keys": 0,
+    "missing_option_keys": 0,
+    "non_chinese_question_fields": 0,
+    "unclear_option_impacts": 0,
+    "locked_overwrites": 0,
+    "leakage_count": 0,
+    "violations": [],
+    "is_valid_contract": true,
+    "manual_reviews": {
+      "reviewer_1": {
+        "reviewer": "Architect_A",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer A verified: questions are distinct, fully independent, and well-tailored for stage [readiness]."
+      },
+      "reviewer_2": {
+        "reviewer": "Architect_B",
+        "relevance": 5,
+        "decisionValue": 5,
+        "independentAnswerability": 5,
+        "clarity": 5,
+        "impactUsefulness": 5,
+        "notes": "Reviewer B verified: option impacts are concrete; recommended keys directly match options."
+      }
+    }
+  }
+}

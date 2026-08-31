@@ -1,5 +1,6 @@
 # Project Architect V1 — Phase 2：Discovery Intelligence 最终验收报告 (Final Validation Report)
 
+> 历史归档：本文记录 B2.1 阶段实现，不属于当前生产运行时契约。当前唯一活动契约见 `docs/blueprint/12_B3_ADAPTIVE_DISCOVERY.md`。
 > **报告时间**：2026-08-23  
 > **所属阶段**：Phase 2 — Discovery Intelligence（核心智能层）  
 > **最终结论**：

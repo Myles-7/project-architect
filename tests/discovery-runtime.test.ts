@@ -94,9 +94,11 @@ describe('Discovery Runtime End-to-End Integration Tests (Phase 2.4)', () => {
     expect(s2.gaps.gaps.length).toBeGreaterThanOrEqual(2);
     expect(s2.gaps.gaps[0]?.area).toBe('target_user');
 
-    // Verify Question Engine: Exactly 1 Critical question produced
-    expect(s2.questions.items.length).toBe(1);
-    const q1 = s2.questions.items[0]!;
+    // Verify B3 initial set is bounded and contains the expected independent root.
+    expect(s2.questions.items.length).toBeGreaterThanOrEqual(2);
+    expect(s2.questions.items.length).toBeLessThanOrEqual(12);
+    expect(new Set(s2.questions.items.map((question) => question.decisionKey)).size).toBe(s2.questions.items.length);
+    const q1 = s2.questions.items.find((question) => question.question.includes('target_user'))!;
     expect(q1.importance).toBe('critical');
     expect(q1.question).toContain('target_user');
     expect(q1.options.length).toBe(2);
@@ -169,7 +171,8 @@ describe('Discovery Runtime End-to-End Integration Tests (Phase 2.4)', () => {
     // Anti-repetition: Question Engine advanced to mvp_scope question!
     const activeQuestion = s4.questions.items.find((q) => q.status === 'proposed');
     expect(activeQuestion).toBeDefined();
-    expect(activeQuestion?.question).toContain('mvp_scope');
+    expect(activeQuestion?.question).toMatch(/[\u3400-\u9fff]/u);
+    expect(activeQuestion?.decisionKey).toContain('mvp_scope');
 
     // Turn 5: User locks a technical constraint & AI introduces conflicting suggestion
     const { decisionRef: lockedDecRef, snapshot: _s5 } = await stateEngine.editOverviewItem(

@@ -1,0 +1,718 @@
+{
+  "stdout": "{\"conversation_id\":\"4e0c3d90-c09f-4c6d-b245-f775455d2911\",\"status\":\"SUCCESS\",\"response\":\"{\\\"assumptions\\\":[{\\\"area\\\":\\\"technical_boundary\\\",\\\"decision_key\\\":\\\"local-file-operations-only\\\",\\\"reason\\\":\\\"本地文件系统读写是 CLI 工具的核心使用场景。支持网络流会极大地增加网络层错误处理、身份验证等复杂性，不符合 MVP 阶段的精简设计。\\\",\\\"statement\\\":\\\"工具仅支持对本地存储设备上的音频文件进行扫描和修改，不支持网络驱动器挂载协议（如 WebDAV）或网络音乐流的整理。\\\"},{\\\"area\\\":\\\"technical_boundary\\\",\\\"decision_key\\\":\\\"metadata-specs-compliance\\\",\\\"reason\\\":\\\"遵循行业主流的标准规范可以确保由本工具修改后的音频元数据，能够被所有通用的本地音乐播放器完美兼容读取。\\\",\\\"statement\\\":\\\"元数据的修改完全遵循 ID3v2.3/v2.4 和 Vorbis Comment 标准规范，不会引入非标准的自定义标签属性。\\\"}],\\\"candidates\\\":[{\\\"area\\\":\\\"core_features\\\",\\\"decision_key\\\":\\\"rule-syntax-placeholder\\\",\\\"rationale\\\":\\\"占位符格式对普通音乐爱好者非常友好，上手快，且足以覆盖 90% 以上按歌手、专辑和音轨号重命名的常规需求。\\\",\\\"statement\\\":\\\"采用类似 `{artist} - {title}` 的花括号占位符格式来表达重命名规则，而不是复杂的正则表达式。\\\"},{\\\"area\\\":\\\"core_features\\\",\\\"decision_key\\\":\\\"cover-format-preservation\\\",\\\"rationale\\\":\\\"这样可以确保提取出的封面图片具有最原始的清晰度，方便用户在其他高质量播放器或展示环境中使用。\\\",\\\"statement\\\":\\\"在提取内嵌封面图片时，保留图片原始的编码格式（如 APIC 标签中的 JPEG 或 PNG），不做强制转码或画质压缩。\\\"}],\\\"confirmed\\\":[\\\"platform-os\\\",\\\"mvp-core\\\",\\\"tech-stack\\\"],\\\"conflicts\\\":[],\\\"gaps\\\":[{\\\"area\\\":\\\"technical_boundary\\\",\\\"decision_key\\\":\\\"error-handling-strategy\\\",\\\"depends_on\\\":[],\\\"impact\\\":\\\"如果直接报错中断，会导致大规模批处理任务频繁中止；如果静默覆盖或跳过，则可能导致数据丢失或文件未整理。\\\",\\\"reason\\\":\\\"尚未明确当重命名冲突（目标文件已存在）或遇到只读文件时，批处理工具的错误处理机制。\\\",\\\"severity\\\":\\\"medium\\\",\\\"should_ask_user\\\":true},{\\\"area\\\":\\\"mvp_scope\\\",\\\"decision_key\\\":\\\"metadata-backup-policy\\\",\\\"depends_on\\\":[],\\\"impact\\\":\\\"关乎音频文件的安全性，不妥善处理可能在写入异常时造成用户文件永久损坏。\\\",\\\"reason\\\":\\\"音频文件直接修改元数据时的写入安全防范策略尚未锁定。\\\",\\\"severity\\\":\\\"high\\\",\\\"should_ask_user\\\":true},{\\\"area\\\":\\\"core_features\\\",\\\"decision_key\\\":\\\"cover-extraction-dest\\\",\\\"depends_on\\\":[],\\\"impact\\\":\\\"不同的保存方式会直接影响本地音乐服务器（如 Plex/Jellyfin）的海报墙刮削兼容性，以及音乐目录的整洁度。\\\",\\\"reason\\\":\\\"内嵌封面图提取后的文件保存位置与去重/覆盖策略尚未确定。\\\",\\\"severity\\\":\\\"low\\\",\\\"should_ask_user\\\":true}],\\\"questions\\\":[{\\\"allow_free_input\\\":true,\\\"decision_key\\\":\\\"error-handling-strategy\\\",\\\"depends_on\\\":[],\\\"importance\\\":\\\"high\\\",\\\"options\\\":[{\\\"impact\\\":\\\"用户在处理过程中拥有最高掌控权，能即时解决冲突。但这也意味着在无人值守的自动化脚本或后台运行时，整个进程会被无限期挂起。\\\",\\\"key\\\":\\\"interactive-prompt\\\",\\\"label\\\":\\\"暂停并弹出交互式提示，让用户手动选择处理方式（如跳过、覆盖或重命名）\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"提供了最高的即时控制力，但牺牲了批处理的自动化和连贯性。\\\"},{\\\"impact\\\":\\\"保证批处理流程绝对流畅且不中断，适合作为脚本或自动化任务运行。但用户无法即时纠正错误，需要在任务结束后根据日志进行手动修复。\\\",\\\"key\\\":\\\"skip-and-report\\\",\\\"label\\\":\\\"自动跳过异常文件并记录，在任务结束时统一输出错误清单（推荐）\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"确保了自动化流程的健壮性，但增加了用户的二次检查成本。\\\"},{\\\"impact\\\":\\\"能够尽可能多地完成整理工作，减少用户手动干预。但在重名冲突时，可能会在硬盘中生成意外的重复音乐版本，导致文件库冗余。\\\",\\\"key\\\":\\\"auto-resolve-suffix\\\",\\\"label\\\":\\\"自动解决（例如对重名文件自动添加数字后缀，对只读文件直接跳过）\\\",\\\"reversibility\\\":\\\"moderate\\\",\\\"tradeoffs\\\":\\\"最大化了任务完成度，但可能会在文件目录中引入脏数据或重复文件。\\\"}],\\\"question\\\":\\\"在批量整理音频文件时，如果遇到文件名冲突（如两个文件重命名后名字相同）或文件只读，CLI 工具应该如何处理？\\\",\\\"reason\\\":\\\"此决策决定了工具在遇到异常时的容错机制。如果策略不明确，在处理大量音乐文件时，可能会因单个文件的权限问题或命名重复而中断整个操作，影响批处理效率。\\\",\\\"recommendation\\\":\\\"(推荐) 自动跳过异常文件并记录错误，在全部处理完成后输出汇总报告。\\\",\\\"recommendation_reason\\\":\\\"这样既能确保大部分文件能顺利整理完毕，又不会让用户遗漏任何错误，方便用户在结束后针对性地手动处理异常文件。\\\",\\\"recommended_option_key\\\":\\\"skip-and-report\\\"},{\\\"allow_free_input\\\":true,\\\"decision_key\\\":\\\"metadata-backup-policy\\\",\\\"depends_on\\\":[],\\\"importance\\\":\\\"high\\\",\\\"options\\\":[{\\\"impact\\\":\\\"提供最高的数据安全保障，即使修改出错或写入中断，用户也能轻松恢复原文件。但这也意味着处理时间会增加一倍，且在磁盘空间紧张时会导致操作直接失败。\\\",\\\"key\\\":\\\"force-bak-files\\\",\\\"label\\\":\\\"在修改前自动在原目录下复制一份备份文件（如生成 .mp3.bak）\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"获得了最安全的恢复保障，但付出了双倍的磁盘空间和显著的处理延迟。\\\"},{\\\"impact\\\":\\\"极大地降低了由于写入中途崩溃导致文件损坏的风险，且不需要额外的存储空间和备份耗时。但如果用户配置的标签整理规则本身写错了，原数据一旦被覆盖将无法通过本工具恢复。\\\",\\\"key\\\":\\\"safe-temp-swap\\\",\\\"label\\\":\\\"默认不备份，但写入时先写入临时文件，成功后再原子性替换原文件（推荐）\\\",\\\"reversibility\\\":\\\"moderate\\\",\\\"tradeoffs\\\":\\\"在不增加磁盘开销的情况下防范了文件损坏，但无法防止用户由于规则配置错误导致的数据覆盖。\\\"},{\\\"impact\\\":\\\"在真正修改音频文件前，在终端打印出所有修改前后的详细对比，并等待用户输入确认。能有效防止规则配错造成的误操作，但会使每次执行都需要人工守候在屏幕前。\\\",\\\"key\\\":\\\"dry-run-preview\\\",\\\"label\\\":\\\"强制或默认展示只读预览（Dry Run），用户手动确认后再真正执行写入\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"提供了完美的防错预览机会，但打破了完全自动化的使用体验。\\\"}],\\\"question\\\":\\\"在对本地音频文件直接修改元数据（ID3/FLAC 标签）前，工具应该采取怎样的文件保护或备份策略？\\\",\\\"reason\\\":\\\"直接修改文件元数据涉及底层二进制的写操作。如果写入中途断电或程序崩溃，可能会导致音频文件损坏无法播放。我们需要在数据安全与操作便利性之间取得平衡。\\\",\\\"recommendation\\\":\\\"(推荐) 默认不自动备份，但写入时采用安全的“写临时文件再替换”机制，且可提供可选择的 --backup 备份参数。\\\",\\\"recommendation_reason\\\":\\\"音频文件体积大，如果默认生成备份文件会占用双倍磁盘空间并使处理速度变慢。采用原子性的安全替换机制既能有效防范写入中断损坏，又不会增加额外的空间与时间负担。\\\",\\\"recommended_option_key\\\":\\\"safe-temp-swap\\\"},{\\\"allow_free_input\\\":true,\\\"decision_key\\\":\\\"cover-extraction-dest\\\",\\\"depends_on\\\":[],\\\"importance\\\":\\\"normal\\\",\\\"options\\\":[{\\\"impact\\\":\\\"最兼容各类本地音乐服务。如果同一个文件夹下有多首来自同一专辑的歌曲，工具只提取一次，避免生成无意义的重复图片。但如果同一文件夹下混杂了不同专辑的歌曲，后提取的封面会覆盖先提取的封面。\\\",\\\"key\\\":\\\"album-cover-same-dir\\\",\\\"label\\\":\\\"提取到音频同目录下，默认命名为 cover.jpg/png（推荐）\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"完美契合按“歌手/专辑/文件夹”整理的音乐库，但在混乱目录中会发生封面覆盖。\\\"},{\\\"impact\\\":\\\"每首音频都会拥有自己绝对独立的封面图片，不会相互覆盖。非常适合杂乱存放音乐的目录。但对于整张专辑的歌曲，会在文件夹里产生大量重复的图片文件，使目录变得非常凌乱。\\\",\\\"key\\\":\\\"track-cover-same-dir\\\",\\\"label\\\":\\\"提取到音频同目录下，以音频文件名命名图片（如 歌曲名-cover.jpg）\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"避免了任何封面覆盖问题，但对于合集或专辑会产生大量无用且重复的图片文件。\\\"},{\\\"impact\\\":\\\"音频文件夹会保持绝对干净，没有任何图片文件。所有提取的封面全部被集中到一个指定的全局目录中（如 --cover-dir）。但某些本地播放器在扫描音乐时可能无法自动关联到这些分离的封面图。\\\",\\\"key\\\":\\\"global-output-dir\\\",\\\"label\\\":\\\"统一保存到指定的全局独立文件夹，以“歌手-专辑.jpg”命名\\\",\\\"reversibility\\\":\\\"easy\\\",\\\"tradeoffs\\\":\\\"保持了音乐目录的极致纯净，但牺牲了某些传统播放器对本地封面的自动识别兼容性。\\\"}],\\\"question\\\":\\\"当从音频文件中提取内嵌封面图片时，提取出来的图片文件应该保存在什么位置？\\\",\\\"reason\\\":\\\"不同的本地音乐服务器（如 Navidrome, Plex, Jellyfin）以及播放器对音乐封面的扫描规则各不相同，不明确这一路径会影响用户海报墙的正常显示。\\\",\\\"recommendation\\\":\\\"(推荐) 提取到音频所在目录下并默认命名为 cover.jpg（同一目录下相同专辑的歌只提取一次）。\\\",\\\"recommendation_reason\\\":\\\"这是最符合主流音乐管理软件和本地播放器的标准规范，且同一专辑只提取一次能有效避免在同目录下产生大量冗余的相同封面图片。\\\",\\\"recommended_option_key\\\":\\\"album-cover-same-dir\\\"}],\\\"risks\\\":[{\\\"area\\\":\\\"user_flows\\\",\\\"impact\\\":\\\"会造成用户本地音乐库的严重混乱，甚至可能导致重名覆盖，原音频文件永久丢失且难以恢复。\\\",\\\"risk_key\\\":\\\"bulk-rename-mistake\\\",\\\"severity\\\":\\\"high\\\",\\\"statement\\\":\\\"用户由于不熟悉占位符或匹配规则，导致成百上千个音频文件被批量重命名为错误的名字或移动到错误的目录层级中。\\\"},{\\\"area\\\":\\\"technical_boundary\\\",\\\"impact\\\":\\\"可能导致音频文件结构损坏，文件变得无法播放且难以修复。\\\",\\\"risk_key\\\":\\\"write-interruption-corruption\\\",\\\"severity\\\":\\\"medium\\\",\\\"statement\\\":\\\"在直接修改大型音频文件（如高码率 FLAC）的元数据时，由于程序被强制关闭、断电或系统故障导致文件写入被意外中断。\\\"}],\\\"tensions\\\":[{\\\"description\\\":\\\"在保证批处理绝对平滑执行的同时，防范由于用户错误的重命名规则导致的文件库混乱。\\\",\\\"reason\\\":\\\"全自动且静默的批处理有利于提高处理效率，但重命名和覆盖操作一旦出错，恢复成本极高。这就需要在“极致流畅自动化”和“多重防错交互提示”之间权衡。\\\"}],\\\"toolAction\\\":\\\"Converging product questions\\\",\\\"toolSummary\\\":\\\"Product converge questions\\\",\\\"unknowns\\\":[\\\"未来是否需要支持除 MP3 和 FLAC 之外的其它音频格式（例如 M4A/AAC, WAV, APE, OGG 等）\\\",\\\"是否需要集成在线音乐元数据数据库（如 MusicBrainz 或网易云音乐 API）以实现自动刮削和补全信息\\\"]}\\n\",\"duration_seconds\":26.4110232,\"num_turns\":1,\"structured_output\":{\"assumptions\":[{\"area\":\"technical_boundary\",\"decision_key\":\"local-file-operations-only\",\"reason\":\"本地文件系统读写是 CLI 工具的核心使用场景。支持网络流会极大地增加网络层错误处理、身份验证等复杂性，不符合 MVP 阶段的精简设计。\",\"statement\":\"工具仅支持对本地存储设备上的音频文件进行扫描和修改，不支持网络驱动器挂载协议（如 WebDAV）或网络音乐流的整理。\"},{\"area\":\"technical_boundary\",\"decision_key\":\"metadata-specs-compliance\",\"reason\":\"遵循行业主流的标准规范可以确保由本工具修改后的音频元数据，能够被所有通用的本地音乐播放器完美兼容读取。\",\"statement\":\"元数据的修改完全遵循 ID3v2.3/v2.4 和 Vorbis Comment 标准规范，不会引入非标准的自定义标签属性。\"}],\"candidates\":[{\"area\":\"core_features\",\"decision_key\":\"rule-syntax-placeholder\",\"rationale\":\"占位符格式对普通音乐爱好者非常友好，上手快，且足以覆盖 90% 以上按歌手、专辑和音轨号重命名的常规需求。\",\"statement\":\"采用类似 `{artist} - {title}` 的花括号占位符格式来表达重命名规则，而不是复杂的正则表达式。\"},{\"area\":\"core_features\",\"decision_key\":\"cover-format-preservation\",\"rationale\":\"这样可以确保提取出的封面图片具有最原始的清晰度，方便用户在其他高质量播放器或展示环境中使用。\",\"statement\":\"在提取内嵌封面图片时，保留图片原始的编码格式（如 APIC 标签中的 JPEG 或 PNG），不做强制转码或画质压缩。\"}],\"confirmed\":[\"platform-os\",\"mvp-core\",\"tech-stack\"],\"conflicts\":[],\"gaps\":[{\"area\":\"technical_boundary\",\"decision_key\":\"error-handling-strategy\",\"depends_on\":[],\"impact\":\"如果直接报错中断，会导致大规模批处理任务频繁中止；如果静默覆盖或跳过，则可能导致数据丢失或文件未整理。\",\"reason\":\"尚未明确当重命名冲突（目标文件已存在）或遇到只读文件时，批处理工具的错误处理机制。\",\"severity\":\"medium\",\"should_ask_user\":true},{\"area\":\"mvp_scope\",\"decision_key\":\"metadata-backup-policy\",\"depends_on\":[],\"impact\":\"关乎音频文件的安全性，不妥善处理可能在写入异常时造成用户文件永久损坏。\",\"reason\":\"音频文件直接修改元数据时的写入安全防范策略尚未锁定。\",\"severity\":\"high\",\"should_ask_user\":true},{\"area\":\"core_features\",\"decision_key\":\"cover-extraction-dest\",\"depends_on\":[],\"impact\":\"不同的保存方式会直接影响本地音乐服务器（如 Plex/Jellyfin）的海报墙刮削兼容性，以及音乐目录的整洁度。\",\"reason\":\"内嵌封面图提取后的文件保存位置与去重/覆盖策略尚未确定。\",\"severity\":\"low\",\"should_ask_user\":true}],\"questions\":[{\"allow_free_input\":true,\"decision_key\":\"error-handling-strategy\",\"depends_on\":[],\"importance\":\"high\",\"options\":[{\"impact\":\"用户在处理过程中拥有最高掌控权，能即时解决冲突。但这也意味着在无人值守的自动化脚本或后台运行时，整个进程会被无限期挂起。\",\"key\":\"interactive-prompt\",\"label\":\"暂停并弹出交互式提示，让用户手动选择处理方式（如跳过、覆盖或重命名）\",\"reversibility\":\"easy\",\"tradeoffs\":\"提供了最高的即时控制力，但牺牲了批处理的自动化和连贯性。\"},{\"impact\":\"保证批处理流程绝对流畅且不中断，适合作为脚本或自动化任务运行。但用户无法即时纠正错误，需要在任务结束后根据日志进行手动修复。\",\"key\":\"skip-and-report\",\"label\":\"自动跳过异常文件并记录，在任务结束时统一输出错误清单（推荐）\",\"reversibility\":\"easy\",\"tradeoffs\":\"确保了自动化流程的健壮性，但增加了用户的二次检查成本。\"},{\"impact\":\"能够尽可能多地完成整理工作，减少用户手动干预。但在重名冲突时，可能会在硬盘中生成意外的重复音乐版本，导致文件库冗余。\",\"key\":\"auto-resolve-suffix\",\"label\":\"自动解决（例如对重名文件自动添加数字后缀，对只读文件直接跳过）\",\"reversibility\":\"moderate\",\"tradeoffs\":\"最大化了任务完成度，但可能会在文件目录中引入脏数据或重复文件。\"}],\"question\":\"在批量整理音频文件时，如果遇到文件名冲突（如两个文件重命名后名字相同）或文件只读，CLI 工具应该如何处理？\",\"reason\":\"此决策决定了工具在遇到异常时的容错机制。如果策略不明确，在处理大量音乐文件时，可能会因单个文件的权限问题或命名重复而中断整个操作，影响批处理效率。\",\"recommendation\":\"(推荐) 自动跳过异常文件并记录错误，在全部处理完成后输出汇总报告。\",\"recommendation_reason\":\"这样既能确保大部分文件能顺利整理完毕，又不会让用户遗漏任何错误，方便用户在结束后针对性地手动处理异常文件。\",\"recommended_option_key\":\"skip-and-report\"},{\"allow_free_input\":true,\"decision_key\":\"metadata-backup-policy\",\"depends_on\":[],\"importance\":\"high\",\"options\":[{\"impact\":\"提供最高的数据安全保障，即使修改出错或写入中断，用户也能轻松恢复原文件。但这也意味着处理时间会增加一倍，且在磁盘空间紧张时会导致操作直接失败。\",\"key\":\"force-bak-files\",\"label\":\"在修改前自动在原目录下复制一份备份文件（如生成 .mp3.bak）\",\"reversibility\":\"easy\",\"tradeoffs\":\"获得了最安全的恢复保障，但付出了双倍的磁盘空间和显著的处理延迟。\"},{\"impact\":\"极大地降低了由于写入中途崩溃导致文件损坏的风险，且不需要额外的存储空间和备份耗时。但如果用户配置的标签整理规则本身写错了，原数据一旦被覆盖将无法通过本工具恢复。\",\"key\":\"safe-temp-swap\",\"label\":\"默认不备份，但写入时先写入临时文件，成功后再原子性替换原文件（推荐）\",\"reversibility\":\"moderate\",\"tradeoffs\":\"在不增加磁盘开销的情况下防范了文件损坏，但无法防止用户由于规则配置错误导致的数据覆盖。\"},{\"impact\":\"在真正修改音频文件前，在终端打印出所有修改前后的详细对比，并等待用户输入确认。能有效防止规则配错造成的误操作，但会使每次执行都需要人工守候在屏幕前。\",\"key\":\"dry-run-preview\",\"label\":\"强制或默认展示只读预览（Dry Run），用户手动确认后再真正执行写入\",\"reversibility\":\"easy\",\"tradeoffs\":\"提供了完美的防错预览机会，但打破了完全自动化的使用体验。\"}],\"question\":\"在对本地音频文件直接修改元数据（ID3/FLAC 标签）前，工具应该采取怎样的文件保护或备份策略？\",\"reason\":\"直接修改文件元数据涉及底层二进制的写操作。如果写入中途断电或程序崩溃，可能会导致音频文件损坏无法播放。我们需要在数据安全与操作便利性之间取得平衡。\",\"recommendation\":\"(推荐) 默认不自动备份，但写入时采用安全的“写临时文件再替换”机制，且可提供可选择的 --backup 备份参数。\",\"recommendation_reason\":\"音频文件体积大，如果默认生成备份文件会占用双倍磁盘空间并使处理速度变慢。采用原子性的安全替换机制既能有效防范写入中断损坏，又不会增加额外的空间与时间负担。\",\"recommended_option_key\":\"safe-temp-swap\"},{\"allow_free_input\":true,\"decision_key\":\"cover-extraction-dest\",\"depends_on\":[],\"importance\":\"normal\",\"options\":[{\"impact\":\"最兼容各类本地音乐服务。如果同一个文件夹下有多首来自同一专辑的歌曲，工具只提取一次，避免生成无意义的重复图片。但如果同一文件夹下混杂了不同专辑的歌曲，后提取的封面会覆盖先提取的封面。\",\"key\":\"album-cover-same-dir\",\"label\":\"提取到音频同目录下，默认命名为 cover.jpg/png（推荐）\",\"reversibility\":\"easy\",\"tradeoffs\":\"完美契合按“歌手/专辑/文件夹”整理的音乐库，但在混乱目录中会发生封面覆盖。\"},{\"impact\":\"每首音频都会拥有自己绝对独立的封面图片，不会相互覆盖。非常适合杂乱存放音乐的目录。但对于整张专辑的歌曲，会在文件夹里产生大量重复的图片文件，使目录变得非常凌乱。\",\"key\":\"track-cover-same-dir\",\"label\":\"提取到音频同目录下，以音频文件名命名图片（如 歌曲名-cover.jpg）\",\"reversibility\":\"easy\",\"tradeoffs\":\"避免了任何封面覆盖问题，但对于合集或专辑会产生大量无用且重复的图片文件。\"},{\"impact\":\"音频文件夹会保持绝对干净，没有任何图片文件。所有提取的封面全部被集中到一个指定的全局目录中（如 --cover-dir）。但某些本地播放器在扫描音乐时可能无法自动关联到这些分离的封面图。\",\"key\":\"global-output-dir\",\"label\":\"统一保存到指定的全局独立文件夹，以“歌手-专辑.jpg”命名\",\"reversibility\":\"easy\",\"tradeoffs\":\"保持了音乐目录的极致纯净，但牺牲了某些传统播放器对本地封面的自动识别兼容性。\"}],\"question\":\"当从音频文件中提取内嵌封面图片时，提取出来的图片文件应该保存在什么位置？\",\"reason\":\"不同的本地音乐服务器（如 Navidrome, Plex, Jellyfin）以及播放器对音乐封面的扫描规则各不相同，不明确这一路径会影响用户海报墙的正常显示。\",\"recommendation\":\"(推荐) 提取到音频所在目录下并默认命名为 cover.jpg（同一目录下相同专辑的歌只提取一次）。\",\"recommendation_reason\":\"这是最符合主流音乐管理软件和本地播放器的标准规范，且同一专辑只提取一次能有效避免在同目录下产生大量冗余的相同封面图片。\",\"recommended_option_key\":\"album-cover-same-dir\"}],\"risks\":[{\"area\":\"user_flows\",\"impact\":\"会造成用户本地音乐库的严重混乱，甚至可能导致重名覆盖，原音频文件永久丢失且难以恢复。\",\"risk_key\":\"bulk-rename-mistake\",\"severity\":\"high\",\"statement\":\"用户由于不熟悉占位符或匹配规则，导致成百上千个音频文件被批量重命名为错误的名字或移动到错误的目录层级中。\"},{\"area\":\"technical_boundary\",\"impact\":\"可能导致音频文件结构损坏，文件变得无法播放且难以修复。\",\"risk_key\":\"write-interruption-corruption\",\"severity\":\"medium\",\"statement\":\"在直接修改大型音频文件（如高码率 FLAC）的元数据时，由于程序被强制关闭、断电或系统故障导致文件写入被意外中断。\"}],\"tensions\":[{\"description\":\"在保证批处理绝对平滑执行的同时，防范由于用户错误的重命名规则导致的文件库混乱。\",\"reason\":\"全自动且静默的批处理有利于提高处理效率，但重命名和覆盖操作一旦出错，恢复成本极高。这就需要在“极致流畅自动化”和“多重防错交互提示”之间权衡。\"}],\"unknowns\":[\"未来是否需要支持除 MP3 和 FLAC 之外的其它音频格式（例如 M4A/AAC, WAV, APE, OGG 等）\",\"是否需要集成在线音乐元数据数据库（如 MusicBrainz 或网易云音乐 API）以实现自动刮削和补全信息\"]},\"json_schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"confirmed\",\"candidates\",\"assumptions\",\"unknowns\",\"risks\",\"gaps\",\"conflicts\",\"tensions\",\"questions\"],\"properties\":{\"confirmed\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"candidates\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"decision_key\",\"area\",\"statement\",\"rationale\"],\"properties\":{\"decision_key\":{\"type\":\"string\",\"minLength\":1},\"area\":{\"type\":\"string\",\"minLength\":1},\"statement\":{\"type\":\"string\",\"minLength\":1},\"rationale\":{\"type\":\"string\",\"minLength\":1}}}},\"assumptions\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"decision_key\",\"area\",\"statement\",\"reason\"],\"properties\":{\"decision_key\":{\"type\":\"string\",\"minLength\":1},\"area\":{\"type\":\"string\",\"minLength\":1},\"statement\":{\"type\":\"string\",\"minLength\":1},\"reason\":{\"type\":\"string\",\"minLength\":1}}}},\"unknowns\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"risks\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"risk_key\",\"area\",\"statement\",\"impact\",\"severity\"],\"properties\":{\"risk_key\":{\"type\":\"string\",\"minLength\":1},\"area\":{\"type\":\"string\",\"minLength\":1},\"statement\":{\"type\":\"string\",\"minLength\":1},\"impact\":{\"type\":\"string\",\"minLength\":1},\"severity\":{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"]}}}},\"conflicts\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"tensions\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"description\",\"reason\"],\"properties\":{\"description\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"}}}},\"gaps\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"decision_key\",\"depends_on\",\"area\",\"severity\",\"reason\",\"impact\",\"should_ask_user\"],\"properties\":{\"decision_key\":{\"type\":\"string\",\"minLength\":1},\"depends_on\":{\"type\":\"array\",\"items\":{\"type\":\"string\"},\"uniqueItems\":true},\"area\":{\"type\":\"string\"},\"severity\":{\"enum\":[\"low\",\"medium\",\"high\",\"critical\"]},\"reason\":{\"type\":\"string\"},\"impact\":{\"type\":\"string\"},\"should_ask_user\":{\"type\":\"boolean\"}}}},\"questions\":{\"type\":\"array\",\"maxItems\":12,\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"decision_key\",\"depends_on\",\"importance\",\"question\",\"reason\",\"recommendation\",\"recommendation_reason\",\"recommended_option_key\",\"options\",\"allow_free_input\"],\"properties\":{\"decision_key\":{\"type\":\"string\",\"minLength\":1},\"depends_on\":{\"type\":\"array\",\"items\":{\"type\":\"string\"},\"uniqueItems\":true},\"importance\":{\"enum\":[\"normal\",\"high\",\"critical\"]},\"question\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"},\"recommendation\":{\"type\":\"string\"},\"recommendation_reason\":{\"type\":\"string\"},\"recommended_option_key\":{\"type\":\"string\",\"minLength\":1},\"options\":{\"type\":\"array\",\"minItems\":2,\"maxItems\":3,\"items\":{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"key\",\"label\",\"impact\"],\"properties\":{\"key\":{\"type\":\"string\",\"minLength\":1},\"label\":{\"type\":\"string\",\"minLength\":1},\"impact\":{\"type\":\"string\",\"minLength\":1},\"tradeoffs\":{\"type\":\"string\"},\"reversibility\":{\"enum\":[\"easy\",\"moderate\",\"hard\"]}}}},\"allow_free_input\":{\"const\":true}}}}}},\"usage\":{\"input_tokens\":21237,\"output_tokens\":14911,\"thinking_tokens\":12123,\"cache_read_tokens\":0,\"total_tokens\":36148}}\n",
+  "stderr": "",
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "timedOut": false,
+  "durationMs": 37046,
+  "envelope": {
+    "conversation_id": "4e0c3d90-c09f-4c6d-b245-f775455d2911",
+    "status": "SUCCESS",
+    "response": "{\"assumptions\":[{\"area\":\"technical_boundary\",\"decision_key\":\"local-file-operations-only\",\"reason\":\"本地文件系统读写是 CLI 工具的核心使用场景。支持网络流会极大地增加网络层错误处理、身份验证等复杂性，不符合 MVP 阶段的精简设计。\",\"statement\":\"工具仅支持对本地存储设备上的音频文件进行扫描和修改，不支持网络驱动器挂载协议（如 WebDAV）或网络音乐流的整理。\"},{\"area\":\"technical_boundary\",\"decision_key\":\"metadata-specs-compliance\",\"reason\":\"遵循行业主流的标准规范可以确保由本工具修改后的音频元数据，能够被所有通用的本地音乐播放器完美兼容读取。\",\"statement\":\"元数据的修改完全遵循 ID3v2.3/v2.4 和 Vorbis Comment 标准规范，不会引入非标准的自定义标签属性。\"}],\"candidates\":[{\"area\":\"core_features\",\"decision_key\":\"rule-syntax-placeholder\",\"rationale\":\"占位符格式对普通音乐爱好者非常友好，上手快，且足以覆盖 90% 以上按歌手、专辑和音轨号重命名的常规需求。\",\"statement\":\"采用类似 `{artist} - {title}` 的花括号占位符格式来表达重命名规则，而不是复杂的正则表达式。\"},{\"area\":\"core_features\",\"decision_key\":\"cover-format-preservation\",\"rationale\":\"这样可以确保提取出的封面图片具有最原始的清晰度，方便用户在其他高质量播放器或展示环境中使用。\",\"statement\":\"在提取内嵌封面图片时，保留图片原始的编码格式（如 APIC 标签中的 JPEG 或 PNG），不做强制转码或画质压缩。\"}],\"confirmed\":[\"platform-os\",\"mvp-core\",\"tech-stack\"],\"conflicts\":[],\"gaps\":[{\"area\":\"technical_boundary\",\"decision_key\":\"error-handling-strategy\",\"depends_on\":[],\"impact\":\"如果直接报错中断，会导致大规模批处理任务频繁中止；如果静默覆盖或跳过，则可能导致数据丢失或文件未整理。\",\"reason\":\"尚未明确当重命名冲突（目标文件已存在）或遇到只读文件时，批处理工具的错误处理机制。\",\"severity\":\"medium\",\"should_ask_user\":true},{\"area\":\"mvp_scope\",\"decision_key\":\"metadata-backup-policy\",\"depends_on\":[],\"impact\":\"关乎音频文件的安全性，不妥善处理可能在写入异常时造成用户文件永久损坏。\",\"reason\":\"音频文件直接修改元数据时的写入安全防范策略尚未锁定。\",\"severity\":\"high\",\"should_ask_user\":true},{\"area\":\"core_features\",\"decision_key\":\"cover-extraction-dest\",\"depends_on\":[],\"impact\":\"不同的保存方式会直接影响本地音乐服务器（如 Plex/Jellyfin）的海报墙刮削兼容性，以及音乐目录的整洁度。\",\"reason\":\"内嵌封面图提取后的文件保存位置与去重/覆盖策略尚未确定。\",\"severity\":\"low\",\"should_ask_user\":true}],\"questions\":[{\"allow_free_input\":true,\"decision_key\":\"error-handling-strategy\",\"depends_on\":[],\"importance\":\"high\",\"options\":[{\"impact\":\"用户在处理过程中拥有最高掌控权，能即时解决冲突。但这也意味着在无人值守的自动化脚本或后台运行时，整个进程会被无限期挂起。\",\"key\":\"interactive-prompt\",\"label\":\"暂停并弹出交互式提示，让用户手动选择处理方式（如跳过、覆盖或重命名）\",\"reversibility\":\"easy\",\"tradeoffs\":\"提供了最高的即时控制力，但牺牲了批处理的自动化和连贯性。\"},{\"impact\":\"保证批处理流程绝对流畅且不中断，适合作为脚本或自动化任务运行。但用户无法即时纠正错误，需要在任务结束后根据日志进行手动修复。\",\"key\":\"skip-and-report\",\"label\":\"自动跳过异常文件并记录，在任务结束时统一输出错误清单（推荐）\",\"reversibility\":\"easy\",\"tradeoffs\":\"确保了自动化流程的健壮性，但增加了用户的二次检查成本。\"},{\"impact\":\"能够尽可能多地完成整理工作，减少用户手动干预。但在重名冲突时，可能会在硬盘中生成意外的重复音乐版本，导致文件库冗余。\",\"key\":\"auto-resolve-suffix\",\"label\":\"自动解决（例如对重名文件自动添加数字后缀，对只读文件直接跳过）\",\"reversibility\":\"moderate\",\"tradeoffs\":\"最大化了任务完成度，但可能会在文件目录中引入脏数据或重复文件。\"}],\"question\":\"在批量整理音频文件时，如果遇到文件名冲突（如两个文件重命名后名字相同）或文件只读，CLI 工具应该如何处理？\",\"reason\":\"此决策决定了工具在遇到异常时的容错机制。如果策略不明确，在处理大量音乐文件时，可能会因单个文件的权限问题或命名重复而中断整个操作，影响批处理效率。\",\"recommendation\":\"(推荐) 自动跳过异常文件并记录错误，在全部处理完成后输出汇总报告。\",\"recommendation_reason\":\"这样既能确保大部分文件能顺利整理完毕，又不会让用户遗漏任何错误，方便用户在结束后针对性地手动处理异常文件。\",\"recommended_option_key\":\"skip-and-report\"},{\"allow_free_input\":true,\"decision_key\":\"metadata-backup-policy\",\"depends_on\":[],\"importance\":\"high\",\"options\":[{\"impact\":\"提供最高的数据安全保障，即使修改出错或写入中断，用户也能轻松恢复原文件。但这也意味着处理时间会增加一倍，且在磁盘空间紧张时会导致操作直接失败。\",\"key\":\"force-bak-files\",\"label\":\"在修改前自动在原目录下复制一份备份文件（如生成 .mp3.bak）\",\"reversibility\":\"easy\",\"tradeoffs\":\"获得了最安全的恢复保障，但付出了双倍的磁盘空间和显著的处理延迟。\"},{\"impact\":\"极大地降低了由于写入中途崩溃导致文件损坏的风险，且不需要额外的存储空间和备份耗时。但如果用户配置的标签整理规则本身写错了，原数据一旦被覆盖将无法通过本工具恢复。\",\"key\":\"safe-temp-swap\",\"label\":\"默认不备份，但写入时先写入临时文件，成功后再原子性替换原文件（推荐）\",\"reversibility\":\"moderate\",\"tradeoffs\":\"在不增加磁盘开销的情况下防范了文件损坏，但无法防止用户由于规则配置错误导致的数据覆盖。\"},{\"impact\":\"在真正修改音频文件前，在终端打印出所有修改前后的详细对比，并等待用户输入确认。能有效防止规则配错造成的误操作，但会使每次执行都需要人工守候在屏幕前。\",\"key\":\"dry-run-preview\",\"label\":\"强制或默认展示只读预览（Dry Run），用户手动确认后再真正执行写入\",\"reversibility\":\"easy\",\"tradeoffs\":\"提供了完美的防错预览机会，但打破了完全自动化的使用体验。\"}],\"question\":\"在对本地音频文件直接修改元数据（ID3/FLAC 标签）前，工具应该采取怎样的文件保护或备份策略？\",\"reason\":\"直接修改文件元数据涉及底层二进制的写操作。如果写入中途断电或程序崩溃，可能会导致音频文件损坏无法播放。我们需要在数据安全与操作便利性之间取得平衡。\",\"recommendation\":\"(推荐) 默认不自动备份，但写入时采用安全的“写临时文件再替换”机制，且可提供可选择的 --backup 备份参数。\",\"recommendation_reason\":\"音频文件体积大，如果默认生成备份文件会占用双倍磁盘空间并使处理速度变慢。采用原子性的安全替换机制既能有效防范写入中断损坏，又不会增加额外的空间与时间负担。\",\"recommended_option_key\":\"safe-temp-swap\"},{\"allow_free_input\":true,\"decision_key\":\"cover-extraction-dest\",\"depends_on\":[],\"importance\":\"normal\",\"options\":[{\"impact\":\"最兼容各类本地音乐服务。如果同一个文件夹下有多首来自同一专辑的歌曲，工具只提取一次，避免生成无意义的重复图片。但如果同一文件夹下混杂了不同专辑的歌曲，后提取的封面会覆盖先提取的封面。\",\"key\":\"album-cover-same-dir\",\"label\":\"提取到音频同目录下，默认命名为 cover.jpg/png（推荐）\",\"reversibility\":\"easy\",\"tradeoffs\":\"完美契合按“歌手/专辑/文件夹”整理的音乐库，但在混乱目录中会发生封面覆盖。\"},{\"impact\":\"每首音频都会拥有自己绝对独立的封面图片，不会相互覆盖。非常适合杂乱存放音乐的目录。但对于整张专辑的歌曲，会在文件夹里产生大量重复的图片文件，使目录变得非常凌乱。\",\"key\":\"track-cover-same-dir\",\"label\":\"提取到音频同目录下，以音频文件名命名图片（如 歌曲名-cover.jpg）\",\"reversibility\":\"easy\",\"tradeoffs\":\"避免了任何封面覆盖问题，但对于合集或专辑会产生大量无用且重复的图片文件。\"},{\"impact\":\"音频文件夹会保持绝对干净，没有任何图片文件。所有提取的封面全部被集中到一个指定的全局目录中（如 --cover-dir）。但某些本地播放器在扫描音乐时可能无法自动关联到这些分离的封面图。\",\"key\":\"global-output-dir\",\"label\":\"统一保存到指定的全局独立文件夹，以“歌手-专辑.jpg”命名\",\"reversibility\":\"easy\",\"tradeoffs\":\"保持了音乐目录的极致纯净，但牺牲了某些传统播放器对本地封面的自动识别兼容性。\"}],\"question\":\"当从音频文件中提取内嵌封面图片时，提取出来的图片文件应该保存在什么位置？\",\"reason\":\"不同的本地音乐服务器（如 Navidrome, Plex, Jellyfin）以及播放器对音乐封面的扫描规则各不相同，不明确这一路径会影响用户海报墙的正常显示。\",\"recommendation\":\"(推荐) 提取到音频所在目录下并默认命名为 cover.jpg（同一目录下相同专辑的歌只提取一次）。\",\"recommendation_reason\":\"这是最符合主流音乐管理软件和本地播放器的标准规范，且同一专辑只提取一次能有效避免在同目录下产生大量冗余的相同封面图片。\",\"recommended_option_key\":\"album-cover-same-dir\"}],\"risks\":[{\"area\":\"user_flows\",\"impact\":\"会造成用户本地音乐库的严重混乱，甚至可能导致重名覆盖，原音频文件永久丢失且难以恢复。\",\"risk_key\":\"bulk-rename-mistake\",\"severity\":\"high\",\"statement\":\"用户由于不熟悉占位符或匹配规则，导致成百上千个音频文件被批量重命名为错误的名字或移动到错误的目录层级中。\"},{\"area\":\"technical_boundary\",\"impact\":\"可能导致音频文件结构损坏，文件变得无法播放且难以修复。\",\"risk_key\":\"write-interruption-corruption\",\"severity\":\"medium\",\"statement\":\"在直接修改大型音频文件（如高码率 FLAC）的元数据时，由于程序被强制关闭、断电或系统故障导致文件写入被意外中断。\"}],\"tensions\":[{\"description\":\"在保证批处理绝对平滑执行的同时，防范由于用户错误的重命名规则导致的文件库混乱。\",\"reason\":\"全自动且静默的批处理有利于提高处理效率，但重命名和覆盖操作一旦出错，恢复成本极高。这就需要在“极致流畅自动化”和“多重防错交互提示”之间权衡。\"}],\"toolAction\":\"Converging product questions\",\"toolSummary\":\"Product converge questions\",\"unknowns\":[\"未来是否需要支持除 MP3 和 FLAC 之外的其它音频格式（例如 M4A/AAC, WAV, APE, OGG 等）\",\"是否需要集成在线音乐元数据数据库（如 MusicBrainz 或网易云音乐 API）以实现自动刮削和补全信息\"]}\n",
+    "duration_seconds": 26.4110232,
+    "num_turns": 1,
+    "structured_output": {
+      "assumptions": [
+        {
+          "area": "technical_boundary",
+          "decision_key": "local-file-operations-only",
+          "reason": "本地文件系统读写是 CLI 工具的核心使用场景。支持网络流会极大地增加网络层错误处理、身份验证等复杂性，不符合 MVP 阶段的精简设计。",
+          "statement": "工具仅支持对本地存储设备上的音频文件进行扫描和修改，不支持网络驱动器挂载协议（如 WebDAV）或网络音乐流的整理。"
+        },
+        {
+          "area": "technical_boundary",
+          "decision_key": "metadata-specs-compliance",
+          "reason": "遵循行业主流的标准规范可以确保由本工具修改后的音频元数据，能够被所有通用的本地音乐播放器完美兼容读取。",
+          "statement": "元数据的修改完全遵循 ID3v2.3/v2.4 和 Vorbis Comment 标准规范，不会引入非标准的自定义标签属性。"
+        }
+      ],
+      "candidates": [
+        {
+          "area": "core_features",
+          "decision_key": "rule-syntax-placeholder",
+          "rationale": "占位符格式对普通音乐爱好者非常友好，上手快，且足以覆盖 90% 以上按歌手、专辑和音轨号重命名的常规需求。",
+          "statement": "采用类似 `{artist} - {title}` 的花括号占位符格式来表达重命名规则，而不是复杂的正则表达式。"
+        },
+        {
+          "area": "core_features",
+          "decision_key": "cover-format-preservation",
+          "rationale": "这样可以确保提取出的封面图片具有最原始的清晰度，方便用户在其他高质量播放器或展示环境中使用。",
+          "statement": "在提取内嵌封面图片时，保留图片原始的编码格式（如 APIC 标签中的 JPEG 或 PNG），不做强制转码或画质压缩。"
+        }
+      ],
+      "confirmed": [
+        "platform-os",
+        "mvp-core",
+        "tech-stack"
+      ],
+      "conflicts": [],
+      "gaps": [
+        {
+          "area": "technical_boundary",
+          "decision_key": "error-handling-strategy",
+          "depends_on": [],
+          "impact": "如果直接报错中断，会导致大规模批处理任务频繁中止；如果静默覆盖或跳过，则可能导致数据丢失或文件未整理。",
+          "reason": "尚未明确当重命名冲突（目标文件已存在）或遇到只读文件时，批处理工具的错误处理机制。",
+          "severity": "medium",
+          "should_ask_user": true
+        },
+        {
+          "area": "mvp_scope",
+          "decision_key": "metadata-backup-policy",
+          "depends_on": [],
+          "impact": "关乎音频文件的安全性，不妥善处理可能在写入异常时造成用户文件永久损坏。",
+          "reason": "音频文件直接修改元数据时的写入安全防范策略尚未锁定。",
+          "severity": "high",
+          "should_ask_user": true
+        },
+        {
+          "area": "core_features",
+          "decision_key": "cover-extraction-dest",
+          "depends_on": [],
+          "impact": "不同的保存方式会直接影响本地音乐服务器（如 Plex/Jellyfin）的海报墙刮削兼容性，以及音乐目录的整洁度。",
+          "reason": "内嵌封面图提取后的文件保存位置与去重/覆盖策略尚未确定。",
+          "severity": "low",
+          "should_ask_user": true
+        }
+      ],
+      "questions": [
+        {
+          "allow_free_input": true,
+          "decision_key": "error-handling-strategy",
+          "depends_on": [],
+          "importance": "high",
+          "options": [
+            {
+              "impact": "用户在处理过程中拥有最高掌控权，能即时解决冲突。但这也意味着在无人值守的自动化脚本或后台运行时，整个进程会被无限期挂起。",
+              "key": "interactive-prompt",
+              "label": "暂停并弹出交互式提示，让用户手动选择处理方式（如跳过、覆盖或重命名）",
+              "reversibility": "easy",
+              "tradeoffs": "提供了最高的即时控制力，但牺牲了批处理的自动化和连贯性。"
+            },
+            {
+              "impact": "保证批处理流程绝对流畅且不中断，适合作为脚本或自动化任务运行。但用户无法即时纠正错误，需要在任务结束后根据日志进行手动修复。",
+              "key": "skip-and-report",
+              "label": "自动跳过异常文件并记录，在任务结束时统一输出错误清单（推荐）",
+              "reversibility": "easy",
+              "tradeoffs": "确保了自动化流程的健壮性，但增加了用户的二次检查成本。"
+            },
+            {
+              "impact": "能够尽可能多地完成整理工作，减少用户手动干预。但在重名冲突时，可能会在硬盘中生成意外的重复音乐版本，导致文件库冗余。",
+              "key": "auto-resolve-suffix",
+              "label": "自动解决（例如对重名文件自动添加数字后缀，对只读文件直接跳过）",
+              "reversibility": "moderate",
+              "tradeoffs": "最大化了任务完成度，但可能会在文件目录中引入脏数据或重复文件。"
+            }
+          ],
+          "question": "在批量整理音频文件时，如果遇到文件名冲突（如两个文件重命名后名字相同）或文件只读，CLI 工具应该如何处理？",
+          "reason": "此决策决定了工具在遇到异常时的容错机制。如果策略不明确，在处理大量音乐文件时，可能会因单个文件的权限问题或命名重复而中断整个操作，影响批处理效率。",
+          "recommendation": "(推荐) 自动跳过异常文件并记录错误，在全部处理完成后输出汇总报告。",
+          "recommendation_reason": "这样既能确保大部分文件能顺利整理完毕，又不会让用户遗漏任何错误，方便用户在结束后针对性地手动处理异常文件。",
+          "recommended_option_key": "skip-and-report"
+        },
+        {
+          "allow_free_input": true,
+          "decision_key": "metadata-backup-policy",
+          "depends_on": [],
+          "importance": "high",
+          "options": [
+            {
+              "impact": "提供最高的数据安全保障，即使修改出错或写入中断，用户也能轻松恢复原文件。但这也意味着处理时间会增加一倍，且在磁盘空间紧张时会导致操作直接失败。",
+              "key": "force-bak-files",
+              "label": "在修改前自动在原目录下复制一份备份文件（如生成 .mp3.bak）",
+              "reversibility": "easy",
+              "tradeoffs": "获得了最安全的恢复保障，但付出了双倍的磁盘空间和显著的处理延迟。"
+            },
+            {
+              "impact": "极大地降低了由于写入中途崩溃导致文件损坏的风险，且不需要额外的存储空间和备份耗时。但如果用户配置的标签整理规则本身写错了，原数据一旦被覆盖将无法通过本工具恢复。",
+              "key": "safe-temp-swap",
+              "label": "默认不备份，但写入时先写入临时文件，成功后再原子性替换原文件（推荐）",
+              "reversibility": "moderate",
+              "tradeoffs": "在不增加磁盘开销的情况下防范了文件损坏，但无法防止用户由于规则配置错误导致的数据覆盖。"
+            },
+            {
+              "impact": "在真正修改音频文件前，在终端打印出所有修改前后的详细对比，并等待用户输入确认。能有效防止规则配错造成的误操作，但会使每次执行都需要人工守候在屏幕前。",
+              "key": "dry-run-preview",
+              "label": "强制或默认展示只读预览（Dry Run），用户手动确认后再真正执行写入",
+              "reversibility": "easy",
+              "tradeoffs": "提供了完美的防错预览机会，但打破了完全自动化的使用体验。"
+            }
+          ],
+          "question": "在对本地音频文件直接修改元数据（ID3/FLAC 标签）前，工具应该采取怎样的文件保护或备份策略？",
+          "reason": "直接修改文件元数据涉及底层二进制的写操作。如果写入中途断电或程序崩溃，可能会导致音频文件损坏无法播放。我们需要在数据安全与操作便利性之间取得平衡。",
+          "recommendation": "(推荐) 默认不自动备份，但写入时采用安全的“写临时文件再替换”机制，且可提供可选择的 --backup 备份参数。",
+          "recommendation_reason": "音频文件体积大，如果默认生成备份文件会占用双倍磁盘空间并使处理速度变慢。采用原子性的安全替换机制既能有效防范写入中断损坏，又不会增加额外的空间与时间负担。",
+          "recommended_option_key": "safe-temp-swap"
+        },
+        {
+          "allow_free_input": true,
+          "decision_key": "cover-extraction-dest",
+          "depends_on": [],
+          "importance": "normal",
+          "options": [
+            {
+              "impact": "最兼容各类本地音乐服务。如果同一个文件夹下有多首来自同一专辑的歌曲，工具只提取一次，避免生成无意义的重复图片。但如果同一文件夹下混杂了不同专辑的歌曲，后提取的封面会覆盖先提取的封面。",
+              "key": "album-cover-same-dir",
+              "label": "提取到音频同目录下，默认命名为 cover.jpg/png（推荐）",
+              "reversibility": "easy",
+              "tradeoffs": "完美契合按“歌手/专辑/文件夹”整理的音乐库，但在混乱目录中会发生封面覆盖。"
+            },
+            {
+              "impact": "每首音频都会拥有自己绝对独立的封面图片，不会相互覆盖。非常适合杂乱存放音乐的目录。但对于整张专辑的歌曲，会在文件夹里产生大量重复的图片文件，使目录变得非常凌乱。",
+              "key": "track-cover-same-dir",
+              "label": "提取到音频同目录下，以音频文件名命名图片（如 歌曲名-cover.jpg）",
+              "reversibility": "easy",
+              "tradeoffs": "避免了任何封面覆盖问题，但对于合集或专辑会产生大量无用且重复的图片文件。"
+            },
+            {
+              "impact": "音频文件夹会保持绝对干净，没有任何图片文件。所有提取的封面全部被集中到一个指定的全局目录中（如 --cover-dir）。但某些本地播放器在扫描音乐时可能无法自动关联到这些分离的封面图。",
+              "key": "global-output-dir",
+              "label": "统一保存到指定的全局独立文件夹，以“歌手-专辑.jpg”命名",
+              "reversibility": "easy",
+              "tradeoffs": "保持了音乐目录的极致纯净，但牺牲了某些传统播放器对本地封面的自动识别兼容性。"
+            }
+          ],
+          "question": "当从音频文件中提取内嵌封面图片时，提取出来的图片文件应该保存在什么位置？",
+          "reason": "不同的本地音乐服务器（如 Navidrome, Plex, Jellyfin）以及播放器对音乐封面的扫描规则各不相同，不明确这一路径会影响用户海报墙的正常显示。",
+          "recommendation": "(推荐) 提取到音频所在目录下并默认命名为 cover.jpg（同一目录下相同专辑的歌只提取一次）。",
+          "recommendation_reason": "这是最符合主流音乐管理软件和本地播放器的标准规范，且同一专辑只提取一次能有效避免在同目录下产生大量冗余的相同封面图片。",
+          "recommended_option_key": "album-cover-same-dir"
+        }
+      ],
+      "risks": [
+        {
+          "area": "user_flows",
+          "impact": "会造成用户本地音乐库的严重混乱，甚至可能导致重名覆盖，原音频文件永久丢失且难以恢复。",
+          "risk_key": "bulk-rename-mistake",
+          "severity": "high",
+          "statement": "用户由于不熟悉占位符或匹配规则，导致成百上千个音频文件被批量重命名为错误的名字或移动到错误的目录层级中。"
+        },
+        {
+          "area": "technical_boundary",
+          "impact": "可能导致音频文件结构损坏，文件变得无法播放且难以修复。",
+          "risk_key": "write-interruption-corruption",
+          "severity": "medium",
+          "statement": "在直接修改大型音频文件（如高码率 FLAC）的元数据时，由于程序被强制关闭、断电或系统故障导致文件写入被意外中断。"
+        }
+      ],
+      "tensions": [
+        {
+          "description": "在保证批处理绝对平滑执行的同时，防范由于用户错误的重命名规则导致的文件库混乱。",
+          "reason": "全自动且静默的批处理有利于提高处理效率，但重命名和覆盖操作一旦出错，恢复成本极高。这就需要在“极致流畅自动化”和“多重防错交互提示”之间权衡。"
+        }
+      ],
+      "unknowns": [
+        "未来是否需要支持除 MP3 和 FLAC 之外的其它音频格式（例如 M4A/AAC, WAV, APE, OGG 等）",
+        "是否需要集成在线音乐元数据数据库（如 MusicBrainz 或网易云音乐 API）以实现自动刮削和补全信息"
+      ]
+    },
+    "json_schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confirmed",
+        "candidates",
+        "assumptions",
+        "unknowns",
+        "risks",
+        "gaps",
+        "conflicts",
+        "tensions",
+        "questions"
+      ],
+      "properties": {
+        "confirmed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "decision_key",
+              "area",
+              "statement",
+              "rationale"
+            ],
+            "properties": {
+              "decision_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "area": {
+                "type": "string",
+                "minLength": 1
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "decision_key",
+              "area",
+              "statement",
+              "reason"
+            ],
+            "properties": {
+              "decision_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "area": {
+                "type": "string",
+                "minLength": 1
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "risk_key",
+              "area",
+              "statement",
+              "impact",
+              "severity"
+            ],
+            "properties": {
+              "risk_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "area": {
+                "type": "string",
+                "minLength": 1
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "impact": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ]
+              }
+            }
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "description",
+              "reason"
+            ],
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "decision_key",
+              "depends_on",
+              "area",
+              "severity",
+              "reason",
+              "impact",
+              "should_ask_user"
+            ],
+            "properties": {
+              "decision_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "depends_on": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              },
+              "area": {
+                "type": "string"
+              },
+              "severity": {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              },
+              "impact": {
+                "type": "string"
+              },
+              "should_ask_user": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "questions": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "decision_key",
+              "depends_on",
+              "importance",
+              "question",
+              "reason",
+              "recommendation",
+              "recommendation_reason",
+              "recommended_option_key",
+              "options",
+              "allow_free_input"
+            ],
+            "properties": {
+              "decision_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "depends_on": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              },
+              "importance": {
+                "enum": [
+                  "normal",
+                  "high",
+                  "critical"
+                ]
+              },
+              "question": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "recommendation": {
+                "type": "string"
+              },
+              "recommendation_reason": {
+                "type": "string"
+              },
+              "recommended_option_key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "options": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "key",
+                    "label",
+                    "impact"
+                  ],
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "impact": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "tradeoffs": {
+                      "type": "string"
+                    },
+                    "reversibility": {
+                      "enum": [
+                        "easy",
+                        "moderate",
+                        "hard"
+                      ]
+                    }
+                  }
+                }
+              },
+              "allow_free_input": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 21237,
+      "output_tokens": 14911,
+      "thinking_tokens": 12123,
+      "cache_read_tokens": 0,
+      "total_tokens": 36148
+    }
+  },
+  "parseError": null,
+  "structuredOutput": {
+    "assumptions": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "local-file-operations-only",
+        "reason": "本地文件系统读写是 CLI 工具的核心使用场景。支持网络流会极大地增加网络层错误处理、身份验证等复杂性，不符合 MVP 阶段的精简设计。",
+        "statement": "工具仅支持对本地存储设备上的音频文件进行扫描和修改，不支持网络驱动器挂载协议（如 WebDAV）或网络音乐流的整理。"
+      },
+      {
+        "area": "technical_boundary",
+        "decision_key": "metadata-specs-compliance",
+        "reason": "遵循行业主流的标准规范可以确保由本工具修改后的音频元数据，能够被所有通用的本地音乐播放器完美兼容读取。",
+        "statement": "元数据的修改完全遵循 ID3v2.3/v2.4 和 Vorbis Comment 标准规范，不会引入非标准的自定义标签属性。"
+      }
+    ],
+    "candidates": [
+      {
+        "area": "core_features",
+        "decision_key": "rule-syntax-placeholder",
+        "rationale": "占位符格式对普通音乐爱好者非常友好，上手快，且足以覆盖 90% 以上按歌手、专辑和音轨号重命名的常规需求。",
+        "statement": "采用类似 `{artist} - {title}` 的花括号占位符格式来表达重命名规则，而不是复杂的正则表达式。"
+      },
+      {
+        "area": "core_features",
+        "decision_key": "cover-format-preservation",
+        "rationale": "这样可以确保提取出的封面图片具有最原始的清晰度，方便用户在其他高质量播放器或展示环境中使用。",
+        "statement": "在提取内嵌封面图片时，保留图片原始的编码格式（如 APIC 标签中的 JPEG 或 PNG），不做强制转码或画质压缩。"
+      }
+    ],
+    "confirmed": [
+      "platform-os",
+      "mvp-core",
+      "tech-stack"
+    ],
+    "conflicts": [],
+    "gaps": [
+      {
+        "area": "technical_boundary",
+        "decision_key": "error-handling-strategy",
+        "depends_on": [],
+        "impact": "如果直接报错中断，会导致大规模批处理任务频繁中止；如果静默覆盖或跳过，则可能导致数据丢失或文件未整理。",
+        "reason": "尚未明确当重命名冲突（目标文件已存在）或遇到只读文件时，批处理工具的错误处理机制。",
+        "severity": "medium",
+        "should_ask_user": true
+      },
+      {
+        "area": "mvp_scope",
+        "decision_key": "metadata-backup-policy",
+        "depends_on": [],
+        "impact": "关乎音频文件的安全性，不妥善处理可能在写入异常时造成用户文件永久损坏。",
+        "reason": "音频文件直接修改元数据时的写入安全防范策略尚未锁定。",
+        "severity": "high",
+        "should_ask_user": true
+      },
+      {
+        "area": "core_features",
+        "decision_key": "cover-extraction-dest",
+        "depends_on": [],
+        "impact": "不同的保存方式会直接影响本地音乐服务器（如 Plex/Jellyfin）的海报墙刮削兼容性，以及音乐目录的整洁度。",
+        "reason": "内嵌封面图提取后的文件保存位置与去重/覆盖策略尚未确定。",
+        "severity": "low",
+        "should_ask_user": true
+      }
+    ],
+    "questions": [
+      {
+        "allow_free_input": true,
+        "decision_key": "error-handling-strategy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "用户在处理过程中拥有最高掌控权，能即时解决冲突。但这也意味着在无人值守的自动化脚本或后台运行时，整个进程会被无限期挂起。",
+            "key": "interactive-prompt",
+            "label": "暂停并弹出交互式提示，让用户手动选择处理方式（如跳过、覆盖或重命名）",
+            "reversibility": "easy",
+            "tradeoffs": "提供了最高的即时控制力，但牺牲了批处理的自动化和连贯性。"
+          },
+          {
+            "impact": "保证批处理流程绝对流畅且不中断，适合作为脚本或自动化任务运行。但用户无法即时纠正错误，需要在任务结束后根据日志进行手动修复。",
+            "key": "skip-and-report",
+            "label": "自动跳过异常文件并记录，在任务结束时统一输出错误清单（推荐）",
+            "reversibility": "easy",
+            "tradeoffs": "确保了自动化流程的健壮性，但增加了用户的二次检查成本。"
+          },
+          {
+            "impact": "能够尽可能多地完成整理工作，减少用户手动干预。但在重名冲突时，可能会在硬盘中生成意外的重复音乐版本，导致文件库冗余。",
+            "key": "auto-resolve-suffix",
+            "label": "自动解决（例如对重名文件自动添加数字后缀，对只读文件直接跳过）",
+            "reversibility": "moderate",
+            "tradeoffs": "最大化了任务完成度，但可能会在文件目录中引入脏数据或重复文件。"
+          }
+        ],
+        "question": "在批量整理音频文件时，如果遇到文件名冲突（如两个文件重命名后名字相同）或文件只读，CLI 工具应该如何处理？",
+        "reason": "此决策决定了工具在遇到异常时的容错机制。如果策略不明确，在处理大量音乐文件时，可能会因单个文件的权限问题或命名重复而中断整个操作，影响批处理效率。",
+        "recommendation": "(推荐) 自动跳过异常文件并记录错误，在全部处理完成后输出汇总报告。",
+        "recommendation_reason": "这样既能确保大部分文件能顺利整理完毕，又不会让用户遗漏任何错误，方便用户在结束后针对性地手动处理异常文件。",
+        "recommended_option_key": "skip-and-report"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "metadata-backup-policy",
+        "depends_on": [],
+        "importance": "high",
+        "options": [
+          {
+            "impact": "提供最高的数据安全保障，即使修改出错或写入中断，用户也能轻松恢复原文件。但这也意味着处理时间会增加一倍，且在磁盘空间紧张时会导致操作直接失败。",
+            "key": "force-bak-files",
+            "label": "在修改前自动在原目录下复制一份备份文件（如生成 .mp3.bak）",
+            "reversibility": "easy",
+            "tradeoffs": "获得了最安全的恢复保障，但付出了双倍的磁盘空间和显著的处理延迟。"
+          },
+          {
+            "impact": "极大地降低了由于写入中途崩溃导致文件损坏的风险，且不需要额外的存储空间和备份耗时。但如果用户配置的标签整理规则本身写错了，原数据一旦被覆盖将无法通过本工具恢复。",
+            "key": "safe-temp-swap",
+            "label": "默认不备份，但写入时先写入临时文件，成功后再原子性替换原文件（推荐）",
+            "reversibility": "moderate",
+            "tradeoffs": "在不增加磁盘开销的情况下防范了文件损坏，但无法防止用户由于规则配置错误导致的数据覆盖。"
+          },
+          {
+            "impact": "在真正修改音频文件前，在终端打印出所有修改前后的详细对比，并等待用户输入确认。能有效防止规则配错造成的误操作，但会使每次执行都需要人工守候在屏幕前。",
+            "key": "dry-run-preview",
+            "label": "强制或默认展示只读预览（Dry Run），用户手动确认后再真正执行写入",
+            "reversibility": "easy",
+            "tradeoffs": "提供了完美的防错预览机会，但打破了完全自动化的使用体验。"
+          }
+        ],
+        "question": "在对本地音频文件直接修改元数据（ID3/FLAC 标签）前，工具应该采取怎样的文件保护或备份策略？",
+        "reason": "直接修改文件元数据涉及底层二进制的写操作。如果写入中途断电或程序崩溃，可能会导致音频文件损坏无法播放。我们需要在数据安全与操作便利性之间取得平衡。",
+        "recommendation": "(推荐) 默认不自动备份，但写入时采用安全的“写临时文件再替换”机制，且可提供可选择的 --backup 备份参数。",
+        "recommendation_reason": "音频文件体积大，如果默认生成备份文件会占用双倍磁盘空间并使处理速度变慢。采用原子性的安全替换机制既能有效防范写入中断损坏，又不会增加额外的空间与时间负担。",
+        "recommended_option_key": "safe-temp-swap"
+      },
+      {
+        "allow_free_input": true,
+        "decision_key": "cover-extraction-dest",
+        "depends_on": [],
+        "importance": "normal",
+        "options": [
+          {
+            "impact": "最兼容各类本地音乐服务。如果同一个文件夹下有多首来自同一专辑的歌曲，工具只提取一次，避免生成无意义的重复图片。但如果同一文件夹下混杂了不同专辑的歌曲，后提取的封面会覆盖先提取的封面。",
+            "key": "album-cover-same-dir",
+            "label": "提取到音频同目录下，默认命名为 cover.jpg/png（推荐）",
+            "reversibility": "easy",
+            "tradeoffs": "完美契合按“歌手/专辑/文件夹”整理的音乐库，但在混乱目录中会发生封面覆盖。"
+          },
+          {
+            "impact": "每首音频都会拥有自己绝对独立的封面图片，不会相互覆盖。非常适合杂乱存放音乐的目录。但对于整张专辑的歌曲，会在文件夹里产生大量重复的图片文件，使目录变得非常凌乱。",
+            "key": "track-cover-same-dir",
+            "label": "提取到音频同目录下，以音频文件名命名图片（如 歌曲名-cover.jpg）",
+            "reversibility": "easy",
+            "tradeoffs": "避免了任何封面覆盖问题，但对于合集或专辑会产生大量无用且重复的图片文件。"
+          },
+          {
+            "impact": "音频文件夹会保持绝对干净，没有任何图片文件。所有提取的封面全部被集中到一个指定的全局目录中（如 --cover-dir）。但某些本地播放器在扫描音乐时可能无法自动关联到这些分离的封面图。",
+            "key": "global-output-dir",
+            "label": "统一保存到指定的全局独立文件夹，以“歌手-专辑.jpg”命名",
+            "reversibility": "easy",
+            "tradeoffs": "保持了音乐目录的极致纯净，但牺牲了某些传统播放器对本地封面的自动识别兼容性。"
+          }
+        ],
+        "question": "当从音频文件中提取内嵌封面图片时，提取出来的图片文件应该保存在什么位置？",
+        "reason": "不同的本地音乐服务器（如 Navidrome, Plex, Jellyfin）以及播放器对音乐封面的扫描规则各不相同，不明确这一路径会影响用户海报墙的正常显示。",
+        "recommendation": "(推荐) 提取到音频所在目录下并默认命名为 cover.jpg（同一目录下相同专辑的歌只提取一次）。",
+        "recommendation_reason": "这是最符合主流音乐管理软件和本地播放器的标准规范，且同一专辑只提取一次能有效避免在同目录下产生大量冗余的相同封面图片。",
+        "recommended_option_key": "album-cover-same-dir"
+      }
+    ],
+    "risks": [
+      {
+        "area": "user_flows",
+        "impact": "会造成用户本地音乐库的严重混乱，甚至可能导致重名覆盖，原音频文件永久丢失且难以恢复。",
+        "risk_key": "bulk-rename-mistake",
+        "severity": "high",
+        "statement": "用户由于不熟悉占位符或匹配规则，导致成百上千个音频文件被批量重命名为错误的名字或移动到错误的目录层级中。"
+      },
+      {
+        "area": "technical_boundary",
+        "impact": "可能导致音频文件结构损坏，文件变得无法播放且难以修复。",
+        "risk_key": "write-interruption-corruption",
+        "severity": "medium",
+        "statement": "在直接修改大型音频文件（如高码率 FLAC）的元数据时，由于程序被强制关闭、断电或系统故障导致文件写入被意外中断。"
+      }
+    ],
+    "tensions": [
+      {
+        "description": "在保证批处理绝对平滑执行的同时，防范由于用户错误的重命名规则导致的文件库混乱。",
+        "reason": "全自动且静默的批处理有利于提高处理效率，但重命名和覆盖操作一旦出错，恢复成本极高。这就需要在“极致流畅自动化”和“多重防错交互提示”之间权衡。"
+      }
+    ],
+    "unknowns": [
+      "未来是否需要支持除 MP3 和 FLAC 之外的其它音频格式（例如 M4A/AAC, WAV, APE, OGG 等）",
+      "是否需要集成在线音乐元数据数据库（如 MusicBrainz 或网易云音乐 API）以实现自动刮削和补全信息"
+    ]
+  },
+  "success": true
+}

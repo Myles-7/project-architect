@@ -6,25 +6,55 @@ export interface DocumentValidationResult {
   warnings: string[];
 }
 
+export interface DocumentValidationOptions {
+  checkPackageCompleteness?: boolean;
+}
+
 export class DocumentValidator {
   /**
    * Validates compiled document text against canonical snapshot truth and checks Source Attribution authenticity.
    */
   validate(
     renderedDocs: Array<{ path: string; content: string }>,
-    snapshot: ProjectSnapshot
+    snapshot: ProjectSnapshot,
+    options: DocumentValidationOptions = {}
   ): DocumentValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // 1. Check for unrendered template placeholders
+    // 1. Check for canonical 8 core documents when package completeness is required
+    if (options.checkPackageCompleteness) {
+      const requiredCorePaths = [
+        'AGENTS.md',
+        'docs/PROJECT.md',
+        'docs/PRODUCT.md',
+        'docs/USER_FLOWS.md',
+        'docs/UX_UI_SPEC.md',
+        'docs/TECHNICAL_GUIDE.md',
+        'docs/DEVELOPMENT_PLAN.md',
+        'docs/ACCEPTANCE.md',
+      ];
+
+      for (const corePath of requiredCorePaths) {
+        if (!renderedDocs.some((d) => d.path === corePath)) {
+          errors.push(`缺少固定核心文档: "${corePath}"。`);
+        }
+      }
+
+      // 2. Check maximum document count cap (Max 13: 8 core + 5 dynamic specs)
+      if (renderedDocs.length > 13) {
+        errors.push(`文档生成数量超额: 包含 ${renderedDocs.length} 份文档，超出最大允许上限 13 份。`);
+      }
+    }
+
+    // 3. Check for unrendered template placeholders
     for (const doc of renderedDocs) {
       if (doc.content.includes('{{') || doc.content.includes('}}')) {
         errors.push(`文档 [${doc.path}] 包含未解析的模板占位符。`);
       }
     }
 
-    // 2. Check that Candidates are NOT marked as [Confirmed: User] or [Locked: User]
+    // 4. Check that Candidates are NOT marked as [Confirmed: User] or [Locked: User]
     const candidateStatements = snapshot.decisions.items
       .filter((d) => d.status === 'candidate')
       .map((d) => d.statement);
@@ -40,7 +70,7 @@ export class DocumentValidator {
       }
     }
 
-    // 3. Check that all Locked decisions are explicitly present in AGENTS.md
+    // 5. Check that all Locked decisions are explicitly present in AGENTS.md (if AGENTS.md is being validated)
     const agentsDoc = renderedDocs.find((d) => d.path === 'AGENTS.md');
     if (agentsDoc) {
       const lockedDecisions = snapshot.decisions.items.filter((d) => d.status === 'locked');
@@ -49,11 +79,9 @@ export class DocumentValidator {
           errors.push(`AGENTS.md 缺少已锁定的核心决策: "${locked.statement}"。`);
         }
       }
-    } else {
-      errors.push('缺少核心入口文件 AGENTS.md。');
     }
 
-    // 4. Source Attribution Authenticity Check
+    // 6. Source Attribution Authenticity Check
     const validDecisionIds = new Set(snapshot.decisions.items.map((d) => d.id));
     const validAssumptionIds = new Set(snapshot.assumptions.items.map((a) => a.id));
 

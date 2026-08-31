@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1787705812508",
+  "gaps": [
+    {
+      "id": "gap-ai-trust_safety-wphg",
+      "area": "trust_safety",
+      "decisionKey": "data_privacy_policy",
+      "dependsOn": [],
+      "severity": "critical",
+      "reason": "学术科研与保密竞赛的输入数据极度敏感，必须明确用户数据的存储与流向政策以建立产品信任。",
+      "impact": "纯本地模式下数据只在本地与直连的 API 之间传输，隐私极佳，但限制了多人协同建模等网络特性。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "critical",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 103,
+      "priority": "critical"
+    },
+    {
+      "id": "gap-ai-target_user-wphg",
+      "area": "target_user",
+      "decisionKey": "human_interaction_mode",
+      "dependsOn": [],
+      "severity": "critical",
+      "reason": "数学公式与代码具有极高严谨性，完全无人干预的自动生成极易在中间步骤跑偏，导致终稿完全不可用。",
+      "impact": "决定了系统架构中是否需要支持复杂的异步任务挂起、恢复和上下文微调机制。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "critical",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "high"
+      },
+      "priorityScore": 100,
+      "priority": "critical"
+    },
+    {
+      "id": "gap-ai-mvp_scope-wphg",
+      "area": "mvp_scope",
+      "decisionKey": "mvp_workflow_scope",
+      "dependsOn": [],
+      "severity": "critical",
+      "reason": "数学建模流程繁冗，若在首个版本中贪多求全，会导致核心建模与论文生成的质量下降并延长交付周期。",
+      "impact": "决定 MVP 的研发成本与发布时间。裁剪掉低频或高不确定性的环节能显著降低开发风险。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "critical",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "high"
+      },
+      "priorityScore": 94,
+      "priority": "critical"
+    },
+    {
+      "id": "gap-01",
+      "area": "target_user",
+      "decisionKey": "target_user:primary_audience",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "项目初始创建，核心目标用户细分画像尚待明确。",
+      "impact": "影响后续 MVP 核心功能优先级。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "high"
+      },
+      "priorityScore": 87,
+      "priority": "critical"
+    },
+    {
+      "id": "gap-ai-产品定位_(product_positioning)-wphg",
+      "area": "产品定位_(product_positioning)",
+      "decisionKey": "target_user_profile",
+      "dependsOn": [],
+      "severity": "critical",
+      "reason": "未定义核心服务的目标用户群体，无法对生成文档的标准与系统的容错率进行合理折中。",
+      "impact": "影响核心工作流和论文排版模板的选择，可能导致产品在竞赛和科研场景下两头不讨好。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "critical",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 84,
+      "priority": "high"
+    },
+    {
+      "id": "gap-chk-user_flows-univ-primary-flow",
+      "area": "user_flows",
+      "decisionKey": "checklist:chk-univ-primary-flow",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "Checklist 标准检查项尚未明确：核心端到端主流程有明确的输入、关键处理分支与交付产物闭环。",
+      "impact": "影响 user_flows 的完整度闭环。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "high"
+      },
+      "priorityScore": 84,
+      "priority": "high"
+    },
+    {
+      "id": "gap-ai-技术边界与安全_(execution_sandbox)-wphg",
+      "area": "技术边界与安全_(execution_sandbox)",
+      "decisionKey": "code_execution_env",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "Agent 需要运行所生成的求解代码来验证正确性并绘制图表，必须确定代码的执行宿主和数据访问边界。",
+      "impact": "本地执行符合 Local-First 理念但要求用户有环境配置能力；云端沙箱无配置障碍但平台运维成本昂贵且有运行限制。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 75,
+      "priority": "high"
+    },
+    {
+      "id": "gap-chk-technical_boundary-univ-platform-choice",
+      "area": "technical_boundary",
+      "decisionKey": "checklist:chk-univ-platform-choice",
+      "dependsOn": [],
+      "severity": "high",
+      "reason": "Checklist 标准检查项尚未明确：明确首发运行平台（如 Windows 桌面、Web 浏览器或 macOS），且符合目标用户使用习惯。",
+      "impact": "影响 technical_boundary 的完整度闭环。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "high",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "high",
+        "stageRelevance": "low"
+      },
+      "priorityScore": 64,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-ai-输出交付物_(deliverables_format)-wphg",
+      "area": "输出交付物_(deliverables_format)",
+      "decisionKey": "paper_output_format",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "用户最终用于提交竞赛或科研发表的成果需要特定物理格式，这直接决定了排版引擎的研发需求。",
+      "impact": "LaTeX 格式公式排版极度专业但需要本地或云端编译器；Word 格式便于大众修改但排版粗糙且不符合多数专业数学竞赛标准。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-ai-商业与运行成本_(business_&_operational_cost)-wphg",
+      "area": "商业与运行成本_(business_&_operational_cost)",
+      "decisionKey": "llm_api_source",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "多 Agent 协同建模流程会产生大量的 Token（大模型文本计费单位）消耗，必须确立 API 费用的承担主体与接入方案。",
+      "impact": "自备 Key (BYOK) 模式零平台成本但用户门槛高；平台统一代理模式体验流畅但面临高额的商业与技术运营开支。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-ai-核心系统架构_(agent_architecture)-wphg",
+      "area": "核心系统架构_(agent_architecture)",
+      "decisionKey": "agent_roles_definition",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "智能体协作的效率取决于分工精细度。角色过多会导致冗余通信与延迟；过少则无法保证各领域的专业产出。",
+      "impact": "直接影响多 Agent 编排框架的设计难度与系统运行速度。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-ai-ux_ui-wphg",
+      "area": "ux_ui",
+      "decisionKey": "model_representation_type",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "公式推导和代码实现是数学建模的两大支柱，需要通过直观的界面排版帮助用户核对两者的映射关系。",
+      "impact": "双栏对照排版直观但界面适配要求高；流式 Notebook（交互式笔记本）混排容易实现但会削弱数学模型的结构化展示。",
+      "shouldAskUser": true,
+      "status": "addressed",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 62,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-chk-acceptance-univ-success-signal",
+      "area": "acceptance",
+      "decisionKey": "checklist:chk-univ-success-signal",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "Checklist 标准检查项尚未明确：项目有一项可被直观验证的完成信号或验收标准。",
+      "impact": "影响 acceptance 的完整度闭环。",
+      "shouldAskUser": false,
+      "status": "open",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "created",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 58,
+      "priority": "medium"
+    }
+  ],
+  "conflicts": [],
+  "tensions": [
+    {
+      "id": "tns-1787705854484-mxun",
+      "description": "完全自动化的建模体验与高准确率要求之间的张力",
+      "reason": "自动化程度越高，用户越容易一键获得结果，但大模型的幻觉以及缺乏人类干预会导致建模细节错误频发，降低结果可用性。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787705854484-zxtd",
+      "description": "本地优先（Local-First）的安全架构与开箱即用（Zero-Config）之间的张力",
+      "reason": "本地运行能最大程度保护用户的学术隐私与数据安全，但需要用户自行配置本地 Python 运行环境与 LaTeX 编译器，大幅提高了软件的使用门槛。",
+      "status": "open"
+    }
+  ],
+  "updatedAt": "2026-08-26T07:58:08.432Z"
+}

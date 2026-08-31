@@ -1,5 +1,6 @@
 # Project Architect V1：Technical Blueprint Review
 
+> 历史归档：本文记录 Phase 0 蓝图审查历史，涉及 B2.1 的预算与单题描述不属于当前生产运行时契约。当前唯一活动契约见 [12_B3_ADAPTIVE_DISCOVERY.md](12_B3_ADAPTIVE_DISCOVERY.md)。
 > 审查对象：[01_PRODUCT_BOUNDARY.md](01_PRODUCT_BOUNDARY.md) 至 [08_DEVELOPMENT_PLAN.md](08_DEVELOPMENT_PLAN.md)，以及必要修订契约 [10_INPUT_MATERIAL_CONTRACT.md](10_INPUT_MATERIAL_CONTRACT.md)  
 > 审查范围：B2.1 一致性、复杂度、个人自用适配性与开发可指导性。  
 > 审查方式：文档一致性与架构契约审查；不重新设计 Prompt、不修改现有 Blueprint。

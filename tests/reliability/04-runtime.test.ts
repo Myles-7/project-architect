@@ -9,7 +9,7 @@ import { SchemaResolver } from '../../packages/agent/src/schemas/SchemaResolver.
 import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import type { DiscoveryResult } from '@project-architect/contracts';
 
-describe('Reliability Suite 4: Agent Runtime & B2.1 Contract Integrity', () => {
+describe('Reliability Suite 4: Agent Runtime & B3 Contract Integrity', () => {
   let tempBaseDir: string;
   let projectPath: string;
   let storage: FileStorage;
@@ -32,7 +32,7 @@ describe('Reliability Suite 4: Agent Runtime & B2.1 Contract Integrity', () => {
     await engine.createProject({
       projectPath,
       name: 'Runtime Verification Project',
-      idea: 'Strict B2.1 execution test',
+      idea: 'Strict B3 execution test',
     });
   });
 
@@ -40,19 +40,19 @@ describe('Reliability Suite 4: Agent Runtime & B2.1 Contract Integrity', () => {
     await rm(tempBaseDir, { recursive: true, force: true });
   });
 
-  it('1. Prompt Integrity: Final prompt includes frozen B2.1 Constitution and mandatory runtime rules', async () => {
+  it('1. Prompt Integrity: Final prompt includes B3 Constitution and mandatory runtime rules', async () => {
     const prompt = await promptLoader.buildPromptText('broad-pass');
-    expect(prompt).toContain('Project Architect Constitution — B2.1 Final Candidate');
-    expect(prompt).toContain('Capability Before Mechanism — Strict Discovery Gate');
-    expect(prompt).toContain('Conflict Strict Mode');
-    expect(prompt).toContain('Mandatory B2.1 Rules');
+    expect(prompt).toContain('Project Architect Constitution — B3 Adaptive Question Sets');
+    expect(prompt).toContain('Capability Before Mechanism');
+    expect(prompt).toContain('Strict Conflict Classification');
+    expect(prompt).toContain('Mandatory B3 Rules');
   });
 
-  it('2. Schema Strictness: SchemaResolver always maps to b2-unified.schema.json across all modes', async () => {
+  it('2. Schema Strictness: SchemaResolver always maps to b3-discovery.schema.json across all modes', async () => {
     const modes = ['idea-analysis', 'gap-analysis', 'question-generation', 'decision-review'] as const;
     for (const mode of modes) {
       const p = await schemaResolver.resolveSchemaPath(mode as any);
-      expect(p.replace(/\\/g, '/')).toContain('experiments/agent-benchmark/schemas/b2-unified.schema.json');
+      expect(p.replace(/\\/g, '/')).toContain('experiments/agent-benchmark/schemas/b3-discovery.schema.json');
     }
   });
 

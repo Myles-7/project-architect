@@ -31,6 +31,12 @@ export interface InputRef {
   errorMessage?: string;
 }
 
+export interface ForkMetadata {
+  sourceProjectId: string;
+  sourceRevision: number;
+  forkedAt: string;
+}
+
 export interface ProjectMetadata {
   schemaVersion: number;
   projectId: string;
@@ -42,4 +48,5 @@ export interface ProjectMetadata {
   inputRefs: InputRef[];
   updatedAt: string;                // ISO 8601
   createdAt: string;                // ISO 8601
+  forkedFrom?: ForkMetadata;
 }

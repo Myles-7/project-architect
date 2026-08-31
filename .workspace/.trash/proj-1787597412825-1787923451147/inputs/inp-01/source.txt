@@ -1,0 +1,31 @@
+可以概括为一套 “Agent 负责判断，Tool 负责执行，Human 负责关键决策，Orchestrator 负责流程” 的人机协同数学建模系统。
+
+角色	暂时设定	核心职责
+Orchestrator	总控	管理流程、状态、阶段跳转、暂停、回退，不做专业建模决策
+Problem Analyst	问题分析 Agent	读题、提取目标/约束、拆分子问题、建立问题依赖关系
+Data Analyst	数据 Agent	判断所需数据、调用工具获取数据、清洗、EDA、解释数据特征
+Model Advisor	模型顾问 Agent	给出多个候选模型、比较优缺点、风险、适用条件和推荐度
+Model Builder	数学建模 Agent	将选定方案转化为变量、假设、公式、目标函数和约束
+Solver Engineer	求解 Agent	将已确认模型实现为代码，调用求解器运行、调参、记录实验
+Validator / Critic	验证与批判 Agent	检查误差、过拟合、稳健性、敏感性、逻辑漏洞，并提出改进方向
+Analyst / Writer	结果与写作 Agent	解释结果、提炼结论、组织图表和论文正文
+Reviewer	审稿 Agent	从评委视角检查逻辑、公式、数据、图表、结论和论文一致性
+
+其中三类角色的边界暂时这样定：
+
+Agent 负责“需要理解、判断、比较、质疑和解释”的工作，例如读题、模型推荐、公式设计、结果解释。Agent 不应该直接替人完成重大选择。
+
+Tool 负责“确定性的执行工作”，例如文件解析、Web/API 数据获取、Python、pandas、sklearn、statsmodels、OR-Tools、CVXPY、Pyomo、pymoo、绘图和论文文件生成。原则是：能可靠用程序完成的事情，优先做 Tool，不额外造 Agent。
+
+Human 负责关键方向决策，例如确认题意、修改子问题、选择数据源、决定异常值处理、选择模型、确认模型假设、决定是否接受验证结果，以及最终论文审核。
+
+整体工作方式暂时是：
+
+Orchestrator 调度 Agent → Agent 调用 Skill / Tool → 生成结构化结果和可视化 → Human 做关键决策 → 写入共享状态 → Orchestrator 决定继续、修改或回退。
+
+因此目前最核心的设计原则可以压缩成四句话：
+
+Orchestrator 管流程。
+Agent 管思考。
+Tool 管执行。
+Human 管决策。
