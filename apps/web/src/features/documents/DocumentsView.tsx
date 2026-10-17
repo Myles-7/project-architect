@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   FileText,
-
   Sparkles,
   Copy,
   Check,
@@ -13,6 +12,12 @@ import {
   Compass,
   Download,
   Terminal,
+  Edit3,
+  Save,
+  FolderOutput,
+  FileEdit,
+  Globe,
+  X,
 } from 'lucide-react';
 import { useProjectSession } from '../../state/ProjectSessionContext.js';
 import { MarkdownRenderer } from '../../components/common/MarkdownRenderer.js';
@@ -23,9 +28,12 @@ import { useToast } from '../../components/common/Toast.js';
 import { ApiClientError } from '../../api/client.js';
 import { downloadZip, type ZipFileEntry } from './exportZip.js';
 import { AgentPromptModal } from './AgentPromptModal.js';
+import { DocumentDiffModal } from './DocumentDiffModal.js';
+import { SpecDriftModal } from '../audit/SpecDriftModal.js';
 import type {
   DocumentListView as DocumentListViewModel,
   DocumentItemView,
+  DocumentDiffItem,
 } from '@project-architect/contracts';
 
 export const DocumentsView: React.FC = () => {
@@ -36,8 +44,12 @@ export const DocumentsView: React.FC = () => {
   const [documentList, setDocumentList] = useState<DocumentListViewModel | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
+  const [isDiffModalOpen, setIsDiffModalOpen] = useState(false);
+  const [detectedDiffs, setDetectedDiffs] = useState<DocumentDiffItem[]>([]);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+  const [isDownloadingHtml, setIsDownloadingHtml] = useState(false);
+  const [isDriftModalOpen, setIsDriftModalOpen] = useState(false);
 
 
   // Document Reader State
@@ -45,8 +57,19 @@ export const DocumentsView: React.FC = () => {
   const [docContent, setDocContent] = useState<string>('');
   const [isLoadingDoc, setIsLoadingDoc] = useState(false);
   const [docError, setDocError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'rendered' | 'raw'>('rendered');
+  const [viewMode, setViewMode] = useState<'rendered' | 'raw' | 'edit'>('rendered');
+  const [isSavingDoc, setIsSavingDoc] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Export to directory state
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportDirectory, setExportDirectory] = useState('');
+  const [isExportingFolder, setIsExportingFolder] = useState(false);
+
+  // Custom Rules / Redlines Injection
+  const [showCustomRulesInput, setShowCustomRulesInput] = useState(false);
+  const [customRulesText, setCustomRulesText] = useState('');
+  const [customNotesText, setCustomNotesText] = useState('');
 
   const fetchDocumentList = useCallback(async () => {
     if (!activeProjectId) return;
@@ -98,15 +121,25 @@ export const DocumentsView: React.FC = () => {
   // Action: Generate Documents (POST /documents/generate)
   // --------------------------------------------------------------------------
 
-  const handleGenerateDocuments = async () => {
+  const handleGenerateDocuments = async (asDraft = false, forceOverwrite = false) => {
     if (!activeProjectId || isGenerating) return;
     const currentRev = stateRevision || 1;
 
     setIsGenerating(true);
     try {
-      await apiClient.generateDocuments(activeProjectId, {
+      const parsedRules = customRulesText
+        .split('\n')
+        .map((r) => r.trim())
+        .filter((r) => r.length > 0);
+
+      const res = await apiClient.generateDocuments(activeProjectId, {
         projectId: activeProjectId,
         expectedRevision: currentRev,
+        customRules: parsedRules.length > 0 ? parsedRules : undefined,
+        customNotes: customNotesText.trim() ? customNotesText.trim() : undefined,
+        autoReApprove: !asDraft,
+        isDraft: asDraft,
+        forceOverwrite,
       });
 
       await refreshSnapshot();
@@ -114,10 +147,30 @@ export const DocumentsView: React.FC = () => {
       if (selectedDocPath) {
         await loadDocumentContent(selectedDocPath);
       }
-      success('成功编译生成包含 AGENTS.md 在内的 8 份核心工程蓝图！', '蓝图生成完成');
+      setIsDiffModalOpen(false);
+      setDetectedDiffs([]);
+
+      if (res.backupPath) {
+        success(
+          `已成功覆盖生成，原文件已自动安全备份至 ${res.backupPath}`,
+          '蓝图重编译完成 (已备份)'
+        );
+      } else {
+        success(
+          asDraft
+            ? '成功编译生成【探索草案】工程蓝图！'
+            : '成功编译生成包含 AGENTS.md 在内的权威工程蓝图！',
+          asDraft ? '草案生成完成' : '蓝图生成完成'
+        );
+      }
     } catch (err: any) {
       if (err instanceof ApiClientError && err.statusCode === 409) {
-        setIsConflictModalOpen(true);
+        if (err.details?.diffs && Array.isArray(err.details.diffs) && err.details.diffs.length > 0) {
+          setDetectedDiffs(err.details.diffs as DocumentDiffItem[]);
+          setIsDiffModalOpen(true);
+        } else {
+          setIsConflictModalOpen(true);
+        }
       } else if (err instanceof ApiClientError && err.statusCode === 422) {
         error(err.message || '当前项目准备度尚未获得用户批准，无法生成文档', '准入门禁拦截');
       } else {
@@ -125,6 +178,39 @@ export const DocumentsView: React.FC = () => {
       }
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSaveDocContent = async () => {
+    if (!activeProjectId || !selectedDocPath || isSavingDoc) return;
+    setIsSavingDoc(true);
+    try {
+      await apiClient.writeDocument(activeProjectId, {
+        docPath: selectedDocPath,
+        content: docContent,
+      });
+      success(`已成功保存对 ${selectedDocPath} 的修改！`, '文档已更新');
+      await fetchDocumentList();
+    } catch (err: any) {
+      error(err.message || '保存文档失败', '操作中断');
+    } finally {
+      setIsSavingDoc(false);
+    }
+  };
+
+  const handleExportToFolder = async () => {
+    if (!activeProjectId || !exportDirectory.trim() || isExportingFolder) return;
+    setIsExportingFolder(true);
+    try {
+      const res = await apiClient.exportDocumentsToPath(activeProjectId, {
+        targetDirectory: exportDirectory.trim(),
+      });
+      success(`已成功将 ${res.copiedCount} 份蓝图同步导出至目标目录：${res.targetDirectory}`, '导出成功');
+      setShowExportModal(false);
+    } catch (err: any) {
+      error(err.message || '导出到目录失败', '操作中断');
+    } finally {
+      setIsExportingFolder(false);
     }
   };
 
@@ -165,6 +251,29 @@ export const DocumentsView: React.FC = () => {
       error(err.message || '打包下载失败', '操作中断');
     } finally {
       setIsDownloadingZip(false);
+    }
+  };
+
+  const handleDownloadHtml = async () => {
+    if (!activeProjectId || isDownloadingHtml) return;
+    setIsDownloadingHtml(true);
+    try {
+      const blob = await apiClient.exportDocumentsHtml(activeProjectId);
+      const cleanProjectName = (snapshot?.metadata?.name || 'project').replace(/[^\w\u4e00-\u9fa5_-]/g, '_');
+      const filename = `${cleanProjectName}-spec.html`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      success(`已成功导出单文件离线交互式规范包 (${filename})`, '导出成功');
+    } catch (err: any) {
+      error(err.message || '导出 HTML 规范包失败', '操作中断');
+    } finally {
+      setIsDownloadingHtml(false);
     }
   };
 
@@ -223,29 +332,123 @@ export const DocumentsView: React.FC = () => {
                 title="将 AGENTS.md 与 docs/ 目录一键打包为 ZIP 下载"
               >
                 <Download className={`w-3.5 h-3.5 ${isDownloadingZip ? 'animate-bounce text-orange-500' : 'text-emerald-500'}`} />
-                <span>{isDownloadingZip ? '正在打包...' : '一键打包下载 (ZIP)'}</span>
+                <span>{isDownloadingZip ? '正在打包...' : '打包下载 (ZIP)'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadHtml}
+                disabled={isDownloadingHtml}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-2xs"
+                title="导出包含所有蓝图、交互式侧边栏、拓扑图与暗色/高亮模式的单文件 HTML 交付包"
+              >
+                <Globe className={`w-3.5 h-3.5 ${isDownloadingHtml ? 'animate-spin text-cyan-500' : 'text-cyan-600 dark:text-cyan-400'}`} />
+                <span>{isDownloadingHtml ? '正在生成 HTML...' : '导出单文件 HTML'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowExportModal(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-2xs"
+                title="直接将蓝图输出至本机某个目标代码仓库路径"
+              >
+                <FolderOutput className="w-3.5 h-3.5 text-blue-500" />
+                <span>输出至本地目录</span>
               </button>
             </>
           )}
 
           <button
             type="button"
-            onClick={handleGenerateDocuments}
-            disabled={isGenerating || !isApproved}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
-            title={!isApproved ? '需先在 Readiness 页面完成用户批准后方可生成' : '一键编译生成完整文档包'}
+            onClick={() => setIsDriftModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-2xs"
+            title="静态审计代码实现是否偏离已锁定规范或引入违禁依赖 (pa verify)"
           >
-            <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
-            <span>
-              {isGenerating
-                ? '正在编译蓝图...'
-                : documentList?.hasCompiledDocs
-                ? '重新编译文档包'
-                : '一键编译生成完整文档包'}
-            </span>
+            <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+            <span>规范漂移审计</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setShowCustomRulesInput(!showCustomRulesInput)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-xs font-medium rounded-xl transition-colors cursor-pointer"
+            title="在编译前插入专属团队规范或工程红线规则"
+          >
+            <span>{showCustomRulesInput ? '收起规范红线' : '自定义红线/规范'}</span>
+          </button>
+
+          {!isApproved ? (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('readiness')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>前往准备度审阅签署</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleGenerateDocuments(true)}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 text-xs font-medium rounded-xl transition-colors cursor-pointer"
+                title="无需等待准备度门禁签署，先行编译探索草案"
+              >
+                <FileEdit className="w-3.5 h-3.5 text-orange-500" />
+                <span>生成草案蓝图 (Draft)</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleGenerateDocuments(false)}
+              disabled={isGenerating}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+              title="一键编译生成完整规范文档包"
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${isGenerating ? 'animate-spin' : ''}`} />
+              <span>
+                {isGenerating
+                  ? '正在编译蓝图...'
+                  : documentList?.hasCompiledDocs
+                  ? '重新编译文档包'
+                  : '一键编译生成完整文档包'}
+              </span>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Custom Rules Input Panel */}
+      {showCustomRulesInput && (
+        <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              插入专属工程红线与自定义开发约束 (直接合并进 AGENTS.md)
+            </span>
+            <span className="text-[11px] text-zinc-400">每行一条规则</span>
+          </div>
+          <textarea
+            value={customRulesText}
+            onChange={(e) => setCustomRulesText(e.target.value)}
+            rows={3}
+            className="w-full p-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-[11px] focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            placeholder="例如：
+- 严禁引入外部未授权第三方 UI 组件库，必须基于 Tailwind 原生搭建
+- 所有持久化数据必须严格使用本地纯文件结构存储，禁止引入 SQLite"
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-zinc-400">团队规范备注 (可选附录)</span>
+          </div>
+          <input
+            type="text"
+            value={customNotesText}
+            onChange={(e) => setCustomNotesText(e.target.value)}
+            className="w-full p-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            placeholder="如：适用于 2026 Q3 企业私有环境部署规范"
+          />
+        </div>
+      )}
 
 
       {/* Manifest Stale Warning if any */}
@@ -256,7 +459,7 @@ export const DocumentsView: React.FC = () => {
             <span>项目决策在生成后已有新演进，当前文档版本可能滞后，建议重新编译。</span>
           </div>
           <button
-            onClick={handleGenerateDocuments}
+            onClick={() => handleGenerateDocuments(false)}
             disabled={isGenerating}
             className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[11px] font-medium hover:bg-amber-700 transition-colors cursor-pointer"
           >
@@ -294,7 +497,7 @@ export const DocumentsView: React.FC = () => {
                   className={`p-3 rounded-xl border transition-all cursor-pointer space-y-1 ${
                     isSelected
                       ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20 shadow-2xs'
-                      : 'border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#17181D] hover:border-zinc-300 dark:hover:border-zinc-700'
+                      : 'border-border-subtle bg-surface-card hover:border-border-default'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -304,19 +507,19 @@ export const DocumentsView: React.FC = () => {
                           isAgentsMd ? 'text-orange-500' : 'text-emerald-600 dark:text-emerald-400'
                         }`}
                       />
-                      <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                      <span className="text-xs font-bold text-text-primary truncate">
                         {doc.title}
                       </span>
                     </div>
 
                     {isAgentsMd && (
-                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                      <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
                         GATEWAY
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+                  <div className="flex items-center justify-between text-xs text-text-muted font-mono">
                     <span className="truncate">{doc.path}</span>
                     {doc.isStale && (
                       <span className="text-amber-600 dark:text-amber-400 font-sans font-medium">
@@ -331,20 +534,20 @@ export const DocumentsView: React.FC = () => {
 
           {/* Right Document Reader Pane */}
           <div className="md:col-span-8">
-            <div className="p-5 rounded-2xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs space-y-4 min-h-[500px] flex flex-col justify-between">
+            <div className="p-5 rounded-2xl bg-surface-card border border-border-subtle shadow-elevation-card space-y-4 min-h-[500px] h-[calc(100vh-200px)] flex flex-col justify-between">
               {/* Reader Header */}
-              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+              <div className="flex items-center justify-between border-b border-border-subtle pb-3">
                 <div className="space-y-0.5 min-w-0 pr-3">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
+                    <h3 className="text-xs sm:text-sm font-bold text-text-primary truncate">
                       {selectedDocItem?.title || selectedDocPath}
                     </h3>
-                    <span className="text-[10px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 rounded">
+                    <span className="text-xs font-mono text-text-muted bg-surface-subtle px-1.5 py-0.5 rounded">
                       {selectedDocPath}
                     </span>
                   </div>
                   {selectedDocItem?.generatedAt && (
-                    <div className="text-[10px] text-zinc-400">
+                    <div className="text-xs text-text-muted">
                       生成时间: {new Date(selectedDocItem.generatedAt).toLocaleString()} · 关联版本: rev.{selectedDocItem.sourceRevision}
                     </div>
                   )}
@@ -373,7 +576,18 @@ export const DocumentsView: React.FC = () => {
                       }`}
                     >
                       <Code className="w-3 h-3" />
-                      <span>Markdown</span>
+                      <span>源码</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('edit')}
+                      className={`px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1 ${
+                        viewMode === 'edit'
+                          ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-2xs'
+                          : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                      }`}
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      <span>编辑</span>
                     </button>
                   </div>
 
@@ -389,7 +603,7 @@ export const DocumentsView: React.FC = () => {
               </div>
 
               {/* Reader Body */}
-              <div className="flex-1 overflow-y-auto max-h-[500px]">
+              <div className="flex-1 min-h-0 overflow-y-auto pr-1">
                 {isLoadingDoc ? (
                   <div className="space-y-3 py-6">
                     <CardSkeleton />
@@ -404,12 +618,81 @@ export const DocumentsView: React.FC = () => {
                   <div className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-sans select-text">
                     <MarkdownRenderer content={docContent} />
                   </div>
-                ) : (
+                ) : viewMode === 'raw' ? (
                   <pre className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-800 dark:text-zinc-200 leading-relaxed overflow-x-auto whitespace-pre-wrap select-text">
                     {docContent}
                   </pre>
+                ) : (
+                  <div className="space-y-3">
+                    <textarea
+                      value={docContent}
+                      onChange={(e) => setDocContent(e.target.value)}
+                      className="w-full h-[380px] p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-zinc-900 dark:text-zinc-100 leading-relaxed focus:outline-hidden focus:ring-1 focus:ring-emerald-500 resize-y"
+                      placeholder="在此直接微调 Markdown 内容..."
+                    />
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveDocContent}
+                        disabled={isSavingDoc}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer shadow-xs"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        <span>{isSavingDoc ? '正在保存...' : '保存修改'}</span>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export to Folder Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                <FolderOutput className="w-4 h-4 text-blue-500" />
+                <span>输出蓝图至本地目录</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+              输入你目标工程的根目录绝对路径（例如 <code>D:\projects\my-app</code>）。系统将把 <code>AGENTS.md</code> 和 <code>docs/</code> 直接写入该目录。
+            </p>
+            <input
+              type="text"
+              value={exportDirectory}
+              onChange={(e) => setExportDirectory(e.target.value)}
+              placeholder="例如：D:\projects\my-app"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500"
+            />
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={handleExportToFolder}
+                disabled={isExportingFolder || !exportDirectory.trim()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-medium rounded-xl transition-colors cursor-pointer shadow-xs"
+              >
+                <FolderOutput className="w-3.5 h-3.5" />
+                <span>{isExportingFolder ? '正在导出...' : '确认同步导出'}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -437,6 +720,21 @@ export const DocumentsView: React.FC = () => {
         }}
         expectedRevision={stateRevision || undefined}
         serverRevision={snapshot?.metadata?.stateRevision || undefined}
+      />
+
+      {/* Document Diff Guard Modal (P2 Feature) */}
+      <DocumentDiffModal
+        isOpen={isDiffModalOpen}
+        onClose={() => setIsDiffModalOpen(false)}
+        diffs={detectedDiffs}
+        onForceOverwrite={() => handleGenerateDocuments(false, true)}
+        isOverwriting={isGenerating}
+      />
+
+      {/* Spec-Drift Auditor Modal (方案 8) */}
+      <SpecDriftModal
+        isOpen={isDriftModalOpen}
+        onClose={() => setIsDriftModalOpen(false)}
       />
     </div>
   );

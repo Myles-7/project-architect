@@ -47,6 +47,8 @@ import {
   type UnlockDecisionRequest,
   type EditOverviewItemRequest,
   type EditOverviewItemResponse,
+  type DeprecateDecisionRequest,
+  type DeprecateDecisionResponse,
   type RunReadinessReviewRequest,
   type RunReadinessReviewResponse,
   type ApproveDevelopmentPackageRequest,
@@ -54,6 +56,12 @@ import {
   type GenerateDocumentsResponse,
   type ReadDocumentRequest,
   type ReadDocumentResponse,
+  type ImportProjectResponse,
+  type GetContextDiagnosticsResponse,
+  type ProjectPreset,
+  type DecisionGraphView,
+  type CascadeImpactResult,
+  type DiagramsResult,
   type RenameProjectResponse,
   type DuplicateProjectResponse,
   type ToggleProjectArchiveResponse,
@@ -64,6 +72,26 @@ import {
   type OpenProjectFolderResponse,
   type ProviderHealthResponse,
   type ToggleInputExclusionResponse,
+  type RetractQuestionRequest,
+  type RetractQuestionResponse,
+  type ValidatePathRequest,
+  type ValidatePathResponse,
+  type ListDirectoriesResponse,
+  type StandaloneHtmlExportResult,
+  type CodebaseAnalysisResult,
+  type BrownfieldCandidateDecision,
+  type SpecDriftReport,
+  type PlanningView,
+  type PlanningHistoryView,
+  type PlanningRun,
+  type PlanningEvent,
+  type StartPlanningRequest,
+  type QuestionAnswerIntent,
+  type ChangeGroup,
+  type ApproveChangeSetRequest,
+  type PlanningRuntimeConfig,
+  type PlanningPackageManifest,
+  type ProjectPlanningDiagnostics,
 } from '@project-architect/contracts';
 
 export class ApiClientError extends Error {
@@ -136,11 +164,14 @@ export class ProjectArchitectApiClient {
       throw new ApiClientError(response.status, undefined, `服务端响应非有效 JSON (HTTP ${response.status})`);
     }
 
+    if (!json || typeof json !== 'object' || Array.isArray(json) || typeof json.success !== 'boolean') {
+      throw new ApiClientError(response.status, undefined, 'API 响应格式无效，请重新读取');
+    }
     if (!response.ok || !json.success) {
       throw new ApiClientError(response.status, json.error, json.error?.message);
     }
 
-    if (json.data === undefined) {
+    if (json.data === undefined || json.data === null) {
       throw new ApiClientError(
         response.status,
         json.error,
@@ -163,8 +194,9 @@ export class ProjectArchitectApiClient {
     return res.data;
   }
 
-  public async listRecentProjects(signal?: AbortSignal): Promise<RecentProjectItem[]> {
-    const res = await this.request<ListRecentProjectsResponse>('/api/projects', { method: 'GET' }, signal);
+  public async listRecentProjects(signal?: AbortSignal, includeTrashed = false): Promise<RecentProjectItem[]> {
+    const res = await this.request<ListRecentProjectsResponse>(includeTrashed ? '/api/projects?includeTrashed=true' : '/api/projects', { method: 'GET' }, signal);
+    if (!Array.isArray(res.data.projects) || !res.data.projects.every(item => item && typeof item.projectId === 'string' && typeof item.name === 'string')) throw new ApiClientError(200, undefined, '项目列表格式无效，请重新读取');
     return res.data.projects;
   }
 
@@ -207,6 +239,7 @@ export class ProjectArchitectApiClient {
       { method: 'GET' },
       signal
     );
+    if (!res.data.snapshot?.metadata || !Array.isArray(res.data.snapshot.questions?.items) || !Array.isArray(res.data.snapshot.decisions?.items)) throw new ApiClientError(200, undefined, '项目状态格式无效，请重新读取');
     return res.data.snapshot;
   }
 
@@ -422,6 +455,22 @@ export class ProjectArchitectApiClient {
     return res.data;
   }
 
+  public async retractQuestion(
+    projectId: string,
+    req: RetractQuestionRequest,
+    signal?: AbortSignal
+  ): Promise<RetractQuestionResponse> {
+    const res = await this.request<RetractQuestionResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/questions/retract`,
+      {
+        method: 'POST',
+        body: JSON.stringify(req),
+      },
+      signal
+    );
+    return res.data;
+  }
+
   public async confirmDecision(
     projectId: string,
     req: ConfirmDecisionRequest,
@@ -554,6 +603,54 @@ export class ProjectArchitectApiClient {
     return res.data;
   }
 
+  public async writeDocument(
+    projectId: string,
+    req: { docPath: string; content: string },
+    signal?: AbortSignal
+  ): Promise<{ docPath: string; saved: boolean }> {
+    const res = await this.request<{ docPath: string; saved: boolean }>(
+      `/api/projects/${encodeURIComponent(projectId)}/documents/write`,
+      {
+        method: 'POST',
+        body: JSON.stringify(req),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async exportDocumentsToPath(
+    projectId: string,
+    req: { targetDirectory: string },
+    signal?: AbortSignal
+  ): Promise<{ targetDirectory: string; copiedCount: number }> {
+    const res = await this.request<{ targetDirectory: string; copiedCount: number }>(
+      `/api/projects/${encodeURIComponent(projectId)}/documents/export-to-path`,
+      {
+        method: 'POST',
+        body: JSON.stringify(req),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async rollbackProject(
+    projectId: string,
+    targetRevision: number,
+    signal?: AbortSignal
+  ): Promise<{ snapshot: ProjectSnapshot }> {
+    const res = await this.request<{ snapshot: ProjectSnapshot }>(
+      `/api/projects/${encodeURIComponent(projectId)}/rollback`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ targetRevision }),
+      },
+      signal
+    );
+    return res.data;
+  }
+
   // Project Management Lifecycle
   public async renameProject(
     projectId: string,
@@ -673,6 +770,331 @@ export class ProjectArchitectApiClient {
       signal
     );
     return res.data;
+  }
+
+  public async deprecateDecision(
+    projectId: string,
+    payload: DeprecateDecisionRequest,
+    signal?: AbortSignal
+  ): Promise<DeprecateDecisionResponse> {
+    const res = await this.request<DeprecateDecisionResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/decisions/deprecate`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async exportProject(projectId: string, signal?: AbortSignal): Promise<Blob> {
+    const url = `${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/export`;
+    const fetchFn = this.customFetch || fetch;
+    const response = await fetchFn(url, { signal });
+    if (!response.ok) {
+      throw new ApiClientError(response.status, undefined, '导出项目失败');
+    }
+    return response.blob();
+  }
+
+  public async importProject(
+    contentBase64: string,
+    signal?: AbortSignal
+  ): Promise<ImportProjectResponse> {
+    const res = await this.request<ImportProjectResponse>(
+      '/api/projects/import',
+      {
+        method: 'POST',
+        body: JSON.stringify({ contentBase64 }),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getContextDiagnostics(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<GetContextDiagnosticsResponse> {
+    const res = await this.request<GetContextDiagnosticsResponse>(
+      `/api/projects/${encodeURIComponent(projectId)}/diagnostics/context`,
+      undefined,
+      signal
+    );
+    return res.data;
+  }
+
+  // ==========================================================================
+  // 8. Filesystem Helper APIs
+  // ==========================================================================
+
+  public async listDirectories(
+    path?: string,
+    signal?: AbortSignal
+  ): Promise<ListDirectoriesResponse> {
+    const query = path ? `?path=${encodeURIComponent(path)}` : '';
+    const res = await this.request<ListDirectoriesResponse>(
+      `/api/fs/directories${query}`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async validatePath(
+    req: ValidatePathRequest,
+    signal?: AbortSignal
+  ): Promise<ValidatePathResponse> {
+    const res = await this.request<ValidatePathResponse>(
+      `/api/fs/validate-path`,
+      {
+        method: 'POST',
+        body: JSON.stringify(req),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  // ==========================================================================
+  // 9. Stage S1 APIs (Presets, DAG, Diagrams)
+  // ==========================================================================
+
+  public async getPresets(signal?: AbortSignal): Promise<ProjectPreset[]> {
+    const res = await this.request<ProjectPreset[]>(
+      '/api/presets',
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getPreset(id: string, signal?: AbortSignal): Promise<ProjectPreset> {
+    const res = await this.request<ProjectPreset>(
+      `/api/presets/${encodeURIComponent(id)}`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getProjectDag(projectId: string, signal?: AbortSignal): Promise<DecisionGraphView> {
+    const res = await this.request<DecisionGraphView>(
+      `/api/projects/${encodeURIComponent(projectId)}/dag`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getDecisionCascadeImpact(
+    projectId: string,
+    decisionId: string,
+    signal?: AbortSignal
+  ): Promise<CascadeImpactResult> {
+    const res = await this.request<CascadeImpactResult>(
+      `/api/projects/${encodeURIComponent(projectId)}/dag/impact?decisionId=${encodeURIComponent(decisionId)}`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getArchitectureDiagrams(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<DiagramsResult> {
+    const res = await this.request<DiagramsResult>(
+      `/api/projects/${encodeURIComponent(projectId)}/diagrams`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  // ==========================================================================
+  // 10. Stage S2 APIs (Standalone HTML Export & Incremental Diff)
+  // ==========================================================================
+
+  public async exportDocumentsHtml(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<Blob> {
+    const url = `${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/documents/export-html`;
+    const fetchFn = this.customFetch || fetch;
+    const response = await fetchFn(url, { signal });
+    if (!response.ok) {
+      throw new ApiClientError(response.status, undefined, '导出单文件 HTML 规范失败');
+    }
+    return response.blob();
+  }
+
+  public async exportDocumentsHtmlMeta(
+    projectId: string,
+    signal?: AbortSignal
+  ): Promise<StandaloneHtmlExportResult> {
+    const res = await this.request<StandaloneHtmlExportResult>(
+      `/api/projects/${encodeURIComponent(projectId)}/documents/export-html?format=json`,
+      { method: 'GET' },
+      signal
+    );
+    return res.data;
+  }
+
+  // ==========================================================================
+  // 11. Stage S3 APIs (Brownfield Scan & Spec-Drift Verification)
+  // ==========================================================================
+
+  public async scanBrownfieldStateless(
+    path: string,
+    maxFiles?: number,
+    signal?: AbortSignal
+  ): Promise<CodebaseAnalysisResult> {
+    const res = await this.request<CodebaseAnalysisResult>(
+      '/api/brownfield/scan',
+      {
+        method: 'POST',
+        body: JSON.stringify({ path, maxFiles }),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async scanBrownfield(
+    projectId: string,
+    path: string,
+    maxFiles?: number,
+    signal?: AbortSignal
+  ): Promise<CodebaseAnalysisResult> {
+    const res = await this.request<CodebaseAnalysisResult>(
+      `/api/projects/${encodeURIComponent(projectId)}/brownfield/scan`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ path, maxFiles }),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async applyBrownfieldCandidates(
+    projectId: string,
+    candidateDecisions: BrownfieldCandidateDecision[],
+    expectedRevision?: number,
+    signal?: AbortSignal
+  ): Promise<{ appliedCount: number; snapshot: ProjectSnapshot }> {
+    const res = await this.request<{ appliedCount: number; snapshot: ProjectSnapshot }>(
+      `/api/projects/${encodeURIComponent(projectId)}/brownfield/apply`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ candidateDecisions, expectedRevision }),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async verifySpecDrift(
+    projectId: string,
+    targetPath?: string,
+    maxFiles?: number,
+    signal?: AbortSignal
+  ): Promise<SpecDriftReport> {
+    const res = await this.request<SpecDriftReport>(
+      `/api/projects/${encodeURIComponent(projectId)}/verify-drift`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ targetPath, maxFiles }),
+      },
+      signal
+    );
+    return res.data;
+  }
+
+  public async getPlanning(projectId: string, signal?: AbortSignal): Promise<PlanningView> {
+    const data = (await this.request<PlanningView>(`/api/projects/${encodeURIComponent(projectId)}/planning`, {}, signal)).data;
+    if (!data.state?.blueprint?.stages || !Array.isArray(data.state.blueprint.blocks) || !Array.isArray(data.state.changeSets) || !Array.isArray(data.state.evidence) || !Array.isArray(data.state.topics) || !Array.isArray(data.state.inputs) || !Array.isArray(data.runs) || !Array.isArray(data.coverageIssues) || !Number.isInteger(data.sourceStateRevision)) throw new ApiClientError(200, undefined, '规划数据格式无效，请重新读取');
+    return data;
+  }
+
+  public async getPlanningDiagnostics(projectId: string, signal?: AbortSignal): Promise<ProjectPlanningDiagnostics> {
+    const data = (await this.request<ProjectPlanningDiagnostics>(`/api/projects/${encodeURIComponent(projectId)}/diagnostics`, {}, signal)).data;
+    const sections = [data.project, data.configuration, data.runtime, data.tasks, data.calls, data.materials, data.provider];
+    if (data.schemaVersion !== 1 || !sections.every(section => section && ['available', 'partial', 'unavailable'].includes(section.availability) && Array.isArray(section.reasons)) || !data.configuration.current || typeof data.configuration.current.designModel !== 'string' || typeof data.configuration.current.reviewModel !== 'string' || !Array.isArray(data.runtime.runs) || !Array.isArray(data.tasks.items) || !Array.isArray(data.calls.items) || !data.calls.usage || !Array.isArray(data.materials.items) || typeof data.project.projectPath !== 'string') throw new ApiClientError(200, undefined, '诊断数据格式无效，请重新读取');
+    return data;
+  }
+
+  public async getPlanningHistory(projectId: string, signal?: AbortSignal): Promise<PlanningHistoryView> {
+    const data = (await this.request<PlanningHistoryView>(`/api/projects/${encodeURIComponent(projectId)}/planning/history`, {}, signal)).data;
+    if (!data.snapshot?.metadata || !Array.isArray(data.state?.changeSets) || !Array.isArray(data.state.inputs) || !Array.isArray(data.snapshot.documents?.items) || !Array.isArray(data.snapshot.decisions?.items) || !Array.isArray(data.runs) || !Array.isArray(data.runtime?.reasons) || !Number.isInteger(data.sourceStateRevision)) throw new ApiClientError(200, undefined, '历史数据格式无效，请重新读取');
+    return data;
+  }
+
+  public async readHistoricalDocument(projectId: string, documentId: string, signal?: AbortSignal): Promise<{ content: string; historical: true; integrity: 'unchecked' }> {
+    const data = (await this.request<{ content: string; historical: true; integrity: 'unchecked' }>(`/api/projects/${encodeURIComponent(projectId)}/planning/history/documents/${encodeURIComponent(documentId)}`, {}, signal)).data;
+    if (typeof data.content !== 'string' || data.historical !== true || data.integrity !== 'unchecked') throw new ApiClientError(200, undefined, '历史文档格式无效，请重新读取');
+    return data;
+  }
+
+  /** draftChangeSetId retains an explicit pending source; Runtime validates it before saving feedback. */
+  public async startPlanningRun(projectId: string, req: StartPlanningRequest, signal?: AbortSignal): Promise<PlanningRun> {
+    return (await this.request<PlanningRun>(`/api/projects/${encodeURIComponent(projectId)}/planning/runs`, { method: 'POST', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public async getPlanningRun(projectId: string, runId: string, signal?: AbortSignal): Promise<PlanningRun> {
+    return (await this.request<PlanningRun>(`/api/projects/${encodeURIComponent(projectId)}/planning/runs/${encodeURIComponent(runId)}`, {}, signal)).data;
+  }
+
+  public async controlPlanningRun(projectId: string, runId: string, action: 'cancel' | 'resume', _req: { expectedRevision: number; operationId: string }, signal?: AbortSignal): Promise<PlanningRun> {
+    return (await this.request<PlanningRun>(`/api/projects/${encodeURIComponent(projectId)}/planning/runs/${encodeURIComponent(runId)}/${action}`, { method: 'POST' }, signal)).data;
+  }
+
+  public async answerPlanningQuestions(projectId: string, req: { answers: QuestionAnswerIntent[]; expectedRevision: number; operationId: string }, signal?: AbortSignal): Promise<{ snapshot: ProjectSnapshot }> {
+    return (await this.request<{ snapshot: ProjectSnapshot }>(`/api/projects/${encodeURIComponent(projectId)}/questions/answers`, { method: 'POST', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public async editPlanningChangeSet(projectId: string, changeSetId: string, req: { groups: ChangeGroup[]; expectedRevision: number; operationId: string }, signal?: AbortSignal): Promise<unknown> {
+    return (await this.request<unknown>(`/api/projects/${encodeURIComponent(projectId)}/planning/changesets/${encodeURIComponent(changeSetId)}`, { method: 'PATCH', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public async approvePlanningChangeSet(projectId: string, changeSetId: string, req: ApproveChangeSetRequest, signal?: AbortSignal): Promise<unknown> {
+    return (await this.request<unknown>(`/api/projects/${encodeURIComponent(projectId)}/planning/changesets/${encodeURIComponent(changeSetId)}/approve`, { method: 'POST', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public async rejectPlanningChangeSet(projectId: string, changeSetId: string, req: Omit<ApproveChangeSetRequest, 'unlockIds'>, signal?: AbortSignal): Promise<unknown> {
+    return (await this.request<unknown>(`/api/projects/${encodeURIComponent(projectId)}/planning/changesets/${encodeURIComponent(changeSetId)}/reject`, { method: 'POST', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public async getPlanningConfig(projectId: string, signal?: AbortSignal): Promise<PlanningRuntimeConfig> {
+    return (await this.request<PlanningRuntimeConfig>(`/api/projects/${encodeURIComponent(projectId)}/planning/config`, {}, signal)).data;
+  }
+
+  public async updatePlanningConfig(projectId: string, req: PlanningRuntimeConfig, signal?: AbortSignal): Promise<PlanningRuntimeConfig> {
+    return (await this.request<PlanningRuntimeConfig>(`/api/projects/${encodeURIComponent(projectId)}/planning/config`, { method: 'PUT', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public async compilePlanningPackage(projectId: string, req: { expectedRevision: number; operationId: string }, signal?: AbortSignal): Promise<PlanningPackageManifest> {
+    return (await this.request<PlanningPackageManifest>(`/api/projects/${encodeURIComponent(projectId)}/planning/package`, { method: 'POST', body: JSON.stringify(req) }, signal)).data;
+  }
+
+  public planningPackageExportUrl(projectId: string): string {
+    return `${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/planning/package/export`;
+  }
+
+  public planningPackageFileUrl(projectId: string, name: string): string {
+    return `${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/planning/package/files/${encodeURIComponent(name)}`;
+  }
+
+  public subscribePlanningEvents(projectId: string, runId: string, onEvent: (event: PlanningEvent) => void): () => void {
+    const source = new EventSource(`${this.baseUrl}/api/projects/${encodeURIComponent(projectId)}/planning/runs/${encodeURIComponent(runId)}/events`);
+    const receive = (event: MessageEvent) => {
+      try { onEvent(JSON.parse(event.data) as PlanningEvent); } catch { /* Only structured events drive this projection. */ }
+    };
+    source.onmessage = receive;
+    source.addEventListener('progress', receive as EventListener);
+    return () => source.close();
   }
 }
 

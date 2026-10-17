@@ -23,10 +23,12 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
       onClose={onClose}
       title="状态版本冲突 (409 Conflict)"
       maxWidth="sm"
+      closeLabel="关闭冲突弹窗"
       footer={
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={onClose}
+            aria-label="关闭冲突弹窗"
             className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             关闭

@@ -1,0 +1,217 @@
+{
+  "label": "flash-materials-quality-20261005-01",
+  "checkedAt": "2026-10-04T22:17:39.091Z",
+  "kind": "Independent automatic eight-point content review; not human approval",
+  "acceptance": "needs-repair",
+  "runtimeStatus": "completed",
+  "scope": "Review of exact approved planning state and exported package. Target prototype implementation, browser/IME behavior, malicious-input DOM display and application performance remain unexecuted. The audit payload was separately executed only against synthetic source fixtures.",
+  "sources": {
+    "manifestSha256": "bf0ec1f2dd47f4eca0fc2c7764fb640c3e5a56562d6db142ba64f91c26ee49ee",
+    "finalSnapshotSha256": "592d94ba9e7c3ecb644cf87cb5ac0313b4cbcb1514790648da2d726fe3569440",
+    "tasksSha256": "4d2e014c7918f3cebb1ef07a4335b034fbd3d82e220448ed6c00be07bf24ce60",
+    "packageSuffix": "quality-reviewed",
+    "zipSha256": "cebb9cf03d72c36ee85cf91277054fa993276f34a232e34cb882d689c5399f5e"
+  },
+  "checks": [
+    {
+      "id": 1,
+      "status": "passed-design-review",
+      "blocks": [
+        "blk-feat-reset",
+        "blk-flow-reset",
+        "blk-acc-reset",
+        "blk-deliv-task-reset-workflow"
+      ],
+      "finding": "Current design explicitly requires immediate clearing of input, output and errors, timer cancellation and refocus, with no second confirmation or undo wait. Actual target behavior remains unexecuted."
+    },
+    {
+      "id": 2,
+      "status": "passed-consistency-design-review",
+      "blocks": [
+        "blk-tech-stack",
+        "blk-tech-deployment",
+        "blk-deliv-spec-deployment"
+      ],
+      "finding": "Current blocks and effective decisions consistently select a self-contained classic defer script and IIFE organization rather than ESM. Local-file and HTTP modes, existing local resources and absent Service Worker prerequisites are explicit. Cross-browser file loading is a future verification target, not an executed pass."
+    },
+    {
+      "id": 3,
+      "status": "passed-text-sink-design-review",
+      "blocks": [
+        "blk-prod-outcomes",
+        "blk-tech-stack",
+        "blk-deliv-acc-security-edge"
+      ],
+      "finding": "Current requirements restrict user content to the text sink and include literal malicious-markup/HTML-entity display, text-node inspection and preservation of original input on failure. They no longer claim proof that the entire app has no DOM XSS. Historical evidence wording is retained as provenance and is not a performed security test."
+    },
+    {
+      "id": 4,
+      "status": "needs-repair",
+      "blocks": [
+        "blk-tech-interface",
+        "blk-tech-data-model",
+        "blk-tech-error",
+        "blk-deliv-task-reset-workflow"
+      ],
+      "finding": "Ordinary input debouncing, IME suppression, cancellation, empty-result placeholders and removal of Enter/confirm paths are present. However compositionend always schedules a new callback and has no invalidated-session rule after clear; clear then late compositionend permits a new timer/error after the required idle reset. Background throttling and resumption also lack a concrete observable acceptance boundary. This is a contract counterexample, not a reproduced browser defect.",
+      "exactContract": "各模块间通过明确的函数签名与原生事件契约进行交互解耦，彻底删除确认按钮专属契约：\n1. DebounceScheduler 接口契约：\n   - schedule(callback: () => void, delayMs: number = 300): void\n     处理：若已存在 timerId 则执行 clearTimeout(timerId)；设置新 setTimeout，在 delayMs 到期后执行 callback 并将 timerId 清空。\n   - cancel(): void\n     处理：若存在 timerId 则执行 clearTimeout(timerId) 并置 null。\n   - isPending(): boolean\n     处理：返回 timerId !== null。\n2. InputController 与输入法事件契约：\n   - inputElement.addEventListener('compositionstart', () => { isComposing = true; DebounceScheduler.cancel(); });\n   - inputElement.addEventListener('compositionend', (e) => { isComposing = false; DebounceScheduler.schedule(handleDebouncedValidateAndDisplay, 300); });\n   - inputElement.addEventListener('input', (e) => { if (!isComposing && !e.isComposing) DebounceScheduler.schedule(handleDebouncedValidateAndDisplay, 300); });\n3. ValidatorModule 接口契约：\n   - validate(rawInput: string): { isValid: boolean, errorMessage: string | null }\n     处理：执行 rawInput.trim()，若长度为 0 返回 { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' }，否则返回 { isValid: true, errorMessage: null }。\n4. DisplayRenderer 接口契约：\n   - renderProjectName(targetElement: HTMLElement, text: string): void\n     处理：targetElement.textContent = text，移除占位灰字样式，应用黑色加粗高对比展示样式。\n   - renderPlaceholder(targetElement: HTMLElement, placeholder: string): void\n     处理：targetElement.textContent = placeholder，应用灰色占位展示样式。\n5. FeedbackBanner 接口契约：\n   - showInputError(inputElement: HTMLElement, containerElement: HTMLElement, errorMsg: string): void\n   - clearInputError(inputElement: HTMLElement, containerElement: HTMLElement): void\n   - showRuntimeAlert(alertMsg: string): void\n6. 清空重置契约：\n   - resetButton.addEventListener('click', handleReset) 统一驱动重置，handleReset 内部第一步调用 DebounceScheduler.cancel() 并重置 isComposing = false。",
+      "counterexample": [
+        "compositionstart starts an IME session",
+        "clear cancels the timer and resets isComposing=false and value empty",
+        "late compositionend from the invalidated session unconditionally schedules a new 300ms task",
+        "the empty input can be validated into an error after the supposedly final idle reset"
+      ]
+    },
+    {
+      "id": 5,
+      "status": "needs-repair",
+      "blocks": [
+        "blk-deliv-val-perf-benchmark",
+        "blk-tech-deployment",
+        "blk-deliv-val-standalone-runtime"
+      ],
+      "finding": "Safari is correctly marked pending real-device verification and unavailable historical experiments remain unexecuted. Performance normalBehavior nevertheless invents measured ranges of 50~150ms, 305~325ms and 5~20ms without target measurements. Steps/evidence require five rounds while verification requires ten interactions and three cold loads; passCriteria uses averages while verification also requires maxima. Counts, statistics, metric endpoints and passing boundaries are not one closed executable contract.",
+      "exactPerformanceTask": {
+        "assumptions": [
+          "运行在主流性能配置的桌面计算机",
+          "测试数据规模为 1~200 字符的典型项目名测试文本"
+        ],
+        "completionCriteria": [
+          "实测数据完整，首屏 DOM 就绪耗时 ≤ 300ms，防抖处理至重绘前调度延迟 ≤ 350ms（DOM 更新及调度延迟 ≤ 50ms），清空响应耗时 ≤ 50ms",
+          "测试过程中主线程无阻塞的长任务（Long Task > 50ms）",
+          "形成完整的性能实测归档记录"
+        ],
+        "environment": "桌面 PC（现代 x86_64 或 Apple Silicon 架构，4 核以上 CPU，8GB 以上内存），Chrome 最新稳定版无痕模式，禁用所有第三方浏览器扩展，本地 file:// 协议或 localhost",
+        "evidenceRequired": [
+          "Chrome DevTools Performance 跟踪导出的 JSON 记录与控制台打印的 5 轮耗时数据日志"
+        ],
+        "exclusions": "不测量网络传输延时（测试在本地文件或本地回环服务下进行），不宣称 requestAnimationFrame 已证明物理像素绘制完毕",
+        "failureBehavior": "若实测超出阈值，分析是否有强制同步布局或不必要的 DOM 重查，精简 DOM 操作后复测",
+        "goal": "实测验证轻量纯原生单页面的首屏 DOM 就绪耗时≤300ms、300ms 输入防抖实时展示与清空交互响应延迟（防抖处理至重绘前调度耗时≤350ms，清空重置耗时≤50ms）的性能设计目标",
+        "modules": [
+          "AppController",
+          "DebounceScheduler",
+          "DisplayRenderer",
+          "InputController"
+        ],
+        "normalBehavior": "打开页面时，从 navigationStart 到 domContentLoadedEventEnd 耗时实测在 50~150ms 之间（符合 300ms DOM 就绪目标）；输入文字停止后，从 input/compositionend 事件触发至 300ms 定时器回调结束及 requestAnimationFrame 回调执行，总耗时在 305~325ms 之间（调度延迟在 5~25ms 之间，符合 50ms 纯计算与重绘前调度指标）；点击清空时，耗时在 5~20ms 之间（符合 50ms 目标）",
+        "onFailure": "若某项指标超时，审查 styles.css 中的选择器复杂度，检查 app.js 中是否存在频繁的 getComputedStyle 或重复 querySelector，将 DOM 引用缓存化后重新测试。",
+        "passCriteria": [
+          "首屏 DOM 就绪耗时（domContentLoadedEventEnd - startTime）平均值 ≤ 300ms；",
+          "输入防抖展示总响应耗时（包含 300ms 防抖等待与 pre-repaint 回调）平均值 ≤ 350ms，其中 DOM 更新与重绘前调度延迟平均值 ≤ 50ms；",
+          "清空重置渲染耗时平均值 ≤ 50ms；",
+          "测试过程中主线程无长任务卡顿。"
+        ],
+        "scope": "使用浏览器标准 Performance Navigation Timing API 与 Performance.now() 进行 DOM 就绪及实时防抖至重绘前回调打点测量，严格区分 DOM 解析就绪与物理绘制完成",
+        "steps": [
+          "1. 启动 Chrome 无痕模式并加载交付的 index.html；",
+          "2. 在 Console 执行 const [nav] = performance.getEntriesByType('navigation'); console.log('DOM 就绪耗时 (domContentLoadedEventEnd - startTime):', nav.domContentLoadedEventEnd - nav.startTime); 记录 DOM 解析与 defer 脚本执行完毕耗时；",
+          "3. 注入防抖测试打点探针：在 input 与 compositionend 事件监听起始处记录 window.__t_input = performance.now()；在 DisplayRenderer 更新后调用 requestAnimationFrame(() => console.log('防抖全流程调度延迟:', performance.now() - window.__t_input)) 打印耗时；",
+          "4. 录入 50 字符典型项目名并停止打字，重复 5 次取平均值；",
+          "5. 点击清空按钮，测量重置耗时，重复 5 次取平均值；",
+          "6. 汇总 DOM 就绪与调度延迟数据，比对是否符合 ≤300ms 与 ≤350ms（调度延迟≤50ms）指标。"
+        ],
+        "verification": [
+          "在 Chrome DevTools Performance 面板录制 3 次冷加载 Trace，查验 DOMContentLoaded 耗时均值是否 ≤ 300ms",
+          "在控制台注入性能测量脚本，连续执行 10 次防抖展示与 10 次清空操作，统计交互响应平均耗时与最大耗时是否均达标",
+          "输出包含设备配置、测试数据规模与测量起止记录的性能实测数据表"
+        ],
+        "id": "blk-deliv-val-perf-benchmark",
+        "title": "交付前置验证任务：首屏 DOM 就绪与实时防抖响应性能基准实测",
+        "kind": "validation",
+        "requirementIds": [
+          "blk-prod-outcomes"
+        ],
+        "blueprintDependsOn": [
+          "blk-deliv-task-package",
+          "blk-deliv-val-standalone-runtime"
+        ],
+        "dependsOn": [
+          "blk-deliv-task-package",
+          "blk-deliv-val-standalone-runtime"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "status": "passed-image-and-scope-review",
+      "blocks": [
+        "blk-page-main-layout",
+        "blk-prod-scope",
+        "blk-prod-non-goals"
+      ],
+      "finding": "Original image remains layout evidence. Q7M4-8261 is a visual sample, not a fixed business name. Original image hash and native viewing records remain traceable through the stages, and scope remains a personal single page without backend/login/database/collaboration/payment additions.",
+      "imageSha256": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "nativeImageViewCount": 42
+    },
+    {
+      "id": 7,
+      "status": "needs-entry-text-repair",
+      "blocks": [
+        "blk-deliv-task-package",
+        "blk-deliv-task-layout-styling"
+      ],
+      "finding": "The actual task graph is repaired: four duplicate product/technical tasks are removed, all four implementations precede packaging, and application validations follow packaging with no dangling block/task references or task cycles. START_HERE nevertheless tells the reader to complete prerequisite validation in the same sentence that names layout implementation as the first executable task. That compiler-generated instruction conflicts with the actual application-validation prerequisites.",
+      "graphPass": true,
+      "exportedTaskCount": 8,
+      "packageDependencies": [
+        "blk-deliv-task-error-handling",
+        "blk-deliv-task-input-workflow",
+        "blk-deliv-task-layout-styling",
+        "blk-deliv-task-reset-workflow"
+      ],
+      "danglingBlockReferences": [],
+      "danglingTaskReferences": [],
+      "taskCycle": [],
+      "exactEntryLine": "首个可执行任务：blk-deliv-task-layout-styling — 交付任务：单按钮精简视觉布局实现与确认按钮样式剔除。按 tasks.json 和 DEVELOPMENT_PLAN 的共同顺序实施，先完成前置验证；未验证事项不能当作能力事实。实现失败时保留证据并向 Project Architect 反馈，修订相关方案后继续。"
+    },
+    {
+      "id": 8,
+      "status": "needs-repair",
+      "blocks": [
+        "blk-deliv-val-security-xss-audit",
+        "blk-deliv-val-perf-benchmark",
+        "blk-prod-outcomes"
+      ],
+      "finding": "The exact JSON-decoded Node audit payload parses and executes correctly on the seven original synthetic cases, replacing the invalid regex. It falsely reports zero dangerous APIs for legal whitespace variants eval (userInput) and new Function (userInput). The new performance definitions correctly distinguish DOM ready and pre-repaint callback timing from completed visible painting, though the clear metric still uses rendering-time wording. No target application was executed.",
+      "decodedAuditEvidence": "decoded-audit-command-probe.json",
+      "auditFailures": [
+        {
+          "name": "whitespace before eval arguments",
+          "code": "eval (userInput);",
+          "expectedExit": 1,
+          "core": false,
+          "actualExit": 0,
+          "stdout": "静态安全检查通过：0 处危险 DOM/执行 API\n",
+          "stderr": "",
+          "signal": null,
+          "pass": false
+        },
+        {
+          "name": "whitespace before Function arguments",
+          "code": "new Function (userInput);",
+          "expectedExit": 1,
+          "core": false,
+          "actualExit": 0,
+          "stdout": "静态安全检查通过：0 处危险 DOM/执行 API\n",
+          "stderr": "",
+          "signal": null,
+          "pass": false
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "preservedReceiptChecks": 41,
+    "inheritedSuccessfulReceipts": 37,
+    "totalSuccessfulReceipts": 41,
+    "newRealCalls": 4,
+    "packageChecks": 247,
+    "httpUiChecks": 20,
+    "httpUiProviderCalls": 0,
+    "exactActualInputArtifactCalls": 4,
+    "activeCallsAtShutdown": 0,
+    "ownedLeasesAtShutdown": []
+  },
+  "correctionPolicy": "Keep original feedback, manifest, provider outputs, result receipts, state, documents and ZIP byte-identical. Follow-up semantic changes must be registered through new public automatic quality feedback. Product compiler/prompt repairs belong to the implementation owner."
+}

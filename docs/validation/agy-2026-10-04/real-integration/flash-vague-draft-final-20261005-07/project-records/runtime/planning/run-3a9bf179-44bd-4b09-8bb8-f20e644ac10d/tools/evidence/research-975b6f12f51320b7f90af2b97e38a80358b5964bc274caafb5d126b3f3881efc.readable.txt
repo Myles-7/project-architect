@@ -1,0 +1,3261 @@
+File API 
+
+ File API
+
+ W3C Working Draft ,
+ 12 September 2026 
+
+ More details about this document 
+
+ This version:
+ https://www.w3.org/TR/2026/WD-FileAPI-20260912/ 
+ Latest published version:
+ https://www.w3.org/TR/FileAPI/ 
+ Editor's Draft:
+ https://w3c.github.io/FileAPI/ 
+ Previous Versions:
+ https://www.w3.org/TR/2026/WD-FileAPI-20260823/ 
+ History:
+ https://www.w3.org/standards/history/FileAPI/ 
+ Feedback:
+ GitHub 
+ Inline In Spec 
+ Editor:
+ Marijn Kruisselbrink ( Google )
+ Former Editor:
+ Arun Ranganathan ( Mozilla Corporation ) arun@mozilla.com 
+ Tests:
+ web-platform-tests FileAPI/ ( ongoing work )
+
+ Copyright © 2026 World Wide Web Consortium . W3C ® liability , trademark and permissive document license rules apply.
+
+ Abstract 
+
+ This specification provides an API for representing file objects in web applications,
+as well as programmatically selecting them and accessing their data. This includes:
+
+ A FileList interface, which represents an array of individually selected files from the underlying system. The user interface for selection can be invoked via <input type="file"> , i.e. when the input element is in the File Upload state [HTML] .
+
+ A Blob interface, which represents immutable raw binary data, and allows access to ranges of bytes within the Blob object as a separate Blob .
+
+ A File interface, which includes readonly informational attributes about a file such as its name and the date of the last modification (on disk) of the file.
+
+ A FileReader interface, which provides methods to read a File or a Blob , and an event model to obtain the results of these reads.
+
+ A URL scheme for use with binary data such as files, so that they can be referenced within web applications.
+
+ Additionally, this specification defines objects to be used within threaded web applications for the synchronous reading of files.
+
+ § 10 Requirements and Use Cases covers the motivation behind this specification.
+
+ This API is designed to be used in conjunction with other APIs and elements on the web platform, notably:
+ XMLHttpRequest (e.g. with an overloaded send() method for File or Blob arguments),
+ postMessage() ,
+ DataTransfer (part of the drag and drop API defined in [HTML] )
+and Web Workers.
+Additionally, it should be possible to programmatically obtain a list of files from the input element
+when it is in the File Upload state [HTML] .
+These kinds of behaviors are defined in the appropriate affiliated specifications.
+
+ Status of this document 
+
+ This section describes the status of this document at the time of its publication. A list of current W3C publications and the latest revision of this technical report can be found in the W3C standards and drafts index . 
+
+ This document was published
+ by the Web Applications Working Group 
+ as a Working Draft using the Recommendation
+ track .
+ Publication as a Working Draft
+ does not imply endorsement by W3C and its Members.
+
+ This is a draft document
+ and may be updated, replaced
+ or obsoleted by other documents at any time.
+ It is inappropriate to cite this document as other than a work in progress.
+
+ Previous discussion of this specification has taken place on two other mailing lists: public-webapps@w3.org ( archive ) and public-webapi@w3.org ( archive ). Ongoing discussion will be on the public-webapps@w3.org mailing list.
+
+ This draft consists of changes made to the previous Last Call Working Draft. Please send comments to the public-webapi@w3.org as described above. You can see Last Call Feedback on the W3C Wiki: https://www.w3.org/wiki/Webapps/LCWD-FileAPI-20130912 
+
+ An implementation report is automatically generated from the test suite.
+
+ This document was produced by a group operating under the W3C Patent Policy . W3C maintains a public list of any patent disclosures made in connection with the deliverables of the group; that page also includes instructions for disclosing a patent. An individual who has actual knowledge of a patent that the individual believes contains Essential Claim(s) must disclose the information in accordance with section 6 of the W3C Patent Policy .
+
+ This document is governed by the
+ 18 August 2025 W3C Process Document .
+
+ Table of Contents
+
+ 1 Introduction 
+ 2 Terminology and Algorithms 
+
+ 3 The Blob Interface and Binary Data 
+
+ 3.1 Constructors 
+
+ 3.1.1 Constructor Parameters 
+
+ 3.2 Attributes 
+
+ 3.3 Methods and Parameters 
+
+ 3.3.1 The slice() method 
+ 3.3.2 The stream() method 
+ 3.3.3 The text() method 
+ 3.3.4 The arrayBuffer() method 
+ 3.3.5 The bytes() method 
+ 3.3.6 The textStream() method 
+
+ 4 The File Interface 
+
+ 4.1 Constructor 
+
+ 4.1.1 Constructor Parameters 
+
+ 4.2 Attributes 
+
+ 5 The FileList Interface 
+
+ 5.1 Attributes 
+ 5.2 Methods and Parameters 
+
+ 6 Reading Data 
+
+ 6.1 The File Reading Task Source 
+
+ 6.2 The FileReader API 
+
+ 6.2.1 Event Handler Content Attributes 
+ 6.2.2 FileReader States 
+
+ 6.2.3 Reading a File or Blob 
+
+ 6.2.3.1 The readAsDataURL() method 
+ 6.2.3.2 The readAsText() method 
+ 6.2.3.3 The readAsArrayBuffer() 
+ 6.2.3.4 The readAsBinaryString() method 
+ 6.2.3.5 The abort() method 
+
+ 6.3 Packaging data 
+
+ 6.4 Events 
+
+ 6.4.1 Event Summary 
+ 6.4.2 Summary of Event Invariants 
+
+ 6.5 Reading on Threads 
+
+ 6.5.1 The FileReaderSync API 
+
+ 6.5.1.1 Constructors 
+ 6.5.1.2 The readAsText() 
+ 6.5.1.3 The readAsDataURL() method 
+ 6.5.1.4 The readAsArrayBuffer() method 
+ 6.5.1.5 The readAsBinaryString() method 
+
+ 7 Errors and Exceptions 
+
+ 7.1 Throwing an Exception or Returning an Error 
+
+ 8 A URL for Blob and MediaSource reference 
+
+ 8.1 Introduction 
+ 8.2 Model 
+
+ 8.3 Dereferencing Model for blob URLs 
+
+ 8.3.1 Origin of blob URLs 
+ 8.3.2 Access restrictions on blob URLs 
+ 8.3.3 Lifetime of blob URLs 
+
+ 8.4 Creating and Revoking a blob URL 
+
+ 8.4.1 Examples of blob URL Creation and Revocation 
+
+ 9 Security and Privacy Considerations 
+ 10 Requirements and Use Cases 
+
+Acknowledgements 
+
+ Conformance 
+
+ Document conventions 
+ Conformant Algorithms 
+
+ Index 
+
+ Terms defined by this specification 
+ Terms defined by reference 
+
+ References 
+
+ Normative References 
+ Non-Normative References 
+
+ IDL Index 
+ Issues Index 
+
+ 1. Introduction 
+
+ This section is informative. 
+
+ Web applications should have the ability to manipulate as wide as possible a range of user input,
+including files that a user may wish to upload to a remote server or manipulate inside a rich web application.
+This specification defines the basic representations for files,
+lists of files,
+errors raised by access to files,
+and programmatic ways to read files.
+Additionally, this specification also defines an interface that represents "raw data"
+which can be asynchronously processed on the main thread of conforming user agents.
+The interfaces and API defined in this specification can be used with other interfaces and APIs exposed to the web platform.
+
+ The File interface represents file data typically obtained from the underlying file system,
+and the Blob interface
+("Binary Large Object" - a name originally introduced to web APIs in Google Gears )
+represents immutable raw data.
+ File or Blob reads should happen asynchronously on the main thread,
+with an optional synchronous API used within threaded web applications.
+An asynchronous API for reading files prevents blocking and UI "freezing" on a user agent’s main thread.
+This specification defines an asynchronous API based on an event model 
+to read and access a File or Blob ’s data.
+A FileReader object provides asynchronous read methods to access that file’s data
+through event handler content attributes and the firing of events.
+The use of events and event handlers allows separate code blocks the ability
+to monitor the progress of the read 
+(which is particularly useful for remote drives or mounted drives,
+ where file access performance may vary from local drives)
+and error conditions that may arise during reading of a file.
+An example will be illustrative.
+
+ In the example below, different code blocks handle progress, error, and success conditions.
+
+ function startRead () { 
+ // obtain input element through DOM 
+
+ var file = document . getElementById ( 'file' ). files [ 0 ]; 
+ if ( file ){ 
+ getAsText ( file ); 
+ } 
+ } 
+
+ function getAsText ( readFile ) { 
+
+ var reader = new FileReader (); 
+
+ // Read file into memory as UTF-16 
+ reader . readAsText ( readFile , "UTF-16" ); 
+
+ // Handle progress, success, and errors 
+ reader . onprogress = updateProgress ; 
+ reader . onload = loaded ; 
+ reader . onerror = errorHandler ; 
+ } 
+
+ function updateProgress ( evt ) { 
+ if ( evt . lengthComputable ) { 
+ // evt.loaded and evt.total are ProgressEvent properties 
+ var loaded = ( evt . loaded / evt . total ); 
+ if ( loaded < 1 ) { 
+ // Increase the prog bar length 
+ // style.width = (loaded * 200) + "px"; 
+ } 
+ } 
+ } 
+
+ function loaded ( evt ) { 
+ // Obtain the read file data 
+ var fileString = evt . target . result ; 
+ // Handle UTF-16 file dump 
+ if ( utils . regexp . isChinese ( fileString )) { 
+ //Chinese Characters + Name validation 
+ } 
+ else { 
+ // run other charset test 
+ } 
+ // xhr.send(fileString) 
+ } 
+
+ function errorHandler ( evt ) { 
+ if ( evt . target . error . name == "NotReadableError" ) { 
+ // The file could not be read 
+ } 
+ } 
+
+ 2. Terminology and Algorithms 
+
+ When this specification says to terminate an algorithm 
+the user agent must terminate the algorithm after finishing the step it is on.
+Asynchronous read methods defined in this specification may return before the algorithm in question is terminated,
+and can be terminated by an abort() call.
+
+ The algorithms and steps in this specification use the following mathematical operations:
+
+ max(a,b) returns the maximum of a and b,
+and is always performed on integers as they are defined in WebIDL [WebIDL] ;
+in the case of max(6,4) the result is 6.
+This operation is also defined in ECMAScript [ECMA-262] .
+
+ min(a,b) returns the minimum of a and b,
+and is always performed on integers as they are defined in WebIDL [WebIDL] ;
+in the case of min(6,4) the result is 4.
+This operation is also defined in ECMAScript [ECMA-262] .
+
+ Mathematical comparisons such as < (less than), ≤ (less than or equal to), and > (greater than) are as in ECMAScript [ECMA-262] .
+
+ The term Unix Epoch is used in this specification to refer to the time 00:00:00 UTC on January 1 1970
+(or 1970-01-01T00:00:00Z ISO 8601);
+this is the same time that is conceptually " 0 " in ECMA-262 [ECMA-262] .
+
+The slice blob algorithm given a Blob blob , start ,
+ end , and contentType is used to refer to the following
+steps and returns a new Blob containing the bytes ranging from the start parameter
+up to but not including the end parameter. It must act as follows:
+
+ Let originalSize be blob ’s size .
+
+ The start parameter, if non-null, is a value for the start point of a slice blob 
+ call, and must be treated as a byte-order position, with the zeroth position representing the
+ first byte. User agents must normalize start according to the following:
+
+ If start is null, let relativeStart be 0.
+
+ If start is negative, let relativeStart be
+ max(( originalSize + start ), 0) .
+
+ Otherwise, let relativeStart be
+ min( start , originalSize ) .
+
+ The end parameter, if non-null. is a value for the end point of a slice blob 
+ call. User agents must normalize end according to the following:
+
+ If end is null, let relativeEnd be originalSize .
+
+ If end is negative, let relativeEnd be
+ max(( originalSize + end ), 0) .
+
+ Otherwise, let relativeEnd be
+ min( end , originalSize ) .
+
+ The contentType parameter, if non-null, is used to set the ASCII-encoded string in
+ lower case representing the media type of the Blob . User agents must normalize
+ contentType according to the following:
+
+ If contentType is null, let relativeContentType be set to the empty
+ string.
+
+ Otherwise, let relativeContentType be set to contentType and run the
+ substeps below:
+
+ If relativeContentType contains any characters outside the range of U+0020 to
+U+007E, then set relativeContentType to the empty string and return from these
+substeps.
+
+ Convert every character in relativeContentType to ASCII lowercase .
+
+ Let span be max(( relativeEnd - relativeStart ), 0) .
+
+ Return a new Blob object S with the following characteristics:
+
+ S refers to span consecutive byte s from blob ’s
+ associated byte sequence, beginning with the byte at byte-order position
+ relativeStart .
+
+ S . size = span .
+
+ S . type = relativeContentType .
+
+ 3. The Blob Interface and Binary Data 
+
+ A Blob object refers to a byte sequence,
+and has a size attribute which is the total number of bytes in the byte sequence,
+and a type attribute,
+which is an ASCII-encoded string in lower case representing the media type of the byte sequence.
+
+ Each Blob must have an internal snapshot state ,
+which must be initially set to the state of the underlying storage,
+if any such underlying storage exists.
+Further normative definition of snapshot state can be found for File s.
+
+ [ Exposed =( Window , Worker ), Serializable ]
+ interface Blob {
+ constructor ( optional sequence < BlobPart > blobParts ,
+ optional BlobPropertyBag options = {});
+
+ readonly attribute unsigned long long size ;
+ readonly attribute DOMString type ;
+
+ // slice Blob into byte-ranged chunks
+ Blob slice ( optional [ Clamp ] long long start ,
+ optional [ Clamp ] long long end ,
+ optional DOMString contentType );
+
+ // read from the Blob.
+ [ NewObject ] ReadableStream stream ();
+ [ NewObject ] Promise < USVString > text ();
+ [ NewObject ] Promise < ArrayBuffer > arrayBuffer ();
+ [ NewObject ] ReadableStream textStream ();
+ [ NewObject ] Promise < Uint8Array > bytes ();
+};
+
+ enum EndingType { "transparent" , "native" };
+
+ dictionary BlobPropertyBag {
+ DOMString type = "";
+ EndingType endings = "transparent";
+};
+
+ typedef ( BufferSource or Blob or USVString ) BlobPart ;
+
+ Blob objects are serializable objects . Their serialization steps ,
+given value and serialized , are:
+
+ Set serialized .[[SnapshotState]] to value ’s snapshot state .
+
+ Set serialized .[[ByteSequence]] to value ’s underlying byte sequence.
+
+ Their deserialization step , given serialized and value , are:
+
+ Set value ’s snapshot state to serialized .[[SnapshotState]].
+
+ Set value ’s underlying byte sequence to serialized .[[ByteSequence]].
+
+A Blob blob has an associated get stream algorithm,
+which runs these steps:
+
+ Let stream be a new ReadableStream created in blob ’s relevant Realm .
+
+ Set up stream with byte reading support.
+
+ Run the following steps in parallel :
+
+ While not all bytes of blob have been read:
+
+ Let bytes be the byte sequence that results from reading a chunk from blob , or
+ failure if a chunk cannot be read.
+
+ Queue a global task on the file reading task source given blob ’s
+ relevant global object to perform the following steps:
+
+ If bytes is failure, then error stream with a failure reason and
+ abort these steps.
+
+ Let chunk be a new Uint8Array wrapping an ArrayBuffer containing bytes . If
+ creating the ArrayBuffer throws an exception, then error stream 
+ with that exception and abort these steps.
+
+ Enqueue chunk in stream .
+
+ We need to specify more concretely what reading from a Blob actually does,
+what possible errors can happen, perhaps something about chunk sizes, etc.
+
+ Return stream .
+
+ 3.1. Constructors 
+
+The Blob() constructor can be invoked with zero or more parameters.
+When the Blob() constructor is invoked,
+user agents must run the following steps:
+
+ If invoked with zero parameters,
+return a new Blob object consisting of 0 bytes,
+with size set to 0,
+and with type set to the empty string.
+
+ Let bytes be the result of processing blob parts given blobParts and options .
+
+ If the type member of the options argument is not the empty string,
+run the following sub-steps:
+
+ Let t be the type dictionary member.
+If t contains any characters outside the range U+0020 to U+007E,
+then set t to the empty string and return from these substeps.
+
+ Convert every character in t to ASCII lowercase .
+
+ Return a Blob object referring to bytes as its associated byte sequence,
+with its size set to the length of bytes ,
+and its type set to the value of t from the substeps above.
+
+ 3.1.1. Constructor Parameters 
+
+ The Blob() constructor can be invoked with the parameters below:
+
+ A blobParts sequence 
+
+ which takes any number of the following types of elements, and in any order:
+
+ BufferSource elements.
+
+ Blob elements.
+
+ USVString elements.
+
+ An optional BlobPropertyBag 
+
+ which takes these optional members:
+
+ type ,
+the ASCII-encoded string in lower case representing the media type of the Blob .
+Normative conditions for this member are provided in the § 3.1 Constructors .
+
+ endings ,
+an enum which can take the values "transparent" or "native" .
+By default this is set to "transparent" . If set to "native" ,
+ line endings will be converted to native 
+in any USVString elements in blobParts .
+
+To process blob parts given a sequence of BlobPart ’s parts 
+and BlobPropertyBag options ,
+run the following steps:
+
+ Let bytes be an empty sequence of bytes.
+
+ For each element in parts :
+
+ If element is a USVString , run the following substeps:
+
+ Let s be element .
+
+ If the endings member of options is "native" ,
+set s to the result of converting line endings to native of element .
+
+ Append the result of UTF-8 encoding s to bytes .
+
+ Note: The algorithm from WebIDL [WebIDL] replaces unmatched surrogates in an invalid utf-16 string
+with U+FFFD replacement characters.
+Scenarios exist when the Blob constructor may result in some data loss
+due to lost or scrambled character sequences.
+
+ If element is a BufferSource , get
+a copy of the bytes held by the buffer source , and append those bytes to bytes .
+
+ If element is a Blob ,
+append the bytes it represents to bytes .
+
+ Note: The type of the Blob array element is ignored and will not affect type of returned
+ Blob object.
+
+ Return bytes .
+
+To 
+convert line endings to native in a string s ,
+run the following steps:
+
+ Let native line ending be the code point U+000A LF.
+
+ If the underlying platform’s conventions are
+to represent newlines as a carriage return and line feed sequence,
+set native line ending to the code point U+000D CR
+followed by the code point U+000A LF.
+
+ Set result to the empty string .
+
+ Let position be a position variable for s ,
+initially pointing at the start of s .
+
+ Let token be the result of collecting a sequence of code points 
+that are not equal to U+000A LF or U+000D CR
+from s given position .
+
+ Append token to result .
+
+ While position is not past the end of s :
+
+ If the code point at position within s equals U+000D CR:
+
+ Append native line ending to result .
+
+ Advance position by 1.
+
+ If position is not past the end of s 
+and the code point at position within s equals U+000A LF
+advance position by 1.
+
+ Otherwise if the code point at position within s equals U+000A LF,
+advance position by 1 and append native line ending to result .
+
+ Let token be the result of collecting a sequence of code points 
+that are not equal to U+000A LF or U+000D CR
+from s given position .
+
+ Append token to result .
+
+ Return result .
+
+ Examples of constructor usage follow.
+
+ // Create a new Blob object 
+
+ var a = new Blob (); 
+
+ // Create a 1024-byte ArrayBuffer 
+ // buffer could also come from reading a File 
+
+ var buffer = new ArrayBuffer ( 1024 ); 
+
+ // Create ArrayBufferView objects based on buffer 
+
+ var shorts = new Uint16Array ( buffer , 512 , 128 ); 
+ var bytes = new Uint8Array ( buffer , shorts . byteOffset + shorts . byteLength ); 
+
+ var b = new Blob ([ "foobarbazetcetc" + "birdiebirdieboo" ], { type : "text/plain;charset=utf-8" }); 
+
+ var c = new Blob ([ b , shorts ]); 
+
+ var a = new Blob ([ b , c , bytes ]); 
+
+ var d = new Blob ([ buffer , b , c , bytes ]); 
+
+ 3.2. Attributes 
+
+ size , of type unsigned long long , readonly 
+ Returns the size of the byte sequence in number of bytes.
+ On getting, conforming user agents must return the total number of bytes that can be read by a FileReader or FileReaderSync object,
+ or 0 if the Blob has no bytes to be read.
+
+ type , of type DOMString , readonly 
+
+ The ASCII-encoded string in lower case representing the media type of the Blob .
+ On getting, user agents must return the type of a Blob 
+ as an ASCII-encoded string in lower case,
+ such that when it is converted to a byte sequence,
+ it is a parsable MIME type ,
+ or the empty string – 0 bytes – if the type cannot be determined.
+
+ The type attribute can be set by the web application itself through constructor invocation
+ and through the slice() call;
+ in these cases, further normative conditions for this attribute are in § 3.1 Constructors ,
+ § 4.1 Constructor ,
+ and § 3.3.1 The slice() method respectively.
+ User agents can also determine the type of a Blob ,
+ especially if the byte sequence is from an on-disk file;
+ in this case, further normative conditions are in the file type guidelines .
+
+ Note: The type t of a Blob is considered a parsable MIME type ,
+ if performing the parse a MIME type algorithm to a byte sequence converted from
+ the ASCII-encoded string representing the Blob object’s type does not return failure.
+
+ Note: Use of the type attribute informs the package data algorithm
+ and determines the Content-Type header when fetching blob URLs .
+
+ 3.3. Methods and Parameters 
+
+ 3.3.1. The slice() method 
+
+The slice() method
+returns a new Blob object with bytes ranging from the optional start parameter
+up to but not including the optional end parameter, and with a type attribute
+that is the value of the optional contentType parameter. It must act as follows:
+
+ Let sliceStart , sliceEnd , and sliceContentType be null.
+
+ If start is given, set sliceStart to start .
+
+ If end is given, set sliceEnd to end .
+
+ If contentType is given, set sliceContentType to contentType .
+
+ Return the result of slice blob given this , sliceStart ,
+ sliceEnd , and sliceContentType .
+
+ The examples below illustrate the different types of slice() calls possible. Since the
+ File interface inherits from the Blob interface, examples are based on the use of the File interface.
+
+ // obtain input element through DOM 
+
+ var file = document . getElementById ( 'file' ). files [ 0 ]; 
+ if ( file ) 
+ { 
+ // create an identical copy of file 
+ // the two calls below are equivalent 
+
+ var fileClone = file . slice (); 
+ var fileClone2 = file . slice ( 0 , file . size ); 
+
+ // slice file into 1/2 chunk starting at middle of file 
+ // Note the use of negative number 
+
+ var fileChunkFromEnd = file . slice ( - ( Math . round ( file . size / 2 ))); 
+
+ // slice file into 1/2 chunk starting at beginning of file 
+
+ var fileChunkFromStart = file . slice ( 0 , Math . round ( file . size / 2 )); 
+
+ // slice file from beginning till 150 bytes before end 
+
+ var fileNoMetadata = file . slice ( 0 , - 150 , "application/experimental" ); 
+ } 
+
+ 3.3.2. The stream() method 
+
+ The stream() method, when invoked, must return
+the result of calling get stream on this .
+
+ 3.3.3. The text() method 
+
+ The text() method, when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on this .
+
+ Let reader be the result of getting a reader from stream .
+ If that threw an exception, return a new promise rejected with that exception.
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Return the result of transforming promise by a fulfillment handler that returns the result of
+ running UTF-8 decode on its first argument.
+
+ Note: This is different from the behavior of readAsText() to align better
+with the behavior of Fetch’s text() . Specifically this method will always
+use UTF-8 as encoding, while FileReader can use a different encoding depending on
+the blob’s type and passed in encoding name.
+
+ 3.3.4. The arrayBuffer() method 
+
+ The arrayBuffer() method, when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on this .
+
+ Let reader be the result of getting a reader from stream .
+ If that threw an exception, return a new promise rejected with that exception.
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Return the result of transforming promise by a fulfillment handler that returns
+ a new ArrayBuffer whose contents are its first argument.
+
+ 3.3.5. The bytes() method 
+
+ The bytes() method, when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on this .
+
+ Let reader be the result of getting a reader from stream .
+ If that threw an exception, return a new promise rejected with that exception.
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Return the result of transforming promise by a fulfillment handler that returns
+ a new Uint8Array wrapping an ArrayBuffer containing its first argument.
+
+ 3.3.6. The textStream() method 
+
+ The textStream() method steps are:
+
+ Let stream be the result of calling get stream on this .
+
+ Let decoder be a new TextDecoderStream in this ’s relevant realm .
+
+ Set up decoder with UTF-8 .
+
+ Return the result of calling stream , piped through decoder .
+
+ Note: This differs from readAsText() in that it always uses the UTF-8 encoding.
+
+ 4. The File Interface 
+
+ A File object is a Blob object with a name attribute, which is a string;
+it can be created within the web application via a constructor,
+or is a reference to a byte sequence from a file from the underlying (OS) file system.
+
+ If a File object is a reference to a byte sequence originating from a file on disk,
+then its snapshot state should be set to the state of the file on disk at the time the File object is created.
+
+ Note: This is a non-trivial requirement to implement for user agents,
+and is thus not a must but a should [RFC2119] .
+User agents should endeavor to have a File object’s snapshot state 
+set to the state of the underlying storage on disk at the time the reference is taken.
+If the file is modified on disk following the time a reference has been taken,
+the File ’s snapshot state will differ from the state of the underlying storage.
+User agents may use modification time stamps and other mechanisms to maintain snapshot state ,
+but this is left as an implementation detail.
+
+ When a File object refers to a file on disk,
+user agents must return the type of that file,
+and must follow the file type guidelines below:
+
+ User agents must return the type as an ASCII-encoded string in lower case,
+such that when it is converted to a corresponding byte sequence,
+it is a parsable MIME type ,
+or the empty string – 0 bytes – if the type cannot be determined.
+
+ When the file is of type text/plain 
+user agents must NOT append a charset parameter to the dictionary of parameters portion of the media type [MIMESNIFF] .
+
+ User agents must not attempt heuristic determination of encoding,
+including statistical methods.
+
+ [ Exposed =( Window , Worker ), Serializable ]
+ interface File : Blob {
+ constructor ( sequence < BlobPart > fileBits ,
+ USVString fileName ,
+ optional FilePropertyBag options = {});
+ readonly attribute DOMString name ;
+ readonly attribute long long lastModified ;
+};
+
+ dictionary FilePropertyBag : BlobPropertyBag {
+ long long lastModified ;
+};
+
+ File objects are serializable objects . Their serialization steps ,
+given value and serialized , are:
+
+ Set serialized .[[SnapshotState]] to value ’s snapshot state .
+
+ Set serialized .[[ByteSequence]] to value ’s underlying byte sequence.
+
+ Set serialized .[[Name]] to the value of value ’s name attribute.
+
+ Set serialized .[[LastModified]] to the value of value ’s lastModified attribute.
+
+ Their deserialization steps , given value and serialized , are:
+
+ Set value ’s snapshot state to serialized .[[SnapshotState]].
+
+ Set value ’s underlying byte sequence to serialized .[[ByteSequence]].
+
+ Initialize the value of value ’s name attribute to serialized .[[Name]].
+
+ Initialize the value of value ’s lastModified attribute to
+ serialized .[[LastModified]].
+
+ 4.1. Constructor 
+
+The File constructor is invoked with two or three parameters,
+depending on whether the optional dictionary parameter is used.
+When the File() constructor is invoked,
+user agents must run the following steps:
+
+ Let bytes be the result of processing blob parts given fileBits 
+and options .
+
+ Let n be the fileName argument to the constructor.
+
+ Note: Underlying OS filesystems use differing conventions for file name;
+with constructed files, mandating UTF-16 lessens ambiquity when file names are converted to byte sequences.
+
+ Process FilePropertyBag dictionary argument by running the following substeps:
+
+ If the type member is provided and is not the empty string,
+let t be set to the type dictionary member.
+If t contains any characters outside the range U+0020 to U+007E,
+then set t to the empty string and return from these substeps.
+
+ Convert every character in t to ASCII lowercase .
+
+ If the lastModified member is provided,
+let d be set to the lastModified dictionary member.
+If it is not provided,
+set d to the current date and time
+represented as the number of milliseconds since the Unix Epoch 
+(which is the equivalent of Date.now() [ECMA-262] ).
+
+ Note: Since ECMA-262 Date objects convert to long long values
+representing the number of milliseconds since the Unix Epoch ,
+the lastModified member could be a Date object [ECMA-262] .
+
+ Return a new File object F such that:
+
+ F refers to the bytes byte sequence.
+
+ F . size is set to the number of total bytes in bytes .
+
+ F . name is set to n .
+
+ F . type is set to t .
+
+ F . lastModified is set to d .
+
+ 4.1.1. Constructor Parameters 
+
+ The File() constructor can be invoked with the parameters below:
+
+ A fileBits sequence 
+
+ which takes any number of the following elements, and in any order:
+
+ BufferSource elements.
+
+ Blob elements, which includes File elements.
+
+ USVString elements.
+
+ A fileName parameter
+
+ A USVString parameter representing the name of the file;
+ normative conditions for this constructor parameter can be found in § 4.1 Constructor .
+
+ An optional FilePropertyBag dictionary
+
+ which in addition to the members of
+ BlobPropertyBag takes one member:
+
+ An optional lastModified member,
+which must be a long long ;
+normative conditions for this member are provided in § 4.1 Constructor .
+
+ 4.2. Attributes 
+
+ name , of type DOMString , readonly 
+ The name of the file.
+ On getting, this must return the name of the file as a string.
+ There are numerous file name variations and conventions used by different underlying OS file systems;
+ this is merely the name of the file, without path information.
+ On getting, if user agents cannot make this information available,
+ they must return the empty string.
+ If a File object is created using a constructor,
+ further normative conditions for this attribute are found in § 4.1 Constructor .
+
+ lastModified , of type long long , readonly 
+ The last modified date of the file.
+ On getting, if user agents can make this information available,
+ this must return a long long set to the time the file was last modified
+ as the number of milliseconds since the Unix Epoch .
+ If the last modification date and time are not known,
+ the attribute must return the current date and time
+ as a long long representing the number of milliseconds since the Unix Epoch ;
+ this is equivalent to Date . now () [ECMA-262] .
+ If a File object is created using a constructor,
+ further normative conditions for this attribute are found in § 4.1 Constructor .
+
+ The File interface is available on objects that expose an attribute of type FileList ;
+these objects are defined in HTML [HTML] .
+The File interface, which inherits from Blob , is immutable,
+and thus represents file data that can be read into memory at the time a read operation is initiated.
+User agents must process reads on files that no longer exist at the time of read as errors ,
+throwing a NotFoundError exception
+if using a FileReaderSync on a Web Worker [Workers] 
+or firing an for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error event
+with the error attribute returning a NotFoundError .
+
+ In the examples below, metadata from a file object is displayed meaningfully, and a file object is created with a name and a last modified date.
+
+ var file = document . getElementById ( "filePicker" ). files [ 0 ]; 
+ var date = new Date ( file . lastModified ); 
+println ( "You selected the file " + file . name + " which was modified on " + date . toDateString () + "." ); 
+
+ ... 
+
+ // Generate a file with a specific last modified date 
+
+ var d = new Date ( 2013 , 12 , 5 , 16 , 23 , 45 , 600 ); 
+ var generatedFile = new File ([ "Rough Draft ...." ], "Draft1.txt" , { type : "text/plain" , lastModified : d }) 
+
+ ... 
+
+ 5. The FileList Interface 
+
+ Note: The FileList interface should be considered "at risk"
+since the general trend on the Web Platform is to replace such interfaces
+with the Array platform object in ECMAScript [ECMA-262] .
+In particular, this means syntax of the sort filelist . item ( 0 ) is at risk;
+most other programmatic use of FileList is unlikely to be affected by the eventual migration to an Array type.
+
+ This interface is a list of File objects.
+
+ [ Exposed =( Window , Worker ), Serializable ]
+ interface FileList {
+ getter File ? item ( unsigned long index );
+ readonly attribute unsigned long length ;
+};
+
+ FileList objects are serializable objects . Their serialization steps ,
+given value and serialized , are:
+
+ Set serialized .[[Files]] to an empty list .
+
+ For each file in value , append the sub-serialization of file to
+ serialized .[[Files]].
+
+ Their deserialization step , given serialized and value , are:
+
+ For each file of serialized .[[Files]], add the sub-deserialization of file to value .
+
+ Sample usage typically involves DOM access to the <input type="file"> element within a form,
+ and then accessing selected files.
+
+ // uploadData is a form element 
+ // fileChooser is input element of type 'file' 
+ var file = document . forms [ 'uploadData' ][ 'fileChooser' ]. files [ 0 ]; 
+
+ // alternative syntax can be 
+ // var file = document.forms['uploadData']['fileChooser'].files.item(0); 
+
+ if ( file ) 
+ { 
+ // Perform file ops 
+ } 
+
+ 5.1. Attributes 
+
+ length , of type unsigned long , readonly 
+ must return the number of files in the FileList object.
+ If there are no files, this attribute must return 0.
+
+ 5.2. Methods and Parameters 
+
+ item(index) 
+
+ must return the index th File object in the FileList .
+ If there is no index th File object in the FileList ,
+ then this method must return null .
+
+ index must be treated by user agents
+ as value for the position of a File object in the FileList ,
+ with 0 representing the first file.
+ Supported property indices are the numbers in the range zero
+ to one less than the number of File objects represented by the FileList object.
+ If there are no such File objects,
+ then there are no supported property indices.
+
+ Note: The HTMLInputElement interface has a readonly attribute of type FileList ,
+which is what is being accessed in the above example.
+Other interfaces with a readonly attribute of type FileList include the DataTransfer interface.
+
+ 6. Reading Data 
+
+ 6.1. The File Reading Task Source 
+
+ This specification defines a new generic task source called the
+ file reading task source ,
+which is used for all tasks that are queued in this specification
+to read byte sequences associated with Blob and File objects.
+It is to be used for features that trigger in response to asynchronously reading binary data.
+
+ 6.2. The FileReader API 
+
+ [ Exposed =( Window , Worker )]
+ interface FileReader : EventTarget {
+ constructor ();
+ // async read methods
+ undefined readAsArrayBuffer ( Blob blob );
+ undefined readAsBinaryString ( Blob blob );
+ undefined readAsText ( Blob blob , optional DOMString encoding );
+ undefined readAsDataURL ( Blob blob );
+
+ undefined abort ();
+
+ // states
+ const unsigned short EMPTY = 0;
+ const unsigned short LOADING = 1;
+ const unsigned short DONE = 2;
+
+ readonly attribute unsigned short readyState ;
+
+ // File or Blob data
+ readonly attribute ( DOMString or ArrayBuffer )? result ;
+
+ readonly attribute DOMException ? error ;
+
+ // event handler content attributes
+ attribute EventHandler onloadstart ;
+ attribute EventHandler onprogress ;
+ attribute EventHandler onload ;
+ attribute EventHandler onabort ;
+ attribute EventHandler onerror ;
+ attribute EventHandler onloadend ;
+};
+
+ A FileReader has an associated state ,
+that is "empty" , "loading" , or "done" . It is initially "empty" .
+
+ A FileReader has an associated result 
+( null , a DOMString or an ArrayBuffer ). It is initially null .
+
+ A FileReader has an associated error 
+( null or a DOMException ). It is initially null .
+
+ The FileReader() constructor,
+when invoked, must return a new FileReader object.
+
+ The readyState attribute’s getter,
+when invoked, switches on this ’s state 
+and runs the associated step:
+
+ "empty" 
+
+ Return EMPTY 
+
+ "loading" 
+
+ Return LOADING 
+
+ "done" 
+
+ Return DONE 
+
+ The result attribute’s getter,
+when invoked, must return this ’s result .
+
+ The error attribute’s getter,
+when invoked, must return this ’s error .
+
+A FileReader fr has an associated read operation algorithm,
+which given blob , a type and an optional encodingLabel ,
+runs the following steps:
+
+ If fr ’s state is "loading" ,
+ throw an InvalidStateError DOMException .
+
+ Set fr ’s state to "loading" .
+
+ Set fr ’s result to null .
+
+ Set fr ’s error to null .
+
+ Let stream be the result of calling get stream on blob .
+
+ Let reader be the result of getting a reader from stream .
+
+ Let bytes be an empty byte sequence .
+
+ Let chunkPromise be the result of reading a chunk from stream with reader .
+
+ Let isFirstChunk be true.
+
+ In parallel , while true:
+
+ Wait for chunkPromise to be fulfilled or rejected.
+
+ If chunkPromise is fulfilled, and isFirstChunk is true,
+ queue a task to fire a progress event called loadstart at fr .
+
+ We might change loadstart to be dispatched synchronously,
+ to align with XMLHttpRequest behavior. [Issue #119] 
+
+ Set isFirstChunk to false.
+
+ If chunkPromise is fulfilled with an object whose done property is false and whose value 
+ property is a Uint8Array object, run these steps:
+
+ Let bs be the byte sequence represented by the Uint8Array object.
+
+ Append bs to bytes .
+
+ If roughly 50ms have passed since these steps were last invoked,
+ queue a task to fire a progress event called progress at fr .
+
+ Set chunkPromise to the result of reading a chunk from stream with reader .
+
+ Otherwise, if chunkPromise is fulfilled with an object whose done property is true,
+ queue a task to run the following steps and abort this algorithm:
+
+ Set fr ’s state to "done" .
+
+ Let result be the result of
+ package data given bytes , type , blob ’s type , and encodingLabel .
+
+ If package data threw an exception error :
+
+ Set fr ’s error to error .
+
+ Fire a progress event called for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error at fr .
+
+ Else:
+
+ Set fr ’s result to result .
+
+ Fire a progress event called load at the fr .
+
+ If fr ’s state is not "loading" ,
+ fire a progress event called loadend at the fr .
+
+ Note: Event handler for the load or for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error events could have started another load,
+ if that happens the loadend event for this load is not fired.
+
+ Otherwise, if chunkPromise is rejected with an error error ,
+ queue a task to run the following steps and abort this algorithm:
+
+ Set fr ’s state to "done" .
+
+ Set fr ’s error to error .
+
+ Fire a progress event called for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error at fr .
+
+ If fr ’s state is not "loading" ,
+ fire a progress event called loadend at fr .
+
+ Note: Event handler for the for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error event could have started another load,
+ if that happens the loadend event for this load is not fired.
+
+ Use the file reading task source for all these tasks.
+
+ 6.2.1. Event Handler Content Attributes 
+
+ The following are the event handler content attributes 
+(and their corresponding event handler event types )
+that user agents must support on FileReader as DOM attributes:
+
+ event handler content attribute 
+
+ event handler event type 
+
+ onloadstart 
+
+ loadstart 
+
+ onprogress 
+
+ progress 
+
+ onabort 
+
+ for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:abort
+for-less references:
+spec:media-source-2; type:event; for:/; text:abort
+spec:media-source-2; type:event; for:/; text:abort">abort 
+
+ onerror 
+
+ for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error 
+
+ onload 
+
+ load 
+
+ onloadend 
+
+ loadend 
+
+ 6.2.2. FileReader States 
+
+The FileReader object can be in one of 3 states.
+The readyState attribute tells you in which state the object is:
+
+ EMPTY (numeric value 0)
+
+ The FileReader object has been constructed,
+ and there are no pending reads.
+ None of the read methods have been called.
+ This is the default state of a newly minted FileReader object,
+ until one of the read methods have been called on it.
+
+ LOADING (numeric value 1)
+
+ A File or Blob is being read.
+ One of the read methods is being processed,
+ and no error has occurred during the read.
+
+ DONE (numeric value 2)
+
+ The entire File or Blob has been read into memory,
+ OR a file read error occurred,
+ OR the read was aborted using abort() .
+ The FileReader is no longer reading a File or Blob .
+ If readyState is set to DONE 
+ it means at least one of the read methods have been called on this FileReader .
+
+ 6.2.3. Reading a File or Blob 
+
+ The FileReader interface makes available several asynchronous read methods —​ readAsArrayBuffer() , readAsBinaryString() , readAsText() and readAsDataURL() ,
+which read files into memory.
+
+ Note: If multiple concurrent read methods are called on the same FileReader object,
+user agents throw an InvalidStateError on any of the read methods that occur
+when readyState = LOADING .
+
+ ( FileReaderSync makes available several synchronous read methods .
+ Collectively, the sync and async read methods of FileReader and FileReaderSync 
+ are referred to as just read methods .)
+
+ 6.2.3.1. The readAsDataURL() method 
+
+ The readAsDataURL( blob ) method,
+when invoked, must initiate a read operation for blob with DataURL .
+
+ 6.2.3.2. The readAsText() method 
+
+ The readAsText( blob , encoding ) method,
+when invoked, must initiate a read operation for blob with Text and encoding .
+
+ 6.2.3.3. The readAsArrayBuffer() 
+
+ The readAsArrayBuffer( blob ) method,
+when invoked, must initiate a read operation for blob with ArrayBuffer .
+
+ 6.2.3.4. The readAsBinaryString() method 
+
+ The readAsBinaryString( blob ) method,
+when invoked, must initiate a read operation for blob with BinaryString .
+
+ Note: The use of readAsArrayBuffer() is preferred over
+ readAsBinaryString() , which is provided for backwards
+compatibility.
+
+ 6.2.3.5. The abort() method 
+
+ When the abort() method is called,
+the user agent must run the steps below:
+
+ If this ’s state is "empty" 
+ or if this ’s state is "done" 
+ set this ’s result to null 
+ and terminate this algorithm .
+
+ If this ’s state is "loading" 
+ set this ’s state to "done" 
+ and set this ’s result to null .
+
+ If there are any tasks from this 
+ on the file reading task source in an affiliated task queue ,
+ then remove those tasks from that task queue.
+
+ Terminate the algorithm for the read method being processed.
+
+ Fire a progress event called for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:abort
+for-less references:
+spec:media-source-2; type:event; for:/; text:abort
+spec:media-source-2; type:event; for:/; text:abort">abort at this .
+
+ If this ’s state is not "loading" ,
+ fire a progress event called loadend at this .
+
+ 6.3. Packaging data 
+
+A Blob has an associated package data algorithm,
+given bytes , a type , a mimeType , and an optional encodingLabel ,
+which switches on type and runs the associated steps:
+
+ DataURL
+
+ Return bytes as a DataURL [RFC2397] subject to the considerations below:
+
+ Use mimeType as part of the Data URL if it is not the empty string
+in keeping with the Data URL specification [RFC2397] .
+
+ Otherwise, return a Data URL without a media-type. [RFC2397] .
+
+ Better specify how the DataURL is generated. [Issue #104] 
+
+ Text
+
+ Let encoding be failure.
+
+ If the encodingLabel is present, set encoding to the result of
+ getting an encoding from encodingLabel .
+
+ If encoding is failure:
+
+ Let type be the result of parse a MIME type given mimeType .
+
+ If type is not failure,
+ set encoding to the result of getting an encoding 
+ from type ’s parameters [ "charset" ].
+
+ If blob has a type attribute of text/plain;charset=utf-8 
+ then getting an encoding is run using "utf-8" as the label.
+ Note that user agents must parse and extract the portion of the Charset Parameter
+ that constitutes a label of an encoding.
+
+ If encoding is failure, then set encoding to UTF-8 .
+
+ Decode bytes using fallback encoding encoding , and return the result.
+
+ ArrayBuffer
+
+ Return a new ArrayBuffer whose contents are bytes .
+
+ BinaryString
+
+ Return bytes as a binary string,
+ in which every byte is represented by a code unit of equal value [0..255].
+
+ 6.4. Events 
+
+ The FileReader object must be the event target for all events in this specification.
+
+ When this specification says to fire a progress event called e 
+(for some ProgressEvent e 
+at a given FileReader reader ),
+the following are normative:
+
+ The progress event e does not bubble. e.bubbles must be false [DOM] 
+
+ The progress event e is NOT cancelable. e.cancelable must be false [DOM] 
+
+ 6.4.1. Event Summary 
+
+ The following are the events that are fired at FileReader objects.
+
+ Event name
+
+ Interface
+
+ Fired when…
+
+ loadstart 
+
+ ProgressEvent 
+
+ When the read starts.
+
+ progress 
+
+ ProgressEvent 
+
+ While reading (and decoding) blob 
+
+ abort 
+
+ ProgressEvent 
+
+ When the read has been aborted.
+ For instance, by invoking the abort() method.
+
+ error 
+
+ ProgressEvent 
+
+ When the read has failed (see file read errors ).
+
+ load 
+
+ ProgressEvent 
+
+ When the read has successfully completed.
+
+ loadend 
+
+ ProgressEvent 
+
+ When the request has completed (either in success or failure).
+
+ 6.4.2. Summary of Event Invariants 
+
+ This section is informative. 
+
+ The following are invariants applicable to event firing 
+for a given asynchronous read method in this specification:
+
+ Once a loadstart has been fired,
+a corresponding loadend fires at completion of the read,
+UNLESS any of the following are true:
+
+ the read method has been cancelled using abort() 
+and a new read method has been invoked
+
+ the event handler function for a load event initiates a new read
+
+ the event handler function for a for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error event initiates a new read.
+
+ Note: The events loadstart and loadend are not coupled in a one-to-one manner.
+
+ This example showcases "read-chaining":
+ initiating another read from within an event handler while the "first" read continues processing.
+
+ // In code of the sort... 
+reader . readAsText ( file ); 
+reader . onload = function (){ reader . readAsText ( alternateFile );} 
+
+ ..... 
+
+ //... the loadend event must not fire for the first read 
+
+reader . readAsText ( file ); 
+reader . abort (); 
+reader . onabort = function (){ reader . readAsText ( updatedFile );} 
+
+ //... the loadend event must not fire for the first read 
+
+ One progress event will fire when blob has been completely read into memory.
+
+ No progress event fires before loadstart .
+
+ No progress event fires after any one of for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:abort
+for-less references:
+spec:media-source-2; type:event; for:/; text:abort
+spec:media-source-2; type:event; for:/; text:abort">abort , load , and for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error have fired.
+At most one of for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:abort
+for-less references:
+spec:media-source-2; type:event; for:/; text:abort
+spec:media-source-2; type:event; for:/; text:abort">abort , load , and for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error fire for a given read.
+
+ No for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:abort
+for-less references:
+spec:media-source-2; type:event; for:/; text:abort
+spec:media-source-2; type:event; for:/; text:abort">abort , load , or for instructions:
+Local references:
+spec:fileapi; type:event; for:FileReader; text:error
+for-less references:
+spec:media-source-2; type:event; for:/; text:error
+spec:media-source-2; type:event; for:/; text:error">error event fires after loadend .
+
+ 6.5. Reading on Threads 
+
+ Web Workers allow for the use of synchronous File or Blob read APIs,
+since such reads on threads do not block the main thread.
+This section defines a synchronous API, which can be used within Workers [Workers] .
+Workers can avail of both the asynchronous API (the FileReader object)
+ and the synchronous API (the FileReaderSync object).
+
+ 6.5.1. The FileReaderSync API 
+
+ This interface provides methods to synchronously read 
+ File or Blob objects into memory.
+
+ [ Exposed =( DedicatedWorker , SharedWorker )]
+ interface FileReaderSync {
+ constructor ();
+ // Synchronously return strings
+
+ ArrayBuffer readAsArrayBuffer ( Blob blob );
+ DOMString readAsBinaryString ( Blob blob );
+ DOMString readAsText ( Blob blob , optional DOMString encoding );
+ DOMString readAsDataURL ( Blob blob );
+};
+
+ 6.5.1.1. Constructors 
+
+ When the FileReaderSync() constructor is invoked,
+the user agent must return a new FileReaderSync object.
+
+ 6.5.1.2. The readAsText() 
+
+ The readAsText( blob , encoding ) method,
+when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on blob .
+
+ Let reader be the result of getting a reader from stream .
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Wait for promise to be fulfilled or rejected.
+
+ If promise fulfilled with a byte sequence bytes :
+
+ Return the result of package data given bytes , Text , blob ’s type , and encoding .
+
+ Throw promise ’s rejection reason.
+
+ 6.5.1.3. The readAsDataURL() method 
+
+ The readAsDataURL( blob ) method,
+when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on blob .
+
+ Let reader be the result of getting a reader from stream .
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Wait for promise to be fulfilled or rejected.
+
+ If promise fulfilled with a byte sequence bytes :
+
+ Return the result of package data given bytes , DataURL , and blob ’s type .
+
+ Throw promise ’s rejection reason.
+
+ 6.5.1.4. The readAsArrayBuffer() method 
+
+ The readAsArrayBuffer( blob ) method,
+when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on blob .
+
+ Let reader be the result of getting a reader from stream .
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Wait for promise to be fulfilled or rejected.
+
+ If promise fulfilled with a byte sequence bytes :
+
+ Return the result of package data given bytes , ArrayBuffer , and blob ’s type .
+
+ Throw promise ’s rejection reason.
+
+ 6.5.1.5. The readAsBinaryString() method 
+
+ The readAsBinaryString( blob ) method,
+when invoked, must run these steps:
+
+ Let stream be the result of calling get stream on blob .
+
+ Let reader be the result of getting a reader from stream .
+
+ Let promise be the result of reading all bytes from stream with reader .
+
+ Wait for promise to be fulfilled or rejected.
+
+ If promise fulfilled with a byte sequence bytes :
+
+ Return the result of package data given bytes , BinaryString , and blob ’s type .
+
+ Throw promise ’s rejection reason.
+
+ Note: The use of readAsArrayBuffer() is preferred over
+ readAsBinaryString() , which is provided for
+backwards compatibility.
+
+ 7. Errors and Exceptions 
+
+ File read errors can occur when reading files from the underlying filesystem.
+The list below of potential error conditions is informative .
+
+ The File or Blob being accessed may not exist
+at the time one of the asynchronous read methods or synchronous read methods are called.
+This may be due to it having been moved or deleted after a reference to it was acquired
+(e.g. concurrent modification with another application).
+See NotFoundError .
+
+ A File or Blob may be unreadable.
+This may be due to permission problems that occur after a reference to a File or Blob has been acquired
+(e.g. concurrent lock with another application).
+Additionally, the snapshot state may have changed.
+See NotReadableError .
+
+ User agents MAY determine that some files are unsafe for use within Web applications.
+A file may change on disk since the original file selection,
+thus resulting in an invalid read.
+Additionally, some file and directory structures may be considered restricted by the underlying filesystem;
+attempts to read from them may be considered a security violation.
+See § 9 Security and Privacy Considerations and SecurityError .
+
+ 7.1. Throwing an Exception or Returning an Error 
+
+ This section is normative. 
+
+ Error conditions can arise when reading a File or a Blob .
+
+ The read operation can terminate due to error conditions when reading a File or a Blob ;
+the particular error condition that causes the get stream algorithm to fail
+is called a failure reason . A failure reason is one of
+ NotFound , UnsafeFile , TooManyReads , SnapshotState , or FileLock .
+
+ Synchronous read methods throw exceptions of the type in the table below
+if there has been an error owing to a particular failure reason .
+
+ Asynchronous read methods use the error attribute of the FileReader object,
+which must return a DOMException object of the most appropriate type from the table below
+if there has been an error owing to a particular failure reason ,
+or otherwise return null.
+
+ Type
+
+ Description and Failure Reason
+
+ NotFoundError 
+
+ If the File or Blob resource could not be found at the time the read was processed,
+ this is the NotFound failure reason .
+
+ For asynchronous read methods the error attribute must return a NotFoundError exception
+ and synchronous read methods must throw a NotFoundError exception.
+
+ SecurityError 
+
+ If:
+
+ it is determined that certain files are unsafe for access within a Web application, this is the UnsafeFile failure reason .
+
+ it is determined that too many read calls are being made on File or Blob resources, this is the TooManyReads failure reason .
+
+ For asynchronous read methods the error attribute may return a SecurityError exception
+ and synchronous read methods may throw a SecurityError exception.
+
+ This is a security error to be used in situations not covered by any other failure reason .
+
+ NotReadableError 
+
+ If:
+
+ the snapshot state of a File or a Blob does not match the state of the underlying storage,
+this is the SnapshotState failure reason .
+
+ the File or Blob cannot be read,
+typically due due to permission problems that occur after a snapshot state has been established
+(e.g. concurrent lock on the underlying storage with another application)
+then this is the FileLock failure reason .
+
+ For asynchronous read methods the error attribute must return a NotReadableError exception
+ and synchronous read methods must throw a NotReadableError exception.
+
+ 8. A URL for Blob and MediaSource reference 
+
+ This section defines a scheme for a URL used to refer to Blob 
+and MediaSource objects.
+
+ 8.1. Introduction 
+
+ This section is informative. 
+
+ Blob (or object) URLs are URLs like
+ blob:http://example.com/550e8400-e29b-41d4-a716-446655440000 .
+This enables integration of Blob s and MediaSource s with other
+APIs that are only designed to be used with URLs, such as the img element.
+ Blob URLs can also be used to navigate to as well as to trigger downloads
+of locally generated data.
+
+ For this purpose two static methods are exposed on the URL interface,
+ createObjectURL(obj) and revokeObjectURL(url) .
+The first method creates a mapping from a URL to a Blob ,
+and the second method revokes said mapping.
+As long as the mapping exist the Blob can’t be garbage collected,
+so some care must be taken to revoke the URL as soon as the reference is no longer needed.
+All URLs are revoked when the global that created the URL itself goes away.
+
+ 8.2. Model 
+
+ Each user agent must maintain a blob URL store .
+A blob URL store is a map 
+where keys are valid URL strings 
+and values are blob URL Entries .
+
+ A blob URL entry consists of an object (of type
+ Blob or MediaSource ), and an environment (an
+ environment settings object ).
+
+ Note: Specifications have to use the obtain a blob object algorithm to access a
+ blob URL entry ’s object .
+
+ Keys in the blob URL store (also known as blob URLs )
+are valid URL strings that when parsed 
+result in a URL with a scheme equal to " blob ",
+an empty host , and a path consisting of one element itself also a valid URL string .
+
+To obtain a blob object given a blob URL entry 
+ blobUrlEntry and an environment , " top-level-navigation ", or
+" top-level-self-fetch " environment , perform the following steps. They return an
+ object .
+
+ Let isAuthorized be true.
+
+ If environment is an environment , then set isAuthorized to the result of
+ checking for same-partition blob URL usage with blobUrlEntry and environment .
+
+ If isAuthorized is false, then return failure.
+
+ Return blobUrlEntry ’s object .
+
+To 
+generate a new blob URL , run the following steps:
+
+ Let result be the empty string.
+
+ Append the string " blob: " to result .
+
+ Let settings be the current settings object 
+
+ Let origin be settings ’s origin .
+
+ Let serialized be the ASCII serialization of origin .
+
+ If serialized is " null ", set it to an implementation-defined value.
+
+ Append serialized to result .
+
+ Append U+0024 SOLIDUS ( / ) to result .
+
+ Generate a UUID [RFC4122] as a string and append it to result .
+
+ Return result .
+
+ An example of a blob URL that can be generated by this algorithm is
+ blob:https://example.org/40a5fb5a-d56d-4a33-b4e2-0acf6a8e5f64 .
+
+To 
+add an entry to the blob URL store for a given object ,
+run the following steps:
+
+ Let store be the user agent’s blob URL store .
+
+ Let url be the result of generating a new blob URL .
+
+ Let entry be a new blob URL entry consisting of object and the current settings object .
+
+ Set store [ url ] to entry .
+
+ Return url .
+
+To 
+remove an entry from the blob URL store for a given url ,
+run the following steps:
+
+ Let store be the user agent’s blob URL store ;
+
+ Let url string be the result of serializing url .
+
+ Remove store [ url string ].
+
+ 8.3. Dereferencing Model for blob URLs 
+
+To resolve a blob URL given a URL url :
+
+ Assert : url ’s scheme is " blob ".
+
+ Let store be the user agent’s blob URL store .
+
+ Let url string be the result of serializing url with the exclude fragment flag set.
+
+ If store [ url string ] exists , return store [ url string ]; otherwise return failure.
+
+ Futher requirements for the parsing and fetching model for blob URLs are defined in the [URL] and [Fetch] specifications.
+
+ 8.3.1. Origin of blob URLs 
+
+ This section is informative. 
+
+ The origin of a blob URL is always the same as that of the environment that created the URL,
+as long as the URL hasn’t been revoked yet. This is achieved by the [URL] spec looking up
+the URL in the blob URL store when parsing a URL, and using that entry to return
+the correct origin.
+
+ If the URL was revoked the serialization of the origin will still remain the same
+as the serialization of the origin of the environment that created the blob URL,
+but for opaque origins the origin itself might be distinct. This difference isn’t
+observable though, since a revoked blob URL can’t be resolved/fetched anymore anyway.
+
+ 8.3.2. Access restrictions on blob URLs 
+
+ Blob URLs can only be fetched from environments where the storage key matches that of
+the environment where the blob URL was created. Top-level blob URL navigations are
+not subject to this restriction.
+
+To check for same-partition blob URL usage given a blob URL entry blobUrlEntry and an environment environment , perform the following steps. They return a boolean.
+
+ Let blobStorageKey be the result of obtaining a storage key for non-storage purposes with blobUrlEntry ’s environment .
+
+ Let environmentStorageKey be the result of obtaining a storage key for non-storage purposes with environment .
+
+ If blobStorageKey is not equal to environmentStorageKey , then return false.
+
+ Return true.
+
+ 8.3.3. Lifetime of blob URLs 
+
+ This specification extends the unloading document cleanup steps with the following steps:
+
+ Let environment be the Document ’s relevant settings object .
+
+ Let store be the user agent’s blob URL store ;
+
+ Remove from store any entries for which the value ’s environment is equal to environment .
+
+ This needs a similar hook when a worker is unloaded.
+
+ 8.4. Creating and Revoking a blob URL 
+
+ Blob URLs are created and revoked using static methods exposed on the URL object.
+Revocation of a blob URL decouples the blob URL from the resource it refers to,
+and if it is dereferenced after it is revoked,
+user agents must act as if a network error has occurred.
+This section describes a supplemental interface to the URL specification [URL] 
+and presents methods for blob URL creation and revocation.
+
+ [ Exposed =( Window , DedicatedWorker , SharedWorker )]
+ partial interface URL {
+ static DOMString createObjectURL (( Blob or MediaSource ) obj );
+ static undefined revokeObjectURL ( DOMString url );
+};
+
+The createObjectURL( obj ) static method must
+return the result of adding an entry to the blob URL store for obj .
+
+The revokeObjectURL( url ) static method must run these steps:
+
+ Let urlRecord be the result of parsing url .
+
+ If urlRecord ’s scheme is not " blob ", return.
+
+ Let entry be urlRecord ’s blob URL entry .
+
+ If entry is null, then return.
+
+ Let isAuthorized be the result of checking for same-partition blob URL usage with entry and the current settings object .
+
+ If isAuthorized is false, then return.
+
+ Remove an entry from the Blob URL Store for url .
+
+ Note: This means that rather than throwing some kind of error, attempting to revoke a URL that isn’t registered or that was registered from an environment in a different storage partition will silently fail.
+User agents might display a message on the error console if this happens.
+
+ Note: Attempts to dereference url after it has been revoked will result in a network error .
+Requests that were started before the url was revoked should still succeed.
+
+ In the example below,
+ window1 and window2 are separate,
+ but in the same origin ;
+ window2 could be an iframe inside window1 .
+
+ myurl = window1 . URL . createObjectURL ( myblob ); 
+window2 . URL . revokeObjectURL ( myurl ); 
+
+ Since a user agent has one global blob URL store ,
+ it is possible to revoke an object URL from a different window than from which it was created.
+ The URL. revokeObjectURL() call
+ ensures that subsequent dereferencing of myurl 
+ results in a the user agent acting as if a network error has occurred.
+
+ 8.4.1. Examples of blob URL Creation and Revocation 
+
+ Blob URL s are strings that are used to fetch Blob objects,
+and can persist for as long as the document from which they were minted
+using URL. createObjectURL() —​see § 8.3.3 Lifetime of blob URLs .
+
+ This section gives sample usage of creation and revocation of blob URL s with explanations.
+
+ In the example below, two img elements [HTML] refer to the same blob URL :
+
+ url = URL . createObjectURL ( blob ); 
+img1 . src = url ; 
+img2 . src = url ; 
+
+ In the example below, URL. revokeObjectURL() is explicitly called.
+
+ var blobURLref = URL . createObjectURL ( file ); 
+img1 = new Image (); 
+img2 = new Image (); 
+
+ // Both assignments below work as expected 
+img1 . src = blobURLref ; 
+img2 . src = blobURLref ; 
+
+ // ... Following body load 
+ // Check if both images have loaded 
+ if ( img1 . complete && img2 . complete ) { 
+ // Ensure that subsequent refs throw an exception 
+ URL . revokeObjectURL ( blobURLref ); 
+ } else { 
+ msg ( "Images cannot be previewed!" ); 
+ // revoke the string-based reference 
+ URL . revokeObjectURL ( blobURLref ); 
+ } 
+
+ The example above allows multiple references to a single blob URL ,
+and the web developer then revokes the blob URL string after both image objects have been loaded.
+While not restricting number of uses of the blob URL offers more flexibility,
+it increases the likelihood of leaks;
+developers should pair it with a corresponding call to URL. revokeObjectURL() .
+
+ 9. Security and Privacy Considerations 
+
+ This section is informative. 
+
+ This specification allows web content to read files from the underlying file system,
+as well as provides a means for files to be accessed by unique identifiers,
+and as such is subject to some security considerations.
+This specification also assumes that the primary user interaction is with the <input type="file"/> element of HTML forms [HTML] ,
+and that all files that are being read by FileReader objects have first been selected by the user.
+Important security considerations include preventing malicious file selection attacks (selection looping),
+preventing access to system-sensitive files,
+and guarding against modifications of files on disk after a selection has taken place.
+
+ Preventing selection looping
+
+ During file selection, a user may be bombarded with the file picker associated with <input type="file"/> 
+ (in a "must choose" loop that forces selection before the file picker is dismissed)
+ and a user agent may prevent file access to any selections by making the FileList object returned be of size 0.
+
+ System-sensitive files
+
+ (e.g. files in /usr/bin, password files, and other native operating system executables)
+ typically should not be exposed to web content,
+ and should not be accessed via blob URLs .
+ User agents may throw a SecurityError exception for synchronous read methods,
+ or return a SecurityError exception for asynchronous reads.
+
+ This section is provisional; more security data may supplement this in subsequent drafts.
+
+ 10. Requirements and Use Cases 
+
+ This section covers what the requirements are for this API,
+as well as illustrates some use cases.
+This version of the API does not satisfy all use cases;
+subsequent versions may elect to address these.
+
+ Once a user has given permission,
+user agents should provide the ability to read and parse data directly from a local file programmatically.
+
+ A lyrics viewer.
+ User wants to read song lyrics from songs in his plist file.
+ User browses for plist file.
+ File is opened, read, parsed, and presented to the user as a sortable, actionable list within a web application.
+ User can select songs to fetch lyrics.
+ User uses the "browse for file" dialog.
+
+ Data should be able to be stored locally so that it is available for later use,
+which is useful for offline data access for web applications.
+
+ A Calendar App.
+ User’s company has a calendar.
+ User wants to sync local events to company calendar,
+ marked as "busy" slots (without leaking personal info).
+ User browses for file and selects it.
+ The text/calendar file is parsed in the browser,
+ allowing the user to merge the files to one calendar view.
+ The user wants to then save the file back to his local calendar file (using "Save As"?).
+ The user can also send the integrated calendar file back to the server calendar store asynchronously.
+
+ User agents should provide the ability to save a local file programmatically given an amount of data and a file name.
+
+ Note: While this specification doesn’t provide an explicit API call to trigger downloads,
+the HTML5 specification has addressed this.
+The download attribute of the a element initiates a download,
+saving a File with the name specified.
+The combination of this API and the download attribute on a elements
+allows for the creation of files within web applications,
+and the ability to save them locally.
+
+ A Spreadsheet App.
+ User interacts with a form, and generates some input.
+ The form then generates a CSV (Comma Separated Variables) output for the user to import into a spreadsheet,
+ and uses "Save...".
+ The generated output can also be directly integrated into a web-based spreadsheet,
+ and uploaded asynchronously.
+
+ User agents should provide a streamlined programmatic ability to send data from a file to a remote server
+that works more efficiently than form-based uploads today.
+
+ A Video/Photo Upload App.
+ User is able to select large files for upload,
+ which can then be "chunk-transfered" to the server.
+
+ User agents should provide an API exposed to script that exposes the features above.
+The user is notified by UI anytime interaction with the file system takes place,
+giving the user full ability to cancel or abort the transaction.
+The user is notified of any file selections,
+and can cancel these.
+No invocations to these APIs occur silently without user intervention.
+
+Acknowledgements 
+
+ This specification was originally developed by the SVG Working Group. Many thanks to Mark Baker and Anne van Kesteren for their feedback.
+
+ Thanks to Robin Berjon, Jonas Sicking and Vsevolod Shmyroff for editing the original specification.
+
+ Special thanks to Olli Pettay, Nikunj Mehta, Garrett Smith, Aaron Boodman, Michael Nordman, Jian Li, Dmitry Titov, Ian Hickson, Darin Fisher, Sam Weinig, Adrian Bateman and Julian Reschke.
+
+ Thanks to the W3C WebApps WG, and to participants on the public-webapps@w3.org listserv
+
+ Conformance 
+
+ Document conventions 
+
+ Conformance requirements are expressed
+ with a combination of descriptive assertions
+ and RFC 2119 terminology.
+ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL”
+ in the normative parts of this document
+ are to be interpreted as described in RFC 2119.
+ However, for readability,
+ these words do not appear in all uppercase letters in this specification.
+
+ All of the text of this specification is normative
+ except sections explicitly marked as non-normative, examples, and notes. [RFC2119] 
+
+ Examples in this specification are introduced with the words “for example”
+ or are set apart from the normative text
+ with class="example" ,
+ like this:
+
+ This is an example of an informative example.
+
+ Informative notes begin with the word “Note”
+ and are set apart from the normative text
+ with class="note" ,
+ like this:
+
+ Note, this is an informative note.
+
+ Conformant Algorithms 
+
+ Requirements phrased in the imperative as part of algorithms
+ (such as "strip any leading space characters"
+ or "return false and abort these steps")
+ are to be interpreted with the meaning of the key word
+ ("must", "should", "may", etc)
+ used in introducing the algorithm.
+
+ Conformance requirements phrased as algorithms or specific steps
+ can be implemented in any manner,
+ so long as the end result is equivalent.
+ In particular, the algorithms defined in this specification
+ are intended to be easy to understand
+ and are not intended to be performant.
+ Implementers are encouraged to optimize.
+
+ Index 
+
+ Terms defined by this specification 
+
+ abort , in § 6.4.1 
+ abort() , in § 6.2.3.5 
+ add an entry , in § 8.2 
+ add an entry to the blob URL store , in § 8.2 
+ adding an entry to the blob URL store , in § 8.2 
+ add the entry , in § 8.2 
+ add the entry to the blob URL store , in § 8.2 
+ arrayBuffer() , in § 3.3.4 
+ asynchronous read method , in § 6.2.3 
+ Blob , in § 3 
+ Blob() , in § 3 
+ Blob(blobParts) , in § 3 
+ Blob(blobParts, options) , in § 3 
+ BlobPart , in § 3 
+ BlobPropertyBag , in § 3 
+ blob URL , in § 8.2 
+ blob URL entry , in § 8.2 
+ blob URL store , in § 8.2 
+ bytes() , in § 3.3.5 
+ check for same-partition blob URL usage , in § 8.3.2 
+
+ constructor()
+
+ constructor for Blob , in § 3 
+ constructor for FileReader , in § 6.2 
+ constructor for FileReaderSync , in § 6.5.1 
+
+ constructor(blobParts) , in § 3 
+ constructor(blobParts, options) , in § 3 
+ constructor(fileBits, fileName) , in § 4 
+ constructor(fileBits, fileName, options) , in § 4 
+ converting line endings to native , in § 3.1.1 
+ convert line endings to native , in § 3.1.1 
+ createObjectURL(obj) , in § 8.4 
+ DONE , in § 6.2 
+ EMPTY , in § 6.2 
+ endings , in § 3.1.1 
+ EndingType , in § 3 
+ environment , in § 8.2 
+
+ error
+
+ attribute for FileReader , in § 6.2 
+ dfn for FileReader , in § 6.2 
+ event for FileReader , in § 6.4.1 
+
+ failure reason , in § 7.1 
+ File , in § 4 
+ File(fileBits, fileName) , in § 4 
+ File(fileBits, fileName, options) , in § 4 
+ FileList , in § 5 
+ FileLock , in § 7.1 
+ FilePropertyBag , in § 4 
+ FileReader , in § 6.2 
+ FileReader() , in § 6.2 
+ file read error , in § 7 
+ FileReaderSync , in § 6.5.1 
+ FileReaderSync() , in § 6.5.1 
+ file reading task source , in § 6.1 
+ file type guidelines , in § 4 
+ fire a progress event , in § 6.4 
+ generate a new blob URL , in § 8.2 
+ generating a new blob URL , in § 8.2 
+ get stream , in § 3 
+ item(index) , in § 5.2 
+
+ lastModified
+
+ attribute for File , in § 4.2 
+ dict-member for FilePropertyBag , in § 4.1.1 
+
+ length , in § 5.1 
+ lifetime , in § 8.3.2 
+ lifetime stipulation , in § 8.3.2 
+ load , in § 6.4.1 
+ loadend , in § 6.4.1 
+ LOADING , in § 6.2 
+ loadstart , in § 6.4.1 
+ name , in § 4.2 
+ "native" , in § 3 
+ NotFound , in § 7.1 
+ object , in § 8.2 
+ object URL , in § 8.2 
+ obtain a blob object , in § 8.2 
+ onabort , in § 6.2.1 
+ onerror , in § 6.2.1 
+ onload , in § 6.2.1 
+ onloadend , in § 6.2.1 
+ onloadstart , in § 6.2.1 
+ onprogress , in § 6.2.1 
+ package data , in § 6.3 
+ process blob parts , in § 3.1.1 
+ processing blob parts , in § 3.1.1 
+ progress , in § 6.4.1 
+
+ readAsArrayBuffer(blob)
+
+ method for FileReader , in § 6.2.3.3 
+ method for FileReaderSync , in § 6.5.1.4 
+
+ readAsBinaryString(blob)
+
+ method for FileReader , in § 6.2.3.4 
+ method for FileReaderSync , in § 6.5.1.5 
+
+ readAsDataURL(blob)
+
+ method for FileReader , in § 6.2.3.1 
+ method for FileReaderSync , in § 6.5.1.3 
+
+ readAsText(blob)
+
+ method for FileReader , in § 6.2.3.2 
+ method for FileReaderSync , in § 6.5.1.2 
+
+ readAsText(blob, encoding)
+
+ method for FileReader , in § 6.2.3.2 
+ method for FileReaderSync , in § 6.5.1.2 
+
+ read method , in § 6.2.3 
+ read operation , in § 6.2 
+ readyState , in § 6.2 
+ remove an entry , in § 8.2 
+ remove an entry from the blob URL store , in § 8.2 
+ remove the entry , in § 8.2 
+ remove the entry from the blob URL store , in § 8.2 
+ resolve a blob URL , in § 8.3 
+
+ result
+
+ attribute for FileReader , in § 6.2 
+ dfn for FileReader , in § 6.2 
+
+ revokeObjectURL(url) , in § 8.4 
+ size , in § 3.2 
+ slice() , in § 3.3.1 
+ slice blob , in § 2 
+ slice(start) , in § 3.3.1 
+ slice(start, end) , in § 3.3.1 
+ slice(start, end, contentType) , in § 3.3.1 
+ slice(start, end, contentType), slice(start, end), slice(start), slice() , in § 3.3.1 
+ snapshot state , in § 3 
+ SnapshotState , in § 7.1 
+ state , in § 6.2 
+ stream() , in § 3.3.2 
+ synchronous read method , in § 6.5.1 
+ terminate an algorithm , in § 2 
+ terminate this algorithm , in § 2 
+ text() , in § 3.3.3 
+ textStream() , in § 3.3.6 
+ TooManyReads , in § 7.1 
+ "transparent" , in § 3 
+
+ type
+
+ attribute for Blob , in § 3.2 
+ dict-member for BlobPropertyBag , in § 3.1.1 
+
+ Unix Epoch , in § 2 
+ UnsafeFile , in § 7.1 
+
+ Terms defined by reference 
+
+ [DOM] defines the following terms:
+
+ Document 
+ EventTarget 
+ fire an event 
+
+ [ECMA-262] defines the following terms:
+
+ Array 
+ Date 
+
+ [ENCODING] defines the following terms:
+
+ TextDecoderStream 
+ decode 
+ getting an encoding 
+ set up a text decoder stream 
+ UTF-8 
+ UTF-8 decode 
+ UTF-8 encode 
+
+ [Fetch] defines the following terms:
+
+ fetch 
+ network error 
+ text() 
+
+ [HTML] defines the following terms:
+
+ DataTransfer 
+ EventHandler 
+ HTMLInputElement 
+ Serializable 
+ a 
+ ASCII serialization of an origin 
+ current settings object 
+ deserialization steps 
+ download 
+ environment 
+ environment settings object 
+ event handler content attribute 
+ event handler event type 
+ iframe 
+ img 
+ in parallel 
+ input 
+ origin 
+ postMessage(message, options) 
+ queue a global task 
+ queue a task 
+ relevant global object 
+ relevant realm 
+ relevant settings object 
+ same origin 
+ serializable object 
+ serialization steps 
+ sub-deserialization 
+ sub-serialization 
+ task 
+ task source 
+ unloading document cleanup steps 
+
+ [INFRA] defines the following terms:
+
+ ASCII lowercase 
+ assert 
+ byte 
+ byte sequence 
+ code point 
+ collecting a sequence of code points 
+ exist 
+ for each 
+ keys 
+ list 
+ map 
+ position variable 
+ remove 
+ set 
+ string 
+ value 
+ values 
+
+ [MEDIA-SOURCE-2] defines the following terms:
+
+ MediaSource 
+
+ [MIMESNIFF] defines the following terms:
+
+ parameters 
+ parsable mime type 
+ parse a MIME type 
+
+ [STORAGE] defines the following terms:
+
+ equal 
+ obtain a storage key for non-storage purposes 
+ storage key 
+
+ [STREAMS] defines the following terms:
+
+ ReadableStream 
+ chunk 
+ enqueue 
+ error 
+ get a reader 
+ pipe through 
+ read a chunk 
+ read all bytes 
+ set up with byte reading support 
+
+ [URL] defines the following terms:
+
+ URL 
+ empty host 
+ path 
+ scheme 
+ URL 
+ URL parser 
+ URL serializer 
+ valid URL string 
+
+ [WebIDL] defines the following terms:
+
+ ArrayBuffer 
+ BufferSource 
+ Clamp 
+ DOMException 
+ DOMString 
+ Exposed 
+ InvalidStateError 
+ NewObject 
+ NotFoundError 
+ NotReadableError 
+ Promise 
+ SecurityError 
+ USVString 
+ Uint8Array 
+ get a copy of the buffer source 
+ long long 
+ new 
+ sequence 
+ supported property indices 
+ this 
+ throw 
+ undefined 
+ unsigned long 
+ unsigned long long 
+ unsigned short 
+
+ [XHR] defines the following terms:
+
+ ProgressEvent 
+ XMLHttpRequest 
+ send() 
+
+ References 
+
+ Normative References 
+
+ [DOM]
+ Anne van Kesteren. DOM Standard . Living Standard. URL: https://dom.spec.whatwg.org/ 
+ [ECMA-262]
+ ECMAScript Language Specification . URL: https://tc39.es/ecma262/multipage/ 
+ [ENCODING]
+ Anne van Kesteren. Encoding Standard . Living Standard. URL: https://encoding.spec.whatwg.org/ 
+ [Fetch]
+ Anne van Kesteren. Fetch Standard . Living Standard. URL: https://fetch.spec.whatwg.org/ 
+ [HTML]
+ Anne van Kesteren; et al. HTML Standard . Living Standard. URL: https://html.spec.whatwg.org/multipage/ 
+ [INFRA]
+ Anne van Kesteren; Domenic Denicola. Infra Standard . Living Standard. URL: https://infra.spec.whatwg.org/ 
+ [MEDIA-SOURCE-2]
+ Jean-Yves Avenard; Mark Watson. Media Source Extensions™ . 7 August 2026. WD. URL: https://www.w3.org/TR/media-source-2/ 
+ [MIMESNIFF]
+ Gordon P. Hemsley. MIME Sniffing Standard . Living Standard. URL: https://mimesniff.spec.whatwg.org/ 
+ [RFC2119]
+ S. Bradner. Key words for use in RFCs to Indicate Requirement Levels . March 1997. Best Current Practice. URL: https://datatracker.ietf.org/doc/html/rfc2119 
+ [RFC2397]
+ L. Masinter. The "data" URL scheme . August 1998. Proposed Standard. URL: https://www.rfc-editor.org/info/rfc2397/ 
+ [RFC4122]
+ K. Davis; B. Peabody; P. Leach. Universally Unique IDentifiers (UUIDs) . May 2024. Proposed Standard. URL: https://www.rfc-editor.org/info/rfc9562/ 
+ [STORAGE]
+ Anne van Kesteren. Storage Standard . Living Standard. URL: https://storage.spec.whatwg.org/ 
+ [STREAMS]
+ Adam Rice; et al. Streams Standard . Living Standard. URL: https://streams.spec.whatwg.org/ 
+ [URL]
+ Anne van Kesteren. URL Standard . Living Standard. URL: https://url.spec.whatwg.org/ 
+ [WebIDL]
+ Edgar Chen; Timothy Gu. Web IDL Standard . Living Standard. URL: https://webidl.spec.whatwg.org/ 
+ [XHR]
+ Anne van Kesteren. XMLHttpRequest Standard . Living Standard. URL: https://xhr.spec.whatwg.org/ 
+
+ Non-Normative References 
+
+ [Workers]
+ Ian Hickson. Web Workers . 28 January 2021. NOTE. URL: https://www.w3.org/TR/workers/ 
+
+ IDL Index 
+
+ [ Exposed =( Window , Worker ), Serializable ]
+ interface Blob {
+ constructor ( optional sequence < BlobPart > blobParts ,
+ optional BlobPropertyBag options = {});
+
+ readonly attribute unsigned long long size ;
+ readonly attribute DOMString type ;
+
+ // slice Blob into byte-ranged chunks
+ Blob slice ( optional [ Clamp ] long long start ,
+ optional [ Clamp ] long long end ,
+ optional DOMString contentType );
+
+ // read from the Blob.
+ [ NewObject ] ReadableStream stream ();
+ [ NewObject ] Promise < USVString > text ();
+ [ NewObject ] Promise < ArrayBuffer > arrayBuffer ();
+ [ NewObject ] ReadableStream textStream ();
+ [ NewObject ] Promise < Uint8Array > bytes ();
+};
+
+ enum EndingType { "transparent" , "native" };
+
+ dictionary BlobPropertyBag {
+ DOMString type = "";
+ EndingType endings = "transparent";
+};
+
+ typedef ( BufferSource or Blob or USVString ) BlobPart ;
+
+[ Exposed =( Window , Worker ), Serializable ]
+ interface File : Blob {
+ constructor ( sequence < BlobPart > fileBits ,
+ USVString fileName ,
+ optional FilePropertyBag options = {});
+ readonly attribute DOMString name ;
+ readonly attribute long long lastModified ;
+};
+
+ dictionary FilePropertyBag : BlobPropertyBag {
+ long long lastModified ;
+};
+
+[ Exposed =( Window , Worker ), Serializable ]
+ interface FileList {
+ getter File ? item ( unsigned long index );
+ readonly attribute unsigned long length ;
+};
+
+[ Exposed =( Window , Worker )]
+ interface FileReader : EventTarget {
+ constructor ();
+ // async read methods
+ undefined readAsArrayBuffer ( Blob blob );
+ undefined readAsBinaryString ( Blob blob );
+ undefined readAsText ( Blob blob , optional DOMString encoding );
+ undefined readAsDataURL ( Blob blob );
+
+ undefined abort ();
+
+ // states
+ const unsigned short EMPTY = 0;
+ const unsigned short LOADING = 1;
+ const unsigned short DONE = 2;
+
+ readonly attribute unsigned short readyState ;
+
+ // File or Blob data
+ readonly attribute ( DOMString or ArrayBuffer )? result ;
+
+ readonly attribute DOMException ? error ;
+
+ // event handler content attributes
+ attribute EventHandler onloadstart ;
+ attribute EventHandler onprogress ;
+ attribute EventHandler onload ;
+ attribute EventHandler onabort ;
+ attribute EventHandler onerror ;
+ attribute EventHandler onloadend ;
+};
+
+[ Exposed =( DedicatedWorker , SharedWorker )]
+ interface FileReaderSync {
+ constructor ();
+ // Synchronously return strings
+
+ ArrayBuffer readAsArrayBuffer ( Blob blob );
+ DOMString readAsBinaryString ( Blob blob );
+ DOMString readAsText ( Blob blob , optional DOMString encoding );
+ DOMString readAsDataURL ( Blob blob );
+};
+
+[ Exposed =( Window , DedicatedWorker , SharedWorker )]
+ partial interface URL {
+ static DOMString createObjectURL (( Blob or MediaSource ) obj );
+ static undefined revokeObjectURL ( DOMString url );
+};
+
+ Issues Index 
+
+ We need to specify more concretely what reading from a Blob actually does,
+what possible errors can happen, perhaps something about chunk sizes, etc. ↵ 
+
+ We might change loadstart to be dispatched synchronously,
+ to align with XMLHttpRequest behavior. [Issue #119] ↵ 
+
+ Better specify how the DataURL is generated. [Issue #104] ↵ 
+
+ This needs a similar hook when a worker is unloaded. ↵ 
+
+ This section is provisional; more security data may supplement this in subsequent drafts. ↵ 
+
+ ✔ MDN 
+
+ Blob/Blob 
+
+ In all current engines.
+
+ Firefox 13+ Safari 6+ Chrome 20+ 
+
+ Opera 12+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12+ 
+
+ Node.js 15.7.0+ 
+
+ ✔ MDN 
+
+ Blob/arrayBuffer 
+
+ In all current engines.
+
+ Firefox 69+ Safari 14+ Chrome 76+ 
+
+ Opera ? Edge 79+ 
+
+ Edge (Legacy) ? IE None 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile ? 
+
+ Node.js 15.7.0+ 
+
+ ✔ MDN 
+
+ Blob/size 
+
+ In all current engines.
+
+ Firefox 4+ Safari 6+ Chrome 5+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 11+ 
+
+ Node.js 15.7.0+ 
+
+ ✔ MDN 
+
+ Blob/slice 
+
+ In all current engines.
+
+ Firefox 13+ Safari 7+ Chrome 21+ 
+
+ Opera 12+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12+ 
+
+ Node.js 15.7.0+ 
+
+ ✔ MDN 
+
+ Blob/stream 
+
+ In all current engines.
+
+ Firefox 69+ Safari 14.1+ Chrome 76+ 
+
+ Opera ? Edge 79+ 
+
+ Edge (Legacy) ? IE None 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile ? 
+
+ Node.js 15.7.0+ 
+
+ ✔ MDN 
+
+ Blob/text 
+
+ In all current engines.
+
+ Firefox 69+ Safari 14+ Chrome 76+ 
+
+ Opera ? Edge 79+ 
+
+ Edge (Legacy) ? IE None 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile ? 
+
+ Node.js 15.7.0+ 
+
+ ✔ MDN 
+
+ Blob/type 
+
+ In all current engines.
+
+ Firefox 4+ Safari 6+ Chrome 5+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 11+ 
+
+ Node.js 15.7.0+ 
+
+ File/type 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 8+ Chrome 13+ 
+
+ Opera 15+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 14+ 
+
+ ✔ MDN 
+
+ Blob 
+
+ In all current engines.
+
+ Firefox 4+ Safari 6+ Chrome 5+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 11+ 
+
+ Node.js 18.0.0+ 
+
+ ✔ MDN 
+
+ File/File 
+
+ In all current engines.
+
+ Firefox 28+ Safari 10.1+ Chrome 38+ 
+
+ Opera ? Edge 79+ 
+
+ Edge (Legacy) ? IE None 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile ? 
+
+ ✔ MDN 
+
+ File/lastModified 
+
+ In all current engines.
+
+ Firefox 15+ Safari 10+ Chrome 13+ 
+
+ Opera 15+ Edge 79+ 
+
+ Edge (Legacy) 18 IE None 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 14+ 
+
+ ✔ MDN 
+
+ File/name 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 8+ Chrome 13+ 
+
+ Opera 15+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 14+ 
+
+ ✔ MDN 
+
+ File 
+
+ In all current engines.
+
+ Firefox 7+ Safari 4+ Chrome 13+ 
+
+ Opera 11.5+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 11.5+ 
+
+ ✔ MDN 
+
+ FileList/item 
+
+ In all current engines.
+
+ Firefox 3+ Safari 4+ Chrome 2+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ FileList/length 
+
+ In all current engines.
+
+ Firefox 3+ Safari 4+ Chrome 2+ 
+
+ Opera 11.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 11.1+ 
+
+ ✔ MDN 
+
+ element; this lets you access the list of files selected with the element. It's also used for a list of files dropped into web content when using the drag and drop API; see the DataTransfer object for details on this usage.">FileList 
+
+ In all current engines.
+
+ Firefox 3+ Safari 4+ Chrome 2+ 
+
+ Opera 11.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView 37+ Samsung Internet ? Opera Mobile 11.1+ 
+
+ ✔ MDN 
+
+ FileReader/FileReader 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ FileReader/abort 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/abort_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/abort_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/error 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/error_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/error_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/load_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/load_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/loadend_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/loadend_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/loadstart_event 
+
+ In all current engines.
+
+ Firefox 79+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 79+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/loadstart_event 
+
+ In all current engines.
+
+ Firefox 79+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 79+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/progress_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/progress_event 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/readAsArrayBuffer 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 12+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 12+ 
+
+ ✔ MDN 
+
+ FileReader/readAsBinaryString 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE None 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/readAsDataURL 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/readAsText 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/readyState 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader/result 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReader 
+
+ In all current engines.
+
+ Firefox 3.6+ Safari 6+ Chrome 6+ 
+
+ Opera 11+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android 32+ iOS Safari ? Chrome for Android ? Android WebView 3+ Samsung Internet ? Opera Mobile 11+ 
+
+ ✔ MDN 
+
+ FileReaderSync/FileReaderSync 
+
+ In all current engines.
+
+ Firefox 8+ Safari 6+ Chrome 7+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ FileReaderSync/readAsArrayBuffer 
+
+ In all current engines.
+
+ Firefox 8+ Safari 6+ Chrome 9+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ FileReaderSync/readAsDataURL 
+
+ In all current engines.
+
+ Firefox 8+ Safari 6+ Chrome 7+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ FileReaderSync/readAsText 
+
+ In all current engines.
+
+ Firefox 8+ Safari 6+ Chrome 7+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ FileReaderSync 
+
+ In all current engines.
+
+ Firefox 8+ Safari 6+ Chrome 7+ 
+
+ Opera 12.1+ Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile 12.1+ 
+
+ ✔ MDN 
+
+ URL/createObjectURL_static 
+
+ In all current engines.
+
+ Firefox 19+ Safari 6+ Chrome 19+ 
+
+ Opera ? Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile ? 
+
+ Node.js 16.7.0+ 
+
+ ✔ MDN 
+
+ URL/revokeObjectURL_static 
+
+ In all current engines.
+
+ Firefox 19+ Safari 6+ Chrome 19+ 
+
+ Opera ? Edge 79+ 
+
+ Edge (Legacy) 12+ IE 10+ 
+
+ Firefox for Android ? iOS Safari ? Chrome for Android ? Android WebView ? Samsung Internet ? Opera Mobile ? 
+
+ Node.js 16.7.0+

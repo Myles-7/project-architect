@@ -1,0 +1,680 @@
+Element: keydown event - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Element 
+
+ keydown 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ Element: keydown event
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The keydown event is fired when a key is pressed.
+
+ Unlike the deprecated keypress event, the keydown event is fired for all keys, regardless of whether they produce a character value.
+
+ The keydown and keyup events provide a code indicating which key is pressed, while keypress indicates which character was entered. For example, a lowercase "a" will be reported as 65 by keydown and keyup , but as 97 by keypress . An uppercase "A" is reported as 65 by all events.
+
+ The event target of a key event is the currently focused element which is processing the keyboard activity. This includes: <input> , <textarea> , anything that is contentEditable , and anything else that can be interacted with the keyboard, such as <a> , <button> , and <summary> . If no suitable element is in focus, the event target will be the <body> or the root. The event bubbles . It can reach Document and Window .
+
+ The event target might change between different key events. For example, the keydown target for pressing the Tab key would be different from the keyup target, because the focus has changed.
+
+ In this article
+
+ Syntax 
+
+ Event type 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ Use the event name in methods like addEventListener() , or set an event handler property.
+
+ js 
+ addEventListener("keydown", (event) => { })
+
+onkeydown = (event) => { }
+
+ Event type 
+
+ A KeyboardEvent . Inherits from UIEvent and Event .
+
+ Examples 
+
+ addEventListener keydown example 
+
+ This example logs the KeyboardEvent.code value whenever you press down a key inside the <input> element.
+
+ html 
+ <input placeholder="Click here, then press down a key." size="40" />
+<p id="log"></p>
+
+ js 
+ const input = document.querySelector("input");
+const log = document.getElementById("log");
+
+input.addEventListener("keydown", logKey);
+
+function logKey(e) {
+ log.textContent += ` ${e.code}`;
+}
+
+ keydown events with IME 
+
+ Since Firefox 65, the keydown and keyup events are now fired during Input method editor composition, to improve cross-browser compatibility for CJKT users ( Firefox bug 354358 ). To ignore all keydown events that are part of composition, do something like this (229 is a special value set for a keyCode relating to an event that has been processed by an IME):
+
+ js 
+ eventTarget.addEventListener("keydown", (event) => {
+ if (event.isComposing || event.keyCode === 229) {
+ return;
+ }
+ // do something
+});
+
+ Note: 
+ compositionstart may fire after keydown when typing the first character that opens up the IME, and compositionend may fire before keydown when typing the last character that closes the IME. In these cases, isComposing is false even when the event is part of composition. However, KeyboardEvent.keyCode is still 229 in these cases, so it's still advisable to check keyCode as well, although it's deprecated.
+
+ Specifications 
+
+ Specification
+
+ UI Events 
+# event-type-keydown 
+
+ HTML 
+# handler-onkeydown 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ input 
+
+ keypress 
+
+ keyup 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Jul 28, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ UI Events 
+ Element 
+ Instance properties activeViewTransition 
+ ariaActiveDescendantElement 
+ ariaAtomic 
+ ariaAutoComplete 
+ ariaBrailleLabel 
+ ariaBrailleRoleDescription 
+ ariaBusy 
+ ariaChecked 
+ ariaColCount 
+ ariaColIndex 
+ ariaColIndexText 
+ ariaColSpan 
+ ariaControlsElements 
+ ariaCurrent 
+ ariaDescribedByElements 
+ ariaDescription 
+ ariaDetailsElements 
+ ariaDisabled 
+ ariaErrorMessageElements 
+ ariaExpanded 
+ ariaFlowToElements 
+ ariaHasPopup 
+ ariaHidden 
+ ariaInvalid 
+ ariaKeyShortcuts 
+ ariaLabel 
+ ariaLabelledByElements 
+ ariaLevel 
+ ariaLive 
+ ariaModal 
+ ariaMultiLine 
+ ariaMultiSelectable 
+ ariaOrientation 
+ ariaOwnsElements 
+ ariaPlaceholder 
+ ariaPosInSet 
+ ariaPressed 
+ ariaReadOnly 
+ ariaRelevant 
+ ariaRequired 
+ ariaRoleDescription 
+ ariaRowCount 
+ ariaRowIndex 
+ ariaRowIndexText 
+ ariaRowSpan 
+ ariaSelected 
+ ariaSetSize 
+ ariaSort 
+ ariaValueMax 
+ ariaValueMin 
+ ariaValueNow 
+ ariaValueText 
+ assignedSlot 
+ attributes 
+ childElementCount 
+ children 
+ classList 
+ className 
+ clientHeight 
+ clientLeft 
+ clientTop 
+ clientWidth 
+ currentCSSZoom 
+ customElementRegistry 
+ elementTiming 
+ firstElementChild 
+ id 
+ innerHTML 
+ lastElementChild 
+ localName 
+ namespaceURI 
+ nextElementSibling 
+ outerHTML 
+ part 
+ prefix 
+ previousElementSibling 
+ role 
+ scrollHeight 
+ scrollLeft 
+ scrollLeftMax 
+ scrollTop 
+ scrollTopMax 
+ scrollWidth 
+ shadowRoot 
+ slot 
+ tagName 
+
+ Instance methods after() 
+ animate() 
+ append() 
+ ariaNotify() 
+ attachShadow() 
+ before() 
+ checkVisibility() 
+ closest() 
+ computedStyleMap() 
+ getAnimations() 
+ getAttribute() 
+ getAttributeNames() 
+ getAttributeNode() 
+ getAttributeNodeNS() 
+ getAttributeNS() 
+ getBoundingClientRect() 
+ getClientRects() 
+ getElementsByClassName() 
+ getElementsByTagName() 
+ getElementsByTagNameNS() 
+ getHTML() 
+ hasAttribute() 
+ hasAttributeNS() 
+ hasAttributes() 
+ hasPointerCapture() 
+ insertAdjacentElement() 
+ insertAdjacentHTML() 
+ insertAdjacentText() 
+ matches() 
+ moveBefore() 
+ prepend() 
+ pseudo() 
+ querySelector() 
+ querySelectorAll() 
+ releasePointerCapture() 
+ remove() 
+ removeAttribute() 
+ removeAttributeNode() 
+ removeAttributeNS() 
+ replaceChildren() 
+ replaceWith() 
+ requestFullscreen() 
+ requestPointerLock() 
+ scroll() 
+ scrollBy() 
+ scrollIntoView() 
+ scrollIntoViewIfNeeded() 
+ scrollTo() 
+ setAttribute() 
+ setAttributeNode() 
+ setAttributeNodeNS() 
+ setAttributeNS() 
+ setCapture() 
+ setHTML() 
+ setHTMLUnsafe() 
+ setPointerCapture() 
+ startViewTransition() 
+ toggleAttribute() 
+
+ Events afterscriptexecute 
+ animationcancel 
+ animationend 
+ animationiteration 
+ animationstart 
+ auxclick 
+ beforeinput 
+ beforematch 
+ beforescriptexecute 
+ beforexrselect 
+ blur 
+ click 
+ compositionend 
+ compositionstart 
+ compositionupdate 
+ contentvisibilityautostatechange 
+ contextmenu 
+ copy 
+ cut 
+ dblclick 
+ DOMActivate 
+ DOMMouseScroll 
+ focus 
+ focusin 
+ focusout 
+ fullscreenchange 
+ fullscreenerror 
+ gesturechange 
+ gestureend 
+ gesturestart 
+ gotpointercapture 
+ input 
+ keydown 
+ keypress 
+ keyup 
+ lostpointercapture 
+ mousedown 
+ mouseenter 
+ mouseleave 
+ mousemove 
+ mouseout 
+ mouseover 
+ mouseup 
+ mousewheel 
+ MozMousePixelScroll 
+ paste 
+ pointercancel 
+ pointerdown 
+ pointerenter 
+ pointerleave 
+ pointermove 
+ pointerout 
+ pointerover 
+ pointerrawupdate 
+ pointerup 
+ scroll 
+ scrollend 
+ scrollsnapchange 
+ scrollsnapchanging 
+ securitypolicyviolation 
+ touchcancel 
+ touchend 
+ touchmove 
+ touchstart 
+ transitioncancel 
+ transitionend 
+ transitionrun 
+ transitionstart 
+ webkitmouseforcechanged 
+ webkitmouseforcedown 
+ webkitmouseforceup 
+ webkitmouseforcewillbegin 
+ wheel 
+
+ Inheritance Node 
+ EventTarget 
+
+ Related pages for UI Events CompositionEvent 
+ FocusEvent 
+ InputEvent 
+ KeyboardEvent 
+ MutationEvent 
+ TextEvent 
+ UIEvent 
+
+ Guides Code values for keyboard events 
+ Key values for keyboard events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

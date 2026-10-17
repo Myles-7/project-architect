@@ -61,7 +61,7 @@ describe('Phase 4.9.2b: Read-Only Projection Endpoints', () => {
     expect(overviewRes.body.stateRevision).toBe(initialRev + 1);
     expect(overviewRes.body.data.projectId).toBe(projectId);
     expect(overviewRes.body.data.sourceStateRevision).toBe(initialRev + 1);
-    expect(overviewRes.body.data.totalConfirmedDecisions).toBe(2);
+    expect(overviewRes.body.data.totalConfirmedDecisions).toBe(1);
     const userSection = overviewRes.body.data.sections.find((s: any) => s.id === 'target_user');
     expect(userSection.items[0].statement).toBe('Engineers');
     expect(userSection.items[0].status).toBe('confirmed');

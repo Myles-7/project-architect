@@ -15,4 +15,15 @@ export * from './config.js';
 export * from './views.js';
 export * from './areas.js';
 export * from './discovery.js';
+export * from './presets.js';
+export * from './dag.js';
+export * from './diagrams.js';
+export * from './export.js';
+export * from './brownfield.js';
+export * from './audit.js';
+export * from './planning.js';
 
+
+export * from './planning-schema.js';
+export * from './planning-diagnostics.js';
+export * from './planning-provider-error.js';

@@ -1,0 +1,576 @@
+IDBObjectStore: createIndex() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ IDBObjectStore 
+
+ createIndex() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Français 
+
+ 日本語 
+
+ IDBObjectStore: createIndex() method
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ Note: This feature is available in Web Workers .
+
+ The createIndex() method of the
+ IDBObjectStore interface creates and returns a new
+ IDBIndex object in the connected database. It creates a new
+field/column defining a new data point for each database record to contain.
+
+ Bear in mind that IndexedDB indexes can contain any JavaScript data type;
+IndexedDB uses the structured clone algorithm to serialize stored objects, which allows for storage of simple
+and complex objects.
+
+ Note that this method must be called only from a VersionChange transaction
+mode callback.
+
+ In this article
+
+ Syntax 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ js 
+ createIndex(indexName, keyPath)
+createIndex(indexName, keyPath, options)
+
+ Parameters 
+
+ indexName 
+
+ The name of the index to create. Note that it is possible to create an index with an empty name.
+
+ keyPath 
+
+ The key path for the index to use. Note that it is possible to create an index with an empty keyPath , and also to pass in a sequence (array) as a keyPath .
+
+ options Optional 
+
+ An object which can include the following
+properties:
+
+ unique 
+
+ If true , the index will not allow duplicate values for a single key. Defaults to false .
+
+ multiEntry 
+
+ If true , the index will add an entry in the index for each array element when the keyPath resolves to an array.
+If false , it will add one single entry containing the array. Defaults to false .
+
+ locale 
+
+ Allows you to specify a locale for the index.
+Any sorting operations performed on the data via key ranges will then obey sorting rules of that locale.
+You can specify its value in one of three ways:
+
+ string : A string containing a specific locale code, e.g., en-US , or pl .
+
+ auto : The platform default locale will be used (may be changed by user agent settings).
+
+ null or undefined : If no locale is specified, normal JavaScript sorting will be used — not locale-aware.
+
+ Return value 
+
+ An IDBIndex object: the newly created index.
+
+ Exceptions 
+
+ This method may raise a DOMException of one of the following types:
+
+ ConstraintError DOMException 
+
+ Thrown if an index with the same name already exists in the object store. Index names are case-sensitive.
+
+ InvalidAccessError DOMException 
+
+ Thrown if the provided key path is a sequence, and multiEntry is set to true in the objectParameters object.
+
+ InvalidStateError DOMException 
+
+ Thrown if:
+
+ The method was not called from a versionchange transaction mode callback, i.e., from inside an onupgradeneeded handler.
+
+ The object store has been deleted.
+
+ SyntaxError DOMException 
+
+ Thrown if the provided keyPath is not a valid key path .
+
+ TransactionInactiveError DOMException 
+
+ Thrown if the transaction this IDBObjectStore 
+belongs to is not active (e.g., has been deleted or removed.) In Firefox
+previous to version 41, an InvalidStateError was raised in
+this case as well, which was misleading; this has now been fixed (see
+ Firefox bug 1176165 .)
+
+ Examples 
+
+ In the following example you can see
+the onupgradeneeded handler being used to update the
+database structure if a database with a higher version number is loaded.
+ createIndex() is used to create new indexes on the object store. For a
+full working example, see our To-do Notifications app ( view example live ).
+
+ js 
+ let db;
+
+// Let us open our database
+const DBOpenRequest = window.indexedDB.open("toDoList", 4);
+
+// Two event handlers for opening the database.
+DBOpenRequest.onerror = (event) => {
+ note.appendChild(document.createElement("li")).textContent =
+ "Error loading database.";
+};
+
+DBOpenRequest.onsuccess = (event) => {
+ note.appendChild(document.createElement("li")).textContent =
+ "Database initialized.";
+
+ // store the result of opening the database in the db variable.
+ // This is used a lot below.
+ db = request.result;
+
+ // Run the displayData() function to populate the task list with
+ // all the to-do list data already in the IDB
+ displayData();
+};
+
+// This handler fires when a new database is created and indicates
+// either that one has not been created before, or a new version
+// was submitted with window.indexedDB.open(). (See above.)
+// It is only implemented in recent browsers.
+DBOpenRequest.onupgradeneeded = (event) => {
+ const db = event.target.result;
+
+ db.onerror = (event) => {
+ note.appendChild(document.createElement("li")).textContent =
+ "Error loading database.";
+ };
+
+ // Create an objectStore for this database
+ const objectStore = db.createObjectStore("toDoList", {
+ keyPath: "taskTitle",
+ });
+
+ // define what data items the objectStore will contain
+
+ objectStore.createIndex("hours", "hours", { unique: false });
+ objectStore.createIndex("minutes", "minutes", { unique: false });
+ objectStore.createIndex("day", "day", { unique: false });
+ objectStore.createIndex("month", "month", { unique: false });
+ objectStore.createIndex("year", "year", { unique: false });
+ objectStore.createIndex("notified", "notified", { unique: false });
+};
+
+ Specifications 
+
+ Specification
+
+ Indexed Database API 3.0 
+# ref-for-dom-idbobjectstore-createindex① 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Using IndexedDB 
+
+ Starting transactions: IDBDatabase 
+
+ Using transactions: IDBTransaction 
+
+ Setting a range of keys: IDBKeyRange 
+
+ Retrieving and making changes to your data: IDBObjectStore 
+
+ Using cursors: IDBCursor 
+
+ Reference example: To-do Notifications ( View the example live ).
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Sep 16, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ IndexedDB API 
+ IDBObjectStore 
+ Instance properties autoIncrement 
+ indexNames 
+ keyPath 
+ name 
+ transaction 
+
+ Instance methods add() 
+ clear() 
+ count() 
+ createIndex() 
+ delete() 
+ deleteIndex() 
+ get() 
+ getAll() 
+ getAllKeys() 
+ getAllRecords() 
+ getKey() 
+ index() 
+ openCursor() 
+ openKeyCursor() 
+ put() 
+
+ Related pages for IndexedDB IDBCursor 
+ IDBCursorWithValue 
+ IDBDatabase 
+ IDBFactory 
+ IDBIndex 
+ IDBKeyRange 
+ IDBOpenDBRequest 
+ IDBRecord 
+ IDBRequest 
+ IDBTransaction 
+ IDBVersionChangeEvent 
+ Window .indexedDB 
+ WorkerGlobalScope .indexedDB 
+
+ Guides Using IndexedDB 
+ IndexedDB key characteristics and basic terminology 
+ Storage quotas and eviction criteria 
+ Checking when a deadline is due 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

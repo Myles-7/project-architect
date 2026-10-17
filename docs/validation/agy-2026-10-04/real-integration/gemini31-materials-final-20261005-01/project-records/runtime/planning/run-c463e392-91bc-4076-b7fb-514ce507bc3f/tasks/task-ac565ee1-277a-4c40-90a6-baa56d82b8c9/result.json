@@ -1,0 +1,427 @@
+{
+  "blockers": [],
+  "clarification": {
+    "constraints": "仅限浏览器纯前端本地运行，桌面优先；无需服务端、登录认证、多人协作或支付系统；上传截图仅作为视觉与空间布局参考，示例文字不作为业务需求。",
+    "delegated": [
+      "前端单页面组件排版与具体样式实现细节",
+      "输入验证与失败保留输入的微交互与错误提示动效",
+      "展示区与底部按钮尺寸与边距比例参数",
+      "纯前端状态管理与异常捕获防护机制"
+    ],
+    "outcomes": "输入有效项目名后点击确认即时在顶部高亮展示；空值提交时就地提示且保留输入；一键清空可复位展示区与输入状态；无服务端与无数据库依赖。",
+    "problem": "在本地进行轻量原型验证时，缺乏零干扰、秒级即时反馈且具备失败保留输入能力的纯客户端核对页面。",
+    "scope": "纯前端桌面优先单页面应用，包含输入框、确认主按钮、顶部核对展示区与清空重置辅助按钮；空间结构严格映射 fixture.png；失败与异常时保护输入不丢失。",
+    "target": "个人开发者本人在桌面浏览器环境中使用的本地单页面轻量原型核对工具。"
+  },
+  "evidence": [
+    {
+      "applicability": "用户原始需求、功能范围界定与非目标约束依据",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T16:08:03.059Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "参考截图视觉元素与空间结构映射依据",
+      "content": "fixture.png 真实像素呈现白底背景，上方居中偏左为黑色无衬线文本“Q7M4-8261”，下方左侧为蓝色矩形色块，下方右侧为橙色圆形色块。布局结构对应为：顶部/上方结果展示区域，底部/下方左侧为主操作区域（确认按钮），底部/下方右侧为辅助操作区域（清空按钮）。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+      "kind": "material",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\inputs\\inp-1791129999124\\fixture.png",
+      "obtainedAt": "2026-10-04T16:08:06.988Z",
+      "outcome": "passed",
+      "source": "material:input:inp-1791129999124"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "面向个人开发者本地独立开发与核对测试场景。用户需要在桌面浏览器中快速核对原型项目名的输入与即时视觉反馈，桌面优先，单人单机使用，无需跨设备同步或多用户协作。",
+          "dependsOn": [],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-prod-target",
+          "kind": "target",
+          "requirementIds": [
+            "material:input:inp-01"
+          ],
+          "stage": "product",
+          "title": "目标用户与使用场景"
+        },
+        {
+          "content": "解决开发者在本地进行轻量原型测试时缺乏即时、低干扰核对界面的问题。痛点包括：常规测试页面常依赖网络请求或复杂脚手架，难以进行秒级纯客户端反馈；在空值或异常提交时若缺乏提示或粗暴清空用户输入，会导致重复录入测试数据，严重降低核对效率。",
+          "dependsOn": [
+            "blk-prod-target"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-prod-problem",
+          "kind": "problem",
+          "requirementIds": [
+            "material:input:inp-01"
+          ],
+          "stage": "product",
+          "title": "核心问题与痛点分析"
+        },
+        {
+          "content": "1. 实时核对成效：输入任意非空项目名点击确认后，顶部展示区即时高对比呈现该名称。\n2. 健壮防错与空值反馈：空值提交时产生明确就地错误警示，不破坏界面状态，异常或提交失败时严格保留已有输入文本。\n3. 一键清空复位：点击清空按钮可将展示区重置为初始待核对占位状态，并同步清空输入框文本与历史校验错误。\n4. 性能目标（待技术阶段验证）：桌面现代浏览器本地冷启动加载耗时≤300ms，输入与按钮点击响应延迟≤50ms（测量起止：事件触发至 DOM 重绘完成，测试环境待技术阶段声明）。",
+          "dependsOn": [
+            "blk-prod-problem"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-prod-outcomes",
+          "kind": "outcomes",
+          "requirementIds": [
+            "material:input:inp-01"
+          ],
+          "stage": "product",
+          "title": "预期产品成效与衡量目标"
+        },
+        {
+          "content": "本产品严格限定为纯前端单页面应用。包含：\n1. 单个文本输入框（用于输入项目名）；\n2. 确认提交按钮（触发非空校验与展示）；\n3. 顶部高对比项目名展示区域；\n4. 清空重置按钮（一键复位界面状态）；\n5. 就地错误警示展示与异常保留输入机制；\n6. 基于 fixture.png 的白底与控件空间排布映射。",
+          "dependsOn": [
+            "blk-prod-outcomes"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+          ],
+          "id": "blk-prod-scope",
+          "kind": "scope",
+          "requirementIds": [
+            "material:input:inp-01"
+          ],
+          "stage": "product",
+          "title": "产品功能与边界范围"
+        },
+        {
+          "content": "明确排除以下所有能力扩张：\n1. 服务端支持：不引入任何后端 API、Node.js 服务端运行时或网络请求；\n2. 数据库与持久化：不依赖 IndexedDB/LocalStorage/远程数据库作为长期数据仓库；\n3. 用户鉴权与权限：无登录、注册、Token 管理或鉴权逻辑；\n4. 协同与支付：无多人协作、链接分享或商业化计费体系；\n5. 不将 fixture.png 中的示例文字“Q7M4-8261”转为业务需求或固定业务约束。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+          ],
+          "id": "blk-prod-non-goals",
+          "kind": "non_goals",
+          "requirementIds": [
+            "material:input:inp-01"
+          ],
+          "stage": "product",
+          "title": "非目标与排除能力"
+        },
+        {
+          "content": "支持在桌面端输入框中录入项目名文本，点击确认按钮后触发核对流程。\n- 正常状态：输入有效字符串时，顶部展示区即时切换为该文本，去除先前任何错误标记，输入框保留当前文字便于微调。\n- 空值状态：输入为空或全空白字符时，阻断展示区更新，输入框高亮错误边框并在其下方显示‘项目名不能为空，请输入有效字符’，且不清空用户输入。\n- 异常保护状态：若执行过程发生未知运行时错误，立即捕获异常并提示，严格保护输入框现有文本，不重置页面，允许用户修复或重试。\n- 初始/离线状态：首次打开展示区显示灰色占位文字‘【等待输入核对】’，完全支持纯离线本地加载。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-feat-input-display",
+          "kind": "feature",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "product",
+          "title": "功能特性：项目名输入、校验提交与即时展示"
+        },
+        {
+          "content": "1. 用户光标聚焦在文本输入框并输入字符。\n2. 用户点击确认按钮（或在输入框内按下 Enter 键）。\n3. 系统截取输入内容并去除首尾空白字符。\n4. 校验分支：\n   - 若字符长度为 0：在输入框下方挂载红色错误文本，保持输入框聚焦与原文本，流程结束；\n   - 若字符长度 > 0：移除存在的错误节点，将内容渲染至顶部展示区，输入框保持原文本。\n5. 异常防护：若 DOM 渲染抛出异常，捕获并在界面顶部以警告条显示错误，输入框文本原样保留。",
+          "dependsOn": [
+            "blk-feat-input-display"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-flow-input-display",
+          "kind": "flow",
+          "requirementIds": [
+            "blk-feat-input-display"
+          ],
+          "stage": "product",
+          "title": "交互流程：输入核对与展示流转"
+        },
+        {
+          "content": "实现单页面内的项目名输入控件、客户端非空校验逻辑、顶部展示区大字渲染以及提交异常保留输入机制。",
+          "dependsOn": [
+            "blk-flow-input-display"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-task-input-display",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-input-display"
+          ],
+          "stage": "product",
+          "task": {
+            "assumptions": [
+              "运行于现代桌面浏览器（支持 ES6 与标准 DOM API）",
+              "用户使用标准键盘鼠标进行交互"
+            ],
+            "completionCriteria": [
+              "非空字符输入确认后展示正确率100%",
+              "空值提交具备可见警示提示且不抹除已输入内容",
+              "异常发生时不发生页面白屏或数据丢失"
+            ],
+            "exclusions": "不连接后端 API，不进行远程唯一性校验，不引入外部庞大表单校验库",
+            "failureBehavior": "输入空值时就地提示且阻止更新；运行出错时捕获错误并保留输入框文本",
+            "goal": "完成输入框与展示区的双向状态联动与非空安全校验",
+            "modules": [
+              "InputComponent",
+              "DisplayComponent",
+              "Validator"
+            ],
+            "normalBehavior": "输入非空项目名并提交后，顶部展示区呈现该名称，错误提示隐藏，输入框文本保持",
+            "scope": "纯客户端 DOM 状态管理、输入文本去空格校验、错误提示展示与渲染保护",
+            "verification": [
+              "验证输入常规字符串后展示区显示内容一致",
+              "验证输入纯空格字符时出现就地错误提示且展示区不更新",
+              "人工注入 DOM 渲染异常，验证输入框字符是否完好保留"
+            ]
+          },
+          "title": "开发任务：输入框、校验器与展示区联动实现"
+        },
+        {
+          "content": "Scenario 1: 正常项目名核对展示\nGiven 页面已在本地桌面浏览器正常加载且处于待命状态\nWhen 用户在输入框中输入 'AiRDUO-Project-01' 并点击确认按钮\nThen 页面顶部展示区立即显示 'AiRDUO-Project-01'，字体为醒目大字，输入框保留 'AiRDUO-Project-01'，页面无错误提示。\n\nScenario 2: 空值输入阻断校验\nGiven 用户在输入框中未输入任何字符或仅输入若干空格\nWhen 用户点击确认按钮\nThen 顶部展示区保持当前状态不更新，输入框下方出现红色可见提示 '项目名不能为空，请输入有效字符'，输入框原有空格或空状态不被强制刷新。\n\nScenario 3: 异常场景保留输入\nGiven 用户在输入框中输入了超长项目名或特殊字符\nWhen 点击确认提交触发模拟运行时异常\nThen 页面显示友好错误横幅，输入框内的所有字符完好保留，允许用户修改或重试。",
+          "dependsOn": [
+            "blk-task-input-display"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-acc-input-display",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-input-display"
+          ],
+          "stage": "product",
+          "title": "验收标准：输入与确认展示 Given-When-Then"
+        }
+      ],
+      "decisions": [
+        {
+          "area": "产品范围",
+          "decisionKey": "dec-product-scope-boundary",
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "rationale": "依据用户明确约束，个人本地原型核对无需任何服务端支撑与复杂架构，轻量化纯前端运行能实现零部署门槛与即开即用。",
+          "statement": "严格限定为纯前端单页面应用，无服务端、无数据库、无用户登录与无协作支付，所有状态仅在前端运行时维护。"
+        },
+        {
+          "area": "交互容错",
+          "decisionKey": "dec-failure-preserve-input",
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "rationale": "用户明确强调‘失败时保留输入’与‘空值有提示’，避免用户在校验失败或异常时重复录入文本，保障核对测试的连贯性。",
+          "statement": "在空值提交或任何意外运行时异常时，严格保留输入框内的既有输入文本，仅就地呈现醒目提示，绝不强制抹除用户输入。"
+        }
+      ],
+      "dependsOn": [],
+      "id": "grp-prod-foundation-and-input",
+      "impact": "确立本地原型核对页面的目标受众、使用边界、非目标约束，以及核心输入、非空校验、顶部高对比展示与失败保留输入的完整产品设计规范与验收标准。",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "产品定位与核心输入展示功能包"
+    },
+    {
+      "blocks": [
+        {
+          "content": "本地单页面原型核对视图（Single Page View），基于 fixture.png 原生像素信息进行视觉与空间布局映射：\n1. 视觉底色：纯白底色（#FFFFFF）清爽背景，无多余装饰纹理；\n2. 顶部展示区域：映射 fixture.png 上方“Q7M4-8261”视觉层级与相对空间位置，作为核对结果大字展示区（初始显示灰色占位文字，确认后以高对比黑色大字显示）；\n3. 底部主操作控件：映射 fixture.png 下方左侧蓝色矩形色块，呈现为蓝色实心矩形外观的【确认】主操作按钮；\n4. 底部辅助操作控件：映射 fixture.png 下方右侧橙色圆形色块，呈现为橙色圆形/圆角外观的【清空】辅助操作按钮；\n5. 输入表单区域：在桌面端位于展示区与底部按钮区之间居中排布，保持操作动线自上而下流畅连贯。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-page-main-layout",
+          "kind": "page",
+          "requirementIds": [
+            "blk-prod-scope"
+          ],
+          "stage": "product",
+          "title": "页面职责与参考图空间结构映射"
+        },
+        {
+          "content": "提供一键清空与重置功能，帮助用户在完成一轮项目名核对后快速复位界面。\n- 正常交互：点击清空按钮后，顶部展示区复位为初始占位提示，输入框内容清空，任何正在显示的校验报错信息被移除，光标自动重新聚焦在输入框内。\n- 容错与恢复：清空操作不依赖外部环境，纯内存重置；若清空过程抛出异常，捕获错误并保留现有视图，提示用户手动刷新。\n- 幂等性：在空页面状态下重复点击清空不会产生任何副作用或错误。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+          ],
+          "id": "blk-feat-reset",
+          "kind": "feature",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "product",
+          "title": "功能特性：一键清空与状态复位"
+        },
+        {
+          "content": "1. 用户点击底部右侧橙色清空按钮（对应 fixture.png 下方右侧橙色圆形色块位置）。\n2. 系统执行界面状态复位：\n   a. 将当前输入框 value 设为空字符串；\n   b. 将顶部展示区 innerText 重置为预设占位文字（如 '【等待输入核对】'）；\n   c. 隐藏或移除所有可见的校验错误 DOM 节点；\n   d. 触发 inputElement.focus() 将焦点重置到输入框，等待新一轮输入。\n3. 流程结束，界面完全恢复初始待命态。",
+          "dependsOn": [
+            "blk-feat-reset"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+          ],
+          "id": "blk-flow-reset",
+          "kind": "flow",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "title": "交互流程：清空重置操作流转"
+        },
+        {
+          "content": "实现清空按钮的事件绑定、各组件状态统一重置以及光标自动回焦机制。",
+          "dependsOn": [
+            "blk-flow-reset"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+          ],
+          "id": "blk-task-reset",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "task": {
+            "assumptions": [
+              "所有组件状态集中受控或具备明确的重置接口"
+            ],
+            "completionCriteria": [
+              "清空操作响应时间≤50ms",
+              "展示区与输入框复位成功率100%",
+              "无状态残留"
+            ],
+            "exclusions": "不重载网页，不清除控制台调试日志",
+            "failureBehavior": "若重置逻辑发生异常，保留当前状态并提示重置失败，不导致页面崩溃",
+            "goal": "实现全局视图状态一键复位与自动回焦",
+            "modules": [
+              "ResetController",
+              "StateManager"
+            ],
+            "normalBehavior": "点击清空按钮后，所有输入、展示及错误状态均恢复为初始态，输入框获得焦点",
+            "scope": "清空按钮事件监听、输入框与展示区复位逻辑、错误状态清理",
+            "verification": [
+              "在已展示项目名且有错误提示的状态下点击清空，验证是否全部复位",
+              "验证清空后输入框是否处于自动聚焦状态"
+            ]
+          },
+          "title": "开发任务：一键清空与组件回焦控制"
+        },
+        {
+          "content": "Scenario 1: 正常清空复位\nGiven 顶部展示区正在展示 'Project-Test'，输入框包含 'Project-Test'，界面无错误\nWhen 用户点击底部右侧清空按钮\nThen 顶部展示区恢复为灰色占位文本 '【等待输入核对】'，输入框文本变为空，输入光标自动聚焦在输入框内。\n\nScenario 2: 清除历史错误提示\nGiven 页面因前次操作正在显示 '项目名不能为空，请输入有效字符' 红色警告\nWhen 用户点击清空按钮\nThen 红色警告提示立刻消失，页面恢复至干净初始态。",
+          "dependsOn": [
+            "blk-task-reset"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+          ],
+          "id": "blk-acc-reset",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "title": "验收标准：清空重置 Given-When-Then"
+        }
+      ],
+      "decisions": [
+        {
+          "area": "视觉与布局结构",
+          "decisionKey": "dec-visual-layout-mapping",
+          "evidenceIds": [
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "rationale": "忠实还原用户提供的参考截图真实视觉元素与布局结构，同时严格遵守用户‘仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求’的规则。",
+          "statement": "采纳 fixture.png 的白底平整背景、顶部显著结果展示区（对应原图黑体字位）、底部左侧蓝色确认按钮（对应原图蓝色矩形）与底部右侧橙色清空按钮（对应原图橙色圆形）的视觉空间排布映射，同时将示例文字 Q7M4-8261 作为纯占位参考而不引入为业务代码依赖。"
+        }
+      ],
+      "dependsOn": [
+        "grp-prod-foundation-and-input"
+      ],
+      "id": "grp-prod-layout-and-reset",
+      "impact": "依据 fixture.png 原生像素结构映射白底高对比桌面单页布局（顶部大字展示、底部左侧蓝色确认、底部右侧橙色清空），并建立状态一键复位与回焦机制。",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "参考布局空间映射与清空重置功能包"
+    }
+  ],
+  "questions": [
+    {
+      "allowFreeInput": true,
+      "area": "交互体验",
+      "createdAt": "2026-10-05T00:08:15.000Z",
+      "decisionKey": "dec-clear-interaction-mode",
+      "dependsOn": [
+        "blk-feat-reset"
+      ],
+      "id": "ques-clear-confirmation",
+      "importance": "normal",
+      "issueRef": "blk-feat-reset",
+      "options": [
+        {
+          "approach": "用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+          "gain": "极速流畅，测试流转零等待零多余点击，最符合单人敏捷本地核对场景。",
+          "impact": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+          "key": "opt-instant-clear",
+          "label": "即时直接清空",
+          "reversibility": "easy",
+          "sacrifice": "如发生手误误触，当前展示与输入内容将立即消失，需重新输入。"
+        },
+        {
+          "approach": "点击清空后立即清空视图，但悬浮显示 3 秒轻量撤销条（可点击'撤销清空'恢复前次内容）。",
+          "gain": "兼顾操作效率与防误触安全性，手误时一键恢复。",
+          "impact": "增加前端临时快照暂存状态，不影响主流程数据流向。",
+          "key": "opt-undo-toast",
+          "label": "轻量即时清空带悬浮撤销（Undo Toast）",
+          "reversibility": "easy",
+          "sacrifice": "需要额外维护一个前次快照状态及 3 秒定时器清理机制，增加轻微视觉元素。"
+        },
+        {
+          "approach": "点击清空时弹出轻量原生/自定义确认对话框，用户确认后才执行清空。",
+          "gain": "误触安全性最高，绝不发生非预期的清空动作。",
+          "impact": "引入模态交互状态，影响桌面快速快捷键操作流。",
+          "key": "opt-modal-confirm",
+          "label": "模态对话框二次确认",
+          "reversibility": "moderate",
+          "sacrifice": "每次清空都需要额外点击一次，显著降低反复核对的流转效率。"
+        }
+      ],
+      "question": "在点击清空按钮时，采用何种重置交互保护机制？",
+      "reason": "清空操作会立即清除已展示核对的项目名与输入框内容。由于该原型定位于开发者快速核对，过于繁琐的弹窗会拖慢流转，但若完全无保护则在误触时需重新键入。在产品规划阶段确定此交互方式，有助于直接界定清空流程的状态机设计。",
+      "recommendation": "推荐方案 A（即时直接清空），兼顾快速本地核对的高频测试效率与低干扰体验。",
+      "recommendationReason": "本地核对工具核心诉求是极速反馈，单人操作场景下弹窗二次确认会产生阻断感；且失败保留输入机制已覆盖提交异常场景，清空后光标自动回焦即可顺畅重测。",
+      "recommendedOptionKey": "opt-instant-clear",
+      "selectionMode": "single",
+      "status": "proposed"
+    }
+  ],
+  "summary": "已完成产品阶段（product）的完整设计方案。通过 native view_file 与 material_image 实际查验并结合材料索引，确认 fixture.png 像素呈现白底背景、上方黑色无衬线字符“Q7M4-8261”、下方左侧蓝色实心矩形与下方右侧橙色实心圆形。严格遵循‘仅作布局参考、不把示例文字转为业务需求’的原则，提炼为顶部核对结果展示区、底部左侧蓝色确认按钮与底部右侧橙色清空按钮的空间布局映射。设计涵盖产品定位、问题分析、成效指标、范围界定、明确非目标以及核心输入展示与清空重置两大功能模块，并配套交互流程、任务细化及 Given-When-Then 验收用例。同时提出 1 项关于清空防误触体验的待批准决策建议，等待用户审阅。"
+}

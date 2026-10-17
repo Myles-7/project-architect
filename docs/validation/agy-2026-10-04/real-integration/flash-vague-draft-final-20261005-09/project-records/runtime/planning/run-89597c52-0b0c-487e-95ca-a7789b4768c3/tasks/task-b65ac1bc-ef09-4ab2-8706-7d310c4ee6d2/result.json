@@ -1,0 +1,184 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用户原始需求输入，明确帮自己整理随手灵感的工具定位与随手记录初衷",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "environment": "local",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-user-input-verified",
+      "kind": "material",
+      "location": "inputs/inp-01/source.txt",
+      "obtainedAt": "2026-10-04T14:57:46.356Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "MDN KeyboardEvent 官方规范，用于指导网页处于激活焦点状态下的快捷键监听机制（页面激活按 N 聚焦、Ctrl/Cmd+Enter 提交与 Enter 单独换行）",
+      "content": "KeyboardEvent objects describe a user interaction with the keyboard; each event describes a single interaction between the user and a key (or key combination) on the keyboard.",
+      "environment": "web",
+      "hash": "27b611f3bd201d0b7a2ac226cb245a37c914b5527f881cdda242e952ae147c57",
+      "id": "evidence-mdn-keyboard-event",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent",
+      "obtainedAt": "2026-10-05T00:00:32.038Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 功能定义与交互规范\n\n1. **页面激活快捷唤起与极速聚焦**：\n   - 处于浏览器当前标签页获得焦点（页面激活）状态下，按键盘字母键 `N` 立即平滑滚动至页面顶部并自动聚焦快速捕获输入框。\n   - 严格遵循单页应用边界，去除非浏览器激活的操作系统全局唤起承诺，仅支持页面焦点快捷键。\n\n2. **多行输入自适应撑开与回车换行约束**：\n   - 默认高度为单行输入框（占位提示：“随手记下新灵感... 按 Ctrl+Enter 保存，输入 #添加标签”）。\n   - 随输入行数自适应展开至最多 8 行高度，超出后内部平滑滚动。\n   - **快捷键规范**：全字段统一快捷键提交，回车键 `Enter` 仅执行单行换行，**绝不保存与提交**。\n\n3. **快捷键提交与独立新建动作**：\n   - 支持 `Ctrl + Enter` (Windows/Linux) 或 `Cmd + Enter` (macOS) 瞬时提交，亦可点击“记录灵感”按钮提交。\n   - 提交时调用存储服务独立的 `createNote` 接口，携带当前本地库代际 `libraryGeneration` 写入数据库，生成全新 UUID，初始化 `revision = 1`；**严格禁止使用 saveNote 的 upsert 机制隐式复活已删除或不存在的便签**。\n   - 提交成功后清除当前代际对应的新建草稿暂存，输入框清空复位为单行，保持聚焦以支持连续记录；未备份计数递增 1。\n\n4. **智能行内标签提取**：\n   - 正文任意位置键入 `#标签名`，提交时自动正则匹配提取标签至 `tags` 数组（单个标签长度 1~20 字符，自动去除 `#` 前缀并去重），正文保留完整行内文本与语义。\n   - 输入框下方同时展示高频/近期推荐标签胶囊，支持鼠标点击或触控点选追加到正文末尾。\n\n5. **空内容拦截与红色抖动警示**：\n   - 严禁提交仅含空格、制表符或换行的空内容。\n   - 空内容触发提交时，输入框触发 300ms 红色边框 Shake 抖动动画拦截，光标保持在输入框中，终止写入，零数据库开销。\n\n6. **存储满载/写入失败与 sessionStorage 隔离暂存保护**：\n   - 若本地持久化层抛出配额超限（`StorageQuotaExceededError`）或代际失效（`LibraryGenerationMismatchError`）或写入异常，**输入框文字与标签 100% 完整保留在文本域中不被清空**，光标不丢失，卡片维持开启状态。\n   - 同时，系统自动通过 `SessionDraftService` 将草稿以 `{ schemaVersion: 1, noteId: 'new_draft', libraryGeneration, baseRevision: 0, content, savedAt: Date.now() }` 严格按新建草稿 ID（`new_draft`）与当前库代际 `libraryGeneration` 隔离暂存于当前标签页 `sessionStorage`（键名 `spark_draft_${libraryGeneration}_new_draft`），防止不同便签草稿相互覆盖。\n   - 界面顶部浮出醒目琥珀色告警横幅：“本地存储空间已满或写入异常，草稿已暂存至当前会话”，提供【复制草稿到剪贴板】与【导出当前未保存草稿】独立恢复文件（`.sparkdraft.json`，含正文、草稿ID、基准版本、代际与时间戳，与正式全量备份严格区分）入口。\n   - 诚实界定可用性边界：说明 `sessionStorage` 在页面刷新时保留，但标签页完全关闭后可能受浏览器策略清除，因此必须提供显式的手动导出草稿保护入口，绝不承诺“零丢稿/100%保证”。",
+          "dependsOn": [
+            "page-main-workspace"
+          ],
+          "evidenceIds": [
+            "evidence-user-input-verified",
+            "evidence-capture-modality",
+            "evidence-mdn-keyboard-event"
+          ],
+          "id": "feature-quick-capture",
+          "kind": "feature",
+          "requirementIds": [
+            "block-scope-core-boundaries"
+          ],
+          "stage": "product",
+          "title": "秒级随手灵感极速捕获功能"
+        },
+        {
+          "content": "### 快速捕获与标签解析交互流详细步骤\n\n1. **步骤 1（捕获唤起与单行换行）**：\n   - 浏览器处于激活焦点状态下，用户敲击键盘快捷键 `N`，页面平滑滚动至顶部，快速捕获输入框自动聚焦并高亮蓝色外边框；\n   - 用户在输入框中录入文本，敲击 `Enter` 键时，光标换行至下一行，输入框自适应垂直展开，**回车仅换行不保存**。\n\n2. **步骤 2（文本录入与智能标签建议）**：\n   - 输入框根据文本行数从 1 行平滑自适应撑开至最多 8 行，超出后内部平滑滚动；\n   - 用户键入 `#` 字符，下方浮出轻量标签补全气泡，支持方向键选择或回车确认补全；亦可点击输入框下方的推荐标签胶囊快捷插入。\n\n3. **步骤 3（提交前置校验与空内容拦截）**：\n   - 用户敲击统一快捷键 `Ctrl + Enter` (Windows/Linux) 或 `Cmd + Enter` (macOS)，或点击右下角“记录灵感”按钮；\n   - 系统执行文本修剪校验：去除首尾空白字符后若长度为 0，输入框立即执行 300ms 红色边框 Shake 抖动动画，光标保留在输入框中，终止提交流程，零数据库开销。\n\n4. **步骤 4（正文标签提取、独立 createNote 写入与视图更新）**：\n   - 校验通过后，使用正则匹配提取正文中所有 `#([^\\s#]{1,20})` 标签，去重后生成 `tags` 数组；\n   - 获取当前本地库代际 `currentLibraryGeneration`；\n   - 调用存储服务独立新建接口 `createNote({ content, tags, isPinned: false, isFavorite: false, status: 'active', trashedAt: null, schemaVersion: 1 }, currentLibraryGeneration)`；\n   - 存储服务校验代际有效性，生成全新 UUID，时间戳 `createdAt = updatedAt = Date.now()`，初始化 `revision = 1`，持久化至 IndexedDB `SparkNotesDB`（绝不调用 saveNote 进行 upsert 隐式复活）；\n   - 写入成功后：\n     - 调用 SessionDraftService 清理当前代际的新建草稿暂存（`spark_draft_${currentLibraryGeneration}_new_draft`）；\n     - 输入框文本清空并平滑复位为单行，保持聚焦以支持连续输入；\n     - 主工作区便签流首部以 150ms 淡入动效插入新便签卡片；\n     - 全局未备份变更计数器自增 1。\n\n5. **步骤 5（存储超限/写入失败异常分支与草稿隔离保护）**：\n   - 若持久化发生 `StorageQuotaExceededError`（配额满）或 `LibraryGenerationMismatchError`（全量覆盖导入后代际失效）或底层异常：\n     - 输入框中用户键入的全部文字与标签 **100% 完整保留在文本域中不被清空**，光标与选择区维持不变；\n     - 系统自动调用 `SessionDraftService.saveDraft({ noteId: 'new_draft', libraryGeneration: currentLibraryGeneration, baseRevision: 0, content })`，按代际与草稿 ID 隔离暂存于 `sessionStorage`；\n     - 快速捕获卡片维持开启状态，卡片顶部浮出琥珀色告警横幅：“本地存储空间已满或写入异常，灵感草稿已暂存”，展示两项安全恢复操作：\n       1. 【复制草稿到剪贴板】：一键将文本复制到剪贴板，提供成功 Toast；\n       2. 【导出当前未保存草稿】：调用 `IBackupService.exportUnsavedDraft` 触发下载独立恢复文件（`.sparkdraft.json`，格式包含 noteId='new_draft'、content、libraryGeneration、savedAt，明确区分于正式数据库备份）；\n       3. 【重试保存】：在用户清理空间后重新触发 `createNote` 写入。",
+          "dependsOn": [
+            "feature-quick-capture"
+          ],
+          "evidenceIds": [
+            "evidence-user-input-verified",
+            "evidence-capture-modality",
+            "evidence-mdn-keyboard-event"
+          ],
+          "id": "flow-quick-capture",
+          "kind": "flow",
+          "requirementIds": [
+            "feature-quick-capture"
+          ],
+          "stage": "product",
+          "title": "快速捕获与标签解析交互流"
+        },
+        {
+          "content": "开发随手灵感极速捕获组件 QuickCaptureCard 与标签提取交互，包含页面激活快捷键 N 聚焦、多行自适应撑开（1~8行）、统一快捷键 Ctrl/Cmd+Enter 提交（Enter 仅换行不保存）、正文 #标签 智能提取清洗、空文本 300ms 红色抖动拦截、调用独立 createNote 接口携带当前 libraryGeneration 写入数据库，以及存储超限/写入失败时文本保留在输入框中、sessionStorage 按 new_draft 与代际双重隔离暂存、复制与导出未保存草稿功能。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "flow-quick-capture"
+          ],
+          "evidenceIds": [
+            "evidence-react-verified",
+            "evidence-typescript",
+            "evidence-storage-estimate",
+            "evidence-mdn-keyboard-event"
+          ],
+          "id": "task-quick-capture",
+          "kind": "task",
+          "requirementIds": [
+            "feature-quick-capture",
+            "flow-quick-capture"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "运行环境为标准现代浏览器，页面处于激活焦点（Active/Focused）状态",
+              "底座 StorageService 已就绪，提供 createNote(note, generation) 与 getCurrentLibraryGeneration() 接口",
+              "SessionDraftService 已就绪，提供按 generation 与 noteId 隔离的暂存与导出接口"
+            ],
+            "completionCriteria": [
+              "页面激活快捷键 N 聚焦与 Ctrl/Cmd+Enter 提交测试通过率 100%，Enter 键单行换行确认率 100%",
+              "输入框 1~8 行自适应高度扩展与超长滚动测试通过率 100%",
+              "#标签 正则提取、去重与特殊字符过滤单元测试通过率 100%",
+              "空文本抖动拦截与零数据库调用测试通过率 100%",
+              "独立 createNote 接口调用与 libraryGeneration 传递验证率 100%",
+              "存储超限/写入失败时输入框文字零丢失、sessionStorage 隔离暂存及导出草稿功能测试通过率 100%"
+            ],
+            "environment": "Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+ 桌面浏览器环境，Node 18+ 开发构建环境",
+            "evidenceRequired": [
+              "Vitest 与 React Testing Library 组件测试执行报告",
+              "快捷键与 Enter 换行行为测试用例日志",
+              "存储异常注入与草稿暂存恢复测试用例日志"
+            ],
+            "exclusions": "不包含便签流展示与卡片交互（属于 NoteFeed 模块）、不包含多标签聚合侧边栏与重命名逻辑（属于 TagRail 模块）、不包含详情模态编辑与 Markdown 渲染（属于 NoteDetailModal 模块）、不包含底层 Dexie 数据库初始化与 Schema 定义（属于 StorageService 基座）。",
+            "failureBehavior": "空内容提交时触发 300ms 红色抖动拦截动画，不发起任何数据库写入；若存储配额满载或写入失败，输入框文字与标签 100% 完整保留在文本域中不被清空，光标不丢失，草稿通过 SessionDraftService 以 spark_draft_${libraryGeneration}_new_draft 暂存入 sessionStorage，界面展示琥珀色告警并提供复制文本与独立导出草稿入口；若代际不匹配，拦截并提示全量导入已重置库代际，支持导出草稿。",
+            "goal": "实现轻量单页应用顶部的秒级随手灵感极速捕获组件与交互流，涵盖页面激活快捷聚焦、多行自适应展开、统一快捷键 Ctrl/Cmd+Enter 提交（Enter 仅换行）、正文 #标签 智能提取、空文本红色抖动拦截、独立 createNote 接口调用与代际传递，以及存储满载/写入失败时的文本保留、sessionStorage 双重隔离暂存与未保存草稿导出入口。",
+            "modules": [
+              "QuickCaptureCard",
+              "useGlobalShortcut",
+              "useTagExtractor",
+              "SessionDraftService",
+              "StorageService"
+            ],
+            "normalBehavior": "页面处于激活焦点状态下按下 N 键平滑滚动并聚焦输入框；输入多行文本高度自适应动态撑开；敲击 Enter 键仅换行不保存；敲击 Ctrl/Cmd+Enter 或点击按钮提交，正文提取 #标签，调用独立 createNote(note, libraryGeneration) 成功写入，生成全新 UUID 与 revision=1，清除会话草稿，输入框清空复位，新卡片插入列表头部，未备份计数 +1。",
+            "onFailure": "若组件测试失败，检查快捷键事件冒泡与阻止策略、textarea 自适应高宽样式计算或 SessionDraftService 键名格式并修复",
+            "passCriteria": [
+              "组件单元测试与交互测试全部通过",
+              "快捷键行为与换行行为完全符合预期",
+              "标签提取与清洗准确率 100%",
+              "失败恢复与草稿暂存验证全部通过"
+            ],
+            "scope": "QuickCaptureCard 组件开发、输入框 textarea 自适应高度控制（1~8行）、页面激活快捷键 Hook（N 键聚焦、Ctrl/Cmd+Enter 提交、Enter 仅换行）、#标签 正则提取与标签清洗 Hook（1~20 字符去重）、空文本 Shake 动画 CSS、调用 StorageService.createNote 传递当前 libraryGeneration、SessionDraftService 隔离暂存集成、存储失败告警横幅与草稿复制/导出功能实现。",
+            "steps": [
+              "1. 实现 QuickCaptureCard 基础组件与多行 textarea 自动撑开 Hook（基于 scrollHeight 计算 1~8 行高度）",
+              "2. 实现 useGlobalShortcut Hook，监听 window keydown 事件：页面激活且非输入元素焦点下按 N 聚焦输入框，输入框内监听 keydown：Enter 键执行默认换行，Ctrl+Enter 或 Cmd+Enter 拦截并调用 onSubmit 提交",
+              "3. 编写 useTagExtractor 正则工具函数：提取正文中 #([^\\s#]{1,20}) 标签并去重，过滤非法符号",
+              "4. 集成 StorageService：提交时读取 getCurrentLibraryGeneration()，调用 createNote(newNote, generation) 执行独立新建",
+              "5. 编写提交校验与抖动动画：空文本触发 shake 样式类（300ms 关键帧动画），拦截提交",
+              "6. 编写异常捕获与 SessionDraftService 集成：捕获 StorageQuotaExceededError 等异常，输入框不清除内容，调用 SessionDraftService.saveDraft 隔离暂存入 sessionStorage，显示告警横幅及复制/导出草稿按钮",
+              "7. 编写 React Testing Library 自动化测试用例，覆盖上述行为与异常恢复"
+            ],
+            "verification": [
+              "使用 React Testing Library 验证页面激活下按 N 键聚焦与 Ctrl/Cmd+Enter 快捷提交，Enter 键仅换行不保存",
+              "测试正文 #标签 正则提取算法：提取多标签、首尾空格清洗、特殊字符过滤、1~20 字符长度约束与数组去重",
+              "测试空文本或纯空白字符提交时的 300ms 红色边框 Shake 抖动动画拦截与零数据库写入",
+              "测试调用独立 createNote 接口携带当前 libraryGeneration，验证 revision=1 初始化且绝不调用 saveNote 的 upsert",
+              "模拟 StorageQuotaExceededError 注入，测试输入框文本 100% 完整保留在 textarea 中未被清空，sessionStorage 生成 spark_draft_${generation}_new_draft 隔离记录，并展示【复制草稿】与【导出当前未保存草稿】独立文件按钮",
+              "测试库代际不匹配时的写入拦截与会话草稿保护"
+            ]
+          },
+          "title": "快速捕获组件与标签即时提取开发任务"
+        },
+        {
+          "content": "### 秒级灵感极速捕获验收标准（Given / When / Then）\n\n- **场景 1：窗口激活状态下按 N 键聚焦与 Enter 键换行（非提交）**\n  - **Given** 用户在浏览器工作区窗口非输入焦点区域，\n  - **When** 用户按下键盘字母键 `N`，并在输入框输入第一行文字后按下 `Enter` 键，\n  - **Then** 页面平滑滚动至顶部，快速捕获输入框聚焦并高亮蓝色外边框；输入框高度自适应撑开并换至第二行，**绝对不触发保存与提交操作**。\n\n- **场景 2：统一快捷键 Ctrl/Cmd+Enter 极速提交与智能标签提取**\n  - **Given** 输入框处于聚焦状态，当前本地库代际为 1，\n  - **When** 用户键入“调研 React 19 并发特性 #前端 #架构”，敲击 `Ctrl + Enter`（Windows/Linux）或 `Cmd + Enter`（macOS），\n  - **Then** 系统调用独立 `createNote` 接口并传入 `sessionGeneration = 1`，生成全新 UUID 与 `revision = 1`，成功持久化至 IndexedDB，提取标签为 `['前端', '架构']`，输入框清空并复位为单行，便签流首部即时以淡入动效插入新卡片，未备份变更计数 +1。\n\n- **场景 3：空文本与纯空白换行提交拦截**\n  - **Given** 输入框无文字或仅包含空格、制表符与换行符，\n  - **When** 用户点击“记录灵感”按钮或敲击 `Ctrl/Cmd + Enter`，\n  - **Then** 提交被拦截，底层 `createNote` 零调用，输入框外边框出现持续 300ms 的红色 Shake 抖动警示动画，光标保留在输入框中，便签流不产生任何变更。\n\n- **场景 4：存储满载或写入失败时文本保留在输入框与 sessionStorage 隔离暂存**\n  - **Given** 浏览器存储配额已满（`StorageQuotaExceededError`），当前库代际为 1，用户在输入框中已键入 200 字重要灵感，\n  - **When** 用户敲击 `Ctrl/Cmd + Enter` 触发提交，\n  - **Then** `createNote` 抛出存储满载异常；输入框文字 **100% 完整保留在文本域中不被清空**，光标不丢失；草稿通过 SessionDraftService 以键名 `spark_draft_1_new_draft` 暂存入 `sessionStorage`；顶部弹出琥珀色告警横幅，明确提供【复制草稿到剪贴板】与【导出当前未保存草稿】独立恢复文件（`.sparkdraft.json`）按钮。\n\n- **场景 5：全量覆盖导入后库代际失效防御与草稿保护**\n  - **Given** 用户在快速输入框键入了灵感草稿（绑定代际 1），期间另一标签页执行了全量覆盖导入导致本地库代际自增为 2，\n  - **When** 用户在原输入框尝试提交该灵感，\n  - **Then** `createNote` 检测到代际不匹配（`sessionGeneration = 1 !== currentGeneration = 2`），拦截写入防止陈旧数据污染新库；输入框文本完整保留，弹窗提示数据已被导入更新，提供【导出当前草稿为文件】或【作为全新灵感重新提交】入口。",
+          "dependsOn": [
+            "task-quick-capture"
+          ],
+          "evidenceIds": [
+            "evidence-user-input-verified",
+            "evidence-capture-modality",
+            "evidence-storage-estimate",
+            "evidence-mdn-keyboard-event"
+          ],
+          "id": "acceptance-quick-capture",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-quick-capture",
+            "flow-quick-capture"
+          ],
+          "stage": "delivery",
+          "title": "秒级灵感极速捕获验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937-group-tech-and-storage"
+      ],
+      "id": "task-b65ac1bc-ef09-4ab2-8706-7d310c4ee6d2-group-quick-capture",
+      "impact": "严格落实全字段 Ctrl/Cmd+Enter 提交与回车仅换行不保存规范；采用独立 createNote 接口并传入当前 libraryGeneration，杜绝 upsert 隐式复活已删除数据；落实写入失败与配额满载时输入框文字零丢失、sessionStorage 双重隔离暂存及导出草稿独立文件保护机制。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "秒级随手灵感极速捕获规范与任务"
+    }
+  ],
+  "questions": [],
+  "summary": "本轮按照登记的秒级随手灵感极速捕获工作范围与自动质量验收反馈，全面完成 feature-quick-capture、flow-quick-capture、task-quick-capture 及 acceptance-quick-capture 四个核心块的待批准候选设计：\n\n1. 【页面焦点快捷键与回车换行约束】：去除非浏览器激活的全局唤起承诺，仅在浏览器标签页激活焦点状态下支持按 N 键平滑滚动并聚焦输入框；全字段统一提交快捷键为 Ctrl/Cmd+Enter，回车键 Enter 仅执行单行换行与多行自适应撑开（1~8行），绝不触发保存与提交；\n2. 【独立 createNote 接口与库代际传递】：提交时调用独立的 createNote 接口，传入当前本地库代际 libraryGeneration，初始化全新 UUID 与 revision=1，严格杜绝通过 saveNote 的 upsert 机制隐式复活已删除数据；全量覆盖导入后代际自增，有效拦截陈旧新建会话误写；\n3. 【空文本校验与红色抖动拦截】：输入为空或纯空格/换行时，触发 300ms 红色边框 Shake 抖动动画拦截，光标保持在输入框中，终止写入，零数据库开销；\n4. 【存储超限/写入失败文本保留与双重隔离草稿】：当遭遇 StorageQuotaExceededError 配额满或写入异常时，输入框文字 100% 完整保留在文本域中不被清空，光标不丢失；草稿通过 SessionDraftService 以 spark_draft_${libraryGeneration}_new_draft 严格按草稿 ID 与代际双重隔离暂存于 sessionStorage；顶部浮出琥珀色告警横幅并提供【复制草稿到剪贴板】与【导出当前未保存草稿】独立恢复文件（.sparkdraft.json）入口，诚实界定可用性边界，杜绝绝对化承诺；\n5. 【开发任务与验收标准闭合】：task-quick-capture 补齐 goal、scope、exclusions、modules、normalBehavior、failureBehavior、verification、completionCriteria、assumptions、steps、environment 等完整契约；acceptance-quick-capture 建立涵盖按键聚焦、换行、快捷提交、空文本拦截、存储满载草稿保留与代际失效防御五大场景的具体 Given/When/Then 验收标准。",
+  "workItems": []
+}

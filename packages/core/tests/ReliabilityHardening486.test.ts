@@ -82,14 +82,14 @@ describe('Phase 4.8.6 Reliability Hardening: Input Materials Handling & Context 
     // 1. Image metadata contract
     expect(imgRef.kind).toBe('image');
     expect(imgRef.status).toBe('ready');
-    expect(imgRef.analysisAvailability).toBe('unavailable');
-    expect(imgRef.summary).toContain('visual analysis unavailable in V1');
+    expect(imgRef.analysisAvailability).toBe('available');
+    expect(imgRef.summary).toContain('vision reading is recorded');
 
     // 2. Extraction file inspection
     const extraction = await storage.readJson<any>(
       join(projectPath, 'inputs', imgRef.id.replace('input:', ''), 'extraction.json')
     );
-    expect(extraction.analysisAvailability).toBe('unavailable');
+    expect(extraction.analysisAvailability).toBe('available');
     expect(extraction.extractedText).toBe('');
 
     // 3. Must NOT enter context text

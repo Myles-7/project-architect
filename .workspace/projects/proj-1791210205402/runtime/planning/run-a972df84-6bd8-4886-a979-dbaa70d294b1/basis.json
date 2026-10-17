@@ -1,0 +1,279 @@
+{
+  "metadata": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "name": "Modern CLI Developer Tool",
+    "tagline": "风格",
+    "stage": "created",
+    "stateRevision": 1,
+    "projectTags": [
+      "cli",
+      "terminal",
+      "developer-experience",
+      "headless"
+    ],
+    "inputRefs": [
+      {
+        "id": "input:inp-01",
+        "kind": "text",
+        "label": "Initial Idea Prompt",
+        "storageRef": "inputs/inp-01/source.txt",
+        "status": "ready",
+        "analysisAvailability": "available",
+        "createdAt": "2026-10-05T14:23:25.402Z",
+        "summary": "风格",
+        "contentHash": "1bfde6b7ea27c9b842be2221c325c64110c9ca591b46afe89faabdc32636f0cf"
+      }
+    ],
+    "updatedAt": "2026-10-05T14:23:25.408Z",
+    "createdAt": "2026-10-05T14:23:25.402Z"
+  },
+  "overview": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "sections": [
+      {
+        "id": "project_overview",
+        "title": "项目概述与愿景",
+        "kind": "fixed",
+        "maturity": "mostly-clear",
+        "itemRefs": [
+          "decision:dec-01"
+        ]
+      },
+      {
+        "id": "target_user",
+        "title": "目标用户与痛点",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "mvp_scope",
+        "title": "MVP 范围与边界",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "core_features",
+        "title": "核心功能特性",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "user_flows",
+        "title": "主要用户旅程与流程",
+        "kind": "fixed",
+        "maturity": "mostly-clear",
+        "itemRefs": [
+          "decision:dec-preset-cli-02"
+        ]
+      },
+      {
+        "id": "page_structure",
+        "title": "页面结构与信息架构",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "ux_ui_direction",
+        "title": "UX 体验与 UI 方向",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "technical_boundary",
+        "title": "技术底线与运行约束",
+        "kind": "fixed",
+        "maturity": "mostly-clear",
+        "itemRefs": [
+          "decision:dec-preset-cli-01"
+        ]
+      },
+      {
+        "id": "delivery_plan",
+        "title": "交付计划与阶段里程碑",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      }
+    ],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "decisions": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "items": [
+      {
+        "id": "dec-01",
+        "area": "project_overview",
+        "statement": "风格",
+        "status": "confirmed",
+        "origin": "user",
+        "evidenceRefs": [
+          "input:inp-01"
+        ],
+        "confirmedBy": "user",
+        "createdAt": "2026-10-05T14:23:25.402Z",
+        "updatedAt": "2026-10-05T14:23:25.402Z"
+      },
+      {
+        "id": "dec-preset-cli-01",
+        "area": "technical_boundary",
+        "statement": "支持 --json 格式化输出与管道输入 (stdin NDJSON) 组合使用。",
+        "status": "confirmed",
+        "origin": "user",
+        "evidenceRefs": [],
+        "confirmedBy": "user",
+        "decisionKey": "pipe_friendly",
+        "rationale": "使工具不仅供人类阅读，亦可无缝无损地接入自动化流水线脚本。",
+        "affectedAreas": [
+          "technical_boundary",
+          "user_flows"
+        ],
+        "createdAt": "2026-10-05T14:23:25.402Z",
+        "updatedAt": "2026-10-05T14:23:25.402Z"
+      },
+      {
+        "id": "dec-preset-cli-02",
+        "area": "user_flows",
+        "statement": "首发支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y)。",
+        "status": "confirmed",
+        "origin": "user",
+        "evidenceRefs": [],
+        "confirmedBy": "user",
+        "decisionKey": "headless_ci_support",
+        "dependsOn": [
+          "dec-preset-cli-01"
+        ],
+        "rationale": "既能兼顾新手首次配置体验，又能确保无头 CI 环境零挂起。",
+        "affectedAreas": [
+          "user_flows",
+          "mvp_scope"
+        ],
+        "createdAt": "2026-10-05T14:23:25.402Z",
+        "updatedAt": "2026-10-05T14:23:25.402Z"
+      }
+    ],
+    "traces": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "assumptions": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "items": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "gaps": {
+    "schemaVersion": 2,
+    "projectId": "proj-1791210205402",
+    "gaps": [
+      {
+        "id": "gap-01",
+        "area": "target_user",
+        "decisionKey": "target_user:primary_audience",
+        "dependsOn": [],
+        "severity": "high",
+        "reason": "项目初始创建，核心目标用户细分画像尚待明确。",
+        "impact": "影响后续 MVP 核心功能优先级。",
+        "shouldAskUser": true,
+        "status": "open"
+      }
+    ],
+    "conflicts": [],
+    "tensions": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "risks": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "items": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "questions": {
+    "schemaVersion": 2,
+    "projectId": "proj-1791210205402",
+    "items": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "readiness": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "current": {
+      "id": "rdn-1791210205408",
+      "status": "not-ready",
+      "reviewedAt": "2026-10-05T14:23:25.402Z",
+      "basisRevision": 1,
+      "requiredAreas": [
+        "target_user",
+        "mvp_scope",
+        "core_features",
+        "user_flows",
+        "page_structure",
+        "ux_ui_direction",
+        "technical_boundary",
+        "delivery_plan"
+      ],
+      "warnings": [
+        "项目刚创建，尚在初始发散阶段。"
+      ],
+      "issues": [
+        "目标用户与 MVP 范围尚未收敛。"
+      ],
+      "assumptionRefs": [],
+      "knownIssueAcknowledgements": [],
+      "criticalConflictAcknowledgements": [],
+      "userDisposition": "pending"
+    },
+    "history": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "documents": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791210205402",
+    "items": [],
+    "updatedAt": "2026-10-05T14:23:25.402Z"
+  },
+  "planning": {
+    "schemaVersion": 1,
+    "blueprint": {
+      "schemaVersion": 1,
+      "blocks": [],
+      "stages": {
+        "product": "not-designed",
+        "technical": "not-designed",
+        "delivery": "not-designed"
+      },
+      "decisionBasisHash": "adec5cebd8b57c9305c87050dbc8544b6604c6de83f36cd6aca35309c2de3efe"
+    },
+    "changeSets": [],
+    "evidence": [],
+    "topics": [
+      {
+        "key": "pipe_friendly",
+        "aliases": [],
+        "history": [
+          "dec-preset-cli-01"
+        ],
+        "effectiveDecisionId": "dec-preset-cli-01"
+      },
+      {
+        "key": "headless_ci_support",
+        "aliases": [],
+        "history": [
+          "dec-preset-cli-02"
+        ],
+        "effectiveDecisionId": "dec-preset-cli-02"
+      }
+    ],
+    "inputs": [],
+    "operations": [],
+    "diagnostics": [
+      "旧决定 dec-01 缺少明确的问题或决策键关联，暂时保留原记录，需审阅后确认主题。"
+    ]
+  }
+}

@@ -1,212 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Activity,
-  Folder,
-  Copy,
-  Check,
-  FileCode,
-  HardDrive,
-  Cpu,
-  CheckCircle2,
-  AlertTriangle,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { DiagnosticSection, ProjectPlanningDiagnostics } from '@project-architect/contracts';
 import { useProjectSession } from '../../state/ProjectSessionContext.js';
-import { StageBadge } from '../../components/common/StatusBadge.js';
 import { useToast } from '../../components/common/Toast.js';
-import type { ProjectSnapshot } from '@project-architect/contracts';
+import { PlanningSettings } from '../planning/PlanningWorkspace.js';
+import { runStatusLabels, stageLabels, taskStatusLabels } from '../planning/planningPresentation.js';
 
-export interface ProjectDiagnosticsViewProps {
-  snapshot?: ProjectSnapshot;
+function Availability({ section }: { section: DiagnosticSection }) {
+  return <div className="planning-availability planning-muted"><span className={`planning-badge ${section.availability === 'available' ? '' : 'warning'}`}>{section.availability === 'available' ? '记录可读' : section.availability === 'partial' ? '记录不完整' : '暂不可读取'}</span>{section.reasons.slice(0, 2).map((reason, index) => <p key={index}>{reason}</p>)}{section.reasons.length > 2 && <details><summary>其余 {section.reasons.length - 2} 条读取说明</summary>{section.reasons.slice(2).map((reason, index) => <p key={index}>{reason}</p>)}</details>}</div>;
 }
+const value = (number: number | null | undefined) => number == null ? '未知' : number.toLocaleString();
 
-export const ProjectDiagnosticsView: React.FC<ProjectDiagnosticsViewProps> = ({
-  snapshot: propsSnapshot,
-}) => {
+export function ProjectDiagnosticsView() {
   const { state, apiClient } = useProjectSession();
-  const snapshot = propsSnapshot || state.snapshot;
-  const { activeProjectId, stateRevision } = state;
-  const { success, error } = useToast();
-  const [copied, setCopied] = useState(false);
-  const [discoveryTurnCount, setDiscoveryTurnCount] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const projectId = state.activeProjectId!;
+  const toast = useToast();
+  const [data, setData] = useState<ProjectPlanningDiagnostics | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(0);
   useEffect(() => {
-    if (!activeProjectId) return;
-    setIsLoading(true);
-    apiClient
-      .getDiscoveryTurns(activeProjectId)
-      .then((res) => {
-        setDiscoveryTurnCount(res.turns.length);
-      })
-      .catch(() => {
-        setDiscoveryTurnCount(null);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [activeProjectId, apiClient, stateRevision]);
-
-  const handleCopyPath = async () => {
-    if (!snapshot?.metadata?.projectId) return;
-    try {
-      // In local-first desktop workbench, project folder is under workspace
-      const path = `.workspace/projects/${snapshot.metadata.projectId}`;
-      await navigator.clipboard.writeText(path);
-      setCopied(true);
-      success('已复制项目物理路径至剪贴板', '复制成功');
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      error('复制路径失败', '剪贴板受限');
-    }
-  };
-
-  const handleOpenFolder = async () => {
-    if (!activeProjectId) return;
-    try {
-      await apiClient.openProjectFolder(activeProjectId);
-      success('已在文件管理器中打开项目目录', '已打开');
-    } catch {
-      error('无法打开本地文件夹，请手动检查系统环境', '打开失败');
-    }
-  };
-
-  if (!snapshot) {
-    return (
-      <div className="p-6 text-center text-xs text-zinc-500">
-        未加载项目，请先选择或创建一个项目。
-      </div>
-    );
-  }
-
-  const confirmedCount = (snapshot.decisions?.items || []).filter(
-    (d) => d.status === 'confirmed' || d.status === 'locked'
-  ).length;
-  const candidateCount = (snapshot.decisions?.items || []).filter(
-    (d) => d.status === 'candidate'
-  ).length;
-  const openGapsCount = (snapshot.gaps?.gaps || []).filter((g) => g.status === 'open').length;
-  const openConflictsCount = (snapshot.gaps?.conflicts || []).filter((c) => c.status === 'open').length;
-  const materialsCount = (snapshot.metadata.inputRefs || []).length;
-  const documentsCount = (snapshot.documents?.items || []).length;
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-4">
-        <div>
-          <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-orange-500" />
-            <span>项目健康与运行诊断中心</span>
-          </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            检查本地文件状态存储、两阶段提交完整性、版本演进以及 Discovery 推演轮次。
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <StageBadge stage={snapshot.metadata.stage} />
-          <span className="font-mono text-xs px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-            rev.{stateRevision ?? snapshot.metadata.stateRevision}
-          </span>
-        </div>
-      </div>
-
-      {/* Project Identity & Storage */}
-      <div className="p-4 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-3">
-        <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
-          <HardDrive className="w-4 h-4 text-zinc-500" />
-          <span>本地存储与物理路径</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-            <div className="text-zinc-400 text-[11px] mb-1">项目标识符 (Project ID)</div>
-            <div className="font-mono font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-              {snapshot.metadata.projectId}
-            </div>
-          </div>
-
-          <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-            <div className="text-zinc-400 text-[11px] mb-1">项目全称</div>
-            <div className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-              {snapshot.metadata.name}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60 text-xs">
-          <div className="flex items-center gap-2 min-w-0 truncate">
-            <Folder className="w-4 h-4 text-orange-500 shrink-0" />
-            <span className="font-mono text-zinc-600 dark:text-zinc-400 truncate">
-              .workspace/projects/{snapshot.metadata.projectId}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handleCopyPath}
-              className="px-2 py-1 rounded bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 flex items-center gap-1 cursor-pointer"
-              aria-label="复制项目本地路径"
-            >
-              {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-              <span>{copied ? '已复制' : '复制路径'}</span>
-            </button>
-            <button
-              onClick={handleOpenFolder}
-              className="px-2 py-1 rounded bg-orange-500 hover:bg-orange-600 text-white font-medium flex items-center gap-1 cursor-pointer"
-              aria-label="在本地文件管理器中打开"
-            >
-              <Folder className="w-3 h-3" />
-              <span>打开目录</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* State Files Health Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-        <div className="p-3.5 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-1">
-          <div className="text-zinc-400 text-[11px] flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-            <span>已确认决策</span>
-          </div>
-          <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-            {confirmedCount} 项
-          </div>
-          <div className="text-[10px] text-zinc-500">另有 {candidateCount} 项候选建议</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-1">
-          <div className="text-zinc-400 text-[11px] flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-            <span>待决缺口/冲突</span>
-          </div>
-          <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-            {openGapsCount + openConflictsCount} 项
-          </div>
-          <div className="text-[10px] text-zinc-500">{openConflictsCount} 项红线互斥</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-1">
-          <div className="text-zinc-400 text-[11px] flex items-center gap-1.5">
-            <FileCode className="w-3.5 h-3.5 text-blue-500" />
-            <span>输入附件与材料</span>
-          </div>
-          <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-            {materialsCount} 份材料
-          </div>
-          <div className="text-[10px] text-zinc-500">含 {documentsCount} 份生成文档</div>
-        </div>
-
-        <div className="p-3.5 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-1">
-          <div className="text-zinc-400 text-[11px] flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-purple-500" />
-            <span>推演轮次记录</span>
-          </div>
-          <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-            {isLoading ? '加载中...' : `${discoveryTurnCount ?? 0} 轮`}
-          </div>
-          <div className="text-[10px] text-zinc-500">完整轮次与审计日志保存</div>
-        </div>
-      </div>
-    </div>
-  );
-};
+    const controller = new AbortController();
+    setData(null); setError(null); setLoading(true);
+    void apiClient.getPlanningDiagnostics(projectId, controller.signal).then(next => { if (!controller.signal.aborted) setData(next); }).catch(failure => { if (!controller.signal.aborted) setError(failure.message || '无法读取运行诊断'); }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [projectId, apiClient, reload]);
+  return <div className="workspace-secondary-page planning-diagnostics">
+    <header className="planning-section-heading"><div><p className="planning-eyebrow">WORKSPACE DIAGNOSTICS</p><h1>运行信息，有据可查</h1><p className="planning-muted">读取本地记录，检查材料与运行状态。</p></div><button className="planning-button" disabled={loading} onClick={() => setReload(count => count + 1)}>刷新诊断</button></header>
+    {loading && <p role="status">正在读取本地记录…</p>}
+    {error && <div className="planning-error" role="alert"><p>{error}</p><button className="planning-button" onClick={() => setReload(count => count + 1)}>重新读取</button></div>}
+    {data && <>
+      <p className="planning-muted">读取时间 {new Date(data.observedAt).toLocaleString()} · 项目版本 {value(data.sourceStateRevision)}</p>
+      <section className="planning-diagnostic-card"><h2>项目目录</h2><Availability section={data.project} /><p className="planning-path">{data.project.projectPath}</p><div className="planning-actions"><button className="planning-button" onClick={async () => { try { await navigator.clipboard.writeText(data.project.projectPath); toast.success('已复制真实项目路径'); } catch { toast.error('无法访问剪贴板，请手动复制路径'); } }}>复制项目路径</button><button className="planning-button" onClick={async () => { try { await apiClient.openProjectFolder(projectId); } catch (failure) { toast.error(failure instanceof Error ? failure.message : '无法打开目录'); } }}>打开目录</button></div></section>
+      <section className="planning-diagnostic-card"><h2>工作区配置</h2><Availability section={data.configuration} /><p className="planning-muted">整个工作区共用；运行创建时会冻结其模型和资料来源。</p><dl className="planning-task-spec"><dt>设计与整合</dt><dd>{data.configuration.current.designModel}</dd><dt>研究与评审</dt><dd>{data.configuration.current.reviewModel}</dd><dt>当前调度并发</dt><dd>{data.configuration.schedulingConcurrency}</dd><dt>配置位置</dt><dd className="planning-path">{data.configuration.configPath}</dd></dl><PlanningSettings initialConfig={data.configuration.current} projectId={projectId} revision={data.sourceStateRevision ?? 0} disabled={loading} onSaved={() => setReload(count => count + 1)} /></section>
+      <section className="planning-diagnostic-card"><h2>规划运行</h2><Availability section={data.runtime} />{data.runtime.availability === 'available' && !data.runtime.runs.length && <p className="planning-muted">没有登记的规划运行。</p>}{data.runtime.runs.map(run => <details key={run.runId}><summary>{run.stage ? stageLabels[run.stage] : '未知阶段'} · {run.effectiveStatus === 'interrupted' ? '重启后中断，尚未恢复' : run.effectiveStatus === 'unknown' ? '状态未知' : runStatusLabels[run.effectiveStatus]}</summary><p className="planning-muted">运行 {run.runId} · 依据{run.basisStatus === 'current' ? '有效' : run.basisStatus === 'stale' ? '已变化' : '未知'} · 原始磁盘状态 {run.storedStatus || '未知'}</p>{run.reasons.map((reason, index) => <p key={index}>{reason}</p>)}{run.effectiveConfig ? <dl className="planning-task-spec"><dt>本轮冻结设计模型</dt><dd>{run.effectiveConfig.designModel}</dd><dt>本轮冻结评审模型</dt><dd>{run.effectiveConfig.reviewModel}</dd><dt>创建时并发配置</dt><dd>{run.effectiveConfig.concurrency}（当前调度以上方设置为准）</dd></dl> : <p className="planning-muted">旧记录没有冻结配置，无法确认当时的设置。</p>}{data.tasks.items.filter(task => task.runId === run.runId).map(task => <details key={task.taskId}><summary>{task.kind} · {taskStatusLabels[task.status]}</summary><p>请求模型 {task.requestedModel || '未知'} · 登记尝试 {value(task.attempts)}</p><p className="planning-muted">{task.outputOrigin === 'assembly' ? '本地汇集产物' : '工作任务'} · 依赖 {task.dependsOn.join('、') || '无'} · 产物完整性尚未重新校验</p></details>)}</details>)}</section>
+      <section className="planning-diagnostic-card"><h2>调用回执</h2><Availability section={data.calls} /><p>{value(data.calls.recordedCalls)} 份可读回执{data.calls.incomplete ? ' · 存在缺失或未知信息' : ''}</p><p className="planning-muted">登记尝试数和可读回执数可能不同；这里的模型是请求模型。用量来自服务返回值，缺失项保留未知。</p><dl className="planning-task-spec">{Object.entries(data.calls.usage).map(([key, count]) => <div key={key}><dt>{key}</dt><dd>{value(count)}</dd></div>)}</dl><details><summary>查看每次调用</summary>{data.calls.items.map((call, index) => <article className="planning-history-entry" key={`${call.runId}:${call.taskId}:${call.attempt}:${index}`}><p>{call.requestedModel || '请求模型未知'} · {call.status || '终态未知'} · {call.durationMs == null ? '耗时未知' : `${(call.durationMs / 1000).toFixed(1)} 秒`}</p><p className="planning-muted">{call.taskId} · 尝试 {call.attempt} · 思考设置 {call.reasoningEffort || '未记录'}</p><Availability section={call} /></article>)}</details></section>
+      <section className="planning-diagnostic-card"><h2>材料可读性</h2><Availability section={data.materials} />{data.materials.availability === 'available' && !data.materials.items.length && <p className="planning-muted">尚未添加材料。</p>}{data.materials.items.map(material => <p key={material.id}>{material.filename} · {material.status} · {material.readable === true ? '本地文件可读' : material.readable === false ? '本地文件不可读' : '可读性未知'}{material.reason ? ` · ${material.reason}` : ''}</p>)}<p className="planning-muted">可读性检查不代表 AI 已完整理解材料。</p></section>
+      <details className="planning-diagnostic-card"><summary>Provider 记录</summary><Availability section={data.provider} /><p>Provider {data.provider.identity || '未记录'}</p><p className="planning-muted">本次读取未触发模型探测；模型目录可用也不能证明图像、工具或试验能力已通过。</p></details>
+    </>}
+  </div>;
+}

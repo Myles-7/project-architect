@@ -1,0 +1,129 @@
+{
+  "label": "flash-materials-quality-publish-20261005-04",
+  "checkedAt": "2026-10-04T22:53:44.776Z",
+  "packageSuffix": "quality-reviewed-r2",
+  "kind": "Exact JSON-decoded exported Node -e payload; syntax parsing and child Node execution on isolated synthetic app.js fixtures. No planned target application executed.",
+  "file": "quality-reviewed-r2-development-package/tasks.json",
+  "sha256": "52feac82f4958891d2e711df246938882058e91278aa9d1a6b4c03255e7614f6",
+  "taskId": "blk-deliv-val-security-xss-audit",
+  "step": "1. 在项目根目录执行可直接运行且覆盖空白变体的 Node.js 静态安全审查命令：node -e \"const fs = require('fs'); const code = fs.readFileSync('app.js', 'utf8'); const patterns = [{ name: 'innerHTML', regex: /innerHTML/ }, { name: 'outerHTML', regex: /outerHTML/ }, { name: 'document.write', regex: /document\\s*\\.\\s*write/ }, { name: 'eval', regex: /\\beval\\s*\\(/ }, { name: 'new Function', regex: /\\bnew\\s+Function\\s*\\(/ }]; const hits = patterns.filter(p => p.regex.test(code)).map(p => p.name); if (hits.length > 0) { console.error('发现禁用危险 API:', hits); process.exit(1); } else { console.log('静态安全检查通过：0 处危险 DOM/执行 API'); }\"；",
+  "command": "const fs = require('fs'); const code = fs.readFileSync('app.js', 'utf8'); const patterns = [{ name: 'innerHTML', regex: /innerHTML/ }, { name: 'outerHTML', regex: /outerHTML/ }, { name: 'document.write', regex: /document\\s*\\.\\s*write/ }, { name: 'eval', regex: /\\beval\\s*\\(/ }, { name: 'new Function', regex: /\\bnew\\s+Function\\s*\\(/ }]; const hits = patterns.filter(p => p.regex.test(code)).map(p => p.name); if (hits.length > 0) { console.error('发现禁用危险 API:', hits); process.exit(1); } else { console.log('静态安全检查通过：0 处危险 DOM/执行 API'); }",
+  "tested": true,
+  "parseSuccess": true,
+  "executionChecks": [
+    {
+      "name": "innerHTML sink",
+      "code": "target.innerHTML = userInput;",
+      "expectedExit": 1,
+      "core": true,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'innerHTML' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "outerHTML sink",
+      "code": "target.outerHTML = userInput;",
+      "expectedExit": 1,
+      "core": true,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'outerHTML' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "document.write sink",
+      "code": "document.write(userInput);",
+      "expectedExit": 1,
+      "core": true,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'document.write' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "eval call",
+      "code": "eval(userInput);",
+      "expectedExit": 1,
+      "core": true,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'eval' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "Function constructor",
+      "code": "new Function(userInput);",
+      "expectedExit": 1,
+      "core": true,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'new Function' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "safe text binding",
+      "code": "target.textContent = userInput;",
+      "expectedExit": 0,
+      "core": true,
+      "actualExit": 0,
+      "stdout": "静态安全检查通过：0 处危险 DOM/执行 API\n",
+      "stderr": "",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "safe renderer",
+      "code": "function render(name) { display.textContent = name; }",
+      "expectedExit": 0,
+      "core": true,
+      "actualExit": 0,
+      "stdout": "静态安全检查通过：0 处危险 DOM/执行 API\n",
+      "stderr": "",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "whitespace before document.write arguments",
+      "code": "document.write (userInput);",
+      "expectedExit": 1,
+      "core": false,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'document.write' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "whitespace before eval arguments",
+      "code": "eval (userInput);",
+      "expectedExit": 1,
+      "core": false,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'eval' ]\n",
+      "signal": null,
+      "pass": true
+    },
+    {
+      "name": "whitespace before Function arguments",
+      "code": "new Function (userInput);",
+      "expectedExit": 1,
+      "core": false,
+      "actualExit": 1,
+      "stdout": "",
+      "stderr": "发现禁用危险 API: [ 'new Function' ]\n",
+      "signal": null,
+      "pass": true
+    }
+  ],
+  "coreExecutionPass": true,
+  "whitespaceVariantPass": true,
+  "status": "passed-synthetic-audit-execution",
+  "error": null
+}

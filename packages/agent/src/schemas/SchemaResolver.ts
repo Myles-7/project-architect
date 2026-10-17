@@ -2,6 +2,8 @@ import { join } from 'node:path';
 import { FileStorage } from '@project-architect/core';
 import type { AgentMode } from '@project-architect/contracts';
 
+export const CANONICAL_B3_SCHEMA_REL_PATH = 'experiments/agent-benchmark/schemas/b3-discovery.schema.json';
+
 export class SchemaResolver {
   private rootDir: string;
 

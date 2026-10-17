@@ -1,0 +1,13 @@
+自动独立质量验收反馈，不是真人新增需求、真人审阅或批准。来源：冻结的flash-materials-contract-closure-20261005-11实际独立review输入中的完整30块候选（已包含成功证据修订）；review因服务额度中断，无有效评审终态。保持30个稳定ID、原42条证据完整对象、8任务原DAG及已正确的清空事务规则。普通细节由AI定，decisions=[]，不开发目标应用，不让用户选择实现小细节。
+
+M4仍不完整：InputController.bindInputNode返回void，失败清理只解除resetButton监听，input/composition监听缺清理所有权。增加明确节点监听登记/解绑契约（可以保持bind原签名并增加unbindInputNode）；同节点重复绑定先安全解绑或幂等，绑定中途失败撤销本次已注册监听；init失败清理本轮input/composition与reset全部句柄，记住实际注册节点/按钮，不能只按下一次elements解绑旧对象。定义重复init和失败retry，确保恰好一次input与composition响应、无双重schedule、草稿不清空。聚焦顺序亦有逻辑错误：focusInput依赖activeInputNode，但init在调用focusInput后才赋activeInputNode，首次聚焦可静默无效而ready=true。初始化准备期直接对elements.initialInputNode.focus()并核对实际聚焦成功，或定义完整合法准备引用；所有依赖/绑定/呈现/清理/焦点装配成功后才ready，不提前接受半初始化事件，不无理由重置已存在代际/纪元。同步模块、接口、输入流程、任务字段与Given/When/Then。
+
+M5已修复：捕获快照失败且无变更时不调用rollback，原节点/草稿/代际/待timer保持，此分支必须保持。已有快照后失败的回滚、单一input拓扑、原始空串/纯空格待任务恢复和成功清空提交点也保持。
+
+M6仍缺严重失败闭包：showGlobalError仅处理容器不存在，动态创建/挂载也可能抛错；定义返回是否真实通知成功并在方法内捕获，通知失败不得再宣称用户已看到错误，更不能递归触发window.onerror。只读兜底失败时“草稿保存在快照”不足：snapshot当前是局部变量，未定义返回后稳定持有者和可用取回路径。增加明确内存恢复状态所有权（例如ResetController的recoveryDraft，禁止刷新、不承诺跨刷新）；只读容器成功挂载才提供手动复制承诺。挂载和通知失败时诚实标为内存保留/显示不可用，保留可调用的恢复重试入口，在DOM修复后再次呈现同一草稿；若没有可见通路不能声称已有可点按钮。console只作为诊断，不能代替普通可见交互。不能因通知失败抹除草稿或无限递归。
+
+M7：blk-deliv-acc-security-edge Scenario4要求任意DOM/脚本错误后继续编辑，与严重回插失败主编辑器受限互相矛盾。本块引用blk-tech-error，属于真实影响闭包，需要局部同步：普通非破坏性错误保留主输入可编辑；严重回插失败按只读挂载成功/挂载失败/连通知失败三个诚实分支验收，不承诺完全恢复。这个关联同步不是全面重写许可，其他真正无关块保持完整对象和原DAG。target/outcomes等泛化“任何异常不破坏界面”若涵盖严重分支，也局部注明边界，不为保留错误话语而放行。
+
+保留300ms普通输入、IME分支、手动删空与空白原文、旧节点守卫、单橙色立即清空、textContent、经典defer/IIFE、file和HTTP静态双启动以及已修好的性能代理测量。公共方法不得静默删除；必要新增解绑/恢复入口的名称、参数、返回、所有权、失败与调用方必须完整且跨块一致。
+
+review须核对完整候选，不以blockers=[]或关键词存在证明正确。无新研究时evidence=[]，不重造旧来源/hash；作者引用未批准候选证据必须原样携带完整对象，已批准可原样引用。Docker未就绪、目标程序未开发，平台/IME/focus/性能仍unexecuted并保留后续验证，不放当前followUp反复调用。产物pending，自动API审批与真人审阅分开。

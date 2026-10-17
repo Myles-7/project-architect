@@ -1,0 +1,353 @@
+{
+  "metadata": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "name": "真实集成验证-flash-materials-chinese-20261005-01",
+    "tagline": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时",
+    "stage": "created",
+    "stateRevision": 4,
+    "projectTags": [
+      "Local-First"
+    ],
+    "inputRefs": [
+      {
+        "id": "input:inp-01",
+        "kind": "text",
+        "label": "Initial Idea Prompt",
+        "storageRef": "inputs/inp-01/source.txt",
+        "status": "ready",
+        "analysisAvailability": "available",
+        "createdAt": "2026-10-04T16:06:39.032Z",
+        "summary": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空",
+        "contentHash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3"
+      },
+      {
+        "id": "input:inp-1791129999124",
+        "kind": "image",
+        "label": "fixture.png",
+        "storageRef": "inputs/inp-1791129999124/fixture.png",
+        "status": "ready",
+        "analysisAvailability": "available",
+        "createdAt": "2026-10-04T16:06:39.124Z",
+        "summary": "Image material; vision reading is recorded per planning task",
+        "contentHash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0"
+      }
+    ],
+    "updatedAt": "2026-10-04T16:12:46.337Z",
+    "createdAt": "2026-10-04T16:06:39.032Z"
+  },
+  "overview": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "sections": [
+      {
+        "id": "project_overview",
+        "title": "项目概述与愿景",
+        "kind": "fixed",
+        "maturity": "mostly-clear",
+        "itemRefs": [
+          "decision:dec-01",
+          "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d"
+        ]
+      },
+      {
+        "id": "target_user",
+        "title": "目标用户与痛点",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "mvp_scope",
+        "title": "MVP 范围与边界",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "core_features",
+        "title": "核心功能特性",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "user_flows",
+        "title": "主要用户旅程与流程",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "page_structure",
+        "title": "页面结构与信息架构",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "ux_ui_direction",
+        "title": "UX 体验与 UI 方向",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "technical_boundary",
+        "title": "技术底线与运行约束",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      },
+      {
+        "id": "delivery_plan",
+        "title": "交付计划与阶段里程碑",
+        "kind": "fixed",
+        "maturity": "unexplored",
+        "itemRefs": []
+      }
+    ],
+    "updatedAt": "2026-10-04T16:12:46.337Z"
+  },
+  "decisions": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "items": [
+      {
+        "id": "dec-01",
+        "area": "project_overview",
+        "statement": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+        "status": "candidate",
+        "origin": "user",
+        "evidenceRefs": [
+          "input:inp-01"
+        ],
+        "createdAt": "2026-10-04T16:06:39.032Z",
+        "updatedAt": "2026-10-04T16:06:39.032Z"
+      },
+      {
+        "id": "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+        "area": "project_overview",
+        "decisionKey": "dec-clear-interaction-mode",
+        "statement": "在点击清空按钮时，采用何种重置交互保护机制？\n即时直接清空：用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+        "rationale": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+        "status": "confirmed",
+        "origin": "user",
+        "confirmedBy": "user",
+        "approvalSource": "answer:simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+        "evidenceRefs": [
+          "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+        ],
+        "createdAt": "2026-10-04T16:12:46.337Z",
+        "updatedAt": "2026-10-04T16:12:46.337Z",
+        "sourceArea": "交互体验"
+      }
+    ],
+    "traces": [
+      {
+        "id": "b9d53859-f454-46f6-95d6-f71d0301808a",
+        "questionRef": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+        "userAnswer": "即时直接清空",
+        "decisionRef": "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+        "stateChanges": [
+          {
+            "ref": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+            "action": "question-answered"
+          },
+          {
+            "ref": "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+            "action": "decision-created"
+          }
+        ],
+        "createdAt": "2026-10-04T16:12:46.337Z"
+      }
+    ],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "assumptions": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "items": [],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "gaps": {
+    "schemaVersion": 2,
+    "projectId": "proj-1791129999032",
+    "gaps": [
+      {
+        "id": "gap-01",
+        "area": "target_user",
+        "decisionKey": "target_user:primary_audience",
+        "dependsOn": [],
+        "severity": "high",
+        "reason": "项目初始创建，核心目标用户细分画像尚待明确。",
+        "impact": "影响后续 MVP 核心功能优先级。",
+        "shouldAskUser": true,
+        "status": "open"
+      }
+    ],
+    "conflicts": [],
+    "tensions": [],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "risks": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "items": [],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "questions": {
+    "schemaVersion": 2,
+    "projectId": "proj-1791129999032",
+    "items": [
+      {
+        "allowFreeInput": true,
+        "area": "交互体验",
+        "createdAt": "2026-10-04T16:12:46.183Z",
+        "decisionKey": "dec-clear-interaction-mode",
+        "dependsOn": [],
+        "id": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+        "importance": "normal",
+        "issueRef": "blk-feat-reset",
+        "options": [
+          {
+            "approach": "用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+            "gain": "极速流畅，测试流转零等待零多余点击，最符合单人敏捷本地核对场景。",
+            "impact": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+            "key": "opt-instant-clear",
+            "label": "即时直接清空",
+            "reversibility": "easy",
+            "sacrifice": "如发生手误误触，当前展示与输入内容将立即消失，需重新输入。"
+          },
+          {
+            "approach": "点击清空后立即清空视图，但悬浮显示 3 秒轻量撤销条（可点击'撤销清空'恢复前次内容）。",
+            "gain": "兼顾操作效率与防误触安全性，手误时一键恢复。",
+            "impact": "增加前端临时快照暂存状态，不影响主流程数据流向。",
+            "key": "opt-undo-toast",
+            "label": "轻量即时清空带悬浮撤销（Undo Toast）",
+            "reversibility": "easy",
+            "sacrifice": "需要额外维护一个前次快照状态及 3 秒定时器清理机制，增加轻微视觉元素。"
+          },
+          {
+            "approach": "点击清空时弹出轻量原生/自定义确认对话框，用户确认后才执行清空。",
+            "gain": "误触安全性最高，绝不发生非预期的清空动作。",
+            "impact": "引入模态交互状态，影响桌面快速快捷键操作流。",
+            "key": "opt-modal-confirm",
+            "label": "模态对话框二次确认",
+            "reversibility": "moderate",
+            "sacrifice": "每次清空都需要额外点击一次，显著降低反复核对的流转效率。"
+          }
+        ],
+        "question": "在点击清空按钮时，采用何种重置交互保护机制？",
+        "reason": "清空操作会立即清除已展示核对的项目名与输入框内容。由于该原型定位于开发者快速核对，过于繁琐的弹窗会拖慢流转，但若完全无保护则在误触时需重新键入。在产品规划阶段确定此交互方式，有助于直接界定清空流程的状态机设计。",
+        "recommendation": "推荐方案 A（即时直接清空），兼顾快速本地核对的高频测试效率与低干扰体验。",
+        "recommendationReason": "本地核对工具核心诉求是极速反馈，单人操作场景下弹窗二次确认会产生阻断感；且失败保留输入机制已覆盖提交异常场景，清空后光标自动回焦即可顺畅重测。",
+        "recommendedOptionKey": "opt-instant-clear",
+        "selectionMode": "single",
+        "status": "answered",
+        "batchId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+        "basisRevision": 3,
+        "basisHash": "4d9d1a99e5ac8c5964ef73a8142ebed2668aed0df492566e9b2a5bbdeb1613cb",
+        "batchStage": "legacy",
+        "answeredAt": "2026-10-04T16:12:46.337Z",
+        "answer": "即时直接清空"
+      }
+    ],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "readiness": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "current": {
+      "id": "rdn-1791129999037",
+      "status": "not-ready",
+      "reviewedAt": "2026-10-04T16:06:39.032Z",
+      "basisRevision": 1,
+      "requiredAreas": [
+        "target_user",
+        "mvp_scope",
+        "core_features",
+        "user_flows",
+        "page_structure",
+        "ux_ui_direction",
+        "technical_boundary",
+        "delivery_plan"
+      ],
+      "warnings": [
+        "项目刚创建，尚在初始发散阶段。"
+      ],
+      "issues": [
+        "目标用户与 MVP 范围尚未收敛。"
+      ],
+      "assumptionRefs": [],
+      "knownIssueAcknowledgements": [],
+      "criticalConflictAcknowledgements": [],
+      "userDisposition": "pending"
+    },
+    "history": [],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "documents": {
+    "schemaVersion": 1,
+    "projectId": "proj-1791129999032",
+    "items": [],
+    "updatedAt": "2026-10-04T16:06:39.032Z"
+  },
+  "planning": {
+    "schemaVersion": 1,
+    "blueprint": {
+      "schemaVersion": 1,
+      "blocks": [],
+      "stages": {
+        "product": "not-designed",
+        "technical": "not-designed",
+        "delivery": "not-designed"
+      },
+      "decisionBasisHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "changeSets": [],
+    "evidence": [
+      {
+        "id": "answer-dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+        "kind": "user",
+        "content": "即时直接清空",
+        "source": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+        "obtainedAt": "2026-10-04T16:12:46.337Z",
+        "applicability": "dec-clear-interaction-mode"
+      }
+    ],
+    "topics": [
+      {
+        "key": "dec-clear-interaction-mode",
+        "aliases": [],
+        "history": [
+          "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d"
+        ],
+        "effectiveDecisionId": "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+        "lastAnswerKind": "selection",
+        "lastAnsweredQuestionId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+      }
+    ],
+    "inputs": [
+      {
+        "id": "inp-01",
+        "raw": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+        "kind": "statement",
+        "createdAt": "2026-10-04T16:06:39.032Z"
+      }
+    ],
+    "operations": [
+      {
+        "id": "questions:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+        "fingerprint": "abf6957eb054f0be6f827dc53d368938d8da6d75be9b97b7c69ce28cb2ab3734",
+        "revision": 3
+      },
+      {
+        "id": "simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+        "fingerprint": "40b3c87d76d5ac74dfa1bd6e4ea0394a869b31ae5505d2d3f9f904a2f41d31c0",
+        "revision": 4
+      }
+    ],
+    "diagnostics": []
+  }
+}

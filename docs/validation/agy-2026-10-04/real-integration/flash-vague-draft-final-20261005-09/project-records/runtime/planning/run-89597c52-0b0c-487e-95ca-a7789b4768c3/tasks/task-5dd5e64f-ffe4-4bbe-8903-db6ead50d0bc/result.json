@@ -1,0 +1,129 @@
+{
+  "blockers": [
+    "【痛点4缺失缺口】先前草案在 block-problem-fragmented-ideas 中仅保留了3个痛点，丢失了原正式批准的核心痛点“无序堆积导致灵感沉没与查找困难”，影响到标签过滤、全文检索与置顶收藏的价值闭环依据。依据：feedback 输入 11aa9e60-8bcb-4731-b3b3-79511d6ae147 第1项明确要求恢复4个痛点。受影响块 ID：block-problem-fragmented-ideas。",
+    "【非目标界定与快捷键统一缺口】block-non-goals-exclusions 需明确界定“不做复杂树形文件夹/无限层级嵌套”与“不做重量级 WYSIWYG 富文本排版编辑器”；且全字段提交快捷键统一为 Ctrl/Cmd+Enter，消除回车直接保存。受影响块 ID：block-non-goals-exclusions, feature-quick-capture, flow-quick-capture, acceptance-quick-capture。",
+    "【接口定义与元数据完整性缺口】interface-service-contracts 缺少 requestPersistence()、isPersisted()、detectPrivateMode()、checkBackupReminderNeeded() 契约；缺少 AppMeta {key, value, updatedAt} 与 libraryGeneration 结构定义；saveNote 需强制必填 expectedRevision，在同事务 CAS（get→比较→put）中执行，且对新创建与编辑更新进行严格方法分离（独立 createNote 动作，禁止 upsert 隐式复活已删除便签）。受影响块 ID：interface-service-contracts, data-model-core-entities, task-foundation-and-storage, acceptance-foundation-and-storage。",
+    "【隐私模式探测的客观技术边界】detectPrivateMode 在现代浏览器（Chrome/Safari/Firefox）中缺乏标准 Web API 支持，属于启发式尽力探测（best-effort heuristic detection）与待验证能力，不能宣称能 100% 识别所有浏览器隐私模式。受影响块 ID：interface-service-contracts, acceptance-foundation-and-storage, val-storage-and-search-benchmark。依据：MDN Storage API 与跨浏览器反指纹安全策略。",
+    "【备份往返与草稿隔离契约缺口】BackupPayload 需完整列明元数据字段（appMeta, backupTracker, libraryGeneration, tags, notes）及各字段严格类型校验规则；需提供独立的“导出当前未保存草稿”动作；sessionStorage 需按 spark_draft_${libraryGeneration}_${noteId} 进行隔离，并诚实说明其在标签页彻底关闭后无法恢复的平台限制。受影响块 ID：feature-data-portability, flow-data-portability, task-data-portability, acceptance-data-portability, error-architecture-and-recovery。依据：MDN sessionStorage 规范。",
+    "【回收区 7 天到期规则的精确判定与 Given/When/Then 细化】需以 RETENTION_MS = 604,800,000 ms（>= 边界）定义超期判定；跨到期停留自动标注超期但严禁暗删；清理需二次确认后物理删除；重复删除不得重置 trashedAt；并发竞争禁止复活已删除便签。受影响块 ID：feature-note-card-view, flow-note-card-actions, task-note-card-view, acceptance-note-card-view。",
+    "【冷启动与检索时延度量标准闭合】冷启动必须统一度量起点为导航起始（navigationStart / PerformanceNavigationTiming.startTime 0），首屏可交互 TTI 目标 <= 1.0s，不能从骨架屏消失起算；检索必须从敲击开始含 80ms 防抖及 DOM 渲染完成，P95 <= 150ms。受影响块 ID：block-outcomes-lightweight-experience, tech-storage-and-search, val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark。依据：MDN PerformanceNavigationTiming 规范。",
+    "【验证任务状态诚实化】当前规划环境 Docker 不可用（experiment:experiment-c122c3c2-4830-486d-853c-5cfd6083dd52 状态为 unavailable），目标应用及 CodingAgent 尚未开发，所有性能基准、跨浏览器（Safari 17+）兼容性及隐私模式实测任务必须如实标为 unexecuted，在交付任务中说明失败后影响与修订路径，不可冒充已实测通过。受影响块 ID：val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "确立 IndexedDB 存储规范，规范对象仓库合法键类型（布尔值不是有效键），以及同事务（readwrite transaction）内 get-compare-put 的 CAS 乐观并发控制与全量覆盖读写原子性。",
+      "content": "This document defines APIs for a database of records holding simple values and hierarchical objects. Each record consists of a key and some value. Moreover, the database maintains indexes over records it stores. An application developer directly uses an API to locate records either by their key or by using an index. A query language can be layered on this API. An indexed database can be implemented using a persistent B-tree data structure.",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-w3c-indexeddb-spec",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:48:50.348Z",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    },
+    {
+      "applicability": "确立纯前端单页应用进行存储配额感知（usage 与 quota）的官方 API 规范，明确其仅在安全上下文（HTTPS 或 localhost）中可用。",
+      "content": "Secure context: This feature is available only in secure contexts (HTTPS), in some or all supporting browsers... The estimate() method of the StorageManager interface asks the Storage Manager for how much storage the current origin takes up (usage), and how much space is available (quota).",
+      "hash": "35346bb4f2f91eab4ed505353267c21a4f0cf57896e95d2ae79a722dc80f3207",
+      "id": "evidence-mdn-storagemanager-estimate",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:48:59.185Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/estimate"
+    },
+    {
+      "applicability": "确立持久化存储权限申请机制，佐证通过 navigator.storage.persist() 申请持久化存储以防御宿主在存储压力下的自动驱逐，适用于数据持久化基座契约。",
+      "content": "Secure context: This feature is available only in secure contexts (HTTPS), in some or all supporting browsers... The persist() method of the StorageManager interface requests permission to use persistent storage, and returns a Promise that resolves to true if permission is granted and bucket mode is persistent, and false otherwise. The browser may or may not honor the request, depending on browser-specific rules.",
+      "hash": "61e3a1ce74716d1ff6ffe010c45422c4b77e11db823c23e7ee5b0e5b6222f625",
+      "id": "evidence-mdn-storagemanager-persist",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:49:05.613Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist"
+    },
+    {
+      "applicability": "确立未保存草稿暂存机制与边界。sessionStorage 数据按标签页隔离并在页面刷新与恢复时保持，但标签页彻底关闭后数据被清空，不能承诺跨标签页关闭必恢复；支持按 noteId 和 libraryGeneration 隔离草稿并提供手动导出草稿能力。",
+      "content": "The read-only sessionStorage property accesses a session Storage object for the current origin. sessionStorage is similar to localStorage; the difference is that while localStorage is partitioned by origin only, sessionStorage is partitioned by both origin and browser tabs (top-level browsing contexts). The data in sessionStorage is only kept for the duration of the page session... A page session lasts as long as the tab or the browser is open, and survives over page reloads and restores... Closing the tab/window ends the session and clears objects in sessionStorage.",
+      "hash": "5039c33bdeeea072fcf81430c447a2b8c6aa23e80b7ac56f26e30207a12df796",
+      "id": "evidence-mdn-session-storage",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:49:12.242Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"
+    },
+    {
+      "applicability": "确立应用冷启动性能测量的官方标准起点。冷启动耗时必须自导航起始（startTime 0，对应 performance.timeOrigin）起算直至输入框可交互标记，不能从骨架屏消失起算。",
+      "content": "The PerformanceNavigationTiming interface provides methods and properties to store and retrieve metrics regarding the browser's document navigation events... PerformanceEntry.startTime Read only: Returns a DOMHighResTimeStamp with a value of 0.",
+      "hash": "1a928f72e59397e2de2d697e23e84e36162ebf96417d007de3811f2699ba56d3",
+      "id": "evidence-mdn-performance-navigation-timing",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:49:23.286Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming"
+    },
+    {
+      "applicability": "确立 Web 应用部署规范与运行边界。Service Worker 与高级安全 API 仅支持在 HTTPS 或 localhost 本地安全上下文中运行，file:// 协议不支持注册 Service Worker，首版不可承诺脱机离线冷重启。",
+      "content": "Documents are secure contexts when their resources are delivered over an HTTPS connection, or are delivered from a loopback (local) address... Service workers and worklets: Only secure contexts are allowed to register service workers, so service workers are always secure contexts... Potentially trustworthy origins: An origin is potentially trustworthy if has: A scheme of https, wss, or file. A host value of 127.0.0.0/8 or ::1/128, localhost.",
+      "hash": "fd5f7ba05c4b9b8d4fce2b9313d3b8808d8abc25660e0619f9f6cc442888376e",
+      "id": "evidence-mdn-secure-contexts",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:49:53.465Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Secure_Contexts"
+    },
+    {
+      "applicability": "确立 Vite 打包产物运行方式，构建输出静态资源需通过 HTTP 本地预览（vite preview）或静态托管平台部署运行，不能脱离 Web 服务器直接以 file:// 协议运行 ESM 应用。",
+      "content": "You are using the default build output location (dist)... Vite is installed as a local dev dependency in your project, and you have setup the following npm scripts: package.json: 'scripts': { 'build': 'vite build', 'preview': 'vite preview' }... It is important to note that vite preview is intended for previewing the build locally and not meant as a production server.",
+      "hash": "2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b",
+      "id": "evidence-vite-static-deploy",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:50:06.856Z",
+      "source": "https://vite.dev/guide/static-deploy.html"
+    },
+    {
+      "applicability": "确立纯客户端 JSON/Markdown 备份导出（Blob 与 URL.createObjectURL）及导入校验（FileReader / File input）的底层技术规范，支持完全去中心化的数据便携性。",
+      "content": "This specification provides an API for representing file objects in web applications, as well as programmatically selecting them and accessing their data. This includes: A FileList interface... A Blob interface, which represents immutable raw binary data... A File interface... A FileReader interface, which provides methods to read a File or a Blob, and an event model to obtain the results of these reads.",
+      "hash": "975b6f12f51320b7f90af2b97e38a80358b5964bc274caafb5d126b3f3881efc",
+      "id": "evidence-w3c-file-api",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:50:12.488Z",
+      "source": "https://www.w3.org/TR/FileAPI/"
+    },
+    {
+      "applicability": "确立浏览器存储配额与驱逐规则依据。Safari 在开启防跟踪保护时会对 7 天无交互的脚本数据执行主动驱逐，为系统的“超过 7 天未备份触发温和防丢提醒”及回收区 7 天生命周期管理提供了直接官方技术依据。",
+      "content": "Safari proactively evicts data when cross-site tracking prevention is turned on. If an origin has no user interaction, such as click or tap, in the last seven days of browser use, its data created from script will be deleted. Cookies set by server are exempt from this eviction... When an origin's data is evicted by the browser, all of its data, not parts of it, is deleted at the same time... This eviction mechanism only applies to origins that are not persistent and skips over origins that have been granted data persistence by using navigator.storage.persist().",
+      "hash": "a47182c320ef508003bba9bfbebda838ded8982e4a1992679aa56293edd55a6c",
+      "id": "evidence-mdn-storage-quotas-eviction",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:50:25.742Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria"
+    },
+    {
+      "applicability": "证明用户原始需求为个人随手记录与整理小工具，不包含团队协作、云端数据库或系统全局唤起等扩张范围。",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-raw-input-inp-01",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T23:48:19.398Z",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "真实证明当前规划环境缺乏可用的 Docker 容器守护进程，无法执行浏览器与 Node 无头自动化性能与兼容性测试；所有真实宿主测试必须实事求是标记为 unexecuted，将其列入后续开发阶段的交付验证任务，禁止虚构测试通过结论。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "{\"runtime\":\"node\",\"image\":\"node:24.13.0-bookworm-slim\",\"network\":\"none\"}",
+      "hash": "77366fe1b8c303f93ac01b5e6c2865c04ce26308d152f8c74449f0b62c0a79fe",
+      "id": "evidence-experiment-docker-unavailable",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-04T23:48:39.575Z",
+      "outcome": "unexecuted",
+      "source": "experiment:experiment-c122c3c2-4830-486d-853c-5cfd6083dd52"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "查证 Dexie.js 在同一个读写事务中实现 CAS（get 后比较 revision 再 put，否则抛出或回滚）的语法与受控异常定义，为整合任务精确规范 saveNote 接口契约提供依据。",
+      "kind": "research"
+    },
+    {
+      "goal": "查证标准 JSON Schema 校验规范在纯前端零依赖环境下的轻量级校验实现，确保 BackupPayload 自导出自导入往返强校验无歧义。",
+      "kind": "research"
+    }
+  ],
+  "groups": [],
+  "questions": [],
+  "summary": "本任务作为规划阶段的研究工作者，针对最新质量验收反馈（11aa9e60-8bcb-4731-b3b3-79511d6ae147）进行了官方规范查证、材料核验与可行性试验。新增发现与技术契约依据包括：1) 依据 W3C IndexedDB Spec 确立了合法键与同一读写事务内 get-compare-put 的 CAS 乐观并发控制规范，明确编辑现有便签时 expectedRevision 必填，新建采用独立 createNote 动作以杜绝隐式复活；2) 依据 MDN sessionStorage 规范确立了草稿按 noteId 与 libraryGeneration 进行隔离的规则，并澄清其在标签页关闭后无法恢复的平台生命周期边界；3) 依据 MDN Secure Contexts 与 Vite 官方部署规范，明确应用运行于 HTTP/HTTPS 安全上下文，首版不支持 file:// 协议与未验证的脱机 PWA 冷重启；4) 依据 MDN PerformanceNavigationTiming 明确冷启动度量必须自导航起始（startTime 0）起算，首屏可交互 TTI 目标 <= 1.0s；5) 澄清 detectPrivateMode 缺乏跨浏览器标准 API 支持的客观事实，标明其为尽力而为的启发式探测；6) 通过受控试验真实记录当前规划环境 Docker 守护进程不可用，所有性能基准与跨端兼容性验证如实标注为 unexecuted 并列入交付验证。所有缺口均已记录在 blockers 中供后续登记整合任务处理。"
+}

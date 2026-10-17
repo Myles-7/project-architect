@@ -1,0 +1,19 @@
+自动独立质量验收反馈，不是真人新增需求或真人批准。用完整当前正式蓝图/草案及旧批准比较基线逐项核对下述已观测问题；已正确内容原样保持，仍成立的缺口局部修复。保持43个稳定块ID、原证据完整对象、原四痛点/范围和已修复能力，禁止先批准坏草案、直接改正式文件或用关键词/空blockers代替跨契约审查。无需用户回答普通实现细节。
+
+本轮澄清已有批准行为的技术细节，没有目标/范围/偏好变化；变更组decisions保持空数组，不重复替代已经有效的用户选择，保持当前已批准需求。
+
+N2：block-scope-core-boundaries和page-main-workspace的详情保存仍曾写Ctrl/Cmd+S，而其他流程要求统一Ctrl/Cmd+Enter。逐块消除旧快捷键冲突，快速输入和详情全部字段提交统一Ctrl/Cmd+Enter；页面焦点N按原契约，输入焦点N不劫持。
+
+N3/N4：所有实体变更都携带界面看到的expectedRevision和会话expectedLibraryGeneration，包括硬删除、到期清理、清空回收站、批量标签/状态。批量动作提交明确的目标ID/版本快照；同一readwrite事务读取db.meta的当前库代际、db.notes当前实体及备份计数→比较→写入/删除→计数递增。不要在事务外缓存代际作最终判断，不使用未定义currentLibraryGeneration变量或仅db.notes事务却读写meta。选择明确的批量原子失败规则，单个目标不存在/版本变动/代际变动则全部不写并显示冲突。新建独立create，现有save/update/restore不能upsert；force仍使用刚显示的新revision再次CAS。物理删除后陈旧编辑、还原、清理绝不能复活。重复trash不更新deletedAt/previousStatus。替换导入本地代际单调递增并让全部旧动作失效，即使ID/revision恰好相同；所有接口/任务/验收一致。
+
+N5：完整BackupPayload与强校验器对应。逐项明确schemaVersion、所有字段类型/必填/空值、ID唯一、status/previousStatus枚举、有限合法时间戳、revision/代际整数、tags关联和元数据一致性；失败不写且指出字段/记录。notes/appMeta/backupTracker/tags/回收字段均可完整往返；操作性本地代际不采用旧备份值。选择清楚的合并同ID冲突处理：例如预览明确保留当前同ID记录，新增仅不冲突ID，或给出另一自洽明确规则；禁止笼统“比对更新”以及覆盖旧revision让陈旧会话匹配。预览版本/代际变化需重新预览，取消和事务失败零改动。说明导入哪些备份计数/提醒元数据保留、哪些本地操作性字段更新及原因，别丢原备份追踪能力。未保存草稿独立导出，sessionStorage按note/newdraft ID+代际隔离，恢复仅装载编辑器，损坏/额度/禁用明确失败和手动导出。
+
+N6：只称HTTPS或localhost受信任来源为部署安全上下文，别写任意HTTP/HTTPS都安全；SW冷重启未实现边界与打开页面离线不同。性能输入可以是自动化驱动但不得称物理键盘实测；WebKit自动化与真Safari分开记录。固定1000条种子、80ms包含150ms P95、导航原点→可交互<=1s、前台设备/版本/预热/样本次数和nearest-rank算法、失败处理均明确。目标程序未开发，所有真实IME/平台/性能验证仍unexecuted。
+
+N7：基础验收同一次saveNote冲突曾同时写“抛出ConcurrentEditConflictError”和“返回conflict:true”；接口Promise<SaveNoteResult>与任务按throw判断未选定统一故障方式。选择一种明确方式，列出成功、版本冲突、代际失效、不存在和环境故障的返回/拒绝约定，UI调用方按同一规则处理，不能声称同一次Promise既reject又resolve。还要统一meta中libraryGeneration的存储形状：data-model定义LibraryGenerationMeta{currentGeneration,lastResetAt}，旧事务示意却写value:nextGeneration整数；明确唯一形状、初始值、同事务读取和导入校验/迁移，不让CodingAgent猜测。
+
+N8：acceptance-search-filter场景2把“处于已归档视图”检索的预期写成仅显示active便签X；这与归档视图的状态隔离冲突。明确全部/收藏/归档/回收四视图的实体集合，以及当前视图、标签AND与关键词条件的组合顺序；已归档只返回archived，回收只返回trashed，收藏保持原active/archived的收藏过滤。搜索不能只排除trashed后把其他状态混进当前专用视图。接口明确调用方是否先筛当前视图或在参数声明视图过滤，feature/flow/task/验收给同一规则，并加归档里同词active不出现的反例。
+
+规划followUp只能登记当前材料和受控环境下可以推进的研究/技术试验；“目标应用开发完成后再测”的性能/IME/平台验证保留在具体蓝图validation任务并标unexecuted，不再误放入当前followUp反复调用。当前目标应用未实现、Docker未就绪的既有事实保持，不伪造实测结果。
+
+其余原十项反馈全部保留，包括Markdown/代码复制、AppMeta/BackupTrackerMeta及公共持久化/隐私能力API（诚实限制）、精确七天>=与停留跨到期不暗删、库并发、草稿与备份隔离。正文、全部task字段、接口参数、流、错误及Given/When/Then必须同一规则。AI独立review须读取完整候选，指出并修复仍存在矛盾后才交pending建议；Core自动接受和compiler导出仅自动验收，真人review pending。

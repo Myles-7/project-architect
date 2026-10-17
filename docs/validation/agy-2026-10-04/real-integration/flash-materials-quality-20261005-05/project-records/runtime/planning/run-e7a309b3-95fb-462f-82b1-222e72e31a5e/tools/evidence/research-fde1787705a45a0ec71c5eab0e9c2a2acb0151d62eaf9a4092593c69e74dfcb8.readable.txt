@@ -1,0 +1,520 @@
+Node: textContent property - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Node 
+
+ textContent 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ Node: textContent property
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The textContent property of the Node interface represents the text content of the node and its descendants.
+
+ Note: 
+ textContent and HTMLElement.innerText are easily confused, but the two properties are different in important ways .
+
+ In this article
+
+ Value 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Value 
+
+ A string, or null . Its value depends on the situation:
+
+ If the node is a document or a doctype , textContent returns null .
+
+ Note: 
+To get all of the text and CDATA data for the whole document, use document.documentElement.textContent .
+
+ If the node is a CDATA section , a comment, a processing instruction , or a text node , textContent returns, or sets, the text inside the node, i.e., the Node.nodeValue .
+
+ For other node types, textContent returns the concatenation of the textContent of every child node, excluding comments and processing instructions. (This is an empty string if the node has no children.)
+
+ Warning: 
+Setting textContent on a node removes all of the node's children and replaces them with a single text node with the given string value.
+
+ Differences from innerText 
+
+ Don't get confused by the differences between Node.textContent and HTMLElement.innerText . Although the names seem similar, there are important differences:
+
+ textContent gets the content of all elements, including <script> and <style> elements. In contrast, innerText only shows "human-readable" elements.
+
+ textContent returns every element in the node. In contrast, innerText is aware of styling and won't return the text of "hidden" elements.
+
+ Moreover, since innerText takes CSS styles into account, reading the value of innerText triggers a reflow to ensure up-to-date computed styles. (Reflows can
+be computationally expensive, and thus should be avoided when possible.)
+
+ Differences from innerHTML 
+
+ Element.innerHTML gets or sets HTML, as its name indicates. We advise against using innerHTML to get or set text inside an element because it deals with raw HTML rather than plain text and can be susceptible to XSS attacks . Even if you are sure that the text never contains HTML syntax, it is still less semantic and slower because it needs to invoke the HTML parser.
+
+ Examples 
+
+ Start with this HTML fragment.
+
+ html 
+ <div id="divA">This is <span>some</span> text!</div>
+
+ You can use textContent to get the element's text content:
+
+ js 
+ let text = document.getElementById("divA").textContent;
+// The text variable is now: 'This is some text!'
+
+ If you prefer to set the element's text content, you can do:
+
+ js 
+ document.getElementById("divA").textContent = "This text is different!";
+// The HTML for divA is now:
+// <div id="divA">This text is different!</div>
+
+ Specifications 
+
+ Specification
+
+ DOM 
+# dom-node-textcontent 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ HTMLScriptElement.textContent and HTMLScriptElement.text 
+
+ HTMLElement.innerText 
+
+ Element.innerHTML 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Oct 28, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Document Object Model (DOM) 
+ Node 
+ Instance properties baseURI 
+ childNodes 
+ firstChild 
+ isConnected 
+ lastChild 
+ nextSibling 
+ nodeName 
+ nodeType 
+ nodeValue 
+ ownerDocument 
+ parentElement 
+ parentNode 
+ previousSibling 
+ textContent 
+
+ Instance methods appendChild() 
+ cloneNode() 
+ compareDocumentPosition() 
+ contains() 
+ getRootNode() 
+ hasChildNodes() 
+ insertBefore() 
+ isDefaultNamespace() 
+ isEqualNode() 
+ isSameNode() 
+ lookupNamespaceURI() 
+ lookupPrefix() 
+ normalize() 
+ removeChild() 
+ replaceChild() 
+
+ Events selectstart 
+
+ Inheritance EventTarget 
+
+ Related pages for DOM AbortController 
+ AbortSignal 
+ AbstractRange 
+ Attr 
+ CDATASection 
+ CharacterData 
+ Comment 
+ CustomEvent 
+ DOMError 
+ DOMException 
+ DOMImplementation 
+ DOMParser 
+ DOMTokenList 
+ Document 
+ DocumentFragment 
+ DocumentType 
+ Element 
+ Event 
+ EventTarget 
+ HTMLCollection 
+ MutationObserver 
+ MutationRecord 
+ NamedNodeMap 
+ NodeIterator 
+ NodeList 
+ ProcessingInstruction 
+ QuotaExceededError 
+ Range 
+ ShadowRoot 
+ StaticRange 
+ Text 
+ TreeWalker 
+ XMLDocument 
+ XPathEvaluator 
+ XPathExpression 
+ XPathResult 
+ XSLTProcessor 
+
+ Guides Anatomy of the DOM 
+ Attribute reflection 
+ Selection and traversal on the DOM tree 
+ Building and updating the DOM tree 
+ Working with events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

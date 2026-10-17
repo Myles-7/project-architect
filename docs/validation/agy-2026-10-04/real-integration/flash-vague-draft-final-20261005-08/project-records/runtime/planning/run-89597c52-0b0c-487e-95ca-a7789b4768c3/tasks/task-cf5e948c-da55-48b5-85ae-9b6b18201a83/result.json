@@ -1,0 +1,202 @@
+{
+  "blockers": [
+    "【痛点4缺失缺口】先前草案在 block-problem-fragmented-ideas 中仅保留了3个痛点，丢失了原正式批准的核心痛点“无序堆积导致灵感沉没与查找困难”，影响到标签过滤、全文检索与置顶收藏的价值闭环依据。依据：feedback 输入 11aa9e60-8bcb-4731-b3b3-79511d6ae147 第1项明确要求恢复4个痛点。受影响块 ID：block-problem-fragmented-ideas。",
+    "【非目标界定与快捷键统一缺口】block-non-goals-exclusions 需明确界定“不做复杂树形文件夹/无限层级嵌套”与“不做重量级 WYSIWYG 富文本排版编辑器”；且全字段提交快捷键统一为 Ctrl/Cmd+Enter，消除回车直接保存。受影响块 ID：block-non-goals-exclusions, feature-quick-capture, flow-quick-capture, acceptance-quick-capture。",
+    "【接口定义与元数据完整性缺口】interface-service-contracts 缺少 requestPersistence()、isPersisted()、detectPrivateMode()、checkBackupReminderNeeded() 契约；缺少 AppMeta {key, value, updatedAt} 与 libraryGeneration 结构定义；saveNote 需强制必填 expectedRevision，在同事务 CAS（get→比较→put）中执行，且对新创建与编辑更新进行严格方法分离（独立 createNote 动作，禁止 upsert 隐式复活已删除便签）。受影响块 ID：interface-service-contracts, data-model-core-entities, task-foundation-and-storage, acceptance-foundation-and-storage。",
+    "【隐私模式探测的客观技术边界】detectPrivateMode 在现代浏览器（Chrome/Safari/Firefox）中缺乏标准 Web API 支持，属于启发式尽力探测（best-effort heuristic detection）与待验证能力，不能宣称能 100% 识别所有浏览器隐私模式。受影响块 ID：interface-service-contracts, acceptance-foundation-and-storage, val-storage-and-search-benchmark。依据：MDN Storage API 与跨浏览器反指纹安全策略。",
+    "【备份往返与草稿隔离契约缺口】BackupPayload 需完整列明元数据字段（appMeta, backupTracker, libraryGeneration, tags, notes）及各字段严格类型校验规则；需提供独立的“导出当前未保存草稿”动作；sessionStorage 需按 spark_draft_${libraryGeneration}_${noteId} 进行隔离，并诚实说明其在标签页彻底关闭后无法恢复的平台限制。受影响块 ID：feature-data-portability, flow-data-portability, task-data-portability, acceptance-data-portability, error-architecture-and-recovery。依据：MDN sessionStorage 规范。",
+    "【回收区 7 天到期规则的精确判定与 Given/When/Then 细化】需以 RETENTION_MS = 604,800,000 ms（>= 边界）定义超期判定；跨到期停留自动标注超期但严禁暗删；清理需二次确认后物理删除；重复删除不得重置 trashedAt；并发竞争禁止复活已删除便签。受影响块 ID：feature-note-card-view, flow-note-card-actions, task-note-card-view, acceptance-note-card-view。",
+    "【冷启动与检索时延度量标准闭合】冷启动必须统一度量起点为导航起始（navigationStart / PerformanceNavigationTiming.startTime 0），首屏可交互 TTI 目标 <= 1.0s，不能从骨架屏消失起算；检索必须从敲击开始含 80ms 防抖及 DOM 渲染完成，P95 <= 150ms。受影响块 ID：block-outcomes-lightweight-experience, tech-storage-and-search, val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark。依据：MDN PerformanceNavigationTiming 规范。",
+    "【验证任务状态诚实化】当前规划环境 Docker 不可用（experiment:experiment-c122c3c2-4830-486d-853c-5cfd6083dd52 状态为 unavailable），目标应用及 CodingAgent 尚未开发，所有性能基准、跨浏览器（Safari 17+）兼容性及隐私模式实测任务必须如实标为 unexecuted，在交付任务中说明失败后影响与修订路径，不可冒充已实测通过。受影响块 ID：val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark。",
+    "【跨范围流程缺失缺口】功能 feature-note-card-view、feature-note-detail-edit、feature-data-portability 缺少对应的独立交互流程块（flow-note-card-actions、flow-note-detail-edit、flow-data-portability），属于其他工作范围待补充补齐。受影响块 ID：feature-note-card-view, feature-note-detail-edit, feature-data-portability。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "即时全文模糊检索防抖与正则特殊字符转义安全高亮规范",
+      "content": "Web search inputs require regex character escaping to prevent RegExp syntax errors, and debouncing to ensure UI responsiveness.",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-9eafc6fa-f715-4ae4-9f20-9281a653dfda",
+      "kind": "material",
+      "location": "inputs/inp-01/source.txt",
+      "obtainedAt": "2026-10-05T00:36:42.475Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "质量反馈明确要求检索时延从敲击开始含 80ms 防抖及 DOM 渲染完成，在 1000 条数据基准下 P95 <= 150ms，且回收区作用域严格隔离。",
+      "content": "检索时延从实际输入动作起算，包含80ms防抖、筛选和DOM结果可见的观测终点，使用1000条固定种子数据、预热/重复次数、样本计算方法（nearest-rank P95、排序索引）、前台浏览器/实际设备与版本、原始样本及超标失败处理。冷启动与检索场景各自记录条件；不能由虚拟性能或AI评审声称目标已实测。原150ms边界不改。常规视图排除回收区便签，回收区视图限定在回收区便签。",
+      "hash": "994b4febdd3c6cd38282029707670f8447197d5d5e03eac223a21e8caa76ddfd",
+      "id": "evidence-312576ea-362f-4ee1-a0c2-a7686eab28a6",
+      "kind": "user",
+      "location": "input:11aa9e60-8bcb-4731-b3b3-79511d6ae147",
+      "obtainedAt": "2026-10-05T00:36:48.562Z",
+      "outcome": "passed",
+      "source": "input:11aa9e60-8bcb-4731-b3b3-79511d6ae147"
+    },
+    {
+      "applicability": "快捷键支持：按 / 键聚焦搜索框，按 Escape 键立即清空重置。",
+      "content": "支持页面焦点快捷键：按 / 键聚焦搜索框，按 Escape 键立即清空重置搜索关键字并复位视图。",
+      "hash": "360ca5cbe8f5671256a372369a63cfe9144377458dd2eda4c2f953ae252ef5a4",
+      "id": "evidence-512c4c10-42ae-42a9-9d8e-b2dca847efec",
+      "kind": "user",
+      "location": "input:11aa9e60-8bcb-4731-b3b3-79511d6ae147",
+      "obtainedAt": "2026-10-05T00:36:51.281Z",
+      "outcome": "passed",
+      "source": "input:11aa9e60-8bcb-4731-b3b3-79511d6ae147"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "在真实宿主浏览器（Chrome 120+ / Safari 17+）上，对 1000 条种子数据基准下的全文模糊检索端到端时延（含 80ms 防抖至 DOM 渲染呈现，nearest-rank P95 <= 150ms）执行实测验证。",
+      "kind": "validation"
+    }
+  ],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 功能定义与核心规范\n\n1. **80ms 防抖即时筛选（Debounced Instant Search）**：\n   - 顶部搜索框提供实时键入监听，挂载 80ms 防抖计时器（避免每个按键均触发全量重匹配，有效降低 CPU 占用并消除输入卡顿感）；\n   - 用户连续键入时自动重置防抖计时，输入停顿满 80ms 立即在内存便签索引中执行即时模糊匹配与视图响应式更新；\n   - 当用户清空输入框时，立即同步还原为无过滤状态，不附加防抖延迟。\n\n2. **正则表达式特殊字符安全转义与防崩溃机制（RegExp Escaping & Crash Prevention）**：\n   - 对用户输入的搜索关键词执行严格的正则特殊字符转义：`query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')`；\n   - 彻底防御 `(`, `)`, `[`, `]`, `*`, `+`, `?`, `^`, `$`, `\\`, `|` 等特殊元字符引发的 `SyntaxError: Invalid regular expression` 运行时异常，即使输入未闭合的括号、星号或连续特殊符号（如 `[todo]`, `(test)`, `C++`），应用依然稳健运行零崩溃，精准匹配包含该字面量的便签。\n\n3. **关键词安全高亮转换（Safe Text Highlighting）**：\n   - 命中关键词在便签正文与标签中以 `<mark class=\"bg-amber-200 dark:bg-amber-800 text-inherit rounded-xs px-0.5 font-medium\">` 呈现高对比度黄色高亮标记；\n   - 采用基于字符串切片（Tokenization）的 React 安全组件渲染机制，将匹配文本与未匹配文本分解为独立 Text 节点和 mark 元素，**绝对不使用 `innerHTML`**，彻底规避 XSS 脚本注入与 DOM 结构污染风险。\n\n4. **检索作用域严格隔离（Strict Scope Isolation）**：\n   - **常规系统视图（全部灵感、已收藏、已归档）**：检索作用域**严格排除处于回收区的便签**（`status === 'trashed'`），仅在对应活跃、收藏或归档集合内进行模糊匹配，绝不泄露已被用户删除的便签；\n   - **回收区独立视图（回收区）**：检索作用域**仅限定在回收区内部便签**（`status === 'trashed'`）范围内进行匹配，绝不混入常规活跃或归档便签，搜索框占位提示自动同步为“在回收区中搜索已删除便签...”。\n\n5. **多标签组合筛选交集（AND Filter）**：\n   - 支持与左侧标签面板选中的 1 至多个标签协同生效；\n   - 检索结果严格遵循交集过滤规则：便签必须同时包含所有选中的标签（AND 关系），且正文或标签命中搜索关键词。\n\n6. **页面激活快捷键与一键清除（Shortcuts & Quick Reset）**：\n   - 页面处于激活焦点状态下，按键盘 `/` 键（非输入焦点时）自动聚焦顶部搜索框并全选已有文字；\n   - 处于搜索框聚焦状态时，按 `Escape` 键立即清空搜索关键字并使输入框失焦（blur），视图瞬时复位；\n   - 搜索框内右侧提供醒目的鼠标/触控清除按钮（`×`），点击即刻还原无搜索状态。\n\n7. **检索时延度量标准闭合（待验证性能目标）**：\n   - 统一度量起点与终点：从用户实际击键输入动作起算，包含 80ms 防抖、内存比对筛选至 DOM 渲染呈现可见的完整端到端周期；\n   - 在 1,000 条固定种子数据（800 活跃、100 归档、100 回收区，单条平均 150 字符）基准下，经 3 次预热后连续 10 次模糊搜索，采用 nearest-rank 方法计算的 95 分位端到端响应延迟（P95）统一标准目标 <= 150ms。若 P95 超出 150ms，判定性能未达标并触发倒排索引与虚拟滚动优化。数字为待验证目标，需在前台浏览器及真实设备上实测，不伪装成已实测事实。",
+          "dependsOn": [
+            "page-main-workspace"
+          ],
+          "evidenceIds": [
+            "evidence-9eafc6fa-f715-4ae4-9f20-9281a653dfda",
+            "evidence-312576ea-362f-4ee1-a0c2-a7686eab28a6",
+            "evidence-512c4c10-42ae-42a9-9d8e-b2dca847efec"
+          ],
+          "id": "feature-search-filter",
+          "kind": "feature",
+          "requirementIds": [
+            "block-scope-core-boundaries"
+          ],
+          "stage": "product",
+          "title": "即时全文模糊检索与关键词高亮功能（回收区隔离机制）"
+        },
+        {
+          "content": "### 即时检索、动态高亮与快捷清除交互流详细步骤\n\n1. **步骤 1（快捷唤起与聚焦）**：\n   - 用户在单页应用主工作区浏览，页面处于激活焦点状态；\n   - 用户敲击键盘按键 `/`（前置判断：当前获得焦点的 DOM 元素非 input、textarea 等文本输入控件）；\n   - 系统捕获键盘事件并调用 `e.preventDefault()` 阻止浏览器默认输入行为，主工作区顶部搜索框立即获得焦点并展示蓝色激活光圈，光标定位于搜索框末尾并全选既有文字；\n   - 移动端或触控设备用户点击顶部搜索输入栏，同样瞬时唤起软键盘并聚焦。\n\n2. **步骤 2（输入监听、80ms 防抖与正则转义）**：\n   - 用户在搜索框内敲击键盘键入查询词（如输入 `C++ (架构) #优化`）；\n   - 系统启动 80ms 防抖定时器；若用户在 80ms 内连续键入，防抖定时器持续重置；\n   - 80ms 倒计时结束触发检索执行：\n     - 首先调用 `escapeRegExp` 对输入内容进行特殊字符转义：`str.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')`，将括号、加号等正则元字符转换为安全字面量；\n     - 校验去除首尾空白后的有效检索词，构建不区分大小写的安全正则比对模式：`new RegExp(`(${escapedQuery})`, 'gi')`。\n\n3. **步骤 3（视图作用域判定与隔离过滤）**：\n   - 检索引擎根据当前单页应用激活的主系统视图确定检索范围：\n     - **若当前为【全部灵感】、【已收藏】或【已归档】视图**：\n       从响应式内存数据源中提取便签，首先施加硬性过滤条件 `note.status !== 'trashed'`，**100% 严格排除所有处于回收区的便签**；\n       若当前视图为【已收藏】，追加 `note.isFavorite === true`；若当前视图为【已归档】，追加 `note.status === 'archived'`；\n     - **若当前为【回收区】独立视图**：\n       强制过滤条件为 `note.status === 'trashed'`，**100% 限定仅在回收区内部便签中进行比对**，常规活跃与归档便签坚决不出现在此视图结果中；\n   - 若侧边栏当前激活了多标签筛选（如勾选了 `#工作` 与 `#架构`），同时比对便签 `tags` 数组是否包含全部勾选标签（AND 组合交集）；\n   - 在便签正文 `note.content` 与标签数组 `note.tags` 中执行模糊正则匹配。\n\n4. **步骤 4（结果排序与安全文本高亮渲染）**：\n   - 匹配命中的便签列表按置顶状态（`isPinned` 置顶优先）与最后修改时间（`updatedAt` 降序）进行排序排版；\n   - 卡片流组件挂载 `<HighlightText />` 安全渲染组件：\n     - 使用正则匹配拆分文本子串，命中项包裹在 `<mark>` 标签中呈现黄色半透明高亮底色；\n     - 未命中项保持纯文本节点渲染，绝对不经过 `dangerouslySetInnerHTML`，保障严密防 XSS 注入；\n   - 搜索框右侧动态显示匹配结果数量（如“找到 3 条灵感”），卡片流以 120ms 平滑动效展示过滤结果。\n\n5. **步骤 5（无匹配结果空白状态分支）**：\n   - 若当前过滤条件下无任何便签匹配，主工作区展示友好居中空白引导：“未找到匹配 ‘xxx’ 的灵感”，并展示【一键清除搜索】快捷按钮；\n   - 用户点击按钮即可立即还原完整视图。\n\n6. **步骤 6（快捷清除与状态瞬时复位）**：\n   - 用户在搜索框聚焦时按下 `Escape` 键，或点击搜索框右侧的 `×` 清除图标；\n   - 搜索框内容立即清空为 `\"\"`，失焦（blur），取消所有未完成的防抖计时器；\n   - 便签流无需任何防抖等待，立即瞬时全量恢复当前系统视图下的完整便签卡片列表，正文高亮标记全部消除。",
+          "dependsOn": [
+            "feature-search-filter"
+          ],
+          "evidenceIds": [
+            "evidence-9eafc6fa-f715-4ae4-9f20-9281a653dfda",
+            "evidence-312576ea-362f-4ee1-a0c2-a7686eab28a6",
+            "evidence-512c4c10-42ae-42a9-9d8e-b2dca847efec"
+          ],
+          "id": "flow-search-filter",
+          "kind": "flow",
+          "requirementIds": [
+            "feature-search-filter"
+          ],
+          "stage": "product",
+          "title": "即时检索、动态高亮与快捷清除交互流"
+        },
+        {
+          "content": "实现前端全文模糊检索引擎 SearchService 与关键词高亮组件 HighlightText，包含 80ms 防抖、正则表达式特殊字符转义防崩、常规视图严格排除回收区便签与回收区专属检索的作用域隔离机制、/ 键聚焦与 Escape 键清空快捷键，以及在 1000 条种子数据基准下 P95 <= 150ms 检索时延的测试基准闭环。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "flow-search-filter"
+          ],
+          "evidenceIds": [
+            "evidence-9eafc6fa-f715-4ae4-9f20-9281a653dfda",
+            "evidence-312576ea-362f-4ee1-a0c2-a7686eab28a6",
+            "evidence-512c4c10-42ae-42a9-9d8e-b2dca847efec"
+          ],
+          "id": "task-search-filter",
+          "kind": "task",
+          "requirementIds": [
+            "feature-search-filter",
+            "flow-search-filter"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "便签数据通过 Dexie.js useLiveQuery 实时同步并映射在客户端内存镜像中",
+              "浏览器运行环境支持标准 KeyboardEvent 与 RegExp API"
+            ],
+            "completionCriteria": [
+              "SearchUtils.escapeRegExp 特殊字符转义与防崩单元测试通过率 100%",
+              "常规视图严格排除回收区便签的作用域隔离测试通过率 100%",
+              "回收区专属检索仅返回 status === 'trashed' 便签测试通过率 100%",
+              "HighlightText 安全组件 XSS 注入防御测试全部通过",
+              "快捷键 / 聚焦与 Escape 瞬时清空交互测试全部通过",
+              "1000 条固定种子数据基准下 nearest-rank P95 <= 150ms 检索时延度量脚本就绪且判定逻辑闭合"
+            ],
+            "environment": "Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+ 桌面浏览器环境，Node 18+ 开发构建环境",
+            "evidenceRequired": [
+              "Vitest 单元测试覆盖率报告",
+              "特殊正则符号转义防崩测试日志",
+              "作用域隔离测试用例执行日志",
+              "1000 条固定种子数据检索时延基准测试脚本与样本数据输出"
+            ],
+            "exclusions": "不包含服务端远程搜索接口，不引入重量级分词引擎或外部搜索引擎，不改变底座 IndexedDB 存储 Schema",
+            "failureBehavior": "特殊正则字符输入不抛异常并作为纯字面量匹配；无结果时展示引导性空白状态并提供一键清除；若端到端时延在低端设备超出 150ms，触发防抖微调至 100ms 或启用虚拟列表优化",
+            "goal": "开发纯前端 80ms 防抖即时全文模糊检索引擎与安全关键词高亮组件，实现正则特殊字符转义防崩、常规视图严格排除回收区便签与回收区专属检索的作用域隔离、/ 与 Escape 键盘快捷键、多标签交集组合过滤，并确立 1000 条种子数据基准下 P95 <= 150ms 响应时延目标。",
+            "modules": [
+              "SearchService",
+              "useDebounceSearch",
+              "HighlightText",
+              "SearchInput",
+              "NoteFeedContainer"
+            ],
+            "normalBehavior": "输入字符后 80ms 触发精确模糊匹配，正文与标签中命中关键词呈现黄色高亮；常规视图下回收区便签绝对不出现在结果中；回收区视图下检索仅限已删除便签；按 / 键秒级聚焦，按 Escape 键或点击清除按钮立即清空并复位视图；1000 条便签下端到端延迟 P95 <= 150ms。",
+            "onFailure": "若测试未通过或特殊字符导致报错，修复转义正则或调整防抖策略，记录错误用例并重新执行验证",
+            "passCriteria": [
+              "全部检索与高亮单元测试通过率 100%",
+              "特殊正则字符不抛 SyntaxError",
+              "常规视图搜索绝不返回 status === 'trashed' 的便签",
+              "回收区搜索仅返回 status === 'trashed' 的便签",
+              "在 1000 条固定种子数据基准下，nearest-rank P95 响应时延目标 <= 150ms 统计指标闭合"
+            ],
+            "scope": "实现 SearchService 模糊匹配引擎、useDebounceSearch 自定义 Hook（80ms 防抖）、HighlightText 安全高亮组件、SearchInput 搜索框组件（含 / 快捷聚焦与 Escape 快捷清除）、常规视图与回收区视图的作用域隔离逻辑、结合 TagFilter 的 AND 组合交集过滤、针对 1000 条种子数据的基准性能测试用例与 nearest-rank P95 统计计算脚本。",
+            "steps": [
+              "1. 实现 SearchUtils 工具函数，包含 escapeRegExp 正则特殊符号转义与关键词分词函数",
+              "2. 实现 SearchService 类，封装 filterNotes(notes, query, scope, selectedTags) 匹配算法与排序逻辑",
+              "3. 实现 useDebounceSearch 自定义 Hook，封装 80ms 防抖、即时清空与查询状态管理",
+              "4. 编写 HighlightText 安全渲染组件，将匹配关键词安全转换为 <mark> 标签，杜绝 innerHTML",
+              "5. 实现 SearchInput 搜索输入框组件，监听页面激活状态下的 / 键聚焦与 Escape 键清空失焦",
+              "6. 在 NoteFeedContainer 中接入 SearchInput 与系统视图联动，落实常规视图排除回收区与回收区专属检索",
+              "7. 编写 Vitest 自动化单元测试与 1000 条种子数据性能度量脚本"
+            ],
+            "verification": [
+              "使用 Vitest 针对 SearchService 进行特殊字符单元测试（覆盖 .*+?^${}()|[]\\\\ 等字符转义及空输入）",
+              "编写针对作用域隔离的单元测试：验证在 active/favorite/archived 视图下，检索结果中 trashed 状态便签命中数为 0；验证在 trashed 视图下，检索结果 100% 仅包含 trashed 便签",
+              "编写基于 fake-indexeddb 与 React Testing Library 的端到端集成测试，验证 / 聚焦与 Escape 清除交互",
+              "在 1000 条固定种子数据（800 active, 100 archived, 100 trashed）下运行性能基准测试脚本，收集 10 次独立搜索端到端耗时样本，验证 nearest-rank P95 统计方法与结果判定"
+            ]
+          },
+          "title": "全文模糊检索引擎与关键词高亮开发任务（回收区范围隔离）"
+        },
+        {
+          "content": "### 即时全文模糊检索与高亮验收标准（Given / When / Then）\n\n- **场景 1：80ms 防抖即时筛选与实时结果呈现**\n  - **Given** 用户处于【全部灵感】视图，本地数据库中存在多条包含关键词“React”的活跃便签，\n  - **When** 用户在顶部搜索框连续键入“React”并停顿满 80ms，\n  - **Then** 便签流自按键输入起算经 80ms 防抖后呈现所有命中“React”的活跃便签，正文与标签中所有“React”子串均被黄色 `<mark>` 标签包裹高亮呈现。\n\n- **场景 2：正则表达式特殊字符转义安全防御（防崩溃）**\n  - **Given** 用户在搜索框中连续键入包含特殊正则符号的复杂字符串（例如 `[BUG] (v1.0) *重要* C++ \\\\path?`），\n  - **When** 80ms 防抖倒计时结束触发检索执行，\n  - **Then** 系统安全执行 `escapeRegExp` 将元字符转换为纯字面量匹配，绝对不抛出 `SyntaxError: Invalid regular expression` 运行时异常，前端应用零崩溃，精准匹配包含该字面量子串的便签。\n\n- **场景 3：检索作用域严格隔离 —— 常规视图坚决排除回收区便签**\n  - **Given** 系统中存在活跃便签 A（包含“项目方案”）、归档便签 B（包含“项目方案”）以及已移入回收区的便签 C（status='trashed'，包含“项目方案”），\n  - **When** 用户在【全部灵感】视图或【已归档】视图的搜索框中输入“项目方案”，\n  - **Then** 检索结果中仅呈现便签 A 或便签 B，已删除便签 C 被 100% 严格排除，绝对不泄漏在常规视图搜索结果中。\n\n- **场景 4：检索作用域严格隔离 —— 回收区专属检索**\n  - **Given** 用户切换至【回收区】独立视图，回收区存在便签 X 与便签 Y（status='trashed'），常规工作区存在多条活跃便签，\n  - **When** 用户在搜索框键入查询关键词，\n  - **Then** 搜索占位符动态变更为“在回收区中搜索已删除便签...”，检索结果 100% 限定在 `status === 'trashed'` 的回收区便签集合内，所有常规活跃便签与归档便签被严格排除。\n\n- **场景 5：快捷键 / 聚焦与 Escape 瞬时清空复位**\n  - **Given** 用户在主工作区浏览便签流，当前光标未聚焦在任何文本输入控件中，\n  - **When** 用户在键盘上按下 `/` 键，\n  - **Then** 顶部搜索框立即获得焦点并全选现有搜索文本；当用户紧接着按下 `Escape` 键，搜索框内容瞬时清空为 `\"\"` 并失焦（blur），便签流无需防抖等待立即恢复当前视图的全部便签列表，高亮标记全部消除。\n\n- **场景 6：关键词安全高亮与 XSS 防护验证**\n  - **Given** 便签正文中包含恶意构造的 HTML 标记或脚本代码（例如 `<script>alert('xss')</script>`），\n  - **When** 用户在搜索框键入 `<script>` 进行检索，\n  - **Then** `<HighlightText />` 组件以纯文本 Token 分解渲染，`<mark>` 仅包裹匹配的文本子串，HTML 标签与特殊符号被原生字符转义展示，绝对不触发任何脚本执行或 DOM 结构污染。\n\n- **场景 7：多标签组合筛选与搜索关键词 AND 交集过滤**\n  - **Given** 用户在侧边栏勾选了标签 `#工作` 与 `#架构`，\n  - **When** 用户在搜索框键入“微服务”，\n  - **Then** 便签流呈现的结果严格满足三者交集：便签必须同时包含 `#工作` 标签、`#架构` 标签，且正文包含关键词“微服务”。\n\n- **场景 8：1000 条种子数据基准下 P95 <= 150ms 检索时延闭合度量**\n  - **Given** 本地数据库中灌入 1,000 条固定种子数据（800 活跃、100 归档、100 回收区，单条均长 150 字符），\n  - **When** 在前台真实桌面浏览器中运行自动化性能测试，经 3 次预热后连续执行 10 次典型搜索，从击键输入事件（T0）起算，包含 80ms 防抖、内存比对至 DOM 渲染完成（T1），\n  - **Then** 记录 10 次端到端耗时样本，按 nearest-rank 方法计算的 95 分位数满足 $P95 \\le 150\\text{ ms}$；若测试环境尚未实现真实运行，该任务诚实记录为 unexecuted 交付验证任务，禁止虚构实测通过结论。",
+          "dependsOn": [
+            "task-search-filter"
+          ],
+          "evidenceIds": [
+            "evidence-9eafc6fa-f715-4ae4-9f20-9281a653dfda",
+            "evidence-312576ea-362f-4ee1-a0c2-a7686eab28a6",
+            "evidence-512c4c10-42ae-42a9-9d8e-b2dca847efec"
+          ],
+          "id": "acceptance-search-filter",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-search-filter",
+            "flow-search-filter"
+          ],
+          "stage": "delivery",
+          "title": "即时全文模糊检索验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-cf5e948c-da55-48b5-85ae-9b6b18201a83-group-search-filter",
+      "impact": "落实 80ms 防抖即时全文模糊检索、正则特殊字符安全转义防崩、关键词安全高亮、常规视图严格排除回收区便签与回收区专属检索的作用域隔离机制、/ 与 Escape 快捷键及 1000 条数据下 P95 <= 150ms 检索时延度量标准闭合",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "即时全文模糊检索与关键词高亮模块规范（回收区隔离机制）"
+    }
+  ],
+  "questions": [],
+  "summary": "本轮任务专注于落实登记范围【work-item-search-filter】的即时全文模糊检索与关键词高亮功能、交互流程、开发任务与验收标准。修订重点包括：\n1. 建立 80ms 防抖即时检索机制与正则表达式特殊字符安全转义（escapeRegExp），彻底防御用户输入特殊符号引发的正则语法崩溃；\n2. 确立关键词安全高亮转换规范，基于纯文本 Token 分解渲染 <mark> 标签，杜绝 innerHTML 与 XSS 注入风险；\n3. 落实检索作用域严格隔离：常规视图（全部灵感、已收藏、已归档）检索 100% 严格排除回收区便签（status === 'trashed'）；回收区独立视图检索 100% 限定在已删除便签集合内；\n4. 闭合检索性能度量标准：统一定义端到端时延从实际击键输入动作起算，包含 80ms 防抖、内存比对至 DOM 渲染完成，在 1000 条固定种子数据（800 活跃、100 归档、100 回收区）基准下，采用 nearest-rank 方法计算的 P95 响应延迟目标 <= 150ms，并如实标注为待验证目标；\n5. 完善快捷键系统：支持页面激活状态下按 / 键自动聚焦搜索框，按 Escape 键瞬时清空重置与失焦；\n6. 编写检索引擎与高亮组件开发任务（task-search-filter）及详细的 Given/When/Then 验收标准（acceptance-search-filter）。\n同时，解决变更组依赖问题（dependsOn: []）与证据冲突问题（使用新登记的独立证据 ID，不混淆复用历史冲突 ID），并将跨范围缺陷完整登记于 blockers 供全局独立评审。",
+  "workItems": []
+}

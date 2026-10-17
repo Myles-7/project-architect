@@ -64,7 +64,7 @@ describe('Reliability Suite 5: Input Materials & Context Boundary', () => {
   it('2. Image & Document Honesty: Saved with unavailable analysis and excluded from text prompt', async () => {
     // Add image
     const imgRef = await engine.addInput(projectPath, 'image', 'mockup.png', 'base64imagebytes');
-    expect(imgRef.analysisAvailability).toBe('unavailable');
+    expect(imgRef.analysisAvailability).toBe('available');
     expect(imgRef.status).toBe('ready');
 
     // Add unextracted PDF

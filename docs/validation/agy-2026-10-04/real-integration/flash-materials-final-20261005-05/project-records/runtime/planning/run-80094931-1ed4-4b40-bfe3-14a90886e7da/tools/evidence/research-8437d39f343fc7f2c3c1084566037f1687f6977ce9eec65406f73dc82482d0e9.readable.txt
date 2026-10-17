@@ -1,0 +1,550 @@
+Node: replaceChild() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Node 
+
+ replaceChild() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ Node: replaceChild() method
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The replaceChild() method of the Node interface replaces a child node within the given (parent) node.
+
+ In this article
+
+ Syntax 
+
+ Example 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ js 
+ replaceChild(newChild, oldChild)
+
+ Parameters 
+
+ newChild 
+
+ The new node to replace oldChild .
+
+ Warning: 
+If the new node is already present somewhere else in the DOM, it is first removed from that position.
+
+ oldChild 
+
+ The child to be replaced.
+
+ Note: 
+The parameter order, new before old , is unusual.
+ Element.replaceWith() , applying only to nodes that are elements,
+may be easier to read and use.
+
+ Return value 
+
+ The replaced Node . This is the same node as oldChild .
+
+ Exceptions 
+
+ HierarchyRequestError DOMException 
+
+ Thrown when the constraints of the DOM tree are violated, that is if one of the following cases occurs:
+
+ If the parent of oldChild is not a Document , DocumentFragment , or an Element .
+
+ If the replacement of oldChild by newChild would lead to a cycle, that is if newChild is an ancestor of the node.
+
+ If newChild is not a DocumentFragment , a DocumentType , an Element , or a CharacterData .
+
+ If the current node is a Text , and its parent is a Document .
+
+ If the current node is a DocumentType and its parent is not a Document , as a doctype should always be a direct descendant of a document .
+
+ If the parent of the node is a Document and newChild is a DocumentFragment with more than one Element child, or that has a Text child.
+
+ If the replacement of oldChild by newChild would lead to Document with more than one Element as child.
+
+ If the replacement of oldChild by newChild would lead to the presence of an Element node before a DocumentType node.
+
+ NotFoundError DOMException 
+
+ Thrown if the parent of oldChild is not the current node.
+
+ Example 
+
+ js 
+ // Given:
+// <div>
+// <span id="childSpan">foo bar</span>
+// </div>
+
+// Create an empty element node
+// without an ID, any attributes, or any content
+const sp1 = document.createElement("span");
+
+// Give it an id attribute called 'newSpan'
+sp1.id = "newSpan";
+
+// Create some content for the new element.
+const sp1Content = document.createTextNode("new replacement span element.");
+
+// Apply that content to the new element
+sp1.appendChild(sp1Content);
+
+// Build a reference to the existing node to be replaced
+const sp2 = document.getElementById("childSpan");
+const parentDiv = sp2.parentNode;
+
+// Replace existing node sp2 with the new span element sp1
+parentDiv.replaceChild(sp1, sp2);
+
+// Result:
+// <div>
+// <span id="newSpan">new replacement span element.</span>
+// </div>
+
+ Specifications 
+
+ Specification
+
+ DOM 
+# dom-node-replacechild 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Node.removeChild 
+
+ Element.replaceWith 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Nov 3, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Document Object Model (DOM) 
+ Node 
+ Instance properties baseURI 
+ childNodes 
+ firstChild 
+ isConnected 
+ lastChild 
+ nextSibling 
+ nodeName 
+ nodeType 
+ nodeValue 
+ ownerDocument 
+ parentElement 
+ parentNode 
+ previousSibling 
+ textContent 
+
+ Instance methods appendChild() 
+ cloneNode() 
+ compareDocumentPosition() 
+ contains() 
+ getRootNode() 
+ hasChildNodes() 
+ insertBefore() 
+ isDefaultNamespace() 
+ isEqualNode() 
+ isSameNode() 
+ lookupNamespaceURI() 
+ lookupPrefix() 
+ normalize() 
+ removeChild() 
+ replaceChild() 
+
+ Events selectstart 
+
+ Inheritance EventTarget 
+
+ Related pages for DOM AbortController 
+ AbortSignal 
+ AbstractRange 
+ Attr 
+ CDATASection 
+ CharacterData 
+ Comment 
+ CustomEvent 
+ DOMError 
+ DOMException 
+ DOMImplementation 
+ DOMParser 
+ DOMTokenList 
+ Document 
+ DocumentFragment 
+ DocumentType 
+ Element 
+ Event 
+ EventTarget 
+ HTMLCollection 
+ MutationObserver 
+ MutationRecord 
+ NamedNodeMap 
+ NodeIterator 
+ NodeList 
+ ProcessingInstruction 
+ QuotaExceededError 
+ Range 
+ ShadowRoot 
+ StaticRange 
+ Text 
+ TreeWalker 
+ XMLDocument 
+ XPathEvaluator 
+ XPathExpression 
+ XPathResult 
+ XSLTProcessor 
+
+ Guides Anatomy of the DOM 
+ Attribute reflection 
+ Selection and traversal on the DOM tree 
+ Building and updating the DOM tree 
+ Working with events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

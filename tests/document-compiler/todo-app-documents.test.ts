@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 import type { DiscoveryResult } from '@project-architect/contracts';
+import { renderHistoricalDocuments } from '../fixtures/historical-documents.js';
 
-describe('Document Compiler E2E — Todo App (Simple Project)', () => {
+describe('Historical Document Renderer — Todo App (Simple Project)', () => {
   let tempBaseDir: string;
   let storage: FileStorage;
   let stateEngine: ProjectStateEngine;
@@ -34,6 +35,11 @@ describe('Document Compiler E2E — Todo App (Simple Project)', () => {
       projectTags: ['Desktop App', 'Utility'],
     });
 
+    const initialIdea = s0.decisions.items.find((decision) => decision.statement === 'A minimalist local todo app for personal task tracking');
+    expect(initialIdea?.status).toBe('candidate');
+    const confirmedInitial = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, s0.metadata.stateRevision);
+    expect(confirmedInitial.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
+
     const mockOutput: DiscoveryResult = {
       confirmed: ['Minimal Todo App', 'A minimalist local todo app for personal task tracking'],
       candidates: ['Fast keyboard shortcuts'],
@@ -49,7 +55,7 @@ describe('Document Compiler E2E — Todo App (Simple Project)', () => {
 
     // Turn 1
     await orchestrator.runDiscoveryTurn(projectPath, {
-      expectedRevision: s0.metadata.stateRevision,
+      expectedRevision: confirmedInitial.metadata.stateRevision,
       userMessage: 'Target user is individual developer. MVP scope is simple list and toggle done. Platform is desktop app.',
     });
 
@@ -79,33 +85,38 @@ describe('Document Compiler E2E — Todo App (Simple Project)', () => {
       'confirmed'
     );
 
-    // Compile Documents
-    const compileResult = await orchestrator.compileDocuments(projectPath);
+    // Render the historical fixture without publication
+    const compileResult = await renderHistoricalDocuments(projectPath, storage);
+    expect(compileResult.filesAfter).toEqual(compileResult.filesBefore);
+    expect(compileResult.manifest.sourceRevision).toBe(compileResult.snapshot.metadata.stateRevision);
+    expect(new Set(compileResult.renderedFiles.map(file => file.content)).size).toBe(compileResult.renderedFiles.length);
 
     expect(compileResult.readiness.ready).toBe(true);
     expect(compileResult.manifest.items.length).toBe(9); // 8 core + DESKTOP_SPEC.md
 
-    // Verify all 8 core markdown documents on disk
-    expect(await storage.exists(join(projectPath, 'AGENTS.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'PROJECT.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'PRODUCT.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'USER_FLOWS.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'UX_UI_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'DEVELOPMENT_PLAN.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'ACCEPTANCE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'documents.json'))).toBe(true);
+    // Verify the complete historical document set rendered in memory
+    expect(compileResult.has('AGENTS.md')).toBe(true);
+    expect(compileResult.has('docs/PROJECT.md')).toBe(true);
+    expect(compileResult.has('docs/PRODUCT.md')).toBe(true);
+    expect(compileResult.has('docs/USER_FLOWS.md')).toBe(true);
+    expect(compileResult.has('docs/UX_UI_SPEC.md')).toBe(true);
+    expect(compileResult.has('docs/TECHNICAL_GUIDE.md')).toBe(true);
+    expect(compileResult.has('docs/DEVELOPMENT_PLAN.md')).toBe(true);
+    expect(compileResult.has('docs/ACCEPTANCE.md')).toBe(true);
+    expect(compileResult.has('docs/specs/DESKTOP_SPEC.md')).toBe(true);
+    expect(await storage.exists(join(projectPath, 'documents', 'manifest.json'))).toBe(false);
+    expect(await storage.exists(join(projectPath, 'documents.json'))).toBe(false);
 
     // Check AGENTS.md content
-    const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));
+    const agentsContent = compileResult.content('AGENTS.md');
     expect(agentsContent).toContain('Minimal Todo App — Coding Agent Guidelines');
     expect(agentsContent).toContain('[Locked: User]');
     expect(agentsContent).toContain('Create, view, check off, and delete local todo items');
 
-    // Verify snapshot stage is documents-generated
+    // Rendering cannot publish a stage or documents state.
     const finalSnapshot = await stateEngine.getSnapshot(projectPath);
-    expect(finalSnapshot.metadata.stage).toBe('documents-generated');
-    expect(finalSnapshot.documents?.items.length).toBe(9);
+    expect(finalSnapshot.metadata).toEqual(compileResult.snapshot.metadata);
+    expect(finalSnapshot.documents?.items).toEqual(compileResult.snapshot.documents?.items);
+    expect(finalSnapshot.documents?.items).toEqual([]);
   });
 });

@@ -1,0 +1,738 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ↓ tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Phase 1: AntigravityCliProvider resolves executable properly
+ ↓ tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Phase 2: ProjectStateEngine applies discovery turn with allowRebase = true without conflict
+ ↓ tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Phase 3: Documents generate with isDraft = true bypasses gate and compiles draft
+ ↓ tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Phase 4: Documents write and export-to-path work cleanly
+ × tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Phase 5: Historical rollback is retired without changing the current state 498ms
+   → expected 200 to be 410 // Object.is equality
+ ↓ tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Real-world AGY hardening: Health check reports provider status and executable path
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > rejects repeated direct Core calls without reading or modifying the project (tampered=false) 874ms
+   → promise resolved "{ metadata: { …(10) }, …(9) }" instead of rejecting
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > rejects repeated direct Core calls without reading or modifying the project (tampered=true) 849ms
+   → promise resolved "{ metadata: { …(10) }, …(9) }" instead of rejecting
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > rejects direct Core calls before inspecting even a missing project 527ms
+   → expected Error: Cannot rollback: revision 3 snapsh… { code: '…' } to match object { code: 'LEGACY_WORKFLOW_RETIRED' }
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > returns 410 before project loading in production, including repeated and stale requests 767ms
+   → expected 410 "Gone", got 200 "OK"
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > returns 410 before project loading in mock, including repeated and stale requests 640ms
+   → expected 410 "Gone", got 200 "OK"
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > returns 410 before project loading in injected-orchestrator, including repeated and stale requests 625ms
+   → expected 410 "Gone", got 200 "OK"
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > keeps tampered target manifest untouched and history readable in production 716ms
+   → expected 410 "Gone", got 200 "OK"
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > keeps tampered target manifest untouched and history readable in mock 669ms
+   → expected 410 "Gone", got 200 "OK"
+ × apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > keeps tampered target manifest untouched and history readable in injected-orchestrator 687ms
+   → expected 410 "Gone", got 200 "OK"
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/product-hardening/phase1-5-enhancements.test.ts > Phase 1 - 5 Enhancements Test Suite > Phase 5: Historical rollback is retired without changing the current state
+AssertionError: expected 200 to be 410 // Object.is equality
+
+- Expected
++ Received
+
+- 410
++ 200
+
+ ❯ tests/product-hardening/phase1-5-enhancements.test.ts:191:32
+    189|     });
+    190|     const rollbackBody = await rollbackRes.json();
+    191|     expect(rollbackRes.status).toBe(410);
+       |                                ^
+    192|     expect(rollbackBody.error.code).toBe('LEGACY_WORKFLOW_RETIRED');
+    193|     expect(rollbackBody).not.toHaveProperty('stateRevision');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > rejects repeated direct Core calls without reading or modifying the project (tampered=false)
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > rejects repeated direct Core calls without reading or modifying the project (tampered=true)
+AssertionError: promise resolved "{ metadata: { …(10) }, …(9) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "assumptions": {
++     "items": [],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 1,
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
++   "decisions": {
++     "items": [
++       {
++         "area": "project_overview",
++         "createdAt": "2026-10-04T22:38:57.170Z",
++         "decisionKey": undefined,
++         "evidenceRefs": [
++           "input:inp-01",
++         ],
++         "id": "dec-01",
++         "origin": "user",
++         "statement": "整理个人笔记",
++         "status": "candidate",
++         "updatedAt": "2026-10-04T22:38:57.170Z",
++       },
++     ],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 1,
++     "traces": [],
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
++   "documents": {
++     "items": [],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 1,
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
++   "gaps": {
++     "conflicts": [],
++     "gaps": [
++       {
++         "area": "target_user",
++         "decisionKey": "target_user:primary_audience",
++         "dependsOn": [],
++         "id": "gap-01",
++         "impact": "影响后续 MVP 核心功能优先级。",
++         "reason": "项目初始创建，核心目标用户细分画像尚待明确。",
++         "severity": "high",
++         "shouldAskUser": true,
++         "status": "open",
++       },
++     ],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 2,
++     "tensions": [],
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
++   "metadata": {
++     "createdAt": "2026-10-04T22:38:57.170Z",
++     "inputRefs": [
++       {
++         "analysisAvailability": "available",
++         "contentHash": "0d989e8680842f27e87ad27fcb235e6b99fab4884af84b1c2bd5cb9f6fd573a6",
++         "createdAt": "2026-10-04T22:38:57.170Z",
++         "id": "input:inp-01",
++         "kind": "text",
++         "label": "Initial Idea Prompt",
++         "status": "ready",
++         "storageRef": "inputs/inp-01/source.txt",
++         "summary": "整理个人笔记",
++       },
++     ],
++     "name": "回滚停用副本",
++     "projectId": "proj-rollback-retirement",
++     "projectTags": [
++       "Local-First",
++     ],
++     "schemaVersion": 1,
++     "stage": "created",
++     "stateRevision": 7,
++     "tagline": "整理个人笔记",
++     "updatedAt": "2026-10-04T22:38:57.895Z",
++   },
++   "overview": {
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 1,
++     "sections": [
++       {
++         "id": "project_overview",
++         "itemRefs": [
++           "decision:dec-01",
++         ],
++         "kind": "fixed",
++         "maturity": "needs-clarification",
++         "title": "项目概述与愿景",
++       },
++       {
++         "id": "target_user",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "目标用户与痛点",
++       },
++       {
++         "id": "mvp_scope",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "MVP 范围与边界",
++       },
++       {
++         "id": "core_features",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "核心功能特性",
++       },
++       {
++         "id": "user_flows",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "主要用户旅程与流程",
++       },
++       {
++         "id": "page_structure",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "页面结构与信息架构",
++       },
++       {
++         "id": "ux_ui_direction",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "UX 体验与 UI 方向",
++       },
++       {
++         "id": "technical_boundary",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "技术底线与运行约束",
++       },
++       {
++         "id": "delivery_plan",
++         "itemRefs": [],
++         "kind": "fixed",
++         "maturity": "unexplored",
++         "title": "交付计划与阶段里程碑",
++       },
++     ],
++     "updatedAt": "2026-10-04T22:38:57.355Z",
++   },
++   "planning": {
++     "blueprint": {
++       "approvedInputHash": "926e5c691d9c4f6189e7403b124a0f97e071aa1ee1996373e3ca0c049476c5c6",
++       "blocks": [
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "服务个人开发者本人，在桌面浏览器整理开发笔记。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "target",
++           "kind": "target",
++           "requirementIds": [],
++           "stage": "product",
++           "title": "目标用户",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "分散文本难以保存和查找，关闭页面后容易丢失修改。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "problem",
++           "kind": "problem",
++           "requirementIds": [],
++           "stage": "product",
++           "title": "问题",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "可以离线新增、编辑、查找笔记并导出自己的完整数据。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "outcomes",
++           "kind": "outcomes",
++           "requirementIds": [],
++           "stage": "product",
++           "title": "预期结果",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "本轮包含单用户本地笔记管理、失败恢复和文件导出。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "scope",
++           "kind": "scope",
++           "requirementIds": [],
++           "stage": "product",
++           "title": "范围",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "本轮不提供账号、团队协作和自动跨设备同步。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "non-goals",
++           "kind": "non_goals",
++           "requirementIds": [],
++           "stage": "product",
++           "title": "不做事项",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "新增笔记、编辑标题与正文、手动保存，并在失败时保留编辑内容。 新版保存失败提示必须继续保留。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "notes",
++           "kind": "feature",
++           "requirementIds": [],
++           "stage": "product",
++           "title": "笔记管理",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "打开列表→新增→输入标题正文→保存→显示成功；保存失败保留输入并提供重试。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "notes-flow",
++           "kind": "flow",
++           "requirementIds": [
++             "notes",
++           ],
++           "stage": "product",
++           "title": "笔记流程",
++         },
++         {
++           "approvedAt": "2026-10-04T22:38:57.662Z",
++           "approvedBy": "approve-newer",
++           "content": "左侧列表右侧编辑器；空列表显示新建入口，加载显示状态，失败提供重试，离线编辑可继续。",
++           "dependsOn": [],
++           "evidenceIds": [],
++           "id": "editor",
++           "kind": "page",
++           "requirementIds": [
++             "notes",
++           ],
++           "stage": "product",
++           "title": "笔记工作区",
++         },
++       ],
++       "decisionBasisHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
++       "schemaVersion": 1,
++       "stages": {
++         "delivery": "not-designed",
++         "product": "approved",
++         "technical": "not-designed",
++       },
++     },
++     "changeSets": [
++       {
++         "approvals": [
++           {
++             "at": "2026-10-04T22:38:57.354Z",
++             "groupIds": [
++               "product-group",
++             ],
++             "operationId": "approve-original",
++             "revision": 3,
++           },
++         ],
++         "basis": {
++           "hash": "811eb71b7ecf5a3209e222f7c75631e28bfd925393b2baaf805b400510ea794e",
++           "revision": 3,
++         },
++         "createdAt": "2026-10-04T22:38:57.223Z",
++         "evidence": [],
++         "groups": [
++           {
++             "blocks": [
++               {
++                 "content": "服务个人开发者本人，在桌面浏览器整理开发笔记。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "target",
++                 "kind": "target",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "目标用户",
++               },
++               {
++                 "content": "分散文本难以保存和查找，关闭页面后容易丢失修改。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "problem",
++                 "kind": "problem",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "问题",
++               },
++               {
++                 "content": "可以离线新增、编辑、查找笔记并导出自己的完整数据。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "outcomes",
++                 "kind": "outcomes",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "预期结果",
++               },
++               {
++                 "content": "本轮包含单用户本地笔记管理、失败恢复和文件导出。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "scope",
++                 "kind": "scope",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "范围",
++               },
++               {
++                 "content": "本轮不提供账号、团队协作和自动跨设备同步。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "non-goals",
++                 "kind": "non_goals",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "不做事项",
++               },
++               {
++                 "content": "新增笔记、编辑标题与正文、手动保存，并在失败时保留编辑内容。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "notes",
++                 "kind": "feature",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "笔记管理",
++               },
++               {
++                 "content": "打开列表→新增→输入标题正文→保存→显示成功；保存失败保留输入并提供重试。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "notes-flow",
++                 "kind": "flow",
++                 "requirementIds": [
++                   "notes",
++                 ],
++                 "stage": "product",
++                 "title": "笔记流程",
++               },
++               {
++                 "content": "左侧列表右侧编辑器；空列表显示新建入口，加载显示状态，失败提供重试，离线编辑可继续。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "editor",
++                 "kind": "page",
++                 "requirementIds": [
++                   "notes",
++                 ],
++                 "stage": "product",
++                 "title": "笔记工作区",
++               },
++             ],
++             "decisions": [],
++             "dependsOn": [],
++             "id": "product-group",
++             "impact": "明确当前阶段的实现范围和失败处理。",
++             "removeBlockIds": [],
++             "status": "approved",
++             "title": "product方案",
++           },
++         ],
++         "id": "original-product",
++         "runId": "fixture-original",
++         "stage": "product",
++         "status": "approved",
++         "summary": "原批准方案",
++       },
++       {
++         "approvals": [
++           {
++             "at": "2026-10-04T22:38:57.662Z",
++             "groupIds": [
++               "product-group",
++             ],
++             "operationId": "approve-newer",
++             "revision": 6,
++           },
++         ],
++         "basis": {
++           "hash": "07d73cb824d5561de7292eb91a1cab0d61c145f4b25d63950ea4a4c27f8f51a0",
++           "revision": 6,
++         },
++         "createdAt": "2026-10-04T22:38:57.523Z",
++         "evidence": [],
++         "groups": [
++           {
++             "blocks": [
++               {
++                 "content": "服务个人开发者本人，在桌面浏览器整理开发笔记。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "target",
++                 "kind": "target",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "目标用户",
++               },
++               {
++                 "content": "分散文本难以保存和查找，关闭页面后容易丢失修改。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "problem",
++                 "kind": "problem",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "问题",
++               },
++               {
++                 "content": "可以离线新增、编辑、查找笔记并导出自己的完整数据。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "outcomes",
++                 "kind": "outcomes",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "预期结果",
++               },
++               {
++                 "content": "本轮包含单用户本地笔记管理、失败恢复和文件导出。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "scope",
++                 "kind": "scope",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "范围",
++               },
++               {
++                 "content": "本轮不提供账号、团队协作和自动跨设备同步。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "non-goals",
++                 "kind": "non_goals",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "不做事项",
++               },
++               {
++                 "content": "新增笔记、编辑标题与正文、手动保存，并在失败时保留编辑内容。 新版保存失败提示必须继续保留。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "notes",
++                 "kind": "feature",
++                 "requirementIds": [],
++                 "stage": "product",
++                 "title": "笔记管理",
++               },
++               {
++                 "content": "打开列表→新增→输入标题正文→保存→显示成功；保存失败保留输入并提供重试。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "notes-flow",
++                 "kind": "flow",
++                 "requirementIds": [
++                   "notes",
++                 ],
++                 "stage": "product",
++                 "title": "笔记流程",
++               },
++               {
++                 "content": "左侧列表右侧编辑器；空列表显示新建入口，加载显示状态，失败提供重试，离线编辑可继续。",
++                 "dependsOn": [],
++                 "evidenceIds": [],
++                 "id": "editor",
++                 "kind": "page",
++                 "requirementIds": [
++                   "notes",
++                 ],
++                 "stage": "product",
++                 "title": "笔记工作区",
++               },
++             ],
++             "decisions": [],
++             "dependsOn": [],
++             "id": "product-group",
++             "impact": "明确当前阶段的实现范围和失败处理。",
++             "removeBlockIds": [],
++             "status": "approved",
++             "title": "product方案",
++           },
++         ],
++         "id": "newer-product",
++         "runId": "fixture-newer",
++         "stage": "product",
++         "status": "approved",
++         "summary": "新版批准方案",
++       },
++     ],
++     "diagnostics": [],
++     "evidence": [],
++     "inputs": [
++       {
++         "createdAt": "2026-10-04T22:38:57.170Z",
++         "id": "inp-01",
++         "kind": "statement",
++         "raw": "整理个人笔记",
++       },
++       {
++         "createdAt": "2026-10-04T22:38:57.453Z",
++         "id": "8b8f8ae6-4011-4a89-93a5-2bdd6d47fb9d",
++         "kind": "feedback",
++         "raw": "开发反馈：保留更新后的笔记保存提示。",
++       },
++     ],
++     "operations": [
++       {
++         "fingerprint": "4e1a77db08c226086cc42eb1ba7af41091ce07270e15bb39cf7850221d124b20",
++         "id": "proposal:original-product",
++         "revision": 2,
++       },
++       {
++         "fingerprint": "21cfc42219aeb9f5528cd9e49ffe9430c5634a155447bebf3a3ba885231078c0",
++         "id": "approve-original",
++         "revision": 3,
++       },
++       {
++         "fingerprint": "8e840df8ebc4b5c8837f25cff3c7ce15da0a701424a151a5d357d7d7dd593112",
++         "id": "new-input",
++         "revision": 4,
++       },
++       {
++         "fingerprint": "30a8c59127643338a23fb975aeb09ade7d4f5bf2b345add2ca4a57a705cdff0a",
++         "id": "proposal:newer-product",
++         "revision": 5,
++       },
++       {
++         "fingerprint": "ad1798046c44040af073055791c02aa4569fae2bad1a925374f5892c42fe3234",
++         "id": "approve-newer",
++         "revision": 6,
++       },
++     ],
++     "schemaVersion": 1,
++     "topics": [],
++   },
++   "questions": {
++     "items": [],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 2,
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
++   "readiness": {
++     "current": {
++       "assumptionRefs": [],
++       "basisRevision": 1,
++       "criticalConflictAcknowledgements": [],
++       "id": "rdn-1791153537177",
++       "issues": [
++         "目标用户与 MVP 范围尚未收敛。",
++       ],
++       "knownIssueAcknowledgements": [],
++       "requiredAreas": [
++         "target_user",
++         "mvp_scope",
++         "core_features",
++         "user_flows",
++         "page_structure",
++         "ux_ui_direction",
++         "technical_boundary",
++         "delivery_plan",
++       ],
++       "reviewedAt": "2026-10-04T22:38:57.170Z",
++       "status": "not-ready",
++       "userDisposition": "pending",
++       "warnings": [
++         "项目刚创建，尚在初始发散阶段。",
++       ],
++     },
++     "history": [],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 1,
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
++   "risks": {
++     "items": [],
++     "projectId": "proj-rollback-retirement",
++     "schemaVersion": 1,
++     "updatedAt": "2026-10-04T22:38:57.170Z",
++   },
+  }
+
+ ❯ apps/server/tests/rollback-retirement.test.ts:135:77
+    133|     const recovery = vi.spyOn(StateCommitManager.prototype, 'recoverIf…
+    134|     for (const revision of [targetRevision, targetRevision, currentRev…
+    135|       await expect(fixture.engine.rollbackToRevision(fixture.path, rev…
+       |                                                                             ^
+    136|       await expectUnchanged(fixture.path, fixture.before);
+    137|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > rejects direct Core calls before inspecting even a missing project
+AssertionError: expected Error: Cannot rollback: revision 3 snapsh… { code: '…' } to match object { code: 'LEGACY_WORKFLOW_RETIRED' }
+
+- Expected
++ Received
+
+- {
+-   "code": "LEGACY_WORKFLOW_RETIRED",
++ Error {
++   "code": "STATE_VALIDATION_FAILED",
+  }
+
+ ❯ apps/server/tests/rollback-retirement.test.ts:147:5
+    145|     const engine = new ProjectStateEngine(storage, new WorkspaceGuard(…
+    146|     const reads = vi.spyOn(storage, 'exists');
+    147|     await expect(engine.rollbackToRevision(join(root, 'missing-project…
+       |     ^
+    148|     expect(reads).not.toHaveBeenCalled();
+    149|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > returns 410 before project loading in production, including repeated and stale requests
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > returns 410 before project loading in mock, including repeated and stale requests
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > returns 410 before project loading in injected-orchestrator, including repeated and stale requests
+Error: expected 410 "Gone", got 200 "OK"
+ ❯ verifyHttp apps/server/tests/rollback-retirement.test.ts:175:101
+    173|     const stale = { targetRevision, expectedRevision: targetRevision, …
+    174|     for (const payload of [stale, stale, { targetRevision: currentRevi…
+    175|       const response = await request(app).post(`/api/projects/${projec…
+       |                                                                                                     ^
+    176|       expect(response.body).toMatchObject({ success: false, error: { c…
+    177|       expect(response.body).not.toHaveProperty('stateRevision');
+ ❯ apps/server/tests/rollback-retirement.test.ts:152:5
+ ❯ Test._assertStatus node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:309:14
+ ❯ node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:365:13
+ ❯ Test._assertFunction node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:342:13
+ ❯ Test.assert node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:195:23
+ ❯ localAssert node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:138:14
+ ❯ Server.<anonymous> node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:152:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > keeps tampered target manifest untouched and history readable in production
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > keeps tampered target manifest untouched and history readable in mock
+ FAIL  apps/server/tests/rollback-retirement.test.ts > Retired historical rollback on real Core project copies > keeps tampered target manifest untouched and history readable in injected-orchestrator
+Error: expected 410 "Gone", got 200 "OK"
+ ❯ verifyHttp apps/server/tests/rollback-retirement.test.ts:175:101
+    173|     const stale = { targetRevision, expectedRevision: targetRevision, …
+    174|     for (const payload of [stale, stale, { targetRevision: currentRevi…
+    175|       const response = await request(app).post(`/api/projects/${projec…
+       |                                                                                                     ^
+    176|       expect(response.body).toMatchObject({ success: false, error: { c…
+    177|       expect(response.body).not.toHaveProperty('stateRevision');
+ ❯ apps/server/tests/rollback-retirement.test.ts:156:5
+ ❯ Test._assertStatus node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:309:14
+ ❯ node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:365:13
+ ❯ Test._assertFunction node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:342:13
+ ❯ Test.assert node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:195:23
+ ❯ localAssert node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:138:14
+ ❯ Server.<anonymous> node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:152:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  10 failed | 5 skipped (15)
+   Start at  06:38:55
+   Duration  7.99s (transform 609ms, setup 0ms, collect 2.67s, tests 6.85s, environment 0ms, prepare 157ms)
+

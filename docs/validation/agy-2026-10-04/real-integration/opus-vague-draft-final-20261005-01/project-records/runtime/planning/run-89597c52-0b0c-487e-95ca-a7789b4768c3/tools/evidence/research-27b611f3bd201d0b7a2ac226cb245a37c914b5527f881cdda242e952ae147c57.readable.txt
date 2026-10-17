@@ -1,0 +1,679 @@
+KeyboardEvent - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ KeyboardEvent 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Русский 
+
+ 中文 (简体) 
+
+ 正體中文 (繁體) 
+
+ KeyboardEvent
+
+ Baseline
+
+ Widely available
+
+ *
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ * Some parts of this feature may have varying levels of support.
+
+ See full compatibility
+
+ Learn more
+
+ KeyboardEvent objects describe a user interaction with the keyboard; each event describes a single interaction between the user and a key (or combination of a key with modifier keys) on the keyboard. The event type ( keydown , keypress , or keyup ) identifies what kind of keyboard activity occurred.
+
+ Note: 
+ KeyboardEvent events just indicate what interaction the user had with a key on the keyboard at a low level, providing no contextual meaning to that interaction. When you need to handle text input, use the input event instead. Keyboard events may not be fired if the user is using an alternate means of entering text, such as a handwriting system on a tablet or graphics tablet.
+
+ In this article
+
+ Constructor 
+
+ Constants 
+
+ Instance properties 
+
+ Instance methods 
+
+ Events 
+
+ Usage notes 
+
+ Example 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Constructor 
+
+ KeyboardEvent() 
+
+ Creates a new KeyboardEvent object.
+
+ Constants 
+
+ The KeyboardEvent interface defines the following constants.
+
+ Keyboard locations 
+
+ The following constants identify which part of the keyboard the key event originates from. They are accessed as KeyboardEvent.DOM_KEY_LOCATION_STANDARD and so forth.
+
+ Keyboard location identifiers
+
+ Constant 
+ Value 
+ Description 
+
+ DOM_KEY_LOCATION_STANDARD 
+ 0x00 
+
+ The key described by the event is not identified as being located in a
+ particular area of the keyboard; it is not located on the numeric
+ keypad (unless it's the NumLock key), and for keys that are duplicated
+ on the left and right sides of the keyboard, the key is, for whatever
+ reason, not to be associated with that location.
+
+ Examples include alphanumeric keys on the standard PC 101 US keyboard,
+ the NumLock key, and the space bar.
+
+ DOM_KEY_LOCATION_LEFT 
+ 0x01 
+
+ The key is one which may exist in multiple locations on the keyboard
+ and, in this instance, is on the left side of the keyboard.
+
+ Examples include the left Control key, the left Command key on a
+ Macintosh keyboard, or the left Shift key.
+
+ DOM_KEY_LOCATION_RIGHT 
+ 0x02 
+
+ The key is one which may exist in multiple positions on the keyboard
+ and, in this case, is located on the right side of the keyboard.
+
+ Examples include the right Shift key and the right Alt key (Option on
+ a Mac keyboard).
+
+ DOM_KEY_LOCATION_NUMPAD 
+ 0x03 
+
+ The key is located on the numeric keypad, or is a virtual key
+ associated with the numeric keypad if there's more than one place the
+ key could originate from. The NumLock key does not fall into this
+ group and is always encoded with the location
+ DOM_KEY_LOCATION_STANDARD .
+
+ Examples include the digits on the numeric keypad, the keypad's Enter
+ key, and the decimal point on the keypad.
+
+ Instance properties 
+
+ This interface also inherits properties of its parents, UIEvent and Event . 
+
+ KeyboardEvent.altKey Read only 
+
+ Returns a boolean value that is true if the Alt ( Option or ⌥ on macOS) key was active when the key event was generated.
+
+ KeyboardEvent.code Read only 
+
+ Returns a string with the code value of the physical key represented by the event.
+
+ Warning: 
+This ignores the user's keyboard layout, so that if the user presses the key at the "Y" position in a QWERTY keyboard layout (near the middle of the row above the home row), this will always return "KeyY", even if the user has a QWERTZ keyboard (which would mean the user expects a "Z" and all the other properties would indicate a "Z") or a Dvorak keyboard layout (where the user would expect an "F"). If you want to display the correct keystrokes to the user, you can use Keyboard.getLayoutMap() .
+
+ KeyboardEvent.ctrlKey Read only 
+
+ Returns a boolean value that is true if the Ctrl key was active when the key event was generated.
+
+ KeyboardEvent.isComposing Read only 
+
+ Returns a boolean value that is true if the event is fired between after compositionstart and before compositionend .
+
+ KeyboardEvent.key Read only 
+
+ Returns a string representing the key value of the key represented by the event.
+
+ KeyboardEvent.location Read only 
+
+ Returns a number representing the location of the key on the keyboard or other input device. A list of the constants identifying the locations is shown above in Keyboard locations .
+
+ KeyboardEvent.metaKey Read only 
+
+ Returns a boolean value that is true if the Meta key (on Mac keyboards, the ⌘ Command key; on Windows keyboards, the Windows key ( ⊞ )) was active when the key event was generated.
+
+ KeyboardEvent.repeat Read only 
+
+ Returns a boolean value that is true if the key is being held down such that it is automatically repeating.
+
+ KeyboardEvent.shiftKey Read only 
+
+ Returns a boolean value that is true if the Shift key was active when the key event was generated.
+
+ Obsolete properties 
+
+ KeyboardEvent.charCode Read only 
+
+ Returns a number representing the Unicode reference number of the key; this property is used only by the keypress event. For keys whose char property contains multiple characters, this is the Unicode value of the first character in that property. In Firefox 26 this returns codes for printable characters.
+
+ KeyboardEvent.keyCode Read only 
+
+ Returns a number representing a system and implementation dependent numerical code identifying the unmodified value of the pressed key.
+
+ KeyboardEvent.keyIdentifier Read only 
+
+ This property is non-standard and has been deprecated in favor of KeyboardEvent.key . It was part of an old version of DOM Level 3 Events.
+
+ Instance methods 
+
+ This interface also inherits methods of its parents, UIEvent and Event . 
+
+ KeyboardEvent.getModifierState() 
+
+ Returns a boolean value indicating if a modifier key such as Alt , Shift , Ctrl , or Meta , was pressed when the event was created.
+
+ Obsolete methods 
+
+ KeyboardEvent.initKeyboardEvent() 
+
+ Initializes a KeyboardEvent object. This is now deprecated. You should instead use the KeyboardEvent() constructor.
+
+ Events 
+
+ The following events are based on the KeyboardEvent type. In the list below, each event links to the documentation for the Element handler for the event, which applies generally to all of the recipients, including Element , Document , and Window .
+
+ keydown 
+
+ A key has been pressed.
+
+ keyup 
+
+ A key has been released.
+
+ Obsolete events 
+
+ keypress 
+
+ A key that normally produces a character value has been pressed. This event was highly device-dependent and is obsolete. You should not use it.
+
+ Usage notes 
+
+ There are three types of keyboard events: keydown , keypress , and keyup . For most keys, Gecko dispatches a sequence of key events like this:
+
+ When the key is first pressed, the keydown event is sent.
+
+ If the key is not a modifier key, the keypress event is sent.
+
+ When the user releases the key, the keyup event is sent.
+
+ Special cases 
+
+ Some keys toggle the state of an indicator light; these include keys such as Caps Lock, Num Lock, and Scroll Lock. On Windows and Linux, these keys dispatch only the keydown and keyup events.
+
+ Note: 
+On Linux, Firefox 12 and earlier also dispatched the keypress event for these keys.
+
+ However, a limitation of the macOS event model causes Caps Lock to dispatch only the keydown event. Num Lock was supported on some older laptop models (2007 models and older), but since then, macOS hasn't supported Num Lock even on external keyboards. On older MacBooks with a Num Lock key, that key doesn't generate any key events. Gecko does support the Scroll Lock key if an external keyboard which has an F14 key is connected. In certain older versions of Firefox, this key generated a keypress event; this inconsistent behavior was Firefox bug 602812 .
+
+ Auto-repeat handling 
+
+ When a key is pressed and held down, it begins to auto-repeat. This results in a sequence of events similar to the following being dispatched:
+
+ keydown 
+
+ keypress 
+
+ keydown 
+
+ keypress 
+
+ <<repeating until the user releases the key>>
+
+ keyup 
+
+ This is what the DOM Level 3 specification says should happen. There are some caveats, however, as described below.
+
+ Auto-repeat on some GTK environments such as Ubuntu 9.4
+
+ In some GTK-based environments, auto-repeat dispatches a native key-up event automatically during auto-repeat, and there's no way for Gecko to know the difference between a repeated series of key presses and an auto-repeat. On those platforms, then, an auto-repeat key will generate the following sequence of events:
+
+ keydown 
+
+ keypress 
+
+ keyup 
+
+ keydown 
+
+ keypress 
+
+ keyup 
+
+ <<repeating until the user releases the key>>
+
+ keyup 
+
+ In these environments, unfortunately, there's no way for web content to tell the difference between auto-repeating keys and keys that are just being pressed repeatedly.
+
+ Example 
+
+ js 
+ document.addEventListener("keydown", (event) => {
+ const keyName = event.key;
+
+ if (keyName === "Control") {
+ // do not alert when only Control key is pressed.
+ return;
+ }
+
+ if (event.ctrlKey) {
+ // Even though event.key is not 'Control' (e.g., 'a' is pressed),
+ // event.ctrlKey may be true if Ctrl key is pressed at the same time.
+ alert(`Combination of ctrlKey + ${keyName}`);
+ } else {
+ alert(`Key pressed ${keyName}`);
+ }
+});
+
+document.addEventListener("keyup", (event) => {
+ const keyName = event.key;
+
+ // As the user releases the Ctrl key, the key is no longer active,
+ // so event.ctrlKey is false.
+ if (keyName === "Control") {
+ alert("Control key was released");
+ }
+});
+
+ Specifications 
+
+ Specification
+
+ UI Events 
+# interface-keyboardevent 
+
+ The KeyboardEvent interface specification went through numerous draft versions, first under DOM Events Level 2 where it was dropped as no consensus arose, then under DOM Events Level 3. This led to the implementation of non-standard initialization methods, the early DOM Events Level 2 version, KeyboardEvent.initKeyEvent() by Gecko browsers and the early DOM Events Level 3 version, KeyboardEvent.initKeyboardEvent() by others. Both have been superseded by the modern usage of a constructor: KeyboardEvent() .
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ Compatibility notes 
+
+ As of Firefox 65, the keypress event is no longer fired for non-printable keys ( Firefox bug 968056 ), except for the Enter key, and the Shift + Enter and Ctrl + Enter key combinations (these were kept for cross-browser compatibility purposes).
+
+ See also 
+
+ KeyboardEvent.code .
+
+ KeyboardEvent.key .
+
+ KeyboardEvent.getModifierState() 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Sep 18, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ UI Events 
+ KeyboardEvent 
+ Constructor KeyboardEvent() 
+
+ Instance properties altKey 
+ charCode 
+ code 
+ ctrlKey 
+ isComposing 
+ key 
+ keyCode 
+ keyIdentifier 
+ location 
+ metaKey 
+ repeat 
+ shiftKey 
+
+ Instance methods getModifierState() 
+ initKeyboardEvent() 
+
+ Inheritance UIEvent 
+ Event 
+
+ Related pages for UI Events CompositionEvent 
+ FocusEvent 
+ InputEvent 
+ MutationEvent 
+ TextEvent 
+ UIEvent 
+
+ Guides Code values for keyboard events 
+ Key values for keyboard events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

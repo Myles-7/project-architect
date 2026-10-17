@@ -1,0 +1,556 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1791129999032",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "status": "candidate",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "createdAt": "2026-10-04T16:06:39.032Z",
+      "updatedAt": "2026-10-04T16:06:39.032Z"
+    },
+    {
+      "id": "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "area": "project_overview",
+      "decisionKey": "dec-clear-interaction-mode",
+      "statement": "在点击清空按钮时，采用何种重置交互保护机制？\n即时直接清空：用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+      "rationale": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+      "status": "superseded",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+      "evidenceRefs": [
+        "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+      ],
+      "createdAt": "2026-10-04T16:12:46.337Z",
+      "updatedAt": "2026-10-04T22:46:14.605Z",
+      "sourceArea": "交互体验",
+      "supersededBy": "decision:dec-bd531b1b-1b49-4659-859c-7a2816990a43"
+    },
+    {
+      "id": "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583",
+      "area": "project_overview",
+      "statement": "严格限定为纯前端单页面应用，桌面优先，无服务端、无数据库、无用户登录与无协作支付，所有状态仅在客户端内存运行时维护。",
+      "decisionKey": "dec-product-scope-boundary",
+      "rationale": "依据用户明确约束，个人本地原型核对无需任何服务端支撑与复杂架构，轻量化纯前端运行能实现零部署门槛与即开即用。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "产品范围",
+      "supersededBy": "decision:dec-aa287b14-ae47-4613-a370-2547e8503db8"
+    },
+    {
+      "id": "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911",
+      "area": "project_overview",
+      "statement": "在空值提交或任何意外运行时异常时，严格保留输入框内的既有输入文本，仅就地呈现醒目提示，绝不强制抹除用户输入。",
+      "decisionKey": "dec-failure-preserve-input",
+      "rationale": "用户明确强调‘失败时保留输入’与‘空值有提示’，避免用户在校验失败或异常时重复录入文本，保障本地敏捷核对的高效与连贯。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "交互容错",
+      "supersededBy": "decision:dec-52328f1b-1086-4a66-911e-975284c94639"
+    },
+    {
+      "id": "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78",
+      "area": "project_overview",
+      "statement": "项目名展示区必须使用 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML。",
+      "decisionKey": "dec-safe-text-rendering",
+      "rationale": "依据 MDN 官方文档规范（evidence-mdn-textcontent-xss-safety），用户输入任意项目名可能包含 HTML 标签或特殊字符，Node.textContent 不调用 HTML 解析器，能够保证文本安全地作为纯文本呈现，从根本上杜绝 DOM 型 XSS 漏洞。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "显示安全",
+      "supersededBy": "decision:dec-51a3692c-1893-4ba0-9b6a-1764381908eb"
+    },
+    {
+      "id": "dec-72513e55-a5a7-44e1-90ad-087b5927447e",
+      "area": "project_overview",
+      "statement": "采纳 fixture.png 的白底平整背景、顶部显著结果展示区（对应原图黑体字位）、底部左侧蓝色确认按钮（对应原图蓝色矩形）与底部右侧橙色清空按钮（对应原图橙色圆形）的视觉空间排布映射，同时将示例文字 Q7M4-8261 作为纯占位参考而不引入为业务代码依赖。",
+      "decisionKey": "dec-visual-layout-mapping",
+      "rationale": "忠实还原用户提供的参考截图真实视觉元素与布局结构，同时严格遵守用户‘仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求’的规则。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-04T16:16:26.124Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "视觉与布局结构",
+      "supersededBy": "decision:dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0"
+    },
+    {
+      "id": "dec-cb1eb212-815a-490e-a829-0219a93de6f5",
+      "area": "project_overview",
+      "statement": "采用纯原生 HTML5 + CSS3 + 现代原生 JavaScript (ES2022+ ESM) 架构，不引入外部庞大前端框架或多余第三方运行时依赖。",
+      "decisionKey": "dec-tech-stack-native-esm",
+      "rationale": "用户明确约束为个人独立本地核对页面，桌面优先，无服务端。原生标准 DOM API 与原生 CSS Flexbox 满足所有输入、校验、textContent 安全渲染与清空回焦需求，启动速度快且完全支持直接本地浏览器双击运行（零构建依赖门槛）。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-htmlinputelement",
+        "evidence-mdn-document-queryselector",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "createdAt": "2026-10-04T16:23:00.364Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "sourceArea": "技术栈架构",
+      "supersededBy": "decision:dec-b96e5737-b207-4156-9ac8-e6621d0985f4"
+    },
+    {
+      "id": "dec-85156520-0768-4968-9e8e-c0ad9e35a393",
+      "area": "project_overview",
+      "statement": "采用受控的单向客户端纯内存状态模型管理页面生命周期，不引入任何本地持久化存储。",
+      "decisionKey": "dec-tech-in-memory-state",
+      "rationale": "契合纯前端本地原型核对的轻量化定位，避免历史缓存与持久化数据污染下一轮测试，保证每次打开页面均具备干净可控的初始就绪态。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:23:00.364Z",
+      "updatedAt": "2026-10-04T16:23:00.364Z",
+      "approvalSource": "change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "sourceArea": "状态架构"
+    },
+    {
+      "id": "dec-b5363cf6-4c99-493b-816b-92f82b05cd30",
+      "area": "project_overview",
+      "statement": "交付标准纯静态单页面产物（index.html, styles.css, app.js），完全支持本地无依赖直接双击运行。",
+      "decisionKey": "dec-tech-deployment-zero-server",
+      "rationale": "极大简化交付复杂度，方便个人开发者使用 Coding Agent 随时直接用浏览器查看与修改代码，无需配置任何 Node.js/Python 复杂构建环境。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:23:00.364Z",
+      "updatedAt": "2026-10-04T22:46:14.605Z",
+      "approvalSource": "change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "sourceArea": "部署与交付",
+      "supersededBy": "decision:dec-28f1afe2-c0fb-4805-bffb-ea33dc044fe0"
+    },
+    {
+      "id": "dec-a5bec314-d39d-41ac-9ea9-0d322bbdedb9",
+      "area": "project_overview",
+      "statement": "交付产物采用自包含原生经典脚本与原生 ESM 双兼容封装形态（使用 defer 属性加载 app.js 并以闭包模块隔离 AppController 与各子模块），确保在 file:// 协议本地双击直接打开与 http:// 静态服务下均可零配置直接执行。",
+      "decisionKey": "dec-delivery-script-packaging",
+      "rationale": "依据 MDN 官方文档（evidence-320443a6-461c-4976-9039-908598ac05f0），直接通过 file:// 加载 ES Module 会触发浏览器跨域限制（CORS error）。通过原生标准经典脚本结合严格模式与闭包模块化组织，既保障本地双击零门槛运行，又保持高内聚低耦合的代码整洁性。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-320443a6-461c-4976-9039-908598ac05f0",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:28:07.521Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-98e4cedc-717d-4d2b-8532-d9919924590f-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-delivery-1791131287489",
+      "sourceArea": "部署与交付",
+      "supersededBy": "decision:dec-b96e5737-b207-4156-9ac8-e6621d0985f4"
+    },
+    {
+      "id": "dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "area": "project_overview",
+      "decisionKey": "dec-visual-layout-mapping",
+      "statement": "关于页面视觉布局映射与确认按钮的存在形式，是否采纳需求变更提议彻底删除蓝色确认按钮并重构为单按钮实时反馈排布？\n彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）：采纳用户需求变更材料提议，从 HTML DOM、CSS 样式与交互控制器中彻底删除确认按钮，仅保留顶部大字展示区、居中输入框与底部右侧橙色圆形清空按钮，完全通过 300ms 防抖触发自动展示。",
+      "rationale": "将正式替代已批准决策 dec-visual-layout-mapping，更新产品范围、页面映射、样式表与交付代码结构。",
+      "status": "superseded",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-materials-chinese-resume-20261005-05-1791147651373",
+      "evidenceRefs": [
+        "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button"
+      ],
+      "createdAt": "2026-10-04T21:00:51.408Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "sourceArea": "general",
+      "supersededBy": "decision:dec-9999754d-8108-40f4-aa34-0fafa02de6be"
+    },
+    {
+      "id": "dec-b96e5737-b207-4156-9ac8-e6621d0985f4",
+      "area": "project_overview",
+      "statement": "技术架构采用纯原生 HTML5 + CSS3 + 现代原生 JavaScript（标准经典脚本搭配 defer 属性与 IIFE 命名空间闭包隔离），支持本地双击（file://）零配置直接运行，并兼容本地轻量静态 HTTP 服务器托管；不引入外部重型前端框架与打包工具。",
+      "decisionKey": "dec-tech-stack-native-classic-defer",
+      "rationale": "依据 MDN 官方文档（evidence-320443a6-461c-4976-9039-908598ac05f0 及 evidence-a2a11c7f-8620-4074-85d7-e1fd95310612），直接通过 file:// 加载 ES Module 会触发浏览器跨域限制（CORS error）。采用自包含标准经典脚本搭配 defer 属性，可在本地双击直接运行且零依赖，同时通过 IIFE 闭包保持模块解耦，并在本地静态 HTTP 服务下保持 100% 行为一致。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-320443a6-461c-4976-9039-908598ac05f0",
+        "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T22:11:19.364Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-e7a309b3-95fb-462f-82b1-222e72e31a5e-delivery-0:api-automated-acceptance-flash-materials-quality-20261005-01-feedback-1791151879316"
+    },
+    {
+      "id": "dec-51a3692c-1893-4ba0-9b6a-1764381908eb",
+      "area": "project_overview",
+      "statement": "项目名展示区必须使用 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML；恶意标记等特殊字符必须以纯文本原样回显，失败与校验异常时保留输入。",
+      "decisionKey": "dec-safe-text-rendering",
+      "rationale": "Node.textContent 仅将输入作为纯文本节点解析回显，不调用 HTML 解析器，防止项目名展示区域发生 HTML 注入与脚本解析执行；结合恶意标记原样回显验收，确保用户内容仅以纯文本形式进入 DOM。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-node-textcontent-official",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T22:11:19.364Z",
+      "updatedAt": "2026-10-04T22:46:14.605Z",
+      "approvalSource": "change-e7a309b3-95fb-462f-82b1-222e72e31a5e-delivery-0:api-automated-acceptance-flash-materials-quality-20261005-01-feedback-1791151879316",
+      "supersededBy": "decision:dec-98f528f5-80df-4ae1-8151-ec0234ac8168"
+    },
+    {
+      "id": "dec-bd531b1b-1b49-4659-859c-7a2816990a43",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空与输入法会话作废机制：用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框；同时立即销毁排队中的 300ms 防抖任务并作废当前输入法合成会话（递增会话令牌 activeSessionId），使任何迟到的旧 compositionend 事件彻底失效，杜绝旧文本回显或自动制造空值错误。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据已批准即时清空决策与质量验收反馈，清空必须在取消排队定时器的同时彻底作废正在进行的输入法合成会话，消除迟到合成事件与清空操作之间的异步竞态反例，保障界面复位状态的一致性与洁净度。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+        "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+        "evidence-mdn-ime-compositionstart-session"
+      ],
+      "createdAt": "2026-10-04T22:46:14.605Z",
+      "updatedAt": "2026-10-04T23:15:00.143Z",
+      "approvalSource": "change-17d98e59-12ea-4a62-8cdf-8b4e2911cd23-delivery-1:api-automated-acceptance-flash-materials-quality-resume-20261005-03-feedback-1791153974566",
+      "supersededBy": "decision:dec-6cb555a8-aa0f-4278-ab24-7147276d1080"
+    },
+    {
+      "id": "dec-98f528f5-80df-4ae1-8151-ec0234ac8168",
+      "area": "project_overview",
+      "statement": "项目名展示区必须使用 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML；恶意标记等特殊字符必须以纯文本原样回显，失败与校验异常时保留输入。该约束严格限定于项目名展示节点的纯文本渲染，不作为全应用杜绝 DOM XSS 的绝对证明。",
+      "decisionKey": "dec-safe-text-rendering",
+      "rationale": "依据 MDN 官方规范与安全证据适用边界修订证据 evidence-dab40954-74e0-4d24-bb31-1064f5dd626f，Node.textContent 仅将输入作为纯文本节点解析回显，不调用 HTML 解析器，有效防止展示区域的 HTML 注入与脚本解析执行；明确该机制适用边界严格限定于展示节点文本绑定，全应用安全由禁用危险 API 静态审查与动态 Payload 验收共同保证。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-node-textcontent-official",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-xss-definition-boundary"
+      ],
+      "createdAt": "2026-10-04T22:46:14.605Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-17d98e59-12ea-4a62-8cdf-8b4e2911cd23-delivery-1:api-automated-acceptance-flash-materials-quality-resume-20261005-03-feedback-1791153974566",
+      "supersededBy": "decision:dec-709c35cc-a4bf-4cce-8f18-d03109392645"
+    },
+    {
+      "id": "dec-28f1afe2-c0fb-4805-bffb-ea33dc044fe0",
+      "area": "project_overview",
+      "statement": "交付标准纯静态单页面自包含产物（index.html, styles.css, app.js, README.md），模式 A 支持本地无依赖直接双击运行（file:// 协议，无前提纯离线）；模式 B 支持本地轻量静态 HTTP 服务器托管（固定端口 8080，使用 python -m http.server 8080 或 npx serve . --listen 8080 访问 http://localhost:8080），明确 npx 工具首次需联网的前提，不新增任何服务端业务代码。",
+      "decisionKey": "dec-tech-deployment-zero-server",
+      "rationale": "统一本地文件与本地轻量静态 HTTP 服务的端口契约与可执行命令，如实说明 npx 与 Python 运行时前提，确保个人开发者可复制执行且离线边界清晰。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-320443a6-461c-4976-9039-908598ac05f0",
+        "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+        "evidence-python-http-server-port-official"
+      ],
+      "createdAt": "2026-10-04T22:46:14.605Z",
+      "updatedAt": "2026-10-04T22:46:14.605Z",
+      "approvalSource": "change-17d98e59-12ea-4a62-8cdf-8b4e2911cd23-delivery-1:api-automated-acceptance-flash-materials-quality-resume-20261005-03-feedback-1791153974566"
+    },
+    {
+      "id": "dec-6cb555a8-aa0f-4278-ab24-7147276d1080",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空与全链路尾随事件隔离守卫机制：用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框；同时立即销毁排队中的 300ms 防抖任务，作废当前输入会话与代际（递增 activeSessionId 与 inputGeneration，进入清空隔离态 quarantined），使任何迟到的旧 compositionend 及尾随 noncomposing input/beforeinput 事件彻底失效并强制隔离复位 DOM value，杜绝旧文本回显或自动制造空值错误；新真实用户输入（物理按键、新合成会话或粘贴）立即解除隔离并恢复正常 300ms 防抖流转。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据质量验收反馈 f1b903e2-8899-458d-a8cb-d51d9626df64，闭合清空后迟到 input 事件与 DOM 写回的合成反例，在保持即时直接清空决策的基础上，建立会话状态机、代际隔离与新输入意图边界，确保旧会话尾随事件被彻底拦截且不制造空值错误，同时保障后续真实用户输入顺畅恢复正常防抖。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+        "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+        "evidence-mdn-ime-compositionstart-session",
+        "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9"
+      ],
+      "createdAt": "2026-10-04T23:15:00.143Z",
+      "updatedAt": "2026-10-04T23:49:55.209Z",
+      "approvalSource": "change-c0db49e0-1a0c-42d1-8771-8a8ee2cd2a83-delivery-0:api-automated-acceptance-flash-materials-quality-20261005-06-feedback-1791155700105",
+      "supersededBy": "decision:dec-4a461c2d-0f30-46a2-b396-d5e2fcd05886"
+    },
+    {
+      "id": "dec-4a461c2d-0f30-46a2-b396-d5e2fcd05886",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空与清空时替换输入节点＋节点代际闭包隔离机制：用户点击清空按钮后立即调用 DebounceScheduler.cancel() 取消防抖任务并递增调度纪元（schedulerEpoch），单调递增全局节点代际计数（inputGeneration）；创建全新 <input> 元素继承全部属性与无障碍配置，为新节点绑定独立事件监听闭包（捕获当前代际作为 bornGeneration 与私有 isComposing=false、trustedDraft=''），通过 Element.replaceWith() 物理替换旧节点移出 DOM 树；将活跃输入节点 activeInputNode 指向新节点，同步复位展示区为灰色占位符并清除错误，光标自动回焦新输入框；旧节点迟到的任何 compositionend、beforeinput 或尾随 input 事件因 node !== activeInputNode 且 bornGeneration !== inputGeneration 被旧闭包入口守卫直接拦截丢弃，不操作新节点、不修改新会话状态、不取消新定时器；新节点直接支持物理键入、粘贴与新中文合成流转 300ms 防抖，无需额外按键解除隔离；防抖调度器采用草稿快照与单调纪元校验，彻底杜绝到期读取被篡改 DOM 的竞态风险。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据最新自动质量验收反馈 input:58d9b19d-41b2-4b33-9b82-848c086d1399 揭示的隔离态反例 A（清空后迟到 compositionend 强写 DOM 导致新输入丢失造错）与反例 B（新会话覆盖全局 token 导致旧事件误结束新合成）以及调度器缺少纪元快照校验问题，彻底放弃单一全局令牌与临时隔离态方案，采纳“清空时替换输入节点＋节点代际闭包隔离＋调度器草稿快照”的最小自洽技术架构，实现物理级节点解耦与事件隔离，闭合所有反例。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+        "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+        "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+        "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba"
+      ],
+      "createdAt": "2026-10-04T23:49:55.209Z",
+      "updatedAt": "2026-10-05T00:52:18.600Z",
+      "approvalSource": "change-167084dd-7b42-4c3b-a43c-0fae51d1040a-delivery-0:api-automated-acceptance-flash-materials-final-20261004-01-feedback-1791157795159",
+      "supersededBy": "decision:dec-97e57de4-b90e-498d-af48-19859bed89c4"
+    },
+    {
+      "id": "dec-97e57de4-b90e-498d-af48-19859bed89c4",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空、清空状态事务（Reset Transaction）与节点物理替换＋代际闭包隔离及失败原子回滚机制：清空操作定义为具备快照准备、替换提交与原子回滚的两阶段状态事务。点击清空时首先捕获包含活跃节点、代际、调度纪元、草稿与DOM位置的快照；在替换成功与新状态就绪前不提前递增全局代际；若在创建、属性复制、replaceWith、展示复位、错误清理或焦点恢复任意阶段抛出异常，立即触发原子回滚（物理回插原节点、还原代际/纪元与草稿，重新调度防抖），原闭包契约严格自洽（bornGeneration === inputGeneration），用户可继续输入、手动删空与重试；事务完全提交后递增代际，旧节点迟到事件因代际与节点失配被旧闭包守卫丢弃，新节点顺畅流转 300ms 防抖；兜底提供横幅只读草稿复制，绝不刷新页面。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据自动质量验收反馈 input:1488ed35-6288-4173-b10a-48bcd6cd16a4（R5-B1 与 R5-B2）及 MDN 规范，解决原方案在 replaceWith 异常时代际失配导致旧节点卡死无法输入、以及替换后后续步骤异常导致空节点残留草稿丢失的问题，建立两阶段状态事务与原子回滚机制，严格遵守失败保留输入决策。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-37699c07-e70f-4d97-b809-4d68ad503428",
+        "evidence-7fc79de9-07c0-43c1-b09d-641f14530819",
+        "evidence-6b1b2275-ff1a-4b49-bb31-827dd7eb8f8e",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T00:52:18.600Z",
+      "updatedAt": "2026-10-05T02:08:30.336Z",
+      "approvalSource": "change-80094931-1ed4-4b40-bfe3-14a90886e7da-delivery-0:api-automated-acceptance-flash-materials-final-20261005-03-feedback-1791161538536",
+      "supersededBy": "decision:dec-014c0ecf-f29d-4169-b0ac-0f9c4295c7c0"
+    },
+    {
+      "id": "dec-014c0ecf-f29d-4169-b0ac-0f9c4295c7c0",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空、清空状态事务（Reset Transaction）与节点物理替换＋代际闭包隔离及失败原子拓扑回滚机制：清空操作定义为具备快照准备、替换提交与原子回滚的两阶段状态事务。点击清空时首先捕获包含活跃节点、代际、调度纪元、草稿与DOM位置的快照，并显式记录 replacement 状态；在替换成功与新状态就绪前不提前递增全局代际；若在创建、属性复制、replaceWith、展示复位、错误清理或焦点恢复任意阶段抛出异常，立即触发原子回滚（物理回插原节点并彻底移除已挂载的新节点，恢复单一输入框合法DOM拓扑与唯一ID，消除双输入框缺陷R6-B1；还原代际/纪元与草稿，针对原始草稿无差别重新调度防抖，消除丢失空值/纯空格任务缺陷R6-B2），原闭包契约严格自洽（bornGeneration === inputGeneration），用户可继续输入、手动删空与重试；事务完全提交后递增代际，旧节点迟到事件因代际与节点失配被旧闭包守卫丢弃，新节点顺畅流转 300ms 防抖；严重回滚失败在独立只读 textarea 容器中原样呈现草稿供手动选中复制，提示诚实且绝不刷新页面；规划期蓝图以模块接口参数、状态所有权与提交/回滚后置条件为权威契约，内部代码示例降级为非执行参考示意。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据自动质量验收反馈 input:238e3436-8977-448a-8760-831f4163ca8c（R6-B1/P1 与 R6-B2/P2）及 DOM 规范，解决原方案在 replaceWith 成功后后续步骤抛错回滚导致 DOM 中遗留双输入框与重复 ID 的缺陷，显式移除已挂载新节点以保真单输入框拓扑；解决原方案回滚因 trim 过滤丢失空值/纯空格待校验任务的缺陷，无条件按原始草稿快照重新调度防抖；同步解决严重回滚失败只读草稿复制兜底容器呈现与代码示意降级，严格遵守失败保留输入决策。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-a8866f76-4ae6-466b-8fab-a69b806b7336",
+        "evidence-fc126627-6e55-40e5-8be5-388ef378a21b",
+        "evidence-e10045cb-3170-4cb6-9c56-de754c9c69da",
+        "evidence-37699c07-e70f-4d97-b809-4d68ad503428",
+        "evidence-7fc79de9-07c0-43c1-b09d-641f14530819",
+        "evidence-6b1b2275-ff1a-4b49-bb31-827dd7eb8f8e",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T02:08:30.336Z",
+      "updatedAt": "2026-10-05T05:35:39.896Z",
+      "approvalSource": "change-c4b3c93d-c8f4-45f9-9233-3b60120ec026-delivery-0:api-automated-acceptance-flash-materials-final-20261005-04-feedback-1791166110287",
+      "supersededBy": "decision:dec-df21c106-ff1f-4276-bab4-660ac296c6cf"
+    },
+    {
+      "id": "dec-df21c106-ff1f-4276-bab4-660ac296c6cf",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空、清空状态事务（Reset Transaction）与节点物理替换＋代际闭包隔离及失败原子拓扑回滚机制：清空操作严格定义为具备快照捕获、内存预制、替换执行、呈现/焦点复位与原子提交的两阶段状态事务。点击清空时调用 captureSnapshot 捕获包含原活跃输入节点、原代际、调度纪元、草稿（涵盖 empty/whitespace/nonempty）、定时器与 DOM 相对位置的完整快照，并在内存创建新节点并复制 5 类持久属性，绑定新闭包；执行 oldNode.replaceWith(newNode) 并记录 mountedReplacementNode；在占位复位、错误清除与焦点恢复全部成功前不提前递增全局代际；全部步骤成功后原子提交更新 activeInputNode 与递增代际；若任意阶段抛错立即触发原子回滚（物理回插原节点并彻底移除已挂载的新节点，恢复单一输入框合法 DOM 拓扑与唯一 ID，消除双输入框缺陷 R6-B1；还原代际/纪元与草稿，针对原始草稿无差别重新调度防抖，消除丢失空值/纯空格任务缺陷 R6-B2），原闭包契约严格自洽（bornGeneration === inputGeneration），用户可继续输入、手动删空与重试；严重回滚失败在独立只读 textarea 容器中原样呈现草稿供手动选中复制，提示诚实且绝不刷新页面；同步声明 AppController.init 显式初始化接口与 4 个核心 DOM 依赖及只读草稿容器就绪契约；蓝图以全部 16 个公共方法接口签名、状态所有权与提交/回滚后置条件为权威契约，内部代码示例降级为非执行参考示意。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据自动质量验收反馈 input:f3d7e9e4-a60b-4c6a-9e9b-2455d0be1fdb（R7-B1 与 R7-B2 质量要求），局部同步 blk-tech-module 的 ResetController API 与职责（两阶段事务提交点与失败回滚后置条件，成功提交才递增代际，消除模块与接口/流程的配方冲突），恢复 AppController.init 显式初始化接口与入参/前置/后置条件，闭合独立只读草稿容器来源，并核对保持全部 16 个公共方法契约一致。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-87250dd5-3148-489d-ac2f-dd3c90150df9",
+        "evidence-a8866f76-4ae6-466b-8fab-a69b806b7336",
+        "evidence-fc126627-6e55-40e5-8be5-388ef378a21b",
+        "evidence-e10045cb-3170-4cb6-9c56-de754c9c69da",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T05:35:39.896Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-628f9e7b-e73e-41c0-8d7a-958179616dca-delivery-0:api-automated-acceptance-flash-materials-final-20261005-05-feedback-1791178539836",
+      "supersededBy": "decision:dec-fcedd2b3-d7d7-449a-8492-e4eec298f862"
+    },
+    {
+      "id": "dec-aa287b14-ae47-4613-a370-2547e8503db8",
+      "area": "project_overview",
+      "statement": "严格限定为纯前端单页面应用，桌面优先，无服务端、无数据库、无用户登录与无协作支付，所有状态仅在客户端内存运行时维护。",
+      "decisionKey": "dec-product-scope-boundary",
+      "rationale": "依据用户明确约束，个人本地原型核对无需任何服务端支撑与复杂架构，轻量化纯前端运行能实现零部署门槛与即开即用。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T07:16:35.265Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-a675bad2-82b9-4f18-96e2-d89fe9517872-delivery-3:api-automated-acceptance-flash-materials-final-20261005-08-product-1791184595206"
+    },
+    {
+      "id": "dec-9999754d-8108-40f4-aa34-0fafa02de6be",
+      "area": "project_overview",
+      "statement": "关于页面视觉布局映射与确认按钮的存在形式，是否采纳需求变更提议彻底删除蓝色确认按钮并重构为单按钮实时反馈排布？\n彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）：采纳用户需求变更材料提议，从 HTML DOM、CSS 样式与交互控制器中彻底删除确认按钮，仅保留顶部大字展示区、居中输入框与底部右侧橙色圆形清空按钮，完全通过 300ms 防抖触发自动展示。",
+      "decisionKey": "dec-visual-layout-mapping",
+      "rationale": "将正式替代已批准决策 dec-visual-layout-mapping，更新产品范围、页面映射、样式表与交付代码结构。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+        "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T07:16:35.265Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-a675bad2-82b9-4f18-96e2-d89fe9517872-delivery-3:api-automated-acceptance-flash-materials-final-20261005-08-product-1791184595206"
+    },
+    {
+      "id": "dec-52328f1b-1086-4a66-911e-975284c94639",
+      "area": "project_overview",
+      "statement": "在空值提交或任何意外运行时异常时，严格保留输入框内的既有输入文本，仅就地呈现醒目提示，绝不强制抹除用户输入。",
+      "decisionKey": "dec-failure-preserve-input",
+      "rationale": "用户明确强调‘失败时保留输入’与‘空值有提示’，避免用户在校验失败或异常时重复录入文本，保障本地敏捷核对的高效与连贯。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T07:16:35.265Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-a675bad2-82b9-4f18-96e2-d89fe9517872-delivery-3:api-automated-acceptance-flash-materials-final-20261005-08-product-1791184595206"
+    },
+    {
+      "id": "dec-709c35cc-a4bf-4cce-8f18-d03109392645",
+      "area": "project_overview",
+      "statement": "项目名展示区必须使用 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML；恶意标记等特殊字符必须以纯文本原样回显，失败与校验异常时保留输入。该约束严格限定于项目名展示节点的纯文本渲染，不作为全应用杜绝 DOM XSS 的绝对证明。",
+      "decisionKey": "dec-safe-text-rendering",
+      "rationale": "依据 MDN 官方规范与安全证据适用边界修订证据 evidence-dab40954-74e0-4d24-bb31-1064f5dd626f，Node.textContent 仅将输入作为纯文本节点解析回显，不调用 HTML 解析器，有效防止展示区域的 HTML 注入与脚本解析执行；明确该机制适用边界严格限定于展示节点文本绑定，全应用安全由禁用危险 API 静态审查与动态 Payload 验收共同保证。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T07:16:35.265Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-a675bad2-82b9-4f18-96e2-d89fe9517872-delivery-3:api-automated-acceptance-flash-materials-final-20261005-08-product-1791184595206"
+    },
+    {
+      "id": "dec-fcedd2b3-d7d7-449a-8492-e4eec298f862",
+      "area": "project_overview",
+      "statement": "在点击清空按钮时，采用即时直接清空、清空状态事务（Reset Transaction）与节点物理替换＋代际闭包隔离及失败原子拓扑回滚机制：清空操作严格定义为具备快照捕获、内存预制、替换执行、呈现/焦点复位与原子提交的两阶段状态事务。点击清空时调用 captureSnapshot 捕获包含原活跃输入节点、原代际、调度纪元、草稿（涵盖 empty/whitespace/nonempty）、定时器与 DOM 相对位置的完整快照，并在内存创建新节点并复制 5 类持久属性，绑定新闭包；执行 oldNode.replaceWith(newNode) 并记录 mountedReplacementNode；在占位复位、错误清除与焦点恢复全部成功前不提前递增全局代际；全部步骤成功后原子提交更新 activeInputNode 与递增代际；若任意阶段抛错立即触发原子回滚（物理回插原节点并彻底移除已挂载的新节点，恢复单一输入框合法 DOM 拓扑与唯一 ID，消除双输入框缺陷 R6-B1；还原代际/纪元与草稿，针对原始草稿无差别重新调度防抖，消除丢失空值/纯空格任务缺陷 R6-B2），原闭包契约严格自洽（bornGeneration === inputGeneration），用户可继续输入、手动删空与重试；严重回滚失败在独立只读 textarea 容器中原样呈现草稿供手动选中复制，提示诚实且绝不刷新页面；同步声明 AppController.init 显式初始化接口与 4 个核心 DOM 依赖及只读草稿容器就绪契约；蓝图以全部 16 个公共方法接口签名、状态所有权与提交/回滚后置条件为权威契约，内部代码示例降级为非执行参考示意。",
+      "decisionKey": "dec-clear-interaction-mode",
+      "rationale": "依据自动质量验收反馈 input:f3d7e9e4-a60b-4c6a-9e9b-2455d0be1fdb（R7-B1 与 R7-B2 质量要求），局部同步 blk-tech-module 的 ResetController API 与职责（两阶段事务提交点与失败回滚后置条件，成功提交才递增代际，消除模块与接口/流程的配方冲突），恢复 AppController.init 显式初始化接口与入参/前置/后置条件，闭合独立只读草稿容器来源，并核对保持全部 16 个公共方法契约一致。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-87250dd5-3148-489d-ac2f-dd3c90150df9",
+        "evidence-a8866f76-4ae6-466b-8fab-a69b806b7336",
+        "evidence-fc126627-6e55-40e5-8be5-388ef378a21b",
+        "evidence-e10045cb-3170-4cb6-9c56-de754c9c69da",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-05T07:16:35.265Z",
+      "updatedAt": "2026-10-05T07:16:35.265Z",
+      "approvalSource": "change-a675bad2-82b9-4f18-96e2-d89fe9517872-delivery-3:api-automated-acceptance-flash-materials-final-20261005-08-product-1791184595206"
+    }
+  ],
+  "traces": [
+    {
+      "id": "b9d53859-f454-46f6-95d6-f71d0301808a",
+      "questionRef": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "userAnswer": "即时直接清空",
+      "decisionRef": "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "stateChanges": [
+        {
+          "ref": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T16:12:46.337Z"
+    },
+    {
+      "id": "f68d65bc-41c5-4daa-ae67-58e567b6ed3c",
+      "questionRef": "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+      "userAnswer": "彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）",
+      "decisionRef": "decision:dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "stateChanges": [
+        {
+          "ref": "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T21:00:51.408Z"
+    }
+  ],
+  "updatedAt": "2026-10-04T16:06:39.032Z"
+}

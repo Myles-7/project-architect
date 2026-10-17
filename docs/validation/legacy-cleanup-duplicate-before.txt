@@ -1,0 +1,53 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/PlanningMigration.test.ts (5 tests | 2 failed) 1421ms
+   ✓ Old-format project migration on copies > reads additively without modifying files, retains history and diagnoses ambiguous records 144ms
+   ✓ Old-format project migration on copies > persists the new files only at a normal commit and retains the recoverable old revision  305ms
+   ✓ Old-format project migration on copies > requires explicit cleanup approval and unlock, preserving all original records as history  432ms
+   × Old-format project migration on copies > does not duplicate the remaining cleanup groups after a partial approval 253ms
+     → expected [ { …(10) }, { …(10) } ] to have a length of 1 but got 2
+   × Old-format project migration on copies > honors rejected cleanup for the same record text across unrelated input, but reviews changed text again 286ms
+     → expected true to be false // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/core/tests/PlanningMigration.test.ts > Old-format project migration on copies > does not duplicate the remaining cleanup groups after a partial approval
+AssertionError: expected [ { …(10) }, { …(10) } ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ packages/core/tests/PlanningMigration.test.ts:84:20
+     82|       s = await service.get(path);
+     83|       const open = s.planning!.changeSets.filter(c => c.runId === 'mig…
+     84|       expect(open).toHaveLength(1);
+       |                    ^
+     85|       expect(open[0]!.id).toBe(cleanup.id);
+     86|       expect(open.flatMap(c => c.groups.filter(g => g.status === 'pend…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/core/tests/PlanningMigration.test.ts > Old-format project migration on copies > honors rejected cleanup for the same record text across unrelated input, but reviews changed text again
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ packages/core/tests/PlanningMigration.test.ts:99:95
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  01:44:01
+   Duration  2.37s (transform 360ms, setup 0ms, collect 649ms, tests 1.42s, environment 0ms, prepare 101ms)
+

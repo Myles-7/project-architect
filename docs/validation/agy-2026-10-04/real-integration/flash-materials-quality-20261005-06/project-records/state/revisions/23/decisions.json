@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1791129999032",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "status": "candidate",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "createdAt": "2026-10-04T16:06:39.032Z",
+      "updatedAt": "2026-10-04T16:06:39.032Z"
+    },
+    {
+      "id": "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "area": "project_overview",
+      "decisionKey": "dec-clear-interaction-mode",
+      "statement": "在点击清空按钮时，采用何种重置交互保护机制？\n即时直接清空：用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+      "rationale": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+      "evidenceRefs": [
+        "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+      ],
+      "createdAt": "2026-10-04T16:12:46.337Z",
+      "updatedAt": "2026-10-04T16:12:46.337Z",
+      "sourceArea": "交互体验"
+    },
+    {
+      "id": "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583",
+      "area": "project_overview",
+      "statement": "严格限定为纯前端单页面应用，桌面优先，无服务端、无数据库、无用户登录与无协作支付，所有状态仅在客户端内存运行时维护。",
+      "decisionKey": "dec-product-scope-boundary",
+      "rationale": "依据用户明确约束，个人本地原型核对无需任何服务端支撑与复杂架构，轻量化纯前端运行能实现零部署门槛与即开即用。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-04T16:16:26.124Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "产品范围"
+    },
+    {
+      "id": "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911",
+      "area": "project_overview",
+      "statement": "在空值提交或任何意外运行时异常时，严格保留输入框内的既有输入文本，仅就地呈现醒目提示，绝不强制抹除用户输入。",
+      "decisionKey": "dec-failure-preserve-input",
+      "rationale": "用户明确强调‘失败时保留输入’与‘空值有提示’，避免用户在校验失败或异常时重复录入文本，保障本地敏捷核对的高效与连贯。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-04T16:16:26.124Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "交互容错"
+    },
+    {
+      "id": "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78",
+      "area": "project_overview",
+      "statement": "项目名展示区必须使用 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML。",
+      "decisionKey": "dec-safe-text-rendering",
+      "rationale": "依据 MDN 官方文档规范（evidence-mdn-textcontent-xss-safety），用户输入任意项目名可能包含 HTML 标签或特殊字符，Node.textContent 不调用 HTML 解析器，能够保证文本安全地作为纯文本呈现，从根本上杜绝 DOM 型 XSS 漏洞。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "显示安全",
+      "supersededBy": "decision:dec-51a3692c-1893-4ba0-9b6a-1764381908eb"
+    },
+    {
+      "id": "dec-72513e55-a5a7-44e1-90ad-087b5927447e",
+      "area": "project_overview",
+      "statement": "采纳 fixture.png 的白底平整背景、顶部显著结果展示区（对应原图黑体字位）、底部左侧蓝色确认按钮（对应原图蓝色矩形）与底部右侧橙色清空按钮（对应原图橙色圆形）的视觉空间排布映射，同时将示例文字 Q7M4-8261 作为纯占位参考而不引入为业务代码依赖。",
+      "decisionKey": "dec-visual-layout-mapping",
+      "rationale": "忠实还原用户提供的参考截图真实视觉元素与布局结构，同时严格遵守用户‘仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求’的规则。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:16:26.124Z",
+      "updatedAt": "2026-10-04T16:16:26.124Z",
+      "approvalSource": "change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1:api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "sourceArea": "视觉与布局结构",
+      "supersededBy": "decision:dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0"
+    },
+    {
+      "id": "dec-cb1eb212-815a-490e-a829-0219a93de6f5",
+      "area": "project_overview",
+      "statement": "采用纯原生 HTML5 + CSS3 + 现代原生 JavaScript (ES2022+ ESM) 架构，不引入外部庞大前端框架或多余第三方运行时依赖。",
+      "decisionKey": "dec-tech-stack-native-esm",
+      "rationale": "用户明确约束为个人独立本地核对页面，桌面优先，无服务端。原生标准 DOM API 与原生 CSS Flexbox 满足所有输入、校验、textContent 安全渲染与清空回焦需求，启动速度快且完全支持直接本地浏览器双击运行（零构建依赖门槛）。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-htmlinputelement",
+        "evidence-mdn-document-queryselector",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "createdAt": "2026-10-04T16:23:00.364Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "sourceArea": "技术栈架构",
+      "supersededBy": "decision:dec-b96e5737-b207-4156-9ac8-e6621d0985f4"
+    },
+    {
+      "id": "dec-85156520-0768-4968-9e8e-c0ad9e35a393",
+      "area": "project_overview",
+      "statement": "采用受控的单向客户端纯内存状态模型管理页面生命周期，不引入任何本地持久化存储。",
+      "decisionKey": "dec-tech-in-memory-state",
+      "rationale": "契合纯前端本地原型核对的轻量化定位，避免历史缓存与持久化数据污染下一轮测试，保证每次打开页面均具备干净可控的初始就绪态。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:23:00.364Z",
+      "updatedAt": "2026-10-04T16:23:00.364Z",
+      "approvalSource": "change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "sourceArea": "状态架构"
+    },
+    {
+      "id": "dec-b5363cf6-4c99-493b-816b-92f82b05cd30",
+      "area": "project_overview",
+      "statement": "交付标准纯静态单页面产物（index.html, styles.css, app.js），完全支持本地无依赖直接双击运行。",
+      "decisionKey": "dec-tech-deployment-zero-server",
+      "rationale": "极大简化交付复杂度，方便个人开发者使用 Coding Agent 随时直接用浏览器查看与修改代码，无需配置任何 Node.js/Python 复杂构建环境。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:23:00.364Z",
+      "updatedAt": "2026-10-04T16:23:00.364Z",
+      "approvalSource": "change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "sourceArea": "部署与交付"
+    },
+    {
+      "id": "dec-a5bec314-d39d-41ac-9ea9-0d322bbdedb9",
+      "area": "project_overview",
+      "statement": "交付产物采用自包含原生经典脚本与原生 ESM 双兼容封装形态（使用 defer 属性加载 app.js 并以闭包模块隔离 AppController 与各子模块），确保在 file:// 协议本地双击直接打开与 http:// 静态服务下均可零配置直接执行。",
+      "decisionKey": "dec-delivery-script-packaging",
+      "rationale": "依据 MDN 官方文档（evidence-320443a6-461c-4976-9039-908598ac05f0），直接通过 file:// 加载 ES Module 会触发浏览器跨域限制（CORS error）。通过原生标准经典脚本结合严格模式与闭包模块化组织，既保障本地双击零门槛运行，又保持高内聚低耦合的代码整洁性。",
+      "status": "superseded",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-320443a6-461c-4976-9039-908598ac05f0",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T16:28:07.521Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-98e4cedc-717d-4d2b-8532-d9919924590f-delivery-0:api-automated-acceptance-flash-materials-chinese-20261005-01-delivery-1791131287489",
+      "sourceArea": "部署与交付",
+      "supersededBy": "decision:dec-b96e5737-b207-4156-9ac8-e6621d0985f4"
+    },
+    {
+      "id": "dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "area": "project_overview",
+      "decisionKey": "dec-visual-layout-mapping",
+      "statement": "关于页面视觉布局映射与确认按钮的存在形式，是否采纳需求变更提议彻底删除蓝色确认按钮并重构为单按钮实时反馈排布？\n彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）：采纳用户需求变更材料提议，从 HTML DOM、CSS 样式与交互控制器中彻底删除确认按钮，仅保留顶部大字展示区、居中输入框与底部右侧橙色圆形清空按钮，完全通过 300ms 防抖触发自动展示。",
+      "rationale": "将正式替代已批准决策 dec-visual-layout-mapping，更新产品范围、页面映射、样式表与交付代码结构。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-materials-chinese-resume-20261005-05-1791147651373",
+      "evidenceRefs": [
+        "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button"
+      ],
+      "createdAt": "2026-10-04T21:00:51.408Z",
+      "updatedAt": "2026-10-04T21:00:51.408Z",
+      "sourceArea": "general"
+    },
+    {
+      "id": "dec-b96e5737-b207-4156-9ac8-e6621d0985f4",
+      "area": "project_overview",
+      "statement": "技术架构采用纯原生 HTML5 + CSS3 + 现代原生 JavaScript（标准经典脚本搭配 defer 属性与 IIFE 命名空间闭包隔离），支持本地双击（file://）零配置直接运行，并兼容本地轻量静态 HTTP 服务器托管；不引入外部重型前端框架与打包工具。",
+      "decisionKey": "dec-tech-stack-native-classic-defer",
+      "rationale": "依据 MDN 官方文档（evidence-320443a6-461c-4976-9039-908598ac05f0 及 evidence-a2a11c7f-8620-4074-85d7-e1fd95310612），直接通过 file:// 加载 ES Module 会触发浏览器跨域限制（CORS error）。采用自包含标准经典脚本搭配 defer 属性，可在本地双击直接运行且零依赖，同时通过 IIFE 闭包保持模块解耦，并在本地静态 HTTP 服务下保持 100% 行为一致。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-320443a6-461c-4976-9039-908598ac05f0",
+        "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T22:11:19.364Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-e7a309b3-95fb-462f-82b1-222e72e31a5e-delivery-0:api-automated-acceptance-flash-materials-quality-20261005-01-feedback-1791151879316"
+    },
+    {
+      "id": "dec-51a3692c-1893-4ba0-9b6a-1764381908eb",
+      "area": "project_overview",
+      "statement": "项目名展示区必须使用 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML；恶意标记等特殊字符必须以纯文本原样回显，失败与校验异常时保留输入。",
+      "decisionKey": "dec-safe-text-rendering",
+      "rationale": "Node.textContent 仅将输入作为纯文本节点解析回显，不调用 HTML 解析器，防止项目名展示区域发生 HTML 注入与脚本解析执行；结合恶意标记原样回显验收，确保用户内容仅以纯文本形式进入 DOM。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-node-textcontent-official",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "createdAt": "2026-10-04T22:11:19.364Z",
+      "updatedAt": "2026-10-04T22:11:19.364Z",
+      "approvalSource": "change-e7a309b3-95fb-462f-82b1-222e72e31a5e-delivery-0:api-automated-acceptance-flash-materials-quality-20261005-01-feedback-1791151879316"
+    }
+  ],
+  "traces": [
+    {
+      "id": "b9d53859-f454-46f6-95d6-f71d0301808a",
+      "questionRef": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "userAnswer": "即时直接清空",
+      "decisionRef": "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "stateChanges": [
+        {
+          "ref": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T16:12:46.337Z"
+    },
+    {
+      "id": "f68d65bc-41c5-4daa-ae67-58e567b6ed3c",
+      "questionRef": "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+      "userAnswer": "彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）",
+      "decisionRef": "decision:dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "stateChanges": [
+        {
+          "ref": "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T21:00:51.408Z"
+    }
+  ],
+  "updatedAt": "2026-10-04T16:06:39.032Z"
+}

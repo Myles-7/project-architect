@@ -1,0 +1,20 @@
+{
+  "label": "flash-materials-quality-20261005-01",
+  "kind": "Second independent view of actual exported content; not target application execution",
+  "status": "needs-repair",
+  "sourceFile": "quality-reviewed-development-package/tasks.json",
+  "sourceSha256": "4d2e014c7918f3cebb1ef07a4335b034fbd3d82e220448ed6c00be07bf24ce60",
+  "taskId": "blk-deliv-task-error-handling",
+  "field": "verification",
+  "exactText": "输入空字符串停止 300ms，核对输入框下方出现红色明确提示，展示区不刷新，且输入框焦点保留",
+  "conflictingFormalRequirement": "blk-feat-input-display and blk-tech-data-model require empty-input validation to remove the old result and restore the placeholder.",
+  "requiredObservableSequence": [
+    "Display a valid old project name after its debounce callback",
+    "Delete all input text",
+    "Wait for the latest 300ms debounce callback to actually execute",
+    "Assert old result is absent, placeholder is visible, and an explicit empty-input error appears",
+    "Retain the empty editable input; retain whitespace characters on the all-whitespace path"
+  ],
+  "clearPath": "Clicking clear must immediately restore idle state, cancel pending work and remove errors without generating an empty-input validation error.",
+  "preservation": "Frozen model outputs, receipts, manifest, state and package files remain byte-identical. Round 2 public feedback is amended before launch; its pre-amendment bytes are separately preserved."
+}

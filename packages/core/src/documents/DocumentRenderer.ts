@@ -54,7 +54,8 @@ export class DocumentRenderer {
    */
   async renderDocument(
     item: DocumentPlanItem,
-    snapshot: ProjectSnapshot
+    snapshot: ProjectSnapshot,
+    options?: { customRules?: string[]; customNotes?: string }
   ): Promise<string> {
     const baseName = basename(item.path);
     const templateFileName = `${baseName}.template`;
@@ -64,7 +65,7 @@ export class DocumentRenderer {
     if (await this.storage.exists(templatePath)) {
       templateContent = await this.storage.readText(templatePath);
     } else {
-      templateContent = `# {{PROJECT_NAME}} — ${item.title}\n\n{{CONFIRMED_DECISIONS_SECTION}}`;
+      throw new Error(`DOCUMENT_TEMPLATE_MISSING: ${templateFileName}`);
     }
 
     const confirmedDecisions = snapshot.decisions.items.filter(
@@ -374,6 +375,22 @@ export class DocumentRenderer {
     const acceptance = acceptanceItems.join('\n');
 
     // ------------------------------------------------------------------------
+    // Custom Rules & Engineering Constraints (User Provided)
+    // ------------------------------------------------------------------------
+    const customRules = options?.customRules || [];
+    const customNotes = options?.customNotes || '';
+
+    const customRulesList =
+      customRules.length > 0
+        ? customRules.map((rule, idx) => `${idx + 1}. **${rule.trim()}**`).join('\n')
+        : '- *无用户特别指定的额外工程红线。*';
+
+    const customRulesSection =
+      customRules.length > 0
+        ? `\n\n---\n\n## 6. 自定义项目工程红线与团队专属规范 (Custom Engineering Constraints)\n\n${customRulesList}${customNotes ? `\n\n**补充说明**: ${customNotes}` : ''}`
+        : '';
+
+    // ------------------------------------------------------------------------
     // Replace all placeholders
     // ------------------------------------------------------------------------
     const replacements: Record<string, string> = {
@@ -401,6 +418,9 @@ export class DocumentRenderer {
       '{{ACCEPTED_RISKS_SECTION}}': acceptedRisksSection,
       '{{AI_SPEC_SECTION}}': aiSpec,
       '{{SECURITY_SPEC_SECTION}}': securitySpec,
+      '{{CUSTOM_RULES_SECTION}}': customRulesSection,
+      '{{CUSTOM_RULES_LIST}}': customRulesList,
+      '{{CUSTOM_NOTES}}': customNotes,
     };
 
     let rendered = templateContent;

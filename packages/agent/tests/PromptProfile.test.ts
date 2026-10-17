@@ -59,7 +59,7 @@ describe('Prompt Profile System Unit Tests (Phase 3.5.1)', () => {
     const promptText = await promptLoader.buildPromptText('question-generation');
     expect(promptText).toContain('Constitution');
     expect(promptText).toContain('Question Generation');
-    expect(promptText).toContain('Language and Readability');
-    expect(promptText).toContain('natural Simplified Chinese');
+    expect(promptText).toContain('clear Simplified Chinese');
+    expect(promptText).toContain('concrete approach, gain, sacrifice, impact and reversibility');
   });
 });

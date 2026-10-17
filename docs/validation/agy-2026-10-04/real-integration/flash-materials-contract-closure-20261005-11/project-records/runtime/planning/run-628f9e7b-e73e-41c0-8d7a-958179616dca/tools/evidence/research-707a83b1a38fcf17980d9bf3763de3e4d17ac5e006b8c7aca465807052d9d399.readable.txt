@@ -1,0 +1,685 @@
+HTMLElement: focus() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ HTMLElement 
+
+ focus() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Français 
+
+ 日本語 
+
+ 中文 (简体) 
+
+ HTMLElement: focus() method
+
+ Baseline
+
+ Widely available
+
+ *
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ * Some parts of this feature may have varying levels of support.
+
+ See full compatibility
+
+ Learn more
+
+ The HTMLElement.focus() method sets focus on the specified element, if it can be focused.
+The focused element is the element that will receive keyboard and similar events by default.
+
+ By default the browser will scroll the element into view after focusing it, and it may also provide visible indication of the focused element (typically by displaying a "focus ring" around the element).
+Parameter options are provided to disable the default scrolling and force visible indication on elements.
+
+ In this article
+
+ Syntax 
+
+ Examples 
+
+ Specifications 
+
+ Notes 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ js 
+ focus()
+focus(options)
+
+ Parameters 
+
+ options Optional 
+
+ An optional object for controlling aspects of the focusing process.
+This object may contain the following properties:
+
+ preventScroll Optional 
+
+ A boolean value indicating whether or not the browser should scroll the document to bring the newly-focused element into view.
+A value of false for preventScroll (the default) means that the browser will scroll the element into view after focusing it.
+If preventScroll is set to true , no scrolling will occur.
+
+ focusVisible Optional 
+
+ A boolean value that should be set to true to force, or false to prevent visible indication that the element is focused.
+If the property is not specified, a browser will provide visible indication if it determines that this would improve accessibility for users.
+
+ Return value 
+
+ None ( undefined ).
+
+ Examples 
+
+ Focus on a text field 
+
+ This example uses a button to set the focus on a text field.
+
+ HTML
+
+ html 
+ <input id="myTextField" value="Text field." />
+<button id="focusButton">Click to set focus on the text field</button>
+
+ JavaScript
+
+ The code below adds an event handler to set the focus on the text field when the button is pressed.
+Note that most browsers will automatically add visible indication (a "focus ring") for a focused text field, so the code does not set focusVisible to true .
+
+ js 
+ document.getElementById("focusButton").addEventListener("click", () => {
+ document.getElementById("myTextField").focus();
+});
+
+ Result
+
+ Select the button to set focus on the text field.
+
+ Focus on a button 
+
+ This example demonstrates how you can set the focus on a button element.
+
+ HTML
+
+ First we define three buttons.
+Both the middle and right button will set focus on the left-most button.
+The right-most button will also specify focusVisible .
+
+ html 
+ <button id="myButton">Button</button>
+<button id="focusButton">Click to set focus on "Button"</button>
+<button id="focusButtonVisibleIndication">
+ Click to set focus and focusVisible on "Button"
+</button>
+
+ JavaScript
+
+ The code below sets up handlers for click events on the middle and right buttons.
+
+ js 
+ document.getElementById("focusButton").addEventListener("click", () => {
+ document.getElementById("myButton").focus();
+});
+
+document
+ .getElementById("focusButtonVisibleIndication")
+ .addEventListener("click", () => {
+ document.getElementById("myButton").focus({ focusVisible: true });
+ });
+
+ Result
+
+ Select either the middle button or right-most button to set focus on the left-most button.
+
+ Browsers do not usually show visible focus indication on button elements when focus is set programmatically, so the effect of selecting the middle button may not be obvious.
+However provided the focusVisible option is supported on your browser, you should see focus changing on the left-most button when the right-most button is selected.
+
+ Focus with and without scrolling 
+
+ This example shows the effect of setting focus with the option preventScroll set true and false (the default).
+
+ HTML
+
+ The HTML defines two buttons that will be used to set the focus of a third button that is off-screen
+
+ html 
+ <button id="focus_scroll">Click to set focus on off-screen button</button>
+<button id="focus_no_scroll">
+ Click to set focus on offscreen button without scrolling
+</button>
+
+<div id="container">
+ <button id="myButton">Button</button>
+</div>
+
+ #myButton {
+ margin-top: 500px; /* Push the button off-screen */
+}
+
+ JavaScript
+
+ This code sets a click event handler on the first and second buttons to set the focus on the last button.
+Note that the first handler doesn't specify the preventScroll option so scrolling to the focused element will be enabled.
+
+ js 
+ document.getElementById("focus_scroll").addEventListener("click", () => {
+ document.getElementById("myButton").focus(); // default: {preventScroll:false}
+});
+
+document.getElementById("focus_no_scroll").addEventListener("click", () => {
+ document.getElementById("myButton").focus({ preventScroll: true });
+});
+
+ Result
+
+ Select the first button to set focus and scroll to the off-screen button.
+Selecting the second button set's the focus, but scrolling is disabled.
+
+ Specifications 
+
+ Specification
+
+ HTML 
+# dom-focus-dev 
+
+ Notes 
+
+ If you call HTMLElement.focus() from a mousedown event handler, you must call event.preventDefault() to keep the focus from leaving the HTMLElement 
+
+ Behavior of the focus in relation to different HTML features like tabindex or shadow dom , which previously remained under-specified, were updated in October 2019.
+See the WHATWG blog for more information.
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ HTMLElement.blur to remove the focus from an element.
+
+ document.activeElement to know which is the currently focused element.
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Jun 23, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ HTML DOM API 
+ HTMLElement 
+ Instance properties accessKey 
+ accessKeyLabel 
+ anchorElement 
+ attributeStyleMap 
+ autocapitalize 
+ autocorrect 
+ autofocus 
+ contentEditable 
+ dataset 
+ dir 
+ draggable 
+ editContext 
+ enterKeyHint 
+ hidden 
+ inert 
+ innerText 
+ inputMode 
+ isContentEditable 
+ lang 
+ nonce 
+ offsetHeight 
+ offsetLeft 
+ offsetParent 
+ offsetTop 
+ offsetWidth 
+ outerText 
+ popover 
+ spellcheck 
+ style 
+ tabIndex 
+ title 
+ translate 
+ virtualKeyboardPolicy 
+ writingSuggestions 
+
+ Instance methods attachInternals() 
+ blur() 
+ click() 
+ focus() 
+ hidePopover() 
+ showPopover() 
+ togglePopover() 
+
+ Events beforetoggle 
+ change 
+ command 
+ drag 
+ dragend 
+ dragenter 
+ dragleave 
+ dragover 
+ dragstart 
+ drop 
+ error 
+ interest 
+ load 
+ loseinterest 
+ toggle 
+
+ Inheritance Element 
+ Node 
+ EventTarget 
+
+ Related pages for HTML DOM BeforeUnloadEvent 
+ DOMStringMap 
+ ErrorEvent 
+ HTMLAnchorElement 
+ HTMLAreaElement 
+ HTMLAudioElement 
+ HTMLBRElement 
+ HTMLBaseElement 
+ HTMLBodyElement 
+ HTMLButtonElement 
+ HTMLCanvasElement 
+ HTMLDListElement 
+ HTMLDataElement 
+ HTMLDataListElement 
+ HTMLDialogElement 
+ HTMLDivElement 
+ HTMLDocument 
+ HTMLEmbedElement 
+ HTMLFieldSetElement 
+ HTMLFormControlsCollection 
+ HTMLFormElement 
+ HTMLFrameSetElement 
+ HTMLGeolocationElement 
+ HTMLHRElement 
+ HTMLHeadElement 
+ HTMLHeadingElement 
+ HTMLHtmlElement 
+ HTMLIFrameElement 
+ HTMLImageElement 
+ HTMLInputElement 
+ HTMLLIElement 
+ HTMLLabelElement 
+ HTMLLegendElement 
+ HTMLLinkElement 
+ HTMLMapElement 
+ HTMLMediaElement 
+ HTMLMenuElement 
+ HTMLMetaElement 
+ HTMLMeterElement 
+ HTMLModElement 
+ HTMLOListElement 
+ HTMLObjectElement 
+ HTMLOptGroupElement 
+ HTMLOptionElement 
+ HTMLOptionsCollection 
+ HTMLOutputElement 
+ HTMLParagraphElement 
+ HTMLPictureElement 
+ HTMLPreElement 
+ HTMLProgressElement 
+ HTMLQuoteElement 
+ HTMLScriptElement 
+ HTMLSelectElement 
+ HTMLSourceElement 
+ HTMLSpanElement 
+ HTMLStyleElement 
+ HTMLTableCaptionElement 
+ HTMLTableCellElement 
+ HTMLTableColElement 
+ HTMLTableElement 
+ HTMLTableRowElement 
+ HTMLTableSectionElement 
+ HTMLTemplateElement 
+ HTMLTextAreaElement 
+ HTMLTimeElement 
+ HTMLTitleElement 
+ HTMLTrackElement 
+ HTMLUListElement 
+ HTMLUnknownElement 
+ HTMLVideoElement 
+ HashChangeEvent 
+ History 
+ ImageData 
+ Location 
+ MessageChannel 
+ MessageEvent 
+ MessagePort 
+ Navigator 
+ PageRevealEvent 
+ PageSwapEvent 
+ PageTransitionEvent 
+ Plugin 
+ PluginArray 
+ PromiseRejectionEvent 
+ RadioNodeList 
+ TimeRanges 
+ UserActivation 
+ ValidityState 
+ Window 
+ WorkletGlobalScope 
+
+ Guides Using microtasks in JavaScript with queueMicrotask() 
+ In depth: Microtasks and the JavaScript runtime environment 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

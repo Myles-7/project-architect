@@ -1,0 +1,58 @@
+{
+  "blockers": [
+    "输入节点生命周期与 IME 尾随事件隔离契约未闭合（反例 A 与反例 B 阻断）：依据 input:58d9b19d-41b2-4b33-9b82-848c086d1399，当前 sourceRevision 28 蓝图在清空后依赖全局 sessionState 与单一全局令牌。在反例 A 中，清空后用户通过真实按键解除隔离（sessionState 恢复为 active），新 input 启动 300ms 计时，但旧会话迟到的 compositionend 在被拒绝分支中执行强制复位 inputElement.value = ''，使得挂起的定时器到期后读取 DOM 空值造成新输入丢失并误报空值错误；在反例 B 中，清空后启动新合成覆盖了全局 currentSessionToken，旧 compositionend 误通过相等检查提前将新会话 isComposing 置为 false。受影响块 ID：blk-tech-data-model、blk-tech-interface、blk-tech-error、blk-flow-input-display、blk-flow-reset、blk-deliv-task-input-workflow、blk-deliv-task-reset-workflow、blk-deliv-acc-input-display、blk-deliv-acc-full-e2e。需在整合任务中采纳‘清空时通过 Element.replaceWith() 替换输入节点＋节点代际闭包隔离’的最小修订建议。",
+    "防抖调度器（DebounceScheduler）缺少单调 Epoch 与草稿快照隔离：依据 input:58d9b19d-41b2-4b33-9b82-848c086d1399，当前调度器在到期后直接调用回调并在回调中读取 inputElement.value，缺少单调递增 schedulerEpoch 与输入代际（inputGeneration）快照校验；若旧回调已入队列但 clearTimeout 来不及撤销，将导致已失效任务继续执行并读取已被篡改的 DOM。受影响块 ID：blk-tech-data-model、blk-tech-interface、blk-tech-module、blk-deliv-task-input-workflow。需在整合任务中将 schedule 升级为捕获 capturedDraft、node 与 generation，维护单调 schedulerEpoch，到期仅验证 capturedDraft，不回读 DOM。",
+    "原生 IME 派发差异与真机焦点行为在当前规划环境无法执行浏览器实测：依据 input:58d9b19d-41b2-4b33-9b82-848c086d1399 与 MDN compositionend 规范，合成事件测试仅能证明书面 JavaScript 契约自洽性，各桌面浏览器（Chrome/Edge/Firefox/Safari）在节点替换后是否重定向原生 IME 组合事件、替换节点是否彻底终结原生会话及屏幕阅读器可访问性行为，在当前无桌面真机的规划环境中无法实测。受影响块 ID：blk-deliv-val-standalone-runtime、blk-tech-stack。不能声称 100% 杜绝所有原生浏览器竞态或已实测通过，必须保留为开发阶段宿主环境实测验证任务。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用于指导清空重置时通过 Element.replaceWith() 替换输入框 DOM 节点以实现节点生命周期与闭包代际隔离，将旧节点闭包与新活跃节点物理隔离，防止旧节点尾随事件操作新节点。",
+      "content": "The Element.replaceWith() method replaces this Element in the children list of its parent with a set of Node objects or strings. Strings are inserted as equivalent Text nodes.",
+      "hash": "2aae27198a28d84070b24d4428e06c1ac390eef3a6417a64dba20d4907da2ee8",
+      "id": "evidence-fd80f380-10ef-4168-9d4e-8a4a827981aa",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith",
+      "obtainedAt": "2026-10-04T23:41:10.156Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+    },
+    {
+      "applicability": "用于事件处理前核验事件监听器绑定的真实节点与当前活跃节点一致性。核对 event.currentTarget 与 node === activeInputNode，确保仅处理直接绑定在当前活跃输入节点上的事件，丢弃已替换作废旧节点的冒泡或尾随事件。",
+      "content": "The currentTarget read-only property of the Event interface identifies the element to which the event handler has been attached.",
+      "hash": "659cef39146b234aaffd6211e8541383f6c351a197f1434b79fd28a423b928e3",
+      "id": "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget",
+      "obtainedAt": "2026-10-04T23:41:23.175Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget"
+    },
+    {
+      "applicability": "用于核验事件所属输入节点是否仍在文档树中。清空操作通过 replaceWith() 移出旧节点后，旧节点的 isConnected 变为 false，事件守卫检查 node.isConnected 若为 false 则直接丢弃事件，避免非挂载节点操作界面状态。",
+      "content": "The read-only isConnected property of the Node interface returns a boolean indicating whether the node is connected (directly or indirectly) to a Document object.",
+      "hash": "efc23d018757062e345938aca4cfdaaf3ad73cf4ecc99e7a0767cc3e0afb55a5",
+      "id": "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected",
+      "obtainedAt": "2026-10-04T23:41:31.567Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected"
+    },
+    {
+      "applicability": "自动质量验收反馈依据：指导输入节点生命周期与定时器隔离契约闭合，采用清空替换输入节点、节点代际闭包隔离与草稿快照调度器最小修订建议。",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。只针对 flash-materials-quality-20261005-06 的 sourceRevision28 / quality-reviewed-r3 最新真实蓝图，旧证据和旧包保留。原生目标应用尚未开发；本轮只有导出契约的静态/合成反例，不能称浏览器实测。\n\n已修正确内容完整保留：300ms实时反馈、即时单按钮清空、手动删空清除旧结果、纯空格原文保留、失败保留输入、无确认按钮和Enter专属提交、经典defer/IIFE/textContent、完整官方证据、端口8080命令、npx首次安装前提、10文件及任务DAG。性能全部字段目前已统一“清空重置至重绘前调度延迟”代理指标，五轮均值<=50ms；该项通过，不再改指标或夸成物理绘制实测。保留原30块稳定ID和28条历史证据原完整对象，新增证据另附。\n\n现在仅输入节点生命周期/定时器隔离契约仍阻断。r3隔离态期间会拒绝尾随input，但解除隔离之后仍使用一个全局currentSessionToken。反例A：旧compositionstart→reset→新keydown解除隔离→新input('Brand-New')并schedule→旧compositionend被拒绝分支强写当前value=''→挂起timer读DOM空值→新输入丢失且产生empty错误。反例B：旧会话reset后新compositionstart覆盖global token→旧compositionend误通过相等检查并置新会话isComposing=false。scheduler仅clearTimeout且直接callback，没检查generation/session/句柄快照；inputGeneration只是声明和清空递增却从未使用，末尾却说有双重守卫。不得继续用这种策略重新声称彻底杜绝竞态。\n\n请在待批准方案中采用明确的“清空时替换输入节点＋节点代际闭包隔离”作为最小修订建议，AI完成普通实现细节。技术契约至少准确表达：\n1. activeInputNode、单调递增inputGeneration、每节点独立组合输入状态；事件绑定时闭包捕获node和bornGeneration。input/beforeinput/compositionstart/compositionend的处理前先核对event.currentTarget、node===activeInputNode、bornGeneration===inputGeneration及节点仍在当前页面；失败立即返回，不能写新节点、改新会话状态或取消新timer。普通InputEvent没有应用自增token，不能假称其自带会话身份。\n2. 清空操作先增加代际并取消/作废定时器，再用新input节点替换旧节点，正确保留id、name、label关联、样式、可访问属性、监听绑定与焦点行为；新节点value=''/trustedDraft=''，清结果和错误。旧节点迟到事件只能到旧闭包并被拒绝，不操作activeInputNode。新节点键入、粘贴、组合输入均正常，不要求用户额外keydown才能解除永久隔离。组合输入状态属于节点闭包，旧end不可能重写新isComposing。不要把强制清新DOM作为拒绝旧事件动作。\n3. schedule接受“已接受的原始草稿快照、node、generation”，保存单调schedulerEpoch/本次timer身份；schedule替代、cancel、clear、compositionstart均使旧epoch失效。即使旧回调已经进入队列、clearTimeout来不及，执行时仍先检查epoch/generation/active node，过期立即return。有效回调只验证capturedDraft，再textContent输出；不要到期读取可能被旧事件更改的DOM。clear同步清空，失败保留对应已接受原文；新用户输入能正常300ms调度。\n4. 给出内部自洽、可以直接指导实现的事件/清空/scheduler接口与伪代码；所有被引用变量有定义且校验实际被使用。不得在正文声称守卫存在而示例缺失。同步data_model、interface、errors、相关flow/page、任务spec全部字段、validation及acceptance；只改真实关联句子，不整块删除原目标、范围和已正确验收。\n5. 精确测试：清空后旧节点end与input不得重显/造错；新节点input之后旧节点end不得抹新草稿/取消新timer；新节点compositionstart之后旧节点end不得结束新composition；旧timer已出队后clear/新输入再执行旧callback无效；新键入/粘贴/完整新中文composition仍可显示；清空替换后label/焦点/ARIA/布局保留。断言写具体状态与输出，不能只写“无竞态”。\n6. 该策略是待批准的技术建议，合成事件只能验证书面事件契约。浏览器是否把旧原生IME事件重新定向到新节点、替换节点能否结束原生会话、实际焦点/辅助技术行为，必须作为Chrome/Edge/Firefox和Safari适用环境的开发验证任务，说明证据与失败后修订策略；不得写100%/彻底杜绝所有浏览器竞态或已验证通过。不要重新运行不可用Docker。\n\n独立review必须核对真正的最新候选正文/字段及实际守卫代码，明确上述每个反例的对应规则。blockers=[]本身不证明内容通过。完成后仍由公开Core自动验收审批并编译新版本，不冒称真人批准，不编辑旧产物或收据。",
+      "hash": "2c26bdb2fdbcf0f523c9509f449ea267544699b1d2afb524f85209467fc8f5da",
+      "id": "evidence-b50b6115-f4a4-42b5-8712-89e75690907c",
+      "kind": "user",
+      "location": "materials/inputs/58d9b19d-41b2-4b33-9b82-848c086d1399",
+      "obtainedAt": "2026-10-04T23:41:58.600Z",
+      "outcome": "passed",
+      "source": "input:58d9b19d-41b2-4b33-9b82-848c086d1399"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "新增发现与官方标准查证：依据最新自动质量验收反馈 input:58d9b19d-41b2-4b33-9b82-848c086d1399，当前 sourceRevision 28 蓝图在输入节点生命周期与防抖调度器隔离契约上存在核心阻断缺口（清空后迟到的旧 compositionend 会误抹新节点输入导致空值报错的反例 A，以及新会话覆盖全局 token 导致旧事件误结束新合成状态的反例 B；且调度器未检查代际与单调 epoch，到期读取 DOM 易受污染）。针对该问题，本任务查证并引入了 W3C/WHATWG 官方标准规范：1) Element.replaceWith() 规范，支持清空时在父容器子节点列表中以全新 <input> 元素替换旧节点，物理阻断旧节点闭包捕获的事件监听与新活跃节点的关联；2) Event.currentTarget 规范，用于事件处理前校验绑定真实元素与当前活跃节点 activeInputNode 一致性；3) Node.isConnected 规范，用于核验事件所属节点是否仍在文档树中。受影响契约包括 blk-tech-data-model、blk-tech-interface、blk-tech-error、blk-flow-input-display、blk-flow-reset、blk-deliv-task-input-workflow、blk-deliv-task-reset-workflow 及端到端验收用例。本方案为待批准技术建议，合成事件仅能验证书面事件契约，真实浏览器原生 IME 与真机行为差异列为开发阶段验证任务。"
+}

@@ -1,0 +1,13 @@
+自动独立质量验收反馈，不是真人新增需求、真人审阅或批准。来源：冻结的flash-vague-contract-closure-20261005-11实际独立review输入，43块完整候选；该review因服务额度中断，无有效评审终态。本反馈列出已独立阅读的具体反例。保持稳定块ID、已有正确能力、原证据完整对象、当前决定与任务DAG。普通细节由AI解决，decisions=[]，不能反复问用户，不开发目标应用。
+
+N9必须实际修复：ImportPreviewTargetState中的notesCount、sumRevision、maxRevision、lastUpdatedAt不是数据库写版本。反例：本地两记录(A revision1 updatedAt1000 trashed, B revision5 updatedAt2000 active)，预览后永久删除A并在时钟2000新建C revision1。前后总数2、revision和6、最大5、时间2000、代际1全部相同，旧预览却已经失效。请采用本地单调databaseWriteVersion：持久化meta中，全部成功的notes/导入相关元数据写事务在同事务递增，失败和幂等零改动不增；不能从数量或revision合计反算，不能由备份旧值覆盖。预览只读事务同时读取代际、writeVersion与摘要；执行同rw事务比较代际和writeVersion，不一致零写入。明确初始化、每个写动作及元数据修改的范围和验收。预览凭证绑定不可变文件字节/已校验载荷，不能允许外部修改preview.payload继续用旧fileSignature；执行重新校验payload/凭证归属或使用服务内冻结ticket，只用已声明结构，不在活跃IndexedDB事务中等待任意网络或异步摘要。增加上述汇总碰撞、新增/编辑/删除/代际变化、载荷变动的反例验收。删除“revision合计捕捉任意更新”的错误保证。
+
+N11必须闭合而非仅改JSON.stringify：SessionDraft已统一对象，继续定义schemaVersion=1、noteId与键精确一致、libraryGeneration与键和当前代际匹配、baseRevision为非负安全整数且new_draft=0、content必须string、savedAt合法毫秒数。JSON损坏、未知版本、非法字段、旧纯字符串、旧代际分别说明拒绝/提示/隔离，不能假恢复。saveDraft自身抛错或sessionStorage拒绝访问时，保持编辑器内存原文和弹窗，文案明确“未成功临时保存”；复制/独立导出直接读取当前编辑器草稿，不依赖getDraft再次读不可用sessionStorage。统一接口、流程、任务及验收，不无条件宣称配额满后临时保存成功。
+
+N12必须唯一且完整：BackupMetaPayload同时有backupTracker和可包含同名的appMeta，依然重复且缺一致性规则。首版目标应用尚未实现，可选明确唯一规范格式，并拒绝非规范appMeta（不为不存在的旧目标应用虚构兼容）；如确需兼容，必须逐key严格验证和检查两处值相等再转成唯一规范，冲突或重复拒绝。appSettings不能停留在Record<string,unknown>：为当前真实持久偏好（如网格/列表）给明确字段、枚举、默认及导入映射；未定义设置不接受。给出Note所有字段（boolean、revision安全整数、schemaVersion、时间数值、生命周期一致性、小写标签数组/重复与UUID）、meta所有字段、notesCount一致性、未知字段策略的具体强校验。区分备份存档与本地操作性代际/writeVersion。保留已修好的覆盖导入tracker基准和合并计数政策，但与标准导出往返、提醒保持一致。
+
+N14：检索验收又把requestAnimationFrame回调称作物理绘制完成，把自动化按键称作物理键盘。统一为“输入事件到DOM更新及下一次重绘前回调”的代理测量或真实提供不同可验证的绘制端点，不谎称rAF证明物理像素可见。起点使用一次完整关键词已输入/最后input事件，不能把人工键入整串字的时长混入150ms防抖处理目标；明确80ms包含、1000条固定种子、3预热、10采样及nearest-rank P95。同一outcomes、feature、flow、task、validation、acceptance必须采用相同口径，原目标的调整作为本反馈支持的自洽变更说明，真实数值仍unexecuted。
+
+N15：feature-search-filter与flow-search-filter收藏分支只用isFavorite=true，技术与page却排除trashed。全部写明isFavorite && (status===active || status===archived)，验收加入trashed但isFavorite=true反例。保留归档搜索排除active和回收区自己的独立检索。
+
+逐项交叉核对全43块及任务所有字段，不只改技术段落留下旧验收。无新研究的review evidence=[]；引用未批准候选证据须携带原完整对象，已批准记录可原样引用。不重造旧ID/hash，不机械删除证据，不以blockers空证明正确。Docker未就绪，目标程序未开发，平台/IME/性能仍有具体后续验证任务且unexecuted，不作为当前followUp反复调度。产物仍待批准，Core自动API审批仅自动验收，不是真人批准。

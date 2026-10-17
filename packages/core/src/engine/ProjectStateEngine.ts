@@ -3,11 +3,14 @@ import { FileStorage } from '../storage/FileStorage.js';
 import { WorkspaceGuard } from '../storage/WorkspaceGuard.js';
 import { StateCommitManager } from '../commit/StateCommitManager.js';
 import { LightweightConflictDetector } from '../conflicts/LightweightConflictDetector.js';
-import { ReadinessEvaluator } from '../readiness/ReadinessEvaluator.js';
-import { ReadinessGate } from '../readiness/ReadinessGate.js';
 import { AreaRegistry } from '../areas/AreaRegistry.js';
 import { ProjectStateMigration } from '../migrations/ProjectStateMigration.js';
 import { DiscoveryTurnStore } from '../discovery/DiscoveryTurnStore.js';
+import { QuestionEngine } from '../questions/QuestionEngine.js';
+import { QuestionBatchPolicy } from '../questions/QuestionBatchPolicy.js';
+import { PresetRegistry } from '../presets/index.js';
+import { emptyPlanningState, classifyInput, effectiveDecisionHash } from '../planning/PlanningState.js';
+import { randomUUID, createHash } from 'node:crypto';
 import {
   parseTypedRef,
   isTypedRef,
@@ -16,6 +19,9 @@ import {
   type InitialProjectIntent,
   type ProjectAreaId,
   type DiscoveryTurnRecord,
+  type QuestionOption,
+  type QuestionImportance,
+  type BrownfieldCandidateDecision,
 } from '@project-architect/contracts';
 import type {
   ProjectMetadata,
@@ -23,7 +29,6 @@ import type {
   ProjectSnapshot,
   DecisionsState,
   DecisionItem,
-  DecisionTrace,
   AssumptionsState,
   AssumptionItem,
   GapsState,
@@ -33,17 +38,14 @@ import type {
   RiskItem,
   QuestionsState,
   QuestionItem,
-  QuestionOption,
   OverviewState,
   OverviewSection,
   ReadinessState,
-  ReadinessSnapshot,
   UserDisposition,
   DocumentsState,
   DiscoveryResult,
   TypedRef,
   DecisionRef,
-  AssumptionRef,
   QuestionRef,
   InputRef,
   InputMaterialKind,
@@ -74,6 +76,8 @@ export class ProjectStateEngine {
   private guard: WorkspaceGuard;
   private commitManager: StateCommitManager;
   private conflictDetector: LightweightConflictDetector;
+  private questionEngine: QuestionEngine;
+  private batchPolicy: QuestionBatchPolicy;
 
   constructor(
     storage: FileStorage = new FileStorage(),
@@ -83,6 +87,8 @@ export class ProjectStateEngine {
     this.guard = guard || new WorkspaceGuard();
     this.commitManager = new StateCommitManager(storage);
     this.conflictDetector = new LightweightConflictDetector();
+    this.questionEngine = new QuestionEngine();
+    this.batchPolicy = new QuestionBatchPolicy();
   }
 
   /**
@@ -91,7 +97,9 @@ export class ProjectStateEngine {
   async createProject(options: {
     name: string;
     idea?: string;
+    materialOnly?: boolean;
     initialIntent?: InitialProjectIntent;
+    presetId?: string;
     projectId?: string;
     projectTags?: string[];
     projectPath?: string;
@@ -104,7 +112,7 @@ export class ProjectStateEngine {
       options.initialIntent.desiredOutcome?.trim()
     );
 
-    if (!hasIdea && !hasIntent) {
+    if (!hasIdea && !hasIntent && !options.materialOnly) {
       throw new Error('Either idea or initialIntent (targetUser, coreProblem, desiredOutcome) must be provided.');
     }
 
@@ -131,13 +139,13 @@ export class ProjectStateEngine {
     if (options.initialIntent) {
       const intent = options.initialIntent;
       initialIdeaContent = [
-        `【核心愿景与期望成果】\n${intent.desiredOutcome.trim()}`,
-        `【目标用户群体】\n${intent.targetUser.trim()}`,
-        `【解决的核心问题与痛点】\n${intent.coreProblem.trim()}`,
-        intent.constraints?.trim() ? `【关键约束与技术底线】\n${intent.constraints.trim()}` : '',
+        `【核心愿景与期望成果】\n${intent.desiredOutcome}`,
+        `【目标用户群体】\n${intent.targetUser}`,
+        `【解决的核心问题与痛点】\n${intent.coreProblem}`,
+        intent.constraints?.trim() ? `【关键约束与技术底线】\n${intent.constraints}` : '',
       ].filter(Boolean).join('\n\n');
     } else {
-      initialIdeaContent = options.idea!.trim();
+      initialIdeaContent = options.idea??'';
     }
 
     await this.storage.writeText(join(initialInputAbsDir, 'source.txt'), initialIdeaContent);
@@ -157,9 +165,15 @@ export class ProjectStateEngine {
       analysisAvailability: 'available',
       createdAt: timestamp,
       summary: initialIdeaContent.slice(0, 80),
+      contentHash:createHash('sha256').update(initialIdeaContent).digest('hex'),
     };
 
     // 2. Initial Metadata
+    const preset = options.presetId ? PresetRegistry.getById(options.presetId) : undefined;
+    const effectiveTags = options.projectTags
+      ? [...options.projectTags]
+      : (preset?.tags ? [...preset.tags] : ['Local-First']);
+
     const metadata: ProjectMetadata = {
       schemaVersion: 1,
       projectId,
@@ -167,8 +181,8 @@ export class ProjectStateEngine {
       tagline: (options.initialIntent?.desiredOutcome || options.idea || options.name).slice(0, 100),
       stage: 'created',
       stateRevision: 1,
-      projectTags: options.projectTags || ['Local-First'],
-      inputRefs: [inputRef],
+      projectTags: effectiveTags,
+      inputRefs: initialIdeaContent.trim()?[inputRef]:[],
       updatedAt: timestamp,
       createdAt: timestamp,
     };
@@ -231,18 +245,25 @@ export class ProjectStateEngine {
           updatedAt: timestamp,
         });
       }
-    } else {
+    } else if(options.idea?.trim()) {
       initialDecisions.push({
         id: 'dec-01',
         area: 'project_overview',
         statement: options.idea!.trim(),
-        status: 'confirmed',
+        status: 'candidate',
         origin: 'user',
         evidenceRefs: [`input:${initialInputId}`],
-        confirmedBy: 'user',
         createdAt: timestamp,
         updatedAt: timestamp,
       });
+    }
+    if (preset) {
+      const presetDecisions = PresetRegistry.instantiateDecisions(preset, timestamp);
+      for (const pd of presetDecisions) {
+        if (!initialDecisions.some((d) => d.id === pd.id)) {
+          initialDecisions.push(pd);
+        }
+      }
     }
 
     const decisions: DecisionsState = {
@@ -378,6 +399,10 @@ export class ProjectStateEngine {
     };
 
     // Commit all initial state files
+    const planning = emptyPlanningState();
+    planning.blueprint.decisionBasisHash=effectiveDecisionHash({decisions});
+    if(initialIdeaContent.trim())planning.inputs.push({id:initialInputId,raw:options.idea??initialIdeaContent,kind:classifyInput(options.idea??initialIdeaContent),createdAt:timestamp});
+    const {blueprint,changeSets,...planningLedger}=planning;
     await this.commitManager.commit(targetDir, 1, {
       metadata,
       overview,
@@ -388,6 +413,7 @@ export class ProjectStateEngine {
       questions,
       readiness,
       documents: manifest,
+      planning:planningLedger,blueprint,changesets:changeSets,
     });
 
     const snapshot: ProjectSnapshot = {
@@ -400,6 +426,7 @@ export class ProjectStateEngine {
       questions,
       readiness,
       documents: manifest,
+      planning,
     };
 
     return { projectPath: targetDir, snapshot };
@@ -413,54 +440,11 @@ export class ProjectStateEngine {
     projectPath: string,
     documentsState: DocumentsState,
     renderedFiles: Array<{ path: string; content: string }> | undefined,
-    expectedRevision: number
+    expectedRevision: number,
+    options?: { isDraft?: boolean }
   ): Promise<ProjectSnapshot> {
-    const snapshot = await this.loadProject(projectPath);
-    this.assertRevision(snapshot.metadata, expectedRevision);
-
-    // Validate using ReadinessGate SSOT
-    new ReadinessGate().validateForDocumentGeneration(snapshot);
-
-    const documentGuard = new WorkspaceGuard(projectPath);
-    const publicFiles = [
-      ...(renderedFiles || []).map((doc) => ({
-        path: documentGuard.assertContained(projectPath, join(projectPath, doc.path), 'Compiled document path'),
-        content: doc.content,
-      })),
-      { path: join(projectPath, 'documents.json'), content: `${JSON.stringify(documentsState, null, 2)}\n` },
-      { path: join(projectPath, 'documents', 'manifest.json'), content: `${JSON.stringify(documentsState, null, 2)}\n` },
-    ];
-    const backups = await Promise.all(publicFiles.map(async (file) => ({
-      path: file.path,
-      existed: await this.storage.exists(file.path),
-      content: await this.storage.exists(file.path) ? await this.storage.readText(file.path) : undefined,
-    })));
-
-    const timestamp = new Date().toISOString();
-    snapshot.metadata.stage = 'documents-generated';
-    snapshot.metadata.updatedAt = timestamp;
-
-    const targetRevision = snapshot.metadata.stateRevision + 1;
-    try {
-      for (const file of publicFiles) await this.storage.writeText(file.path, file.content);
-      await this.commitManager.commit(
-        projectPath,
-        targetRevision,
-        {
-          metadata: snapshot.metadata,
-          documents: documentsState,
-        },
-        expectedRevision
-      );
-    } catch (error) {
-      for (const backup of backups) {
-        if (backup.existed) await this.storage.writeText(backup.path, backup.content || '');
-        else await this.storage.remove(backup.path);
-      }
-      throw error;
-    }
-
-    return this.loadProject(projectPath);
+    void documentsState; void renderedFiles; void expectedRevision; void options; void projectPath;
+    throw Object.assign(new Error('旧文档发布已停用；请从已批准规划生成开发包。'), { code: ErrorCode.LEGACY_WORKFLOW_RETIRED });
   }
 
   /**
@@ -475,37 +459,37 @@ export class ProjectStateEngine {
     // Run recovery check for any interrupted two-phase commits
     await this.commitManager.recoverIfNeeded(absPath);
 
-    const metadata = await this.storage.readJson<ProjectMetadata>(join(absPath, 'project.json'));
-    const stateDir = join(absPath, 'state');
+    const activeRevision = await this.commitManager.getCurrentRevision(absPath);
+    const stateDir = activeRevision > 0 ? this.commitManager.getRevisionDir(absPath,activeRevision) : join(absPath,'state');
+    const metadata = await this.storage.readJson<ProjectMetadata>(activeRevision > 0 ? join(stateDir,'metadata.json') : join(absPath,'project.json'));
+    for (const input of metadata.inputRefs) {
+      if(input.status==='excluded')continue;
+      const source = this.guard.assertContained(absPath, join(absPath,input.storageRef),'Input material');
+      if (await this.storage.exists(source)) {
+        const currentHash=createHash('sha256').update(await this.storage.readBuffer(source)).digest('hex');
+        if(input.contentHash&&input.contentHash!==currentHash){input.status='failed';input.analysisAvailability='unavailable';input.summary='材料文件已被外部修改，请重新添加或排除；旧提取内容不可作为证据。';}
+        else input.contentHash=currentHash;
+      }else{input.status='failed';input.analysisAvailability='unavailable';input.summary='材料原文件缺失，请重新添加或排除。';}
+    }
 
     const decisions = await this.storage.readJson<DecisionsState>(join(stateDir, 'decisions.json'));
-    // Phase 2.5 is additive: older local projects do not yet have a trace array.
-    decisions.traces ??= [];
     const assumptions = await this.storage.readJson<AssumptionsState>(join(stateDir, 'assumptions.json'));
     const gaps = await this.storage.readJson<GapsState>(join(stateDir, 'gaps.json'));
     const risks = await this.storage.readJson<RisksState>(join(stateDir, 'risks.json'));
     const questions = await this.storage.readJson<QuestionsState>(join(stateDir, 'questions.json'));
-    // B3 additive migration: normalize legacy records in memory. The next
-    // ordinary state commit persists schemaVersion 2 without a separate rewrite.
-    gaps.schemaVersion = 2;
-    for (const gap of gaps.gaps) {
-      gap.decisionKey ??= this.normalizeDecisionKey(`${gap.area}:${gap.id}`);
-      const legacyDependency = gap.dependency && gap.dependency.toLowerCase() !== 'none'
-        ? [gap.dependency]
-        : [];
-      gap.dependsOn ??= legacyDependency.map((value) => this.normalizeDecisionKey(value));
-    }
-    questions.schemaVersion = 2;
-    for (const question of questions.items) {
-      const linkedGapId = question.issueRef.startsWith('gap:') ? question.issueRef.slice(4) : undefined;
-      const linkedGap = linkedGapId ? gaps.gaps.find((gap) => gap.id === linkedGapId) : undefined;
-      question.decisionKey ??= linkedGap?.decisionKey || this.normalizeDecisionKey(`legacy:${question.id}`);
-      question.dependsOn ??= linkedGap?.dependsOn || [];
-      question.batchId ??= 'legacy';
-      question.batchStage ??= 'legacy';
-      question.basisRevision ??= metadata.stateRevision;
-    }
     const readiness = await this.storage.readJson<ReadinessState>(join(stateDir, 'readiness.json'));
+    const planning = emptyPlanningState();
+    let legacyPlanningLedger = true;
+    for (const [file, key] of [['planning.json', 'ledger'], ['blueprint.json', 'blueprint'], ['changesets.json', 'changeSets']] as const) {
+      if (await this.storage.exists(join(stateDir, file))) {
+        const data = await this.storage.readJson<any>(join(stateDir, file));
+        if (key === 'ledger') { Object.assign(planning, data); legacyPlanningLedger = false; }
+        else if (key === 'blueprint') planning.blueprint = data;
+        else planning.changeSets = data;
+      }
+    }
+    // B3 additive normalization is shared with pure inspection projections.
+    ProjectStateMigration.normalizeLoadedRecords({ metadata, decisions, gaps, questions, planning }, legacyPlanningLedger);
 
     let documents: DocumentsState | undefined;
     if (await this.storage.exists(join(stateDir, 'documents.json'))) {
@@ -529,10 +513,24 @@ export class ProjectStateEngine {
       questions,
       readiness,
       documents,
+      planning,
     };
 
     ProjectStateMigration.migrateInMemory(snapshot);
     return snapshot;
+  }
+
+  /** Core-only persistence boundary for validated planning intents. */
+  async commitPlanningState(projectPath: string, snapshot: ProjectSnapshot, expectedRevision: number): Promise<ProjectSnapshot> {
+    this.assertRevision(snapshot.metadata, expectedRevision);
+    if (!snapshot.planning) throw new Error('Planning state required');
+    const { blueprint, changeSets, ...ledger } = snapshot.planning;
+    await this.commitManager.commit(projectPath, expectedRevision + 1, {
+      metadata: snapshot.metadata, decisions: snapshot.decisions, questions: snapshot.questions, gaps: snapshot.gaps,
+      overview: this.buildOverviewProjection(snapshot.metadata.projectId, snapshot.decisions, snapshot.gaps),
+      planning: ledger, blueprint, changesets: changeSets,
+    }, expectedRevision);
+    return this.loadProject(projectPath);
   }
 
   /**
@@ -722,78 +720,8 @@ export class ProjectStateEngine {
     projectPath: string,
     expectedRevision: number
   ): Promise<ProjectSnapshot> {
-    const snapshot = await this.loadProject(projectPath);
-    this.assertRevision(snapshot.metadata, expectedRevision);
-
-    const evalResult = new ReadinessEvaluator().evaluate(snapshot);
-    const timestamp = new Date().toISOString();
-
-    const currentRevision = snapshot.metadata.stateRevision;
-    const lastReadiness = snapshot.readiness?.current;
-    const isSameRevision = Boolean(lastReadiness && lastReadiness.basisRevision === currentRevision);
-    const userDisposition = isSameRevision && lastReadiness ? lastReadiness.userDisposition : 'pending';
-
-    const satisfiedCount = CANONICAL_B3_AREAS.filter((area) =>
-      snapshot.decisions.items.some(
-        (d) => (d.area === area || d.id === area) && (d.status === 'confirmed' || d.status === 'locked')
-      )
-    ).length;
-
-    const targetRevision = snapshot.metadata.stateRevision + 1;
-
-    const readinessSnapshot: ReadinessSnapshot = {
-      id: `rdn-${Date.now()}`,
-      status: evalResult.ready
-        ? evalResult.warnings.length > 0
-          ? 'ready-with-warnings'
-          : 'ready'
-        : 'not-ready',
-      reviewedAt: timestamp,
-      basisRevision: currentRevision,
-      requiredAreas: [...CANONICAL_B3_AREAS],
-      warnings: evalResult.warnings,
-      issues: evalResult.blockingIssues,
-      assumptionRefs: snapshot.assumptions.items.map((a) => `assumption:${a.id}` as AssumptionRef),
-      knownIssueAcknowledgements: isSameRevision
-        ? snapshot.readiness?.current?.knownIssueAcknowledgements || []
-        : [],
-      criticalConflictAcknowledgements: isSameRevision
-        ? snapshot.readiness?.current?.criticalConflictAcknowledgements || []
-        : [],
-      userDisposition,
-      coverage: {
-        total: CANONICAL_B3_AREAS.length,
-        satisfied: satisfiedCount,
-        ratio: satisfiedCount / CANONICAL_B3_AREAS.length,
-      },
-      credibilityScore: evalResult.score,
-    };
-
-    const updatedReadiness: ReadinessState = {
-      schemaVersion: 1,
-      projectId: snapshot.metadata.projectId,
-      current: readinessSnapshot,
-      history: [
-        ...(snapshot.readiness?.history || []),
-        ...(snapshot.readiness?.current ? [snapshot.readiness.current] : []),
-      ],
-      updatedAt: timestamp,
-    };
-
-    snapshot.metadata.stage = 'readiness-review';
-    snapshot.metadata.updatedAt = timestamp;
-
-    await this.commitManager.commit(
-      projectPath,
-      targetRevision,
-      {
-        metadata: snapshot.metadata,
-        readiness: updatedReadiness,
-      },
-      expectedRevision
-    );
-
-    return this.loadProject(projectPath);
+    void projectPath; void expectedRevision;
+    throw Object.assign(new Error('旧准备度评审写入已停用；请使用规划变更包。'), { code: ErrorCode.LEGACY_WORKFLOW_RETIRED });
   }
 
   /**
@@ -810,100 +738,8 @@ export class ProjectStateEngine {
           criticalConflicts?: string[];
         }
   ): Promise<ProjectSnapshot> {
-    const snapshot = await this.loadProject(projectPath);
-    this.assertRevision(snapshot.metadata, expectedRevision);
-
-    let ackRefs: TypedRef[] = [];
-    if (Array.isArray(acknowledgements)) {
-      ackRefs = acknowledgements;
-    } else if (acknowledgements) {
-      ackRefs = [
-        ...(acknowledgements.knownIssues || []).map((id) =>
-          id.startsWith('gap:') ? id : `gap:${id}`
-        ),
-        ...(acknowledgements.criticalConflicts || []).map((id) =>
-          id.startsWith('conflict:') ? id : `conflict:${id}`
-        ),
-      ] as TypedRef[];
-    }
-
-    // SSOT Validation via ReadinessGate
-    new ReadinessGate().validateForDisposition(snapshot, disposition, ackRefs);
-
-    const timestamp = new Date().toISOString();
-    const currentReadiness = snapshot.readiness?.current || {
-      id: `rdn-${Date.now()}`,
-      status: 'not-ready',
-      reviewedAt: timestamp,
-      basisRevision: snapshot.metadata.stateRevision,
-      requiredAreas: [...CANONICAL_B3_AREAS],
-      warnings: [],
-      issues: [],
-      assumptionRefs: [],
-      knownIssueAcknowledgements: [],
-      criticalConflictAcknowledgements: [],
-      userDisposition: 'pending',
-    };
-
-    let newKnownIssues: string[] = [];
-    let newCriticalConflicts: string[] = [];
-
-    for (const ref of ackRefs) {
-      if (ref.startsWith('conflict:') || ref.startsWith('cnf:')) {
-        newCriticalConflicts.push(ref);
-      } else {
-        newKnownIssues.push(ref);
-      }
-    }
-
-    const allAckConflicts = Array.from(
-      new Set([...currentReadiness.criticalConflictAcknowledgements, ...newCriticalConflicts])
-    );
-    const allAckIssues = Array.from(
-      new Set([...currentReadiness.knownIssueAcknowledgements, ...newKnownIssues])
-    );
-
-    const targetRevision = snapshot.metadata.stateRevision + 1;
-
-    const updatedSnapshot: ReadinessSnapshot = {
-      ...currentReadiness,
-      basisRevision: snapshot.metadata.stateRevision,
-      userDisposition: disposition,
-      reviewedAt: timestamp,
-      knownIssueAcknowledgements: allAckIssues,
-      criticalConflictAcknowledgements: allAckConflicts,
-    };
-
-    const updatedReadiness: ReadinessState = {
-      schemaVersion: 1,
-      projectId: snapshot.metadata.projectId,
-      current: updatedSnapshot,
-      history: [
-        ...(snapshot.readiness?.history || []),
-        ...(snapshot.readiness?.current ? [snapshot.readiness.current] : []),
-      ],
-      updatedAt: timestamp,
-    };
-
-    if (disposition.startsWith('approved')) {
-      snapshot.metadata.stage = 'approved';
-    } else if (disposition === 'return-to-discovery') {
-      snapshot.metadata.stage = 'broad-pass';
-    }
-
-    snapshot.metadata.updatedAt = timestamp;
-
-    await this.commitManager.commit(
-      projectPath,
-      targetRevision,
-      {
-        metadata: snapshot.metadata,
-        readiness: updatedReadiness,
-      },
-      expectedRevision
-    );
-
-    return this.loadProject(projectPath);
+    void projectPath; void disposition; void expectedRevision; void acknowledgements;
+    throw Object.assign(new Error('旧准备度签署已停用；请明确批准规划变更包。'), { code: ErrorCode.LEGACY_WORKFLOW_RETIRED });
   }
 
   /**
@@ -968,6 +804,86 @@ export class ProjectStateEngine {
   }
 
   /**
+   * Ingests candidate decisions discovered via brownfield codebase scanning.
+   * Guarantees: All ingested items are strictly candidate status (never auto-confirmed/locked).
+   */
+  async ingestBrownfieldCandidates(
+    projectPath: string,
+    candidates: BrownfieldCandidateDecision[],
+    expectedRevision?: number
+  ): Promise<ProjectSnapshot> {
+    const snapshot = await this.loadProject(projectPath);
+    if (expectedRevision !== undefined) {
+      this.assertRevision(snapshot.metadata, expectedRevision);
+    }
+
+    const timestamp = new Date().toISOString();
+    const existingKeys = new Set(snapshot.decisions.items.map((d) => d.decisionKey || d.statement));
+    const newDecisions: DecisionItem[] = [];
+    const newTags = new Set(snapshot.metadata.projectTags || []);
+
+    for (const cand of candidates) {
+      if (existingKeys.has(cand.decisionKey)) {
+        continue;
+      }
+      existingKeys.add(cand.decisionKey);
+
+      const decId = `dec-bf-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const canonicalArea = AreaRegistry.normalize(cand.areaId);
+
+      newDecisions.push({
+        id: decId,
+        area: canonicalArea,
+        statement: `${cand.title}：${cand.summary}`,
+        status: 'candidate', // STRICT USER AUTHORITY FIRST
+        origin: 'agent',
+        evidenceRefs: [],
+        decisionKey: cand.decisionKey,
+        rationale: cand.details,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      });
+
+      if (cand.suggestedTags) {
+        for (const tag of cand.suggestedTags) {
+          newTags.add(tag);
+        }
+      }
+    }
+
+    if (newDecisions.length === 0) {
+      return snapshot;
+    }
+
+    const updatedDecisions = {
+      ...snapshot.decisions,
+      items: [...snapshot.decisions.items, ...newDecisions],
+      updatedAt: timestamp,
+    };
+
+    const updatedMetadata = {
+      ...snapshot.metadata,
+      projectTags: Array.from(newTags),
+      updatedAt: timestamp,
+    };
+
+    const updatedOverview = this.buildOverviewProjection(
+      snapshot.metadata.projectId,
+      updatedDecisions,
+      snapshot.gaps
+    );
+
+    const targetRevision = snapshot.metadata.stateRevision + 1;
+    await this.commitManager.commit(projectPath, targetRevision, {
+      metadata: updatedMetadata,
+      decisions: updatedDecisions,
+      overview: updatedOverview,
+    });
+
+    return await this.loadProject(projectPath);
+  }
+
+  /**
    * Directly records an active assumption into project state.
    */
   async addAssumption(
@@ -1016,74 +932,127 @@ export class ProjectStateEngine {
    * compact audit trace. This is the only path that promotes a question answer
    * into project fact; Agent output never takes this path by itself.
    */
-  async answerQuestion(
+  async answerQuestion(projectPath: string, questionRef: QuestionRef, answer: string, expectedRevision: number): Promise<ProjectSnapshot> {
+    const snapshot = await this.loadProject(projectPath);
+    const id = String(questionRef).replace(/^question:/, '');
+    const question = snapshot.questions.items.find(q => q.id === id);
+    if (!question) throw new Error('Question not found');
+    const selected = question.options.find(option => option.key === answer.trim() || option.label === answer.trim());
+    const { PlanningService } = await import('../planning/PlanningService.js');
+    return new PlanningService(this).answer(projectPath, [{ questionId: id, kind: selected ? 'selection' : 'custom', ...(selected ? { optionKeys: [selected.key] } : { text: answer }) }], expectedRevision, 'legacy-answer:' + randomUUID());
+  }
+
+  /**
+   * Retracts an answered question within the undo window or on user request.
+   * Performs four-way cascading consistency:
+   * 1. Rejects associated decision (status: 'rejected', rejectionReason: 'retracted_by_user').
+   * 2. Re-opens linked gap if no other confirmed/candidate decisions cover it.
+   * 3. Deprecates associated assumption if answered as an assumption.
+   * 4. Resets question to 'shown' with cleared answer and re-evaluates overview projection & readiness.
+   */
+  async retractQuestion(
     projectPath: string,
     questionRef: QuestionRef,
-    answer: string,
-    expectedRevision: number,
-  ): Promise<ProjectSnapshot> {
+    expectedRevision: number
+  ): Promise<{ snapshot: ProjectSnapshot; retractedQuestionId: string; reopenedGapRef?: TypedRef }> {
     const snapshot = await this.loadProject(projectPath);
     this.assertRevision(snapshot.metadata, expectedRevision);
-    if (!answer.trim()) throw new Error('A user answer is required to create a decision trace.');
 
     const cleanRef = String(questionRef).startsWith('question:') ? questionRef : (`question:${questionRef}` as QuestionRef);
     const parsed = parseTypedRef(cleanRef);
     if (parsed.kind !== 'question') throw new Error(`Expected a question reference, received "${questionRef}".`);
     const question = snapshot.questions.items.find((item) => item.id === parsed.id);
     if (!question) throw new Error(`Question "${questionRef}" not found`);
-    if (question.status === 'answered' || question.status === 'dismissed' || question.status === 'superseded') {
-      throw new Error(`Question "${questionRef}" can no longer be answered. Current status: "${question.status}"`);
+    if (question.status !== 'answered') {
+      throw new Error(`Question "${questionRef}" is not answered (current status: "${question.status}").`);
     }
 
     const timestamp = new Date().toISOString();
-    question.status = 'answered';
-    question.answer = answer.trim();
-    question.answeredAt = timestamp;
 
-    const issue = parseTypedRef(question.issueRef);
-    const linkedGap = issue.kind === 'gap'
-      ? snapshot.gaps.gaps.find((gap) => gap.id === issue.id)
-      : undefined;
-    const decisionId = `dec-${Date.now()}`;
-    const decisionRef = `decision:${decisionId}` as DecisionRef;
-    const decision: DecisionItem = {
-      id: decisionId,
-      area: linkedGap?.area ?? 'general',
-      statement: answer.trim(),
-      status: 'confirmed',
-      origin: 'user',
-      evidenceRefs: [questionRef],
-      confirmedBy: 'user',
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-    snapshot.decisions.items.push(decision);
-
-    const stateChanges: DecisionTrace['stateChanges'] = [
-      { ref: questionRef, action: 'question-answered' },
-      { ref: decisionRef, action: 'decision-created' },
-    ];
-    if (linkedGap?.status === 'open') {
-      linkedGap.status = 'addressed';
-      stateChanges.push({ ref: `gap:${linkedGap.id}` as TypedRef, action: 'gap-addressed' });
+    // 1. Mark associated decision(s) as rejected
+    const associatedDecisions = snapshot.decisions.items.filter(
+      (d) => d.evidenceRefs && d.evidenceRefs.includes(cleanRef) && d.status !== 'superseded' && d.status !== 'rejected'
+    );
+    for (const dec of associatedDecisions) {
+      dec.status = 'rejected';
+      dec.rejectionReason = 'retracted_by_user';
+      dec.updatedAt = timestamp;
     }
-    const traceId = `trace-${Date.now()}`;
+
+    // Also look up trace if exists
+    let associatedDecisionRef: DecisionRef | undefined;
+    if (snapshot.decisions.traces) {
+      const trace = snapshot.decisions.traces.find((t) => t.questionRef === cleanRef);
+      if (trace && trace.decisionRef) {
+        associatedDecisionRef = trace.decisionRef;
+        const targetDec = snapshot.decisions.items.find((d) => `decision:${d.id}` === trace.decisionRef);
+        if (targetDec && targetDec.status !== 'rejected') {
+          targetDec.status = 'rejected';
+          targetDec.rejectionReason = 'retracted_by_user';
+          targetDec.updatedAt = timestamp;
+        }
+      }
+    }
+
+    // 2. Reopen linked gap if no other active decision covers it
+    let reopenedGapRef: TypedRef | undefined;
+    const issue = parseTypedRef(question.issueRef);
+    if (issue.kind === 'gap') {
+      const linkedGap = snapshot.gaps.gaps.find((g) => g.id === issue.id);
+      if (linkedGap) {
+        const otherActiveDecisions = snapshot.decisions.items.some(
+          (d) =>
+            d.status !== 'rejected' &&
+            d.status !== 'superseded' &&
+            (d.status as string) !== 'deprecated' &&
+            d.area === linkedGap.area &&
+            !associatedDecisions.some((ad) => ad.id === d.id)
+        );
+        if (!otherActiveDecisions && linkedGap.status === 'addressed') {
+          linkedGap.status = 'open';
+          reopenedGapRef = `gap:${linkedGap.id}` as TypedRef;
+        }
+      }
+    }
+
+    // 3. Clean up assumption if answered as assumption
+    if (question.answer?.startsWith('[Assumption]')) {
+      const asmText = question.answer.replace(/^\[Assumption\]\s*/, '').trim();
+      for (const asm of snapshot.assumptions.items) {
+        if (asm.statement.trim() === asmText || (question.decisionKey && asm.decisionKey === question.decisionKey)) {
+          asm.status = 'deprecated' as any;
+        }
+      }
+    }
+
+    // 4. Reset question status
+    question.status = 'shown';
+    delete question.answer;
+    delete question.answeredAt;
+
+    // 5. Append trace event
     snapshot.decisions.traces ??= [];
     snapshot.decisions.traces.push({
-      id: traceId,
-      questionRef,
-      userAnswer: answer.trim(),
-      decisionRef,
-      stateChanges,
+      id: `trace-retract-${Date.now()}`,
+      questionRef: cleanRef,
+      userAnswer: '[Retracted]',
+      decisionRef: associatedDecisionRef || (`decision:none` as DecisionRef),
+      stateChanges: [
+        { ref: cleanRef, action: 'question-retracted' as any },
+        ...(reopenedGapRef ? [{ ref: reopenedGapRef, action: 'gap-reopened' as any }] : []),
+      ],
       createdAt: timestamp,
     });
+
     snapshot.decisions.updatedAt = timestamp;
     snapshot.questions.updatedAt = timestamp;
     snapshot.gaps.updatedAt = timestamp;
+    snapshot.assumptions.updatedAt = timestamp;
     snapshot.metadata.updatedAt = timestamp;
 
     const overview = this.buildOverviewProjection(snapshot.metadata.projectId, snapshot.decisions, snapshot.gaps);
     const targetRevision = snapshot.metadata.stateRevision + 1;
+
     await this.commitManager.commit(
       projectPath,
       targetRevision,
@@ -1092,12 +1061,18 @@ export class ProjectStateEngine {
         decisions: snapshot.decisions,
         gaps: snapshot.gaps,
         questions: snapshot.questions,
+        assumptions: snapshot.assumptions,
         overview,
       },
       expectedRevision
     );
+
     const updatedSnapshot = await this.loadProject(projectPath);
-    return updatedSnapshot;
+    return {
+      snapshot: updatedSnapshot,
+      retractedQuestionId: parsed.id,
+      reopenedGapRef,
+    };
   }
 
   /**
@@ -1403,6 +1378,85 @@ export class ProjectStateEngine {
   }
 
   /**
+   * Deprecates or discards a decision.
+   * Marks candidate/confirmed decision as deprecated, cleans up dependencies,
+   * updates Gaps and rebuilds Overview Projection.
+   */
+  async deprecateDecision(
+    projectPath: string,
+    decisionRef: DecisionRef,
+    expectedRevision: number
+  ): Promise<{ deprecatedRef: DecisionRef; snapshot: ProjectSnapshot }> {
+    const snapshot = await this.loadProject(projectPath);
+    this.assertRevision(snapshot.metadata, expectedRevision);
+
+    const parsed = parseTypedRef(decisionRef);
+    const existing = snapshot.decisions.items.find((d) => d.id === parsed.id);
+    if (!existing) {
+      const err: any = new Error(`Decision not found: ${decisionRef}`);
+      err.code = ErrorCode.STATE_VALIDATION_FAILED;
+      throw err;
+    }
+
+    if (existing.status === 'locked') {
+      const err: any = new Error(`Cannot deprecate a locked decision without unlocking it first: ${decisionRef}`);
+      err.code = ErrorCode.DECISION_LOCKED;
+      throw err;
+    }
+
+    const timestamp = new Date().toISOString();
+    existing.status = 'deprecated';
+    existing.updatedAt = timestamp;
+
+    for (const d of snapshot.decisions.items) {
+      if (d.evidenceRefs) {
+        d.evidenceRefs = d.evidenceRefs.filter((ref) => ref !== decisionRef);
+      }
+    }
+
+    const areaId = existing.area;
+    const hasRemainingConfirmed = snapshot.decisions.items.some(
+      (d) => d.area === areaId && (d.status === 'confirmed' || d.status === 'locked')
+    );
+
+    let updatedGaps = snapshot.gaps;
+    if (!hasRemainingConfirmed) {
+      updatedGaps = {
+        ...snapshot.gaps,
+        gaps: snapshot.gaps.gaps.map((g) => {
+          if (g.area === areaId && g.status === 'addressed') {
+            return { ...g, status: 'open' as const };
+          }
+          return g;
+        }),
+        updatedAt: timestamp,
+      };
+    }
+
+    const updatedOverview = this.buildOverviewProjection(
+      snapshot.metadata.projectId,
+      snapshot.decisions,
+      updatedGaps
+    );
+
+    const targetRevision = snapshot.metadata.stateRevision + 1;
+    await this.commitManager.commit(
+      projectPath,
+      targetRevision,
+      {
+        metadata: snapshot.metadata,
+        decisions: snapshot.decisions,
+        gaps: updatedGaps,
+        overview: updatedOverview,
+      },
+      expectedRevision
+    );
+
+    const newSnapshot = await this.loadProject(projectPath);
+    return { deprecatedRef: decisionRef, snapshot: newSnapshot };
+  }
+
+  /**
    * Applies the structured result of a B3 discovery-turn to Project State.
    * Enforces rules:
    * 1. Agent suggestions enter Candidate/Assumption/Gap/Risk/Question.
@@ -1615,40 +1669,137 @@ export class ProjectStateEngine {
           snapshot.questions.items.push(q);
         }
       }
-    } else {
-      for (const q of result.questions || []) {
-        const exists = snapshot.questions.items.some(
-          (item) => item.question.trim() === q.question.trim() && item.status !== 'dismissed'
+    } else if (result.questions && result.questions.length > 0) {
+      // Gate enforcement on incoming AI / raw questions:
+      // Local stage budget, deduplication, cycle detection, gap linkage, and batch metadata
+      const policy = this.batchPolicy.evaluate(snapshot);
+      const batchId = `batch-${snapshot.metadata.stateRevision}-${Date.now().toString(36)}`;
+
+      // 1. Build dependency graph for incoming questions
+      const questionDepGraph = new Map<string, string[]>();
+      for (const q of result.questions) {
+        const area = AreaRegistry.normalize((q as any).area || 'technical_boundary');
+        const decisionKey = this.normalizeDecisionKey(
+          (q as any).decisionKey || q.decision_key || `${area}:${q.question}`
         );
-        if (!exists) {
-          const mappedOptions: QuestionOption[] = (q.options || []).map((o, idx) => ({
-            key: o.key || `opt_${idx + 1}`,
-            label: o.label,
-            impact: o.impact,
-            tradeoffs: o.tradeoffs,
-            reversibility: o.reversibility || 'moderate',
-          }));
-          snapshot.questions.items.push({
-            id: `q-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-            issueRef: 'gap:general',
-            area: (q as any).area,
-            decisionKey: this.normalizeDecisionKey(
-              (q as any).decisionKey || q.decision_key || `legacy:${q.question}`
-            ),
-            dependsOn: ((q as any).dependsOn || q.depends_on || []).map((value: string) =>
-              this.normalizeDecisionKey(value)
-            ),
-            importance: q.importance,
-            question: q.question,
-            reason: q.reason,
-            recommendation: q.recommendation,
-            recommendationReason: q.recommendation_reason,
-            recommendedOptionKey: q.recommended_option_key || mappedOptions[0]?.key,
-            options: mappedOptions,
-            allowFreeInput: true,
-            status: 'proposed',
-            createdAt: timestamp,
-          });
+        const deps = ((q as any).dependsOn || q.depends_on || []).map((d: string) => this.normalizeDecisionKey(d));
+        questionDepGraph.set(decisionKey, deps);
+      }
+
+      const seenKeys = new Set<string>();
+      const candidateQuestions: QuestionItem[] = [];
+
+      for (const q of result.questions) {
+        const area = AreaRegistry.normalize((q as any).area || 'technical_boundary');
+        const decisionKey = this.normalizeDecisionKey(
+          (q as any).decisionKey || q.decision_key || `${area}:${q.question}`
+        );
+
+        // Deduplicate within the batch
+        if (seenKeys.has(decisionKey)) continue;
+        seenKeys.add(decisionKey);
+
+        // Check for dependency cycles
+        if (this.hasCycle(decisionKey, questionDepGraph)) continue;
+
+        // Check if already in snapshot questions (active or answered)
+        const alreadyExists = snapshot.questions.items.some(
+          (item) =>
+            (item.decisionKey && this.normalizeDecisionKey(item.decisionKey) === decisionKey) ||
+            item.question.trim() === q.question.trim()
+        );
+        if (alreadyExists) continue;
+
+        // Ensure matching GapItem exists in snapshot.gaps.gaps
+        let matchingGap = snapshot.gaps.gaps.find(
+          (g) => g.decisionKey === decisionKey && g.status === 'open'
+        );
+        if (!matchingGap) {
+          matchingGap = {
+            id: `gap-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            area,
+            decisionKey,
+            dependsOn: ((q as any).dependsOn || q.depends_on || []).map((d: string) => this.normalizeDecisionKey(d)),
+            severity: q.importance === 'critical' ? 'critical' : 'high',
+            reason: q.reason || q.question,
+            impact: '未决架构决策',
+            shouldAskUser: true,
+            status: 'open',
+          };
+          snapshot.gaps.gaps.push(matchingGap);
+        }
+
+        const issueRef = (q as any).issueRef || (`gap:${matchingGap.id}` as TypedRef);
+        const mappedOptions: QuestionOption[] = (q.options || []).map((o: any, idx: number) => ({
+          key: o.key || `opt_${idx + 1}`,
+          label: o.label || '',
+          impact: o.impact || '',
+          tradeoffs: o.tradeoffs,
+          reversibility: o.reversibility || 'moderate',
+          gain: o.gain,
+          sacrifice: o.sacrifice,
+        }));
+
+        const recommendedOptionKey =
+          (q as any).recommendedOptionKey || q.recommended_option_key || mappedOptions[0]?.key;
+        const importance: QuestionImportance = ['critical', 'high', 'normal'].includes(q.importance)
+          ? q.importance
+          : 'normal';
+
+        candidateQuestions.push({
+          id: (q as any).id || `q-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          issueRef,
+          gapRef: issueRef,
+          area,
+          decisionKey,
+          dependsOn: ((q as any).dependsOn || q.depends_on || []).map((d: string) => this.normalizeDecisionKey(d)),
+          importance,
+          priority: importance,
+          question: q.question,
+          reason: q.reason,
+          whyNow: (q as any).whyNow || q.reason,
+          impact: (q as any).impact || matchingGap.impact,
+          recommendation: q.recommendation,
+          recommendationReason: (q as any).recommendationReason || q.recommendation_reason,
+          recommendedOptionKey,
+          options: mappedOptions,
+          allowFreeInput: true,
+          status: (q as any).status || 'proposed',
+          createdAt: (q as any).createdAt || timestamp,
+          batchId,
+          batchStage: policy.stage,
+          basisRevision: snapshot.metadata.stateRevision,
+        });
+      }
+
+      // Strictly budget: Never admit more questions than policy.maxQuestions
+      const budgetedQuestions = candidateQuestions.slice(0, policy.maxQuestions);
+      for (const q of budgetedQuestions) {
+        snapshot.questions.items.push(q);
+      }
+    } else {
+      // If neither payload.questions nor result.questions provided, generate via QuestionEngine
+      const openGaps = snapshot.gaps.gaps.filter((g) => g.status === 'open');
+      if (openGaps.length > 0) {
+        const engineResult = this.questionEngine.generateQuestions(
+          openGaps,
+          snapshot
+        );
+        for (const q of engineResult.questions) {
+          const exists = snapshot.questions.items.some(
+            (item) => item.question.trim() === q.question.trim() && item.status !== 'dismissed'
+          );
+          if (!exists) {
+            snapshot.questions.items.push(q);
+          }
+        }
+        for (const asm of engineResult.autoAssumptions) {
+          const exists = snapshot.assumptions.items.some(
+            (a) => a.statement.trim().toLowerCase() === asm.statement.trim().toLowerCase() && a.status === 'active'
+          );
+          if (!exists) {
+            snapshot.assumptions.items.push(asm);
+          }
         }
       }
     }
@@ -1713,10 +1864,13 @@ export class ProjectStateEngine {
       newConflicts: ConflictItem[];
       newRisks: RiskItem[];
     },
-    expectedRevision: number
+    expectedRevision: number,
+    allowRebase = false
   ): Promise<ProjectSnapshot> {
     const snapshot = await this.loadProject(projectPath);
-    this.assertRevision(snapshot.metadata, expectedRevision);
+    if (!allowRebase) {
+      this.assertRevision(snapshot.metadata, expectedRevision);
+    }
 
     const timestamp = new Date().toISOString();
 
@@ -1826,7 +1980,7 @@ export class ProjectStateEngine {
         questions: snapshot.questions,
         overview: updatedOverview,
       },
-      expectedRevision
+      allowRebase ? snapshot.metadata.stateRevision : expectedRevision
     );
 
     return this.loadProject(projectPath);
@@ -1842,7 +1996,8 @@ export class ProjectStateEngine {
     filename: string,
     content: string,
     contentEncoding?: 'utf8' | 'base64',
-    expectedRevision?: number
+    expectedRevision?: number,
+    extractedText?: string
   ): Promise<InputRef> {
     const snapshot = await this.loadProject(projectPath);
     if (expectedRevision !== undefined) {
@@ -1879,7 +2034,7 @@ export class ProjectStateEngine {
     const isBase64 = contentEncoding === 'base64';
     let fileBuffer: Buffer;
     if (isBase64) {
-      const cleanBase64 = content.replace(/\s/g, '');
+      const cleanBase64 = content.replace(/\s/g, '').replace(/^data:.*?;base64,/, '');
       if (!/^[A-Za-z0-9+/=]+$/.test(cleanBase64)) {
         const err: any = new Error('Invalid Base64 encoding in content payload.');
         err.code = ErrorCode.STATE_VALIDATION_FAILED;
@@ -1928,7 +2083,7 @@ export class ProjectStateEngine {
       const excerpt = textContent.slice(0, 4000);
       await this.storage.writeJson(join(inputDir, 'extraction.json'), {
         id: `input:${inputId}`,
-        extractedText: excerpt,
+        extractedText: textContent,
         status: 'ready',
         analysisAvailability: 'available',
         updatedAt: timestamp,
@@ -1949,8 +2104,8 @@ export class ProjectStateEngine {
         id: `input:${inputId}`,
         extractedText: '',
         status: 'ready',
-        analysisAvailability: 'unavailable',
-        reason: 'Image saved for reference. V1 visual analysis is unavailable.',
+        analysisAvailability: 'available',
+        reason: 'Image available to registered vision tasks; reading does not confirm requirements.',
         updatedAt: timestamp,
       });
 
@@ -1960,33 +2115,55 @@ export class ProjectStateEngine {
         label: filename,
         storageRef: storageRelPath,
         status: 'ready',
-        analysisAvailability: 'unavailable',
+        analysisAvailability: 'available',
         createdAt: timestamp,
-        summary: 'Image material (visual analysis unavailable in V1)',
+        summary: 'Image material; vision reading is recorded per planning task',
       };
     } else if (isDoc) {
-      const errorMessage =
-        'V1 local extractor does not parse binary PDF/DOCX format without external parser.';
-      await this.storage.writeJson(join(inputDir, 'extraction.json'), {
-        id: `input:${inputId}`,
-        extractedText: '',
-        status: 'failed',
-        analysisAvailability: 'unavailable',
-        errorMessage,
-        updatedAt: timestamp,
-      });
+      if (extractedText && extractedText.trim().length > 0) {
+        const excerpt = extractedText.slice(0, 4000);
+        await this.storage.writeJson(join(inputDir, 'extraction.json'), {
+          id: `input:${inputId}`,
+          extractedText,
+          status: 'ready',
+          analysisAvailability: 'available',
+          updatedAt: timestamp,
+        });
 
-      inputRef = {
-        id: `input:${inputId}`,
-        kind: 'file',
-        label: filename,
-        storageRef: storageRelPath,
-        status: 'failed',
-        analysisAvailability: 'unavailable',
-        errorMessage,
-        createdAt: timestamp,
-        summary: 'Binary document (unextracted in V1)',
-      };
+        inputRef = {
+          id: `input:${inputId}`,
+          kind: 'file',
+          label: filename,
+          storageRef: storageRelPath,
+          status: 'ready',
+          analysisAvailability: 'available',
+          createdAt: timestamp,
+          summary: excerpt.slice(0, 80),
+        };
+      } else {
+        const errorMessage =
+          'V1 local extractor does not parse binary PDF/DOCX format without external parser.';
+        await this.storage.writeJson(join(inputDir, 'extraction.json'), {
+          id: `input:${inputId}`,
+          extractedText: '',
+          status: 'failed',
+          analysisAvailability: 'unavailable',
+          errorMessage,
+          updatedAt: timestamp,
+        });
+
+        inputRef = {
+          id: `input:${inputId}`,
+          kind: 'file',
+          label: filename,
+          storageRef: storageRelPath,
+          status: 'failed',
+          analysisAvailability: 'unavailable',
+          errorMessage,
+          createdAt: timestamp,
+          summary: 'Binary document (unextracted in V1)',
+        };
+      }
     } else {
       inputRef = {
         id: `input:${inputId}`,
@@ -2027,7 +2204,8 @@ export class ProjectStateEngine {
       const activeDecisions = decisions.items.filter(
         (d) => AreaRegistry.normalize(d.area) === sec.id &&
           d.status !== 'superseded' &&
-          d.status !== 'rejected'
+          d.status !== 'rejected' &&
+          (d.status as string) !== 'deprecated'
       );
 
       const itemRefs: TypedRef[] = activeDecisions.map((d) => `decision:${d.id}` as TypedRef);
@@ -2148,7 +2326,8 @@ export class ProjectStateEngine {
   async recordDiscoveryInput(
     projectPath: string,
     text: string,
-    expectedRevision: number
+    expectedRevision: number,
+    clientTurnId?: string
   ): Promise<{ inputRef: string; turnId: string; snapshot: ProjectSnapshot }> {
     const snapshot = await this.loadProject(projectPath);
     this.assertRevision(snapshot.metadata, expectedRevision);
@@ -2162,6 +2341,22 @@ export class ProjectStateEngine {
       const err: any = new Error(`Discovery input exceeds maximum allowed size of ${maxChars} characters.`);
       err.code = ErrorCode.INPUT_TOO_LARGE;
       throw err;
+    }
+
+    // Idempotency check: if clientTurnId is provided, check if already recorded in inputRefs
+    if (clientTurnId) {
+      const existing = snapshot.metadata.inputRefs.find((r) => r.clientTurnId === clientTurnId);
+      if (existing) {
+        const turnStore = new DiscoveryTurnStore(this.storage);
+        const turns = await turnStore.loadTurns(projectPath).catch(() => []);
+        const matchingTurn = turns.find((t: DiscoveryTurnRecord) => t.inputRef === String(existing.id));
+        const turnId = matchingTurn ? matchingTurn.id : String(existing.id).replace(/^input:/, '');
+        return {
+          inputRef: String(existing.id),
+          turnId,
+          snapshot,
+        };
+      }
     }
 
     const timestamp = new Date().toISOString();
@@ -2195,6 +2390,7 @@ export class ProjectStateEngine {
       analysisAvailability: 'available',
       createdAt: timestamp,
       summary: cleanText.slice(0, 100),
+      clientTurnId,
     };
 
     snapshot.metadata.inputRefs.push(inputRef);
@@ -2252,8 +2448,10 @@ export class ProjectStateEngine {
   /**
    * Reads raw content or extracted text of an input material.
    */
-  async readInputContent(projectPath: string, inputIdOrRef: string): Promise<string> {
-    const id = inputIdOrRef.startsWith('input:') ? inputIdOrRef.slice(6) : inputIdOrRef;
+  async readInputContent(projectPath: string, inputIdOrRef: string | { id?: string }): Promise<string> {
+    const raw = typeof inputIdOrRef === 'string' ? inputIdOrRef : inputIdOrRef?.id || '';
+    const id = raw.startsWith('input:') ? raw.slice(6) : raw;
+    if (!id) return '';
     const inputDir = join(projectPath, 'inputs', id);
     const extractionPath = join(inputDir, 'extraction.json');
     if (await this.storage.exists(extractionPath)) {
@@ -2269,6 +2467,25 @@ export class ProjectStateEngine {
   }
 
   private normalizeDecisionKey(value: string): string {
-    return value.toLowerCase().trim().replace(/[^a-z0-9_:-]+/g, '_');
+    return ProjectStateMigration.normalizeDecisionKey(value);
+  }
+
+  private hasCycle(start: string, graph: Map<string, string[]>): boolean {
+    const visit = (current: string, path: Set<string>): boolean => {
+      if (path.has(current)) return current === start;
+      const nextPath = new Set(path).add(current);
+      return (graph.get(current) || []).some((next) => graph.has(next) && visit(next, nextPath));
+    };
+    return visit(start, new Set());
+  }
+
+  /**
+   * @deprecated Historical rollback writes are retired. History remains readable.
+   * Reject before any project read or crash recovery so callers cannot promote old snapshots.
+   */
+  async rollbackToRevision(_projectPath: string, _targetRevision: number): Promise<ProjectSnapshot> {
+    throw Object.assign(new Error('旧历史回滚写入已停用；历史记录仍可读取。'), {
+      code: ErrorCode.LEGACY_WORKFLOW_RETIRED,
+    });
   }
 }

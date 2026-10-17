@@ -31,8 +31,11 @@ describe('ProjectStateEngine Core Tests', () => {
     expect(snapshot.metadata.name).toBe('Local Clipboard App');
     expect(snapshot.metadata.stateRevision).toBe(1);
     expect(snapshot.decisions.items.length).toBe(1);
-    expect(snapshot.decisions.items[0]?.status).toBe('confirmed');
-    expect(snapshot.decisions.items[0]?.confirmedBy).toBe('user');
+    expect(snapshot.decisions.items[0]?.status).toBe('candidate');
+    expect(snapshot.decisions.items[0]?.origin).toBe('user');
+    expect(snapshot.decisions.items[0]?.confirmedBy).toBeUndefined();
+    expect(snapshot.planning?.inputs[0]?.raw).toBe('A pure offline clipboard manager for Windows');
+    expect(snapshot.decisions.items.some((decision) => ['confirmed', 'locked'].includes(decision.status))).toBe(false);
     expect(snapshot.overview.sections.length).toBeGreaterThan(5);
 
     // Verify files on disk
@@ -106,11 +109,15 @@ describe('ProjectStateEngine Core Tests', () => {
       projectPath: testProjectDir,
     });
 
-    const decId = snapshot.decisions.items[0]!.id;
+    const initial = snapshot.decisions.items.find((decision) => decision.statement === 'Initial idea statement');
+    expect(initial?.status).toBe('candidate');
+    const decId = initial!.id;
+    const confirmedSnap = await engine.confirmDecision(testProjectDir, `decision:${decId}`, snapshot.metadata.stateRevision);
+    expect(confirmedSnap.decisions.items.find((decision) => decision.id === decId)?.confirmedBy).toBe('user');
 
     // Lock confirmed decision
-    const lockedSnap = await engine.lockDecision(testProjectDir, `decision:${decId}`, 1);
-    expect(lockedSnap.metadata.stateRevision).toBe(2);
+    const lockedSnap = await engine.lockDecision(testProjectDir, `decision:${decId}`, confirmedSnap.metadata.stateRevision);
+    expect(lockedSnap.metadata.stateRevision).toBe(3);
     expect(lockedSnap.decisions.items[0]?.status).toBe('locked');
 
     // AI discovery cannot overwrite locked decision
@@ -125,14 +132,14 @@ describe('ProjectStateEngine Core Tests', () => {
       gaps: [],
       questions: [],
     };
-    const snapAfterAi = await engine.applyDiscoveryTurn(testProjectDir, mockDiscovery, 2);
+    const snapAfterAi = await engine.applyDiscoveryTurn(testProjectDir, mockDiscovery, lockedSnap.metadata.stateRevision);
     const stillLocked = snapAfterAi.decisions.items.find((d) => d.id === decId);
     expect(stillLocked?.status).toBe('locked');
     expect(stillLocked?.statement).toBe('Initial idea statement');
 
     // Unlock decision
-    const unlockedSnap = await engine.unlockDecision(testProjectDir, `decision:${decId}`, 3);
-    expect(unlockedSnap.metadata.stateRevision).toBe(4);
+    const unlockedSnap = await engine.unlockDecision(testProjectDir, `decision:${decId}`, snapAfterAi.metadata.stateRevision);
+    expect(unlockedSnap.metadata.stateRevision).toBe(5);
     expect(unlockedSnap.decisions.items[0]?.status).toBe('confirmed');
   });
 
@@ -167,5 +174,25 @@ describe('ProjectStateEngine Core Tests', () => {
     expect(dismissed.metadata.stateRevision).toBe(3);
     expect(dismissed.questions.items.filter((item) => item.status === 'dismissed')).toHaveLength(2);
     expect(dismissed.decisions.items).toHaveLength(beforeDecisions);
+  });
+
+  it('deprecates a decision and cleans up dependent references', async () => {
+    const { snapshot: initial } = await engine.createProject({
+      name: 'Deprecate Test',
+      idea: 'Initial statement for deprecation',
+      projectPath: testProjectDir,
+    });
+    expect(initial.metadata.stateRevision).toBe(1);
+
+    const { deprecatedRef, snapshot } = await engine.deprecateDecision(
+      testProjectDir,
+      'decision:dec-01',
+      1
+    );
+
+    expect(deprecatedRef).toBe('decision:dec-01');
+    expect(snapshot.metadata.stateRevision).toBe(2);
+    const item = snapshot.decisions.items.find((d) => d.id === 'dec-01');
+    expect(item?.status).toBe('deprecated');
   });
 });

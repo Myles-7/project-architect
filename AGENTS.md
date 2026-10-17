@@ -15,7 +15,9 @@
    - 统一输出契约：`experiments/agent-benchmark/schemas/b3-discovery.schema.json`
    - 自适应问题集规范：`docs/blueprint/12_B3_ADAPTIVE_DISCOVERY.md`（与旧文档冲突时以此为准）
 3. **权威 Provider 证据**：
-   - `experiments/agent-benchmark/src/antigravity-provider.mjs`
+   - 正式适配器：`packages/agent/src/provider/AntigravityCliProvider.ts`
+   - 真实能力与失败控制：`docs/validation/AGY_CAPABILITIES_2026-10-04.md`
+   - `experiments/agent-benchmark/src/antigravity-provider.mjs` 保留为历史实验依据。
 
 ---
 
@@ -23,15 +25,15 @@
 
 1. **保持 B3 契约完整**：
    - B3 是唯一生产运行时；B2.1 资产只作为历史实验记录，不得重新接入运行时回退。
-   - 问题数量必须由 Core 的本地阶段预算决定，同批问题必须使用唯一 `decision_key` 且互不依赖。
-   - 严禁引入 Multi-Agent、角色轮流讨论或自监督流水线。
-2. **严格单次调用与结构化输出**：
-   - 一个用户操作对应的 `discovery-turn` 最多触发一次主要 Provider 调用。
-   - 严禁通过连续发起“分析”、“找 Gap”、“提问”等多次隐蔽调用欺骗上层。
-   - 状态变更必须 100% 来自 `structured_output`，严禁从自然语言文本中爬取推断。
+   - Core 强制每批最多三题；同批问题必须使用唯一 `decisionKey` 且互不依赖（历史读取兼容 `decision_key`）。
+   - 允许由 PlanningRuntime 登记和调度多个 agy 任务、独立评审与自动修订；工作者不得自行启动未登记的子 Agent。
+2. **可追踪的多任务与结构化输出**：
+   - 一个用户操作可触发多个登记的 Provider 调用；每次调用、工具动作、重试、评审与修订必须有运行记录。
+   - 不设置费用、Token、总调用数或总修订轮数门禁；并发默认四个。依据失效、取消、环境错误或连续三次无进展时暂停。
+   - AI 状态建议必须来自经校验的终态 `structured_output`，严禁从自然语言输出爬取推断。用户结构化意图与审批由 Core 执行正式状态操作。
 3. **用户授权第一与状态保护**：
    - AI 结果永远只能作为建议（Candidate/Gap/Risk/Tension/Assumption）。
-   - 只有用户陈述、明确回答或手动编辑才能成为 `Confirmed` 或 `Locked`。AI 严禁越权直接写入。
+   - 只有明确结构化答案、手动编辑或用户批准变更包才能成为 `Confirmed` 或 `Locked`。自由文本保存原文，AI 归纳待批准。AI 严禁越权直接写入。
    - Project State（`packages/core`）是唯一的规范事实，Frontend 仅为投影与意图提交者。
 4. **自用优先，拒绝过度工程化**：
    - **禁止引入数据库**（如 SQLite、PostgreSQL、Prisma、TypeORM 等），全系统采用本地文件目录 + 两阶段 State Commit。
@@ -43,25 +45,23 @@
 
 ---
 
-## 3. 开发阶段与推荐阅读路径
+## 3. 重构阶段与推荐阅读路径
 
-开发严格遵循以下里程碑推进（参见 `docs/blueprint/08_DEVELOPMENT_PLAN.md`）：
+2026-10-04 用户批准的重构规范为 `docs/blueprint/13_PLANNING_WORKBENCH.md`；与旧蓝图、单次调用测试或旧准备度规则冲突时以该规范为准。重构按 M0–M8 推进，保留既存未提交改动。项目自身约束不得传播成用户项目的默认约束。
+
+当前开发按以下顺序推进；`docs/blueprint/08_DEVELOPMENT_PLAN.md` 的旧四里程碑保留为历史背景：
 
 ```text
-Milestone 1: Core Engine (packages/core, packages/contracts, file I/O, commit/recovery)
-     ↓
-Milestone 2: AI Integration (packages/agent, context manager, provider adapter)
-     ↓
-Milestone 3: Workspace UI (apps/web, apps/server, API client, UI interaction)
-     ↓
-Milestone 4: Document Generation (document compiler, AGENTS.md & 8 core markdown docs)
+M0 基线与规范 → M1 直接缺陷 → M2 状态与审批 → M3 agy 能力
+    → M4 任务调度 → M5 三阶段设计 → M6 正式双栏 UI
+    → M7 开发包 → M8 迁移、自动检查、真实能力与用户审阅
 ```
 
 **阅读顺序**：
-1. `docs/blueprint/01_PRODUCT_BOUNDARY.md`（产品边界）
-2. `docs/blueprint/02_SYSTEM_ARCHITECTURE.md`（系统总体架构）
-3. `docs/blueprint/03_AGENT_RUNTIME.md`（Agent 运行机制）
-4. `docs/blueprint/04_PROJECT_STATE_MODEL.md`（状态数据模型）
-5. `docs/blueprint/implementation/16_SHARED_CONTRACTS.md`（共享类型契约）
-6. `docs/blueprint/implementation/12_API_CONTRACT.md`（API 规范）
-7. `docs/blueprint/implementation/14_TEST_STRATEGY.md`（测试策略）
+1. `docs/blueprint/13_PLANNING_WORKBENCH.md`（已批准目标、边界与实施顺序）
+2. `docs/blueprint/12_B3_ADAPTIVE_DISCOVERY.md`（活动任务、提问与审批规范）
+3. `packages/contracts/src/planning.ts`、`planning-schema.ts`（正式类型与输出 Schema）
+4. `docs/api/PLANNING_API.md`（正式规划接口、错误与恢复行为）
+5. `docs/blueprint/implementation/14_TEST_STRATEGY.md`（测试策略）
+6. `docs/REFACTOR_PROGRESS.md`、`docs/validation/REFACTOR_ACCEPTANCE_2026-10-04.md`（实施与验收边界）
+7. 按需读取 `01_PRODUCT_BOUNDARY.md`、`02_SYSTEM_ARCHITECTURE.md`、`03_AGENT_RUNTIME.md`、`04_PROJECT_STATE_MODEL.md` 的兼容背景，冲突以新规范为准。

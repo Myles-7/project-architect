@@ -10,6 +10,14 @@ export type DiscoveryTurnStatus =
   | 'failed'
   | 'stale';
 
+export type DiscoveryIntensity = 'lite' | 'standard' | 'deep';
+
+export type DiscoveryExecutionPhase =
+  | 'context_assembly'
+  | 'provider_inference'
+  | 'gap_detection'
+  | 'state_commit';
+
 export type AgentRunDiagnostics = Record<string, unknown>;
 
 export interface DiscoveryTurnRecord {

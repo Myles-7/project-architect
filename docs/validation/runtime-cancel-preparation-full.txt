@@ -1,0 +1,71 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ✓ apps/server/tests/planning-partition.test.ts (24 tests) 20811ms
+   ✓ Registered recovery from actual Provider output limits > splits the failed authoring task, assembles all validated fragments and preserves draft authority  932ms
+   ✓ Registered recovery from actual Provider output limits > restarts only the failed slice and keeps successful results, receipts and the original failed schema unchanged  985ms
+   ✓ Registered recovery from actual Provider output limits > prevents assembly delivery after cancel while child work is running  614ms
+   ✓ Registered recovery from actual Provider output limits > prevents assembly delivery after basis-change while child work is running  858ms
+   ✓ Registered recovery from actual Provider output limits > offers four valid slice questions in two batches and continues after all answers without discarding any  1616ms
+   ✓ Registered recovery from actual Provider output limits > restores assembly provenance from the receipt after an interrupted run metadata write  856ms
+   ✓ Registered recovery from actual Provider output limits > retains the unfinished registered scope through user answers and rejects an otherwise covered proposal that omits it  1280ms
+   ✓ Registered recovery from actual Provider output limits > preserves the pending modify of a formal block through an unanswered slice and carries its legal candidate intent into answer continuation  1429ms
+   ✓ Registered recovery from actual Provider output limits > preserves the pending delete of a formal block through an unanswered slice and carries its legal candidate intent into answer continuation  1290ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds an assembly from source receipts after result writing and before receipt writing (complete orphan)  832ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds an assembly from source receipts after result writing and before receipt writing (truncated orphan)  830ms
+   ✓ Registered recovery from actual Provider output limits > blocks final delivery when a later complete revision drops registered modifications and removals of formal blocks  952ms
+   ✓ Registered recovery from actual Provider output limits > still rejects a Provider result whose receipt is missing instead of treating it as a recoverable assembly  711ms
+   ✓ Registered recovery from actual Provider output limits > shows a deferred fourth question with a valid reopen reason even when its topic has an earlier answer  1626ms
+   ✓ Registered recovery from actual Provider output limits > requires an explicit candidate action for a registered formal-block modify in initial design splitting without a base candidate  1035ms
+   ✓ Registered recovery from actual Provider output limits > requires an explicit candidate action for a registered formal-block delete in initial design splitting without a base candidate  1025ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (none interruption)  1282ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (after-reference interruption)  1389ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (after-cleanup interruption)  1267ms
+ ✓ apps/server/tests/planning-runtime.test.ts (44 tests) 24548ms
+   ✓ Planning runtime lifecycle and authority > rejects 'feedback' feedback before changing state and preserves the prerequisite error on retry  360ms
+   ✓ Planning runtime lifecycle and authority > rejects 'technical' feedback before changing state and preserves the prerequisite error on retry  312ms
+   ✓ Planning runtime lifecycle and authority > rejects 'delivery' feedback before changing state and preserves the prerequisite error on retry  483ms
+   ✓ Planning runtime lifecycle and authority > rejects 'product' feedback before changing state and preserves the prerequisite error on retry  313ms
+   ✓ Planning runtime lifecycle and authority > sends complete explicitly selected tradeoffs in provider context after saving and restarting  629ms
+   ✓ Planning runtime lifecycle and authority > sends custom raw answers and all options after restart without inventing a selection  725ms
+   ✓ Planning runtime lifecycle and authority > sends delegate raw answers and all options after restart without inventing a selection  891ms
+   ✓ Planning runtime lifecycle and authority > sends defer raw answers and all options after restart without inventing a selection  663ms
+   ✓ Planning runtime lifecycle and authority > keeps a historical label-matching answer unknown and retains the original options and formal decision as reference  766ms
+   ✓ Planning runtime lifecycle and authority > pauses for valid questions before follow-ups and reevaluates them after answers  739ms
+   ✓ Planning runtime lifecycle and authority > deduplicates asynchronous follow-ups before scheduling and reuses the completed task  473ms
+   ✓ Planning runtime lifecycle and authority > keeps sibling follow-up work registered and cancellable after another task fails  335ms
+   ✓ Planning runtime lifecycle and authority > does not invoke a sibling Provider after cancellation during attempt preparation  317ms
+   ✓ Planning runtime lifecycle and authority > finishes ready clarification and passes deferred work to design without running it early  626ms
+   ✓ Planning runtime lifecycle and authority > repairs an incomplete clarification instead of declaring an unusable completion  478ms
+   ✓ Planning runtime lifecycle and authority > does not present old clarification constraints after a structured choice changes decisions  435ms
+   ✓ Planning runtime lifecycle and authority > reexecutes the same follow-up when a user answer changes its basis  815ms
+   ✓ Planning runtime lifecycle and authority > freezes model and official-source preferences through answers and server restart  597ms
+   ✓ Planning runtime lifecycle and authority > retries transient service failures twice and records every invocation  327ms
+   ✓ Planning runtime lifecycle and authority > pauses after three unchanged drafts even if question IDs and timestamps change  381ms
+   ✓ Planning runtime lifecycle and authority > runs independent review and repairs a blocking finding before offering a package  728ms
+   ✓ Planning runtime lifecycle and authority > keeps the latest corrected draft explicit when a new decision resumes revision  1150ms
+   ✓ Planning runtime lifecycle and authority > resumes only the failed parallel task and preserves the completed design  758ms
+   ✓ Planning runtime lifecycle and authority > repairs immutable evidence conflicts before publishing a proposal  699ms
+   ✓ Planning runtime lifecycle and authority > rejects changed persisted intermediate output before launching another call  397ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s selection answer and preserves completed calls  681ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s custom answer and preserves completed calls  622ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s delegate answer and preserves completed calls  664ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s defer answer and preserves completed calls  617ms
+   ✓ Planning runtime lifecycle and authority > rejects an unrelated change when attempting answer continuation  596ms
+   ✓ Planning runtime lifecycle and authority > keeps partial selection answers resumable after an early continue attempt  700ms
+   ✓ Planning runtime lifecycle and authority > keeps partial custom answers resumable after an early continue attempt  724ms
+   ✓ Planning runtime lifecycle and authority > keeps partial delegate answers resumable after an early continue attempt  711ms
+   ✓ Planning runtime lifecycle and authority > keeps partial defer answers resumable after an early continue attempt  678ms
+   ✓ Planning runtime lifecycle and authority > cannot cancel a different project and waits for the old executor before resume  518ms
+   ✓ Planning runtime lifecycle and authority > does not accept a ready clarification after the basis changed  695ms
+   ✓ Planning runtime lifecycle and authority > rejects product feedback that changes a ready clarification basis without saving it  319ms
+   ✓ Planning runtime lifecycle and authority > records accepted product redesign feedback once and registers the resulting input basis  755ms
+   ✓ Planning runtime lifecycle and authority > can redesign a previously approved product without making stale content formal again  775ms
+   ✓ Planning runtime lifecycle and authority > recovers a completed result and event sequence from the interrupted journal  487ms
+   ✓ Planning runtime lifecycle and authority > survives a runtime disk fault without a poisoned write tail or registration leak  349ms
+
+ Test Files  2 passed (2)
+      Tests  68 passed (68)
+   Start at  04:42:45
+   Duration  25.90s (transform 560ms, setup 0ms, collect 2.08s, tests 45.36s, environment 0ms, prepare 180ms)
+

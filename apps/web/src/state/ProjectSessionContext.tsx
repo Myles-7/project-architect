@@ -36,17 +36,24 @@ export interface ProjectSessionContextValue {
     name: string,
     idea?: string,
     projectTags?: string[],
-    initialIntent?: InitialProjectIntent
+    initialIntent?: InitialProjectIntent,
+    presetId?: string,
+    materialOnly?: boolean
   ) => Promise<{ projectId: string; snapshot: ProjectSnapshot }>;
   openProject: (projectId: string) => Promise<ProjectSnapshot>;
   refreshSnapshot: () => Promise<ProjectSnapshot | null>;
-  runInitialDiscovery: (projectId?: string) => Promise<void>;
+  runInitialDiscovery: (projectId?: string, expectedRevision?: number) => Promise<void>;
   setLatestDiscovery: (
     discoveryResult: DiscoveryResult,
     diagnostics?: { durationMs?: number; totalTokens?: number | 'unavailable' },
     timestamp?: string
   ) => void;
-  scheduleDiscoveryJob: (expectedRevision?: number, userMessage?: string, turnId?: string) => Promise<DiscoveryJobView>;
+  scheduleDiscoveryJob: (
+    expectedRevision?: number,
+    userMessage?: string,
+    turnId?: string,
+    intensity?: import('@project-architect/contracts').DiscoveryIntensity
+  ) => Promise<DiscoveryJobView>;
   cancelDiscoveryJob: () => Promise<DiscoveryJobView | null>;
   fetchDiscoveryJob: () => Promise<DiscoveryJobView | null>;
   answerQuestionAsAssumption: (
@@ -54,6 +61,12 @@ export interface ProjectSessionContextValue {
     assumptionStatement: string,
     rationale?: string
   ) => Promise<number>;
+  deprecateDecision: (
+    decisionRef: import('@project-architect/contracts').DecisionRef
+  ) => Promise<ProjectSnapshot>;
+  retractQuestion: (
+    questionRef: import('@project-architect/contracts').QuestionRef
+  ) => Promise<ProjectSnapshot>;
   clearSession: () => void;
   // Navigation & Linking
   setHighlightTarget: (target: HighlightTarget | null) => void;
@@ -66,7 +79,132 @@ export interface ProjectSessionContextValue {
   resetSession: () => void;
 }
 
-const ProjectSessionContext = createContext<ProjectSessionContextValue | undefined>(undefined);
+export const ProjectSessionContext = createContext<ProjectSessionContextValue | undefined>(undefined);
+
+export function useOptionalProjectSession(): ProjectSessionContextValue | undefined {
+  return useContext(ProjectSessionContext);
+}
+
+const isMockMode =
+  typeof import.meta !== 'undefined' &&
+  (import.meta.env?.VITE_MOCK_MODE === 'true' || import.meta.env?.VITE_MOCK_MODE === true);
+
+const createOfflineDemoSnapshot = (): ProjectSnapshot => {
+  const now = new Date().toISOString();
+  return {
+    metadata: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      name: 'Offline Architecture Demo',
+      stage: 'deep-dive',
+      stateRevision: 1,
+      createdAt: now,
+      updatedAt: now,
+      inputRefs: [],
+      projectTags: ['Desktop', 'Local-First'],
+    },
+    overview: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      sections: [
+        {
+          id: 'project_overview',
+          title: 'Project Overview',
+          kind: 'fixed',
+          maturity: 'mostly-clear',
+          itemRefs: ['decision:dec-01'],
+        },
+        {
+          id: 'technical_boundary',
+          title: 'Technical Boundary',
+          kind: 'fixed',
+          maturity: 'mostly-clear',
+          itemRefs: ['decision:dec-02'],
+        },
+      ],
+      updatedAt: now,
+    },
+    decisions: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      items: [
+        {
+          id: 'dec-01',
+          area: 'project_overview',
+          statement: 'Local-first architecture design platform for AI coding agents',
+          status: 'confirmed',
+          origin: 'user',
+          evidenceRefs: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: 'dec-02',
+          area: 'technical_boundary',
+          statement: 'Strictly zero centralized database, local directory two-stage commit',
+          status: 'locked',
+          origin: 'user',
+          evidenceRefs: [],
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+      traces: [],
+      updatedAt: now,
+    },
+    assumptions: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      items: [],
+      updatedAt: now,
+    },
+    gaps: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      gaps: [],
+      conflicts: [],
+      tensions: [],
+      updatedAt: now,
+    },
+    risks: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      items: [],
+      updatedAt: now,
+    },
+    questions: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      items: [],
+      updatedAt: now,
+    },
+    readiness: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      current: {
+        id: 'rdn-demo',
+        status: 'ready',
+        reviewedAt: now,
+        basisRevision: 1,
+        requiredAreas: ['project_overview', 'target_user', 'technical_boundary'],
+        warnings: [],
+        issues: [],
+        assumptionRefs: [],
+        knownIssueAcknowledgements: [],
+        criticalConflictAcknowledgements: [],
+        userDisposition: 'approved',
+      },
+      history: [],
+      updatedAt: now,
+    },
+    documents: {
+      schemaVersion: 1,
+      projectId: 'offline-demo',
+      items: [],
+      updatedAt: now,
+    },
+  };
+};
 
 export function ProjectSessionProvider({
   children,
@@ -78,17 +216,41 @@ export function ProjectSessionProvider({
   const [state, dispatch] = useReducer(projectSessionReducer, initialProjectSessionState);
   const activeRequestAbortController = useRef<AbortController | null>(null);
 
+  // Auto-initialize offline demo snapshot when VITE_MOCK_MODE is enabled
+  useEffect(() => {
+    if (isMockMode && !state.activeProjectId) {
+      const mockSnapshot = createOfflineDemoSnapshot();
+      dispatch({
+        type: 'SET_ACTIVE_PROJECT',
+        payload: { projectId: 'offline-demo', snapshot: mockSnapshot },
+      });
+    }
+  }, [state.activeProjectId]);
+
   // Sync theme with HTML document root class
   useEffect(() => {
     const root = document.documentElement;
-    const isDark =
-      state.uiState.theme === 'dark' ||
-      (state.uiState.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const applyTheme = () => {
+      const isDark =
+        state.uiState.theme === 'dark' ||
+        (state.uiState.theme === 'system' &&
+          typeof window !== 'undefined' &&
+          window.matchMedia?.('(prefers-color-scheme: dark)').matches);
 
-    if (isDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+      if (isDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    };
+
+    applyTheme();
+
+    if (state.uiState.theme === 'system' && typeof window !== 'undefined' && window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => applyTheme();
+      mediaQuery.addEventListener?.('change', listener);
+      return () => mediaQuery.removeEventListener?.('change', listener);
     }
   }, [state.uiState.theme]);
 
@@ -160,7 +322,9 @@ export function ProjectSessionProvider({
       name: string,
       idea?: string,
       projectTags?: string[],
-      initialIntent?: InitialProjectIntent
+      initialIntent?: InitialProjectIntent,
+      presetId?: string,
+      materialOnly?: boolean
     ): Promise<{ projectId: string; snapshot: ProjectSnapshot }> => {
       cancelActiveRequest();
       const controller = new AbortController();
@@ -168,7 +332,7 @@ export function ProjectSessionProvider({
 
       dispatch({ type: 'SET_REQUEST_STATE', payload: { status: 'loading', error: null, lastAction: 'create_project' } });
       try {
-        const res = await apiClient.createProject({ name, idea, initialIntent, projectTags }, controller.signal);
+        const res = await apiClient.createProject({ name, idea, initialIntent, projectTags, presetId, materialOnly }, controller.signal);
         dispatch({
           type: 'SET_ACTIVE_PROJECT',
           payload: { projectId: res.projectId, snapshot: res.snapshot },
@@ -205,8 +369,46 @@ export function ProjectSessionProvider({
     }
   }, [apiClient, state.activeProjectId]);
 
+  // BroadcastChannel for cross-tab realtime state synchronization
+  useEffect(() => {
+    let bc: BroadcastChannel | null = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        bc = new BroadcastChannel('pa_project_sync');
+        bc.onmessage = (event) => {
+          const { type, projectId, snapshot } = event.data || {};
+          if (type === 'SYNC_SNAPSHOT' && projectId === state.activeProjectId && snapshot) {
+            dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot } });
+          }
+        };
+      }
+    } catch {}
+    return () => {
+      bc?.close();
+    };
+  }, [state.activeProjectId]);
+
+  const broadcastSnapshot = useCallback((snapshot: ProjectSnapshot) => {
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const bc = new BroadcastChannel('pa_project_sync');
+        bc.postMessage({
+          type: 'SYNC_SNAPSHOT',
+          projectId: snapshot.metadata.projectId,
+          snapshot,
+        });
+        bc.close();
+      }
+    } catch {}
+  }, []);
+
   const scheduleDiscoveryJob = useCallback(
-    async (expectedRevision?: number, userMessage?: string, turnId?: string): Promise<DiscoveryJobView> => {
+    async (
+      expectedRevision?: number,
+      userMessage?: string,
+      turnId?: string,
+      intensity?: import('@project-architect/contracts').DiscoveryIntensity
+    ): Promise<DiscoveryJobView> => {
       if (!state.activeProjectId) throw new Error('No active project');
       const rev = expectedRevision ?? state.stateRevision ?? 1;
       const res = await apiClient.scheduleDiscoveryJob(state.activeProjectId, {
@@ -214,6 +416,8 @@ export function ProjectSessionProvider({
         expectedRevision: rev,
         userMessage,
         turnId,
+        intensity,
+        allowRebase: true,
       });
       dispatch({ type: 'SET_DISCOVERY_JOB', payload: res.job });
       return res.job;
@@ -237,9 +441,46 @@ export function ProjectSessionProvider({
         expectedRevision: rev,
       });
       dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot: res.snapshot } });
+      broadcastSnapshot(res.snapshot);
       return res.snapshot.metadata.stateRevision;
     },
-    [apiClient, state.activeProjectId, state.stateRevision]
+    [apiClient, state.activeProjectId, state.stateRevision, broadcastSnapshot]
+  );
+
+  const deprecateDecision = useCallback(
+    async (
+      decisionRef: import('@project-architect/contracts').DecisionRef
+    ): Promise<ProjectSnapshot> => {
+      if (!state.activeProjectId) throw new Error('No active project');
+      const rev = state.stateRevision ?? 1;
+      const res = await apiClient.deprecateDecision(state.activeProjectId, {
+        projectId: state.activeProjectId,
+        decisionRef,
+        expectedRevision: rev,
+      });
+      dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot: res.snapshot } });
+      broadcastSnapshot(res.snapshot);
+      return res.snapshot;
+    },
+    [apiClient, state.activeProjectId, state.stateRevision, broadcastSnapshot]
+  );
+
+  const retractQuestion = useCallback(
+    async (
+      questionRef: import('@project-architect/contracts').QuestionRef
+    ): Promise<ProjectSnapshot> => {
+      if (!state.activeProjectId) throw new Error('No active project');
+      const rev = state.stateRevision ?? 1;
+      const res = await apiClient.retractQuestion(state.activeProjectId, {
+        projectId: state.activeProjectId,
+        questionRef,
+        expectedRevision: rev,
+      });
+      dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot: res.snapshot } });
+      broadcastSnapshot(res.snapshot);
+      return res.snapshot;
+    },
+    [apiClient, state.activeProjectId, state.stateRevision, broadcastSnapshot]
   );
 
   const cancelDiscoveryJob = useCallback(async (): Promise<DiscoveryJobView | null> => {
@@ -339,11 +580,20 @@ export function ProjectSessionProvider({
   );
 
   const runInitialDiscovery = useCallback(
-    async (projectIdOverride?: string): Promise<void> => {
+    async (projectIdOverride?: string, expectedRevisionOverride?: number): Promise<void> => {
       const targetId = projectIdOverride || state.activeProjectId;
       if (!targetId) return;
 
-      const currentRev = state.stateRevision || 1;
+      let currentRev = expectedRevisionOverride ?? state.stateRevision ?? 1;
+      if (expectedRevisionOverride === undefined) {
+        try {
+          const snapshot = await apiClient.getProjectSnapshot(targetId);
+          if (snapshot && typeof snapshot.metadata?.stateRevision === 'number') {
+            currentRev = snapshot.metadata.stateRevision;
+          }
+        } catch {}
+      }
+
       dispatch({
         type: 'SET_REQUEST_STATE',
         payload: { status: 'loading', error: null, lastAction: 'initial_discovery' },
@@ -410,6 +660,8 @@ export function ProjectSessionProvider({
         cancelDiscoveryJob,
         fetchDiscoveryJob,
         answerQuestionAsAssumption,
+        deprecateDecision,
+        retractQuestion,
         setHighlightTarget,
         jumpToFix,
         clearSession,

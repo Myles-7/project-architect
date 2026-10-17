@@ -7,10 +7,10 @@ import type { DiscoveryResult } from '@project-architect/contracts';
 describe('B3 Multi-Stage Contract & Quality Gate Tests (Phase 7)', () => {
   const batchPolicy = new QuestionBatchPolicy();
 
-  it('1. Enforces stage question budgets: initial (12), explore (8), converge (4), readiness (2)', () => {
-    expect(batchPolicy.getBudgetForStage('initial')).toEqual({ targetMin: 8, maxQuestions: 12 });
-    expect(batchPolicy.getBudgetForStage('explore')).toEqual({ targetMin: 5, maxQuestions: 8 });
-    expect(batchPolicy.getBudgetForStage('converge')).toEqual({ targetMin: 2, maxQuestions: 4 });
+  it('1. Enforces stage question budgets: initial (3), explore (3), converge (3), readiness (2)', () => {
+    expect(batchPolicy.getBudgetForStage('initial')).toEqual({ targetMin: 1, maxQuestions: 3 });
+    expect(batchPolicy.getBudgetForStage('explore')).toEqual({ targetMin: 1, maxQuestions: 3 });
+    expect(batchPolicy.getBudgetForStage('converge')).toEqual({ targetMin: 1, maxQuestions: 3 });
     expect(batchPolicy.getBudgetForStage('readiness')).toEqual({ targetMin: 0, maxQuestions: 2 });
   });
 

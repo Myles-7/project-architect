@@ -1,0 +1,294 @@
+{
+  "at": "2026-10-04T12:18:10.286Z",
+  "node": "v24.19.0",
+  "executable": "C:\\Users\\Li Cheng Xin\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "checks": {
+    "node24": true,
+    "initialized": true,
+    "toolsCount": 7,
+    "environmentPrepareTool": true,
+    "indexRegisteredIds": [
+      "text-01",
+      "image-01"
+    ],
+    "readConcatenatesToOriginal": true,
+    "firstReadHasNextOffset": true,
+    "lastReadComplete": true,
+    "imageBytesHashMatches": true,
+    "unknownIdIsError": true
+  },
+  "stderr": "",
+  "results": [
+    {
+      "result": {
+        "protocolVersion": "2025-11-25",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        },
+        "serverInfo": {
+          "name": "project-architect",
+          "version": "1.0.0"
+        }
+      },
+      "jsonrpc": "2.0",
+      "id": 1
+    },
+    {
+      "result": {
+        "tools": [
+          {
+            "name": "material_index",
+            "description": "List registered materials with provenance and hashes.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {}
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          },
+          {
+            "name": "material_read",
+            "description": "Read a range from a registered text/extracted material; nextOffset identifies unread content.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "length": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 262144
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          },
+          {
+            "name": "material_image",
+            "description": "Read actual bytes of a registered image, with provenance. Use image content to inspect it.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true
+            }
+          },
+          {
+            "name": "research_read",
+            "description": "Fetch an HTTPS page from an explicitly allowed official documentation host. Redirects are confined to those hosts; returns source, date, hash and official links.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "url"
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "openWorldHint": true
+            }
+          },
+          {
+            "name": "evidence_record",
+            "description": "Record candidate evidence with source, date, hash and scope; cannot confirm project facts.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "content": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "conclusion": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "source",
+                "content",
+                "scope"
+              ]
+            }
+          },
+          {
+            "name": "environment_prepare",
+            "description": "Prepare a fixed isolated Docker Node/Python/Chromium image and exact dependency versions. Only generated dependency-manager commands run online; experiment source runs offline.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {
+                "runtime": {
+                  "type": "string",
+                  "enum": [
+                    "node",
+                    "python",
+                    "chromium"
+                  ]
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "version"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "runtime"
+              ]
+            }
+          },
+          {
+            "name": "experiment_run",
+            "description": "Run submitted Node/Python/Chromium source in an existing approved Docker image, using only an isolated source mount and network none. Missing environment is unavailable, never pass.",
+            "inputSchema": {
+              "type": "object",
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "properties": {
+                "runtime": {
+                  "type": "string",
+                  "enum": [
+                    "node",
+                    "python",
+                    "chromium"
+                  ]
+                },
+                "source": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "timeoutMs": {
+                  "type": "integer",
+                  "minimum": 1000,
+                  "maximum": 600000
+                }
+              },
+              "required": [
+                "runtime",
+                "source"
+              ]
+            }
+          }
+        ]
+      },
+      "jsonrpc": "2.0",
+      "id": 2
+    },
+    {
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "[{\"id\":\"text-01\",\"path\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\input.txt\",\"mimeType\":\"text/plain\",\"source\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\input.txt\",\"sha256\":\"78cf3227444869c2c3189946e54045c4f1de68db7719d40ffbc67a5f995a42ab\",\"bytes\":71,\"readTool\":\"material_read\"},{\"id\":\"image-01\",\"path\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\fixture.png\",\"mimeType\":\"image/png\",\"source\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\fixture.png\",\"sha256\":\"0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0\",\"bytes\":5437,\"readTool\":\"material_image\"}]"
+          }
+        ]
+      },
+      "jsonrpc": "2.0",
+      "id": 3
+    },
+    {
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"id\":\"text-01\",\"content\":\"Node24-SDK-material-\",\"offset\":0,\"nextOffset\":20,\"totalCharacters\":71,\"sha256\":\"78cf3227444869c2c3189946e54045c4f1de68db7719d40ffbc67a5f995a42ab\",\"sourceSha256\":\"78cf3227444869c2c3189946e54045c4f1de68db7719d40ffbc67a5f995a42ab\",\"source\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\input.txt\",\"readAt\":\"2026-10-04T12:18:10.277Z\"}"
+          }
+        ]
+      },
+      "jsonrpc": "2.0",
+      "id": 4
+    },
+    {
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"id\":\"text-01\",\"content\":\"read: R9X2-5106\\nSecond line for chunk verification.\",\"offset\":20,\"nextOffset\":null,\"totalCharacters\":71,\"sha256\":\"78cf3227444869c2c3189946e54045c4f1de68db7719d40ffbc67a5f995a42ab\",\"sourceSha256\":\"78cf3227444869c2c3189946e54045c4f1de68db7719d40ffbc67a5f995a42ab\",\"source\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\input.txt\",\"readAt\":\"2026-10-04T12:18:10.280Z\"}"
+          }
+        ]
+      },
+      "jsonrpc": "2.0",
+      "id": 5
+    },
+    {
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"id\":\"image-01\",\"path\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\fixture.png\",\"mimeType\":\"image/png\",\"sha256\":\"0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0\",\"source\":\"D:\\\\桌面\\\\项目构思\\\\docs\\\\validation\\\\agy-2026-10-04\\\\node24-followup\\\\materials\\\\fixture.png\",\"readAt\":\"2026-10-04T12:18:10.282Z\"}"
+          },
+          {
+            "type": "image",
+            "data": "iVBORw0KGgoAAAANSUhEUgAAAoAAAAFoCAYAAADHMkpRAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAABTSSURBVHhe7dtRjtu4tgXQTO19XCBTef81nJ5LptJ3JHVRFZfjOqQkkqYtOmctYP8ktkxRbJwdG/3jHQCAVH7EPwAA4O+mAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAAgAkowACACSjAAIAJKMAvrR/3//5+eP9x4/t/Pzn3/gmACA5BfAF/Xori95xfr6PdsGxzzvOVjn995+fxWuP3jPm1/tb5TM+8vYrvvYeoaj//Od95l2M2Nvj2evbPz/j53LL7r3NfbClf/95//mgfQSYSQF8IbuDrTlv770jcH+Aj2erzO3e58yh+uutvP4lM3tCcT8z76FT37PsPyt/bJfrrWydh1Zd9zbzAd/4toYTnzPAEQXwJRz/1NubnvnXNVg7sjXwi8L0LfO+Mdq7r5792XX7jdBXTikG/YVsdC/2n99RBkpnbY+bMvBZO4r7PuU5A7RRAJd3MLj3hszON1wf2Spg0V5RGs92kSsGaUjruvft72tv6anbKO57z+whNtbRkdb9OHp2TenZn+HyN/BZe2r/rc26NsADKIBL2xncrRP5w86Q7LnMsMpw3PvcwxIxY7BW1tS6vlab9zFj/R0211G7yc2z0vBt2eZ7t/bz3vO9XeJrb9/6h8y9/6DY3N8nP2eAHgrgwuoDa/ubsyOzr9ekVgpq0/nG5kCduOb6XvzJwRKP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",
+            "mimeType": "image/png"
+          }
+        ]
+      },
+      "jsonrpc": "2.0",
+      "id": 6
+    },
+    {
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Error: Unknown material: not-registered"
+          }
+        ],
+        "isError": true
+      },
+      "jsonrpc": "2.0",
+      "id": 7
+    }
+  ]
+}

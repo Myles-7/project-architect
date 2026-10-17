@@ -1,0 +1,891 @@
+{
+  "conversation_id": "eff86b20-ea9b-4719-9d33-0c504b01113e",
+  "status": "SUCCESS",
+  "response": "{\"blockers\":[],\"clarification\":{},\"evidence\":[{\"applicability\":\"IndexedDB 规范明确 key 类型仅支持 string, date, float, binary, array，不支持 boolean 类型，因此 isPinned 与 isFavorite 不能作为直接的 IndexedDB 索引键。\",\"content\":\"A key can be one of the following types: string , date , float, binary data (represented by an ArrayBuffer or a TypedArray view such as a Uint8Array ), and array .\",\"environment\":\"Web APIs - MDN IndexedDB Key Characteristics\",\"hash\":\"433c8b63f66becd8036bec947275803847b458e39319e52c208aed7a9e6c6812\",\"id\":\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\",\"kind\":\"official-source\",\"location\":\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Terminology\",\"obtainedAt\":\"2026-10-04T20:50:42.383Z\",\"outcome\":\"passed\",\"source\":\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Terminology\"}],\"followUp\":[],\"groups\":[{\"blocks\":[{\"content\":\"### 核心技术栈与架构基准（修订 IndexedDB 规范与运行环境边界）\\n\\n1. **运行形态与平台边界**：\\n   - 定位为个人开发者在桌面 PC 或移动端浏览器中通过常驻标签页或书签使用的轻量 Web 单页应用（SPA）。\\n   - 交互快捷键严格限定为**页面获得焦点后的应用级快捷键**（如页面焦点下按 `N` 聚焦快速录入框、按 `/` 聚焦搜索框、按 `Ctrl/Cmd + Enter` 提交、按 `Ctrl/Cmd + S` 保存），彻底移除无法在浏览器单页沙箱内实现的“操作系统级全局唤起/全局快捷键”承诺。\\n\\n2. **视图层与响应式状态基座**：\\n   - 采用 React 19 + TypeScript 5.x 现代前端工程架构，严格启用类型校验。\\n   - 客户端响应式数据流：基于 Dexie.js 的 `useLiveQuery` 结合 React Context 进行轻量分发，本地数据读写后视图毫秒级自动响应。\\n\\n3. **客户端数据库引擎与 W3C 规范对齐（剔除 Boolean 无效索引）**：\\n   - 基于浏览器原生 IndexedDB，采用 Dexie.js 封装库管理对象仓库。\\n   - **Boolean 索引规范修正**：依据 W3C IndexedDB 官方规范（引用 evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2），IndexedDB 有效键类型仅支持 `string, date, float, binary, array`，`boolean` 不是有效键，禁止将 `isPinned` 与 `isFavorite` 声明为索引或使用 `where(...).equals(true)`。\\n   - `notes` 对象仓库索引严格精简为有效键：`id, updatedAt, createdAt, status, trashedAt, *tags`。\\n   - `isPinned` 与 `isFavorite` 作为便签实体普通属性保存，在活跃便签集合读取后由内存管道（`collection.filter()`）进行毫秒级过滤与置顶分拣，在 1,000 条基准规模下完全免除无效索引开销。\\n   - `trashedAt` 保持数值时间戳有效索引，供回收区 7 天到期筛选（`Date.now() - trashedAt \\u003e 7 * 86400 * 1000`）。\\n   - 宿主持久化防护：应用启动在安全上下文检测 `navigator.storage.persisted()` 并尝试调用 `persist()` 申请持久化授权，辅以 `StorageManager.estimate()` 监控配额。\\n\\n4. **部署、运行与离线能力真实边界**：\\n   - 构建命令 `vite build`，配置 `base: './'` 输出纯静态文件包。\\n   - **运行协议边界**：`base: './'` 仅确保静态资源相对路径解析正确，不代表 ESM 模块可在 `file://` 协议下免服务器直接双击运行（现代浏览器对本地文件跨源模块脚本存在严格 CORS 阻断）；应用必须通过本地轻量 HTTP 服务器（如 `localhost:5173` / `npm run preview`）或 HTTPS 静态托管平台运行。\\n   - **离线能力边界**：首版离线保证严格限定为“已在浏览器中打开/加载完成的页面，断网状态下所有本地数据读写、检索、打标与回收流转均可离线运行”；首次获取资源与脱机重新打开的 PWA Service Worker 离线缓存列为后续演进目标，首版不做既有离线启动保证。\\n\\n5. **数据一致性与并发控制基线**：\\n   - 分离数据结构版本 `schemaVersion`（当前为 1）与记录并发修订版本号 `revision`（单记录自增整型），并在持久化写入时支持乐观并发检测。\\n   - 统一导出与导入传输协议契约 `BackupPayload`（包含 `schemaVersion: 1`），全量覆盖导入必须在单一原子事务中完成。\\n\\n6. **性能目标与口径统一（待验证目标）**：\\n   - 统一通过边界：在常规桌面 PC 硬件（4核 CPU、8GB 内存）与最新稳定版 Chrome/Edge/Firefox 浏览器环境下，灌入 1,000 条便签样本规模下，包含 80ms 输入防抖的全文检索端到端耗时目标 `\\u003c 150ms`（`\\u003c 150ms` 为通过，`\\u003e= 150ms` 为失败并触发虚拟列表优化）。首屏冷启动 TTI 目标 `\\u003c 1.0s`。各项指标移入真实交付验证任务闭环实测。\",\"dependsOn\":[\"page-main-workspace\",\"block-scope-core-boundaries\"],\"evidenceIds\":[\"evidence-react-official\",\"evidence-vite-official\",\"evidence-typescript\",\"evidence-exp-docker-env-prep\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-storage-eviction-policy\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"tech-core-architecture\",\"kind\":\"technology\",\"requirementIds\":[\"block-scope-core-boundaries\",\"block-outcomes-lightweight-experience\"],\"stage\":\"technical\",\"title\":\"纯前端轻量 Web 单页应用技术栈与运行环境规范\"},{\"content\":\"### 核心模块划分与职责解耦设计（修订存储与状态流转职责）\\n\\n系统解耦为六大高内聚职责模块：\\n\\n1. **存储驱动服务模块 (`StorageService`)**：\\n   - **职责**：基于 Dexie.js 封装底层 IndexedDB 对象仓库（`notes` 与 `meta`）；严格落实 IndexedDB 键规范，仅对 `id, updatedAt, createdAt, status, trashedAt, *tags` 建立有效索引，移除 boolean 索引；对 `isPinned` 与 `isFavorite` 实施内存高效过滤。\\n   - **状态机与生命周期流转**：\\n     - `trashNote(id)`：原子记录移入时间戳 `trashedAt = Date.now()`，并将当前状态暂存至 `previousStatus: 'active' | 'archived'`，状态变更为 `status = 'trashed'`。\\n     - `restoreNote(id)`：依据 `previousStatus` 精准还原为原有的 `active` 或 `archived` 状态，恢复 `previousStatus = null` 与 `trashedAt = null`，杜绝一律无差别变回 active。\\n     - `saveNote(note, options)`：落地基于 `revision` 修订号的乐观并发检测；若检测到多标签页修改冲突抛出 `ConcurrencyConflictError`。\\n   - **原子事务保障**：单条/批量操作及全量导入覆盖均在统一 Dexie 读写事务（`db.transaction('rw', [db.notes, db.meta], ...)`）中执行，异常自动整体回滚，不使用不可靠的内存快照再回写机制。\\n\\n2. **便签领域业务模块 (`NoteService`)**：\\n   - **职责**：协调便签业务逻辑，包括正文标签提取、回收区剩余保留天数计算（`Math.max(0, 7 - Math.floor((Date.now() - trashedAt) / 86400000))`）、归档与撤销归档状态流转。\\n   - **编辑生命周期管理**：严格区分“保存并退出”、“放弃修改”与“继续编辑”，禁止在模态弹窗或卡片失焦关闭时一律隐式自动保存；写入受阻时协同前端组件保留内存草稿。\\n\\n3. **即时模糊检索引擎 (`SearchEngine`)**：\\n   - **职责**：维护内存搜索索引镜像；根据当前激活视图自动隔离数据源（常规视图与归档视图严格过滤排除 `status === 'trashed'` 便签；回收区视图限定在回收区暂存便签内检索）；挂载 80ms 输入防抖管道，执行正则安全黄色高亮。\\n\\n4. **备份管理与数据便携模块 (`BackupManager`)**：\\n   - **职责**：按照统一的 `schemaVersion: 1` 协议导出符合规范的 JSON 备份文件及 Markdown 文档，默认包含回收区暂存便签并支持排除选项；实现自导出文件 100% 自导入；执行导入文件的严格 Schema 校验；协调 StorageService 在单个原子事务内完成数据恢复；维护未备份变更计数器与时间戳。\\n\\n5. **Markdown 安全解析与排版模块 (`MarkdownRenderer`)**：\\n   - **职责**：集成 marked 与 DOMPurify 白名单过滤，防范 XSS 漏洞；集成 Prism.js 代码语法高亮与一键复制代码块；针对回收区便签详情强制实施只读保护。\\n\\n6. **工作区展现与交互编排模块 (`WorkspaceUI`)**：\\n   - **职责**：顶部操作栏、便签卡片流、侧边栏导航（含回收区超期琥珀色预警圆点、归档箱恢复入口、移动端触控多标签筛选支持）、常驻超期提示横幅、彻底删除二次确认对话框及详情编辑弹窗（含未保存确认对话框）。\",\"dependsOn\":[\"tech-core-architecture\"],\"evidenceIds\":[\"evidence-react-official\",\"evidence-vite-official\",\"evidence-indexeddb-spec\",\"evidence-mdn-storage-persist-api\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-aa854fb0-c683-487b-9f19-90974f40bc8e\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"module-system-decomposition\",\"kind\":\"module\",\"requirementIds\":[\"block-scope-core-boundaries\",\"page-main-workspace\"],\"stage\":\"technical\",\"title\":\"系统核心模块划分与职责边界规范\"},{\"content\":\"### 客户端持久化存储与模糊检索技术架构（修订规范与并发模型）\\n\\n1. **单一事实来源与 Dexie Schema 规范化**：\\n   - 数据库名称为 `SparkNotesDB`（数据库版本 1）。\\n   - **有效索引声明**：依据 IndexedDB 官方规范对有效键的要求（去除 boolean 索引），对象仓库定义如下：\\n     - `notes`: `id, updatedAt, createdAt, status, trashedAt, *tags`\\n     - `meta`: `key`\\n   - **置顶与收藏的内存分拣策略**：\\n     `isPinned` 与 `isFavorite` 保留为实体内部的 boolean 属性。查询活跃便签时，通过 `db.notes.where('status').equals('active').toArray()` 取得数据集，随后在内存中由 JavaScript 管道进行快速排序与布尔过滤（`notes.filter(n =\\u003e n.isPinned)`）。由于本地数据规模受控在 1,000 条左右，内存过滤耗时在 2ms 以内，完全消除 IndexedDB 对 boolean 键不支持的底层隐患。\\n   - **回收区时间戳范围索引**：\\n     `trashedAt` 保持数值整型索引，用于到期便签快速聚合：\\n     `db.notes.where('status').equals('trashed').and(note =\\u003e note.trashedAt !== null \\u0026\\u0026 (Date.now() - note.trashedAt \\u003e 7 * 86400 * 1000)).toArray()`。\\n\\n2. **并发修订版本与乐观冲突检测机制**：\\n   - 每条便签实体维护自增整型 `revision`。\\n   - 当调用 `saveNote(note, { expectedRevision })` 时，在 Dexie `readwrite` 事务内先读取既有记录：\\n     - 若数据库内现有记录的 `revision` 与提交的 `expectedRevision` 不一致，表明存在多标签页并发修改，立即中止写入并抛出 `ConcurrencyConflictError`。\\n     - 写入成功时，`revision` 自增 1，同时更新 `updatedAt = Date.now()`。\\n\\n3. **导入恢复的单事务原子性规范**：\\n   - 全量覆盖导入与元数据重置必须在同一个 Dexie 读写事务中完成：\\n     ```typescript\\n     await db.transaction('rw', [db.notes, db.meta], async () =\\u003e {\\n       await db.notes.clear();\\n       await db.notes.bulkAdd(payload.notes);\\n       await db.meta.put({ key: 'backup_tracker', value: updatedTracker, updatedAt: Date.now() });\\n     });\\n     ```\\n   - 若任何一步遇到配额不足或格式异常，底层事务自动回滚（Rollback），现有数据完好保持，严禁使用“先清空再内存回写”的伪事务方案。\\n\\n4. **纯前端全文模糊检索架构**：\\n   - 数据源隔离机制：主工作区常规视图仅加载 `status === 'active'` 便签，归档视图仅加载 `status === 'archived'` 便签，回收区视图仅加载 `status === 'trashed'` 便签，彻底杜绝已删除内容穿透至正常搜索。\\n   - 检索性能闭环：输入挂载 80ms 防抖，对特殊正则字符进行转义，在 1,000 条便签规模下，端到端耗时测量起止为“击键结束至 DOM 重新排版渲染完成”，目标 `\\u003c 150ms`（`\\u003c 150ms` 为通过，`\\u003e= 150ms` 为不通过）。\",\"dependsOn\":[\"tech-core-architecture\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-mdn-indexeddb\",\"evidence-mdn-using-indexeddb\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-storage-eviction-policy\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"tech-storage-and-search\",\"kind\":\"technology\",\"requirementIds\":[\"feature-quick-capture\",\"feature-search-filter\",\"feature-tag-organization\",\"feature-note-card-view\"],\"stage\":\"technical\",\"title\":\"客户端持久化存储与模糊检索技术架构\"},{\"content\":\"### 客户端持久化数据模型与实体关系架构（修订字段与版本契约）\\n\\n1. **便签实体定义 (`Note`)**：\\n```typescript\\nexport type NoteStatus = 'active' | 'archived' | 'trashed';\\n\\nexport interface Note {\\n  id: string;                                   // 唯一主键，UUID v4 格式，如 \\\"550e8400-e29b-41d4-a716-446655440000\\\"\\n  content: string;                              // 便签正文纯文本，包含行内 Markdown 语法与标签\\n  tags: string[];                               // 标签名称数组，去除 \\\"#\\\" 前缀，元素去重，单标签字符长度 1~20\\n  isPinned: boolean;                            // 是否置顶展示（非 IndexedDB 索引，由前端内存过滤分拣）\\n  isFavorite: boolean;                          // 是否加星收藏（非 IndexedDB 索引，由前端内存过滤分拣）\\n  status: NoteStatus;                           // 当前生命周期状态：active | archived | trashed\\n  previousStatus: 'active' | 'archived' | null; // 移入回收区前的原状态，非回收区时为 null；还原时据此精准恢复\\n  createdAt: number;                            // 创建时间戳（毫秒级整型，Date.now()），生成后不可变更\\n  updatedAt: number;                            // 最后修改时间戳（毫秒级整型），任何正文、标签或状态变动时更新\\n  trashedAt: number | null;                     // 移入回收区时间戳，活跃/归档状态时为 null；IndexedDB 数值索引键\\n  revision: number;                             // 记录并发修订版本号（整型，从 1 递增，用于乐观锁冲突检测）\\n}\\n```\\n\\n2. **全局元数据实体 (`AppMeta`)**：\\n```typescript\\nexport interface AppMeta {\\n  key: string;                                  // 主键标识符，如 \\\"backup_tracker\\\", \\\"user_preferences\\\"\\n  value: any;                                   // 强类型配置对象\\n  updatedAt: number;                            // 更新时间戳\\n}\\n\\nexport interface BackupTrackerMeta {\\n  lastBackupAt: number;                         // 上次成功导出备份的时间戳\\n  unbackedChangesCount: number;                 // 累计未备份变更次数（新增/编辑/归档/移入回收区/还原/清空均 +1）\\n  isPrivateModeDetected: boolean;               // 是否检测到处于无痕隐身模式\\n}\\n```\\n\\n3. **外部备份文件传输契约 (`BackupPayload`)**：\\n```typescript\\nexport interface BackupPayload {\\n  app: 'SparkNotes';                            // 固定应用标识符\\n  schemaVersion: 1;                             // 统一备份协议结构版本号（整型 1，结构层与记录 revision 彻底解耦）\\n  exportedAt: string;                           // ISO 8601 标准时间字符串，如 \\\"2026-10-05T08:00:00.000Z\\\"\\n  notesCount: number;                           // 包含的便签总记录数\\n  notes: Note[];                                // 便签完整数据数组（包含 status, previousStatus, trashedAt 与 revision）\\n}\\n```\\n\\n4. **实体生命周期状态机与流转约束规范**：\\n- **创建便签**：`status = 'active'`, `previousStatus = null`, `trashedAt = null`, `revision = 1`。\\n- **归档便签**：`status = 'archived'`, `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\\n- **取消归档**：从归档视图触发还原，`status = 'active'`, `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\\n- **移入回收区**：\\n  - 记录原状态：`previousStatus = (note.status === 'archived' ? 'archived' : 'active')`。\\n  - 更新状态：`status = 'trashed'`, `trashedAt = Date.now()`, `revision++`, `updatedAt = Date.now()`。\\n  - 未备份变更计数器自增 1。\\n- **从回收区还原**：\\n  - 依据 `previousStatus` 精准还原：`status = note.previousStatus || 'active'`。\\n  - 清空暂存字段：`previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\\n  - 标签、置顶（`isPinned`）与收藏（`isFavorite`）完好保留，未备份变更计数自增 1。\\n- **超期判定规则**：`Date.now() - trashedAt \\u003e 7 * 86400 * 1000` (604,800,000 毫秒)。\\n- **彻底删除**：经用户二次确认弹窗后，从 IndexedDB 执行物理主键删除（`db.notes.delete(id)`）。\",\"dependsOn\":[\"tech-storage-and-search\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-file-api\",\"evidence-typescript\",\"evidence-mdn-blob-spec\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"data-model-core-entities\",\"kind\":\"data_model\",\"requirementIds\":[\"feature-quick-capture\",\"feature-note-card-view\",\"feature-data-portability\"],\"stage\":\"technical\",\"title\":\"客户端持久化数据模型与实体关系架构（回收区与并发修订）\"},{\"content\":\"### 模块服务接口、契约定义与数据流转规范（修订并发与生命周期契约）\\n\\n1. **存储服务接口契约 (`IStorageService`)**：\\n```typescript\\nexport interface SaveNoteOptions {\\n  expectedRevision?: number; // 预期修订版本号；若提供且与数据库现有 revision 不一致，抛出 ConcurrencyConflictError\\n  forceOverwrite?: boolean;  // 用户在冲突弹窗中明确选择覆盖时设为 true\\n}\\n\\nexport interface IStorageService {\\n  // 数据库生命周期\\n  init(): Promise\\u003cvoid\\u003e;\\n  close(): Promise\\u003cvoid\\u003e;\\n\\n  // 持久化保护与配额感知\\n  requestPersistence(): Promise\\u003cboolean\\u003e;\\n  isPersisted(): Promise\\u003cboolean\\u003e;\\n  getStorageQuota(): Promise\\u003c{ usage: number; quota: number; percentUsed: number }\\u003e;\\n\\n  // 便签基础 CRUD 与并发控制\\n  getNoteById(id: string): Promise\\u003cNote | null\\u003e;\\n  listNotes(filter?: {\\n    status?: NoteStatus;\\n    isFavorite?: boolean;\\n    isPinned?: boolean;\\n    tags?: string[];\\n  }): Promise\\u003cNote[]\\u003e;\\n  saveNote(note: Note, options?: SaveNoteOptions): Promise\\u003c{ savedRevision: number }\\u003e;\\n\\n  // 归档与取消归档\\n  archiveNote(id: string): Promise\\u003cvoid\\u003e;\\n  unarchiveNote(id: string): Promise\\u003cvoid\\u003e;\\n\\n  // 回收区 7 天生命周期专用接口（支持 previousStatus 还原）\\n  trashNote(id: string): Promise\\u003cvoid\\u003e;                       // 记录 previousStatus 与 trashedAt，置 status='trashed'\\n  restoreNote(id: string): Promise\\u003c{ restoredStatus: 'active' | 'archived' }\\u003e; // 精准恢复至 previousStatus\\n  hardDeleteNote(id: string): Promise\\u003cvoid\\u003e;                  // 物理彻底删除单条便签\\n  listTrashedNotes(): Promise\\u003cNote[]\\u003e;                        // 获取回收区所有便签\\n  listExpiredTrashedNotes(retentionDays?: number): Promise\\u003cNote[]\\u003e; // 查询驻留超 7 天的超期便签\\n  purgeExpiredTrashedNotes(retentionDays?: number): Promise\\u003c{ purgedCount: number }\\u003e; // 批量清空已超期便签（单事务保证）\\n  emptyTrash(): Promise\\u003c{ purgedCount: number }\\u003e;             // 一键彻底清空回收区所有便签（单事务保证）\\n\\n  // 批量操作与原子导入\\n  batchUpdateTags(oldTag: string, newTag: string): Promise\\u003c{ affectedCount: number }\\u003e;\\n  batchImportNotes(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise\\u003c{ inserted: number; updated: number }\\u003e;\\n  clearAllData(): Promise\\u003cvoid\\u003e;\\n\\n  // 元数据管理\\n  getMeta\\u003cT\\u003e(key: string): Promise\\u003cT | null\\u003e;\\n  setMeta\\u003cT\\u003e(key: string, value: T): Promise\\u003cvoid\\u003e;\\n}\\n```\\n\\n2. **备份管理服务接口契约 (`IBackupService`)**：\\n```typescript\\nexport interface IBackupService {\\n  exportJsonBackup(options?: { includeTrash?: boolean }): Promise\\u003c{ blob: Blob; fileName: string; count: number; payload: BackupPayload }\\u003e;\\n  exportMarkdownBundle(): Promise\\u003c{ blob: Blob; fileName: string; count: number }\\u003e;\\n  validateBackupFile(rawJsonText: string): { valid: boolean; errorReason?: string; payload?: BackupPayload };\\n  executeImport(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise\\u003c{ success: boolean; insertedCount: number; updatedCount: number }\\u003e;\\n  checkBackupReminderNeeded(tracker: BackupTrackerMeta): boolean;\\n  detectPrivateMode(): Promise\\u003cboolean\\u003e;\\n}\\n```\\n\\n3. **编辑交互契约与关闭行为规则**：\\n- **明确的操作分流**：详情与编辑弹窗底部提供三个明确动作入口：\\n  - 【保存并退出】：触发校验与 `StorageService.saveNote(note, { expectedRevision })`；保存成功后关闭弹窗并提示保存成功。\\n  - 【放弃修改】：若内容有变动，弹出二次确认对话框“修改尚未保存，确定要放弃吗？”，用户确认后清空组件内存草稿并关闭弹窗；若内容无变动直接关闭。\\n  - 【继续编辑】：取消关闭动作，光标保留在文本框中。\\n- **严禁静默自动保存**：禁止在点击遮罩层、按下 `Esc` 或卡片失焦时在后台静默自动保存未确认的内容。若检测到未保存内容，按 `Esc` 触发未保存放弃确认对话框。\\n- **并发冲突消解契约**：当 `saveNote` 抛出 `ConcurrencyConflictError` 时，界面绝不关闭，弹出冲突弹窗并列出：【覆盖保存】（传递 `forceOverwrite: true`）、【另存为新便签】（重新生成 UUID 保存）及【复制我的草稿】。\",\"dependsOn\":[\"module-system-decomposition\",\"data-model-core-entities\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-file-api\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-blob-spec\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"interface-service-contracts\",\"kind\":\"interface\",\"requirementIds\":[\"feature-quick-capture\",\"feature-search-filter\",\"feature-data-portability\",\"feature-note-detail-edit\",\"feature-note-card-view\"],\"stage\":\"technical\",\"title\":\"模块服务接口、契约定义与数据流转规范\"},{\"content\":\"### 全局错误类型体系、降级策略与状态恢复机制（消除绝对承诺，规范草稿保留）\\n\\n1. **结构化受控错误字典**：\\n   - `StorageQuotaExceededError`（配额满载异常）：捕获底层 `QuotaExceededError`；快速录入卡片与详情编辑弹窗绝对不清空用户输入的文字，弹窗维持展开，卡片顶部浮出琥珀色告警横幅，提供【重试保存】、【复制草稿】与【导出备份】快捷入口。\\n   - `ConcurrencyConflictError`（多标签页并发冲突）：当另一个标签页已修改该便签导致 revision 不一致时抛出；当前草稿完整保留在组件内存中，弹出冲突消解对话框供用户选择覆盖或另存为新卡片。\\n   - `TrashOperationError`（回收区操作异常）：\\n     - **移入回收区失败**：卡片状态保持原状留在活跃或归档列表中，弹出 Toast 提示“移入回收区失败”，内容无损。\\n     - **便签还原失败**：便签继续留在回收区中，弹出 Toast 提示“还原失败，已保留在回收区”，`previousStatus` 完好保留。\\n     - **彻底删除与超期清空失败**：底层 IndexedDB 读写事务自动回滚（Rollback），未完成物理删除的便签完整保留在回收区中，绝不产生部分删除的不一致脏数据。\\n   - `BackupValidationError`（备份解析校验错误）：上传文件格式损坏、缺少 `schemaVersion: 1` 或必填字段缺失时立即阻断，不触碰本地既有数据。\\n   - `TransactionRollbackError`（事务中断回滚）：全量覆盖导入或批量打标中断时，Dexie 读写事务自动整体回滚，数据保持操作前状态。\\n\\n2. **组件内存草稿保留策略与恢复边界声明**：\\n   - **杜绝绝对化宣称**：彻底剔除“100% 保证零丢稿”、“绝对永不丢失”等无证据绝对化词汇。\\n   - **真实物理边界**：在浏览器本地持久化写入遇阻（如配额满载、锁死或并发冲突）时，系统通过 React 组件本地状态（`useState` 内存缓冲区）严格保留正在键入的文本、光标位置与提取标签，禁止关闭弹窗或折叠卡片；同时提供一键复制到剪贴板的能力。\\n   - **崩溃风险声明**：若在持久化成功前用户强行关闭当前标签页、刷新浏览器或操作系统直接杀掉浏览器进程，驻留在内存中的未持久化草稿将无法恢复。系统通过非阻断式未保存预警横幅与复制按钮最大化降低此类风险。\\n\\n3. **异常处理矩阵与失败后承诺**：\\n   - **快速捕获写入失败**：输入框文本完整保留在 DOM 文本域与内存状态中，卡片保持展开，按钮恢复可点击态，提示重试或导出。\\n   - **详情编辑保存失败**：弹窗强制阻止关闭，修改后的正文完整保留在编辑器文本域，展示错误原因与重试按钮。\\n   - **移入回收区/还原失败**：卡片回滚至操作前视觉位置，Toast 提示操作未落盘。\\n   - **清空回收区失败**：底层事务自动完整回滚，全部便签安全保留在回收区中。\\n   - **全量覆盖导入失败**：单个原子事务自动完整回滚，现有便签与元数据 100% 保持导入前状态不变。\",\"dependsOn\":[\"interface-service-contracts\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-storage-eviction-policy\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"error-architecture-and-recovery\",\"kind\":\"error\",\"requirementIds\":[\"feature-quick-capture\",\"feature-note-card-view\",\"feature-data-portability\",\"feature-note-detail-edit\"],\"stage\":\"technical\",\"title\":\"全局错误类型体系、降级策略与状态恢复机制\"},{\"content\":\"### 基础工程脚手架与 Dexie.js 存储驱动实现规范（回收区生命周期与并发控制）\\n\\n1. **工程基座与依赖配置**：\\n   - 使用 Vite + React 19 + TypeScript 5.x 初始化纯前端工程，启用严格类型模式。\\n   - 安装配置 Dexie.js、marked、DOMPurify、Prism.js、Lucide React 及 Tailwind CSS。\\n   - 配置构建输出相对路径 `base: './'`，明确开发与预览通过本地 HTTP 静态服务器（如 `npm run dev` / `npm run preview`）启动，不误导为 `file://` 直接双击免服务运行。\\n\\n2. **IndexedDB 强类型 Schema 与 Dexie 实例封装**：\\n   - 数据库类 `SparkNotesDB extends Dexie`：\\n     - `notes`: `id, updatedAt, createdAt, status, trashedAt, *tags`（依据规范剔除 boolean `isPinned` 与 `isFavorite` 索引）。\\n     - `meta`: `key`（保存 `backup_tracker`、用户偏好与存储状态）。\\n   - 实现 `IStorageService` 完整方法集，确保所有数据写入与状态流转均经过强类型校验。\\n\\n3. **回收区生命周期与 previousStatus 状态恢复实现**：\\n   - `trashNote(id)`：在事务中读取当前便签，记录 `previousStatus = (note.status === 'archived' ? 'archived' : 'active')`，原子更新 `status = 'trashed'`, `trashedAt = Date.now()`, `revision++`, `updatedAt = Date.now()`。\\n   - `restoreNote(id)`：在事务中读取便签，将状态精确还原为 `status = note.previousStatus || 'active'`，重置 `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`，保留原有 tags、isPinned、isFavorite。\\n   - `hardDeleteNote(id)`：调用 `db.notes.delete(id)` 物理清除。\\n   - `listExpiredTrashedNotes(retentionDays = 7)`：基于 `trashedAt` 索引执行范围过滤。\\n   - `purgeExpiredTrashedNotes(retentionDays = 7)`：采用单个 Dexie 事务批量删除超期便签，失败自动回滚。\\n   - `emptyTrash()`：事务清空回收区所有便签。\\n\\n4. **并发控制与原子导入导出事务实现**：\\n   - `saveNote(note, { expectedRevision, forceOverwrite })`：执行 revision 乐观锁比对，版本冲突抛出 `ConcurrencyConflictError`，保存成功 revision 自增。\\n   - `batchImportNotes(payload, 'overwrite')`：使用单个 `db.transaction('rw', [db.notes, db.meta], async () =\\u003e { ... })` 包含清空、批量插入及元数据更新，失败自动整体回滚，不使用内存快照回写。\\n   - 实现 `requestPersistence()` 与 `getStorageQuota()` 适配 StorageManager API。\",\"dependsOn\":[\"tech-core-architecture\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\"],\"evidenceIds\":[\"evidence-vite-official\",\"evidence-indexeddb-spec\",\"evidence-mdn-indexeddb\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"task-foundation-and-storage\",\"kind\":\"task\",\"requirementIds\":[\"tech-core-architecture\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\"],\"stage\":\"delivery\",\"task\":{\"assumptions\":[\"宿主环境支持标准 IndexedDB 2.0+ 与 StorageManager API\",\"应用运行于标准安全上下文（HTTPS 或 localhost 静态服务）\"],\"completionCriteria\":[\"StorageService 基础 CRUD、归档恢复与回收区方法集单元测试通过率 100%\",\"IndexedDB Schema 中无 boolean 索引，isPinned/isFavorite 内存过滤与分拣准确率 100%\",\"回收区便签移入与还原能 100% 精准恢复 previousStatus（active 或 archived）\",\"saveNote 乐观锁 revision 并发冲突拦截测试通过\",\"全量覆盖导入在单事务内原子执行，模拟失败 100% 自动回滚保持原状\"],\"environment\":\"Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境\",\"exclusions\":\"不包含具体的页面 UI 布局与样式渲染，不包含外部备份文件 UI 解析弹窗\",\"failureBehavior\":\"配额超限抛出受控 StorageQuotaExceededError；并发版本不一致抛出 ConcurrencyConflictError；批量操作或全量导入中断触发事务完整回滚，保持数据零损坏\",\"goal\":\"完成工程脚手架搭建，实现基于 Dexie.js 的强类型持久化驱动，剔除 boolean 无效索引（改用内存过滤），落地回收区 previousStatus 精准还原、revision 乐观锁并发检测与原子导入导出事务。\",\"modules\":[\"StorageService\",\"SparkNotesDB\",\"NoteEntity\"],\"normalBehavior\":\"初始化数据库连接；通过内存过滤实现置顶与收藏分拣；CRUD 精准执行；移入回收区记录 previousStatus，还原精准恢复原状态；saveNote 自增 revision；全量覆盖导入在单一原子事务中完成。\",\"onFailure\":\"存储驱动初始化异常抛出受控错误，UI 层捕获展示错误横幅，提示用户检查浏览器隐私配置或存储空间\",\"passCriteria\":[\"数据库初始化与有效索引查询通过率 100%\",\"previousStatus 还原与 revision 乐观并发测试全部通过\",\"全量覆盖单事务原子性与回滚测试全部通过\"],\"scope\":\"项目脚手架配置、Dexie.js Schema 定义（剔除 boolean 索引）、IStorageService 全部接口实现（包含 previousStatus、revision 乐观并发、原子导入事务与 StorageManager 配额感知）。\",\"steps\":[\"1. 初始化 Vite + React 19 + TypeScript 项目脚手架，安装 dexie 依赖并配置 strict 类型检查\",\"2. 编写 SparkNotesDB 强类型声明，声明索引 id, updatedAt, createdAt, status, trashedAt, *tags（排除 isPinned, isFavorite）\",\"3. 实现 IStorageService 核心接口：saveNote（带 revision 乐观锁）、trashNote（记录 previousStatus 与 trashedAt）、restoreNote（还原至 previousStatus）\",\"4. 实现 listExpiredTrashedNotes 与 purgeExpiredTrashedNotes 批量删除事务\",\"5. 实现 batchImportNotes 原子全量覆盖事务（单个 transaction 包含 clear、bulkAdd 与 meta 更新）\",\"6. 使用 Vitest 与 fake-indexeddb 编写自动化单元测试覆盖上述所有方法与回滚分支\"],\"verification\":[\"使用 fake-indexeddb 执行单元测试，核验 Schema 索引中无 boolean 字段\",\"测试 previousStatus 在原为 active 与 archived 时的还原准确性\",\"模拟并发保存测试 ConcurrencyConflictError 触发与数据防覆盖保护\",\"模拟写入中断验证 batchImportNotes 事务回滚后数据库原样保留\"]},\"title\":\"工程基座搭建与 Dexie 存储驱动封装实现任务\"},{\"content\":\"### 存储驱动与持久化基座验收标准（Given / When / Then）\\n\\n- **场景 1：数据库 Schema 初始化与 Boolean 索引剔除验证**\\n  - **Given** 应用主进程启动并挂载 StorageService，\\n  - **When** IndexedDB 成功创建名为 `SparkNotesDB` 的数据库，\\n  - **Then** `notes` 仓库成功创建包含 `updatedAt`、`createdAt`、`status`、`trashedAt`（数值时间戳）、`*tags` 的索引；仓库中**不存在** `isPinned` 与 `isFavorite` 索引；查询置顶便签时，服务层通过内存管道（`filter(n =\\u003e n.isPinned)`）快速分拣返回，控制台无任何非法键警告。\\n\\n- **场景 2：便签移入回收区与 previousStatus 精准还原流转**\\n  - **Given** 数据库中存在 1 条处于 `archived`（已归档）状态的便签，\\n  - **When** 用户调用 `trashNote(id)` 将其移入回收区，随后调用 `restoreNote(id)` 进行还原，\\n  - **Then** 移入回收区后 `status` 变为 `'trashed'`，`previousStatus` 记录为 `'archived'`，`trashedAt` 被赋予当前时间戳；还原后便签状态精准恢复为 `'archived'`，`previousStatus` 与 `trashedAt` 恢复为 `null`，绝不错误变更为 `'active'`。\\n\\n- **场景 3：多标签页并发修改 revision 乐观锁冲突拦截**\\n  - **Given** 标签页 A 与标签页 B 同时打开同一条便签（revision = 1），\\n  - **When** 标签页 B 先行修改并成功保存（数据库内 revision 递增为 2），随后标签页 A 尝试以旧版本（expectedRevision = 1）提交保存，\\n  - **Then** StorageService 准确拦截写入并抛出 `ConcurrencyConflictError`，数据库中保留标签页 B 的修改不被静默覆盖，标签页 A 捕获错误并维持当前草稿在内存中不被清空。\\n\\n- **场景 4：驻留超 7 天过期筛选与批量清理事务原子性**\\n  - **Given** 回收区存有 5 条便签（其中 2 条 `trashedAt` 距今超过 7 天，3 条未超期），\\n  - **When** 调用 `listExpiredTrashedNotes(7)`，精准返回该 2 条超期便签；当调用 `purgeExpiredTrashedNotes(7)` 时，若中途模拟注入异常，\\n  - **Then** 事务自动完整回滚，5 条便签均完整保留在数据库中，绝不产生部分删除的不一致脏数据。\\n\\n- **场景 5：全量覆盖导入单事务原子性与失败回滚**\\n  - **Given** 用户本地有 10 条现有便签，准备导入一份包含 20 条新便签的合法 `BackupPayload` 文件（schemaVersion: 1），\\n  - **When** 用户选择“全量覆盖恢复”，若在插入第 15 条便签时模拟注入配额超限异常，\\n  - **Then** Dexie 复合读写事务立即中止并触发自动回滚，本地原有的 10 条便签 100% 完整保留，元数据不被损坏。\\n\\n- **场景 6：配额满载受控异常转换与存储感知**\\n  - **Given** 浏览器处于模拟配额超限状态，\\n  - **When** 执行便签保存或导入，\\n  - **Then** StorageService 准确捕获底层的 QuotaExceededError 并转换为受控异常 `StorageQuotaExceededError`，未完成事务自动回滚，调用方组件保留输入草稿不丢失。\",\"dependsOn\":[\"task-foundation-and-storage\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"acceptance-foundation-and-storage\",\"kind\":\"acceptance\",\"requirementIds\":[\"tech-core-architecture\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\"],\"stage\":\"delivery\",\"title\":\"存储驱动与持久化基座验收标准\"}],\"decisions\":[{\"aliases\":[],\"area\":\"storage_architecture\",\"decisionKey\":\"technical.indexeddb_key_and_concurrency_strategy\",\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"rationale\":\"依据 W3C IndexedDB 官方规范，Boolean 不是有效键类型（仅支持 string, date, float, binary, array），因此剔除 isPinned 与 isFavorite 的底层索引，采用内存高效过滤；同时引入记录级 revision 乐观锁，防止多标签页并发编辑静默覆盖；统一 schemaVersion 与 BackupPayload 契约并在单事务中完成全量导入。\",\"replaces\":[],\"statement\":\"在 IndexedDB (Dexie.js) 中仅对有效键（id, updatedAt, createdAt, status, trashedAt, *tags）声明索引，isPinned 与 isFavorite 改为内存过滤；实体引入 revision 乐观并发修订号；统一 BackupPayload (schemaVersion: 1) 并在单一读写事务中执行全量覆盖导入与元数据重置。\"}],\"dependsOn\":[],\"id\":\"task-e212c988-8ba8-4219-946e-4552c865adff-group-storage-foundation\",\"impact\":\"修订存储架构、模块分解、IndexedDB Schema、实体数据模型、服务接口契约、错误恢复机制以及基础存储实现任务与验收标准。\",\"rejectDecisionIds\":[],\"removeBlockIds\":[],\"status\":\"pending\",\"title\":\"存储驱动架构、实体契约、IndexedDB规范对齐与并发控制变更组\"}],\"questions\":[],\"summary\":\"已完成本登记范围（基础存储驱动、实体模型、服务契约、错误恢复及实现任务）的完整设计修订：1. 依据 W3C IndexedDB 官方规范明确的键类型约束（去除无效 boolean 索引），剔除 notes 仓库中 isPinned 与 isFavorite 的底层索引，改为内存高效分拣过滤；2. 数据实体与契约中严格分离数据结构版本 schemaVersion (固定为 1) 与记录并发修订号 revision，为 saveNote 引入乐观并发检测与 ConcurrencyConflictError；3. 规范回收区生命周期状态机，通过 previousStatus ('active' | 'archived') 确保还原时精准恢复移入前的原状态，杜绝无差别变回 active；4. 统一 BackupPayload 传输契约，全量覆盖导入必须在单个 Dexie 读写事务中原子执行，失败自动回滚；5. 明确组件内存草稿保留策略，杜绝绝对化“零丢稿”承诺；6. 澄清应用为页面聚焦快捷键与静态 HTTP 服务运行形态，消除系统级全局快捷键与 file:// 运行误导。所涵盖 8 个块保持稳定 ID 并维持完整可执行契约。\",\"toolAction\":\"Finalizing storage foundation design\",\"toolSummary\":\"Storage foundation update\",\"workItems\":[{\"blockIds\":[\"tech-core-architecture\",\"module-system-decomposition\",\"tech-storage-and-search\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\",\"task-foundation-and-storage\",\"acceptance-foundation-and-storage\"],\"dependsOn\":[],\"goal\":\"完成轻量单页随手灵感工具基础存储驱动、核心数据实体、服务接口契约、IndexedDB规范对齐、乐观并发控制与错误恢复的完整设计与任务验收交付。\",\"id\":\"workitem-storage-foundation-and-contracts\"}]}\n{\"blockers\":[],\"clarification\":null,\"evidence\":[{\"applicability\":\"IndexedDB 规范明确 key 类型仅支持 string, date, float, binary, array，不支持 boolean 类型，因此 isPinned 与 isFavorite 不能作为直接的 IndexedDB 索引键。\",\"content\":\"A key can be one of the following types: string , date , float, binary data (represented by an ArrayBuffer or a TypedArray view such as a Uint8Array ), and array .\",\"environment\":\"Web APIs - MDN IndexedDB Key Characteristics\",\"hash\":\"433c8b63f66becd8036bec947275803847b458e39319e52c208aed7a9e6c6812\",\"id\":\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\",\"kind\":\"official-source\",\"location\":\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Terminology\",\"obtainedAt\":\"2026-10-04T20:50:42.383Z\",\"outcome\":\"passed\",\"source\":\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Terminology\"}],\"followUp\":[],\"groups\":[{\"blocks\":[{\"content\":\"### 核心技术栈与架构基准（修订 IndexedDB 规范与运行环境边界）\\n\\n1. **运行形态与平台边界**：\\n   - 定位为个人开发者在桌面 PC 或移动端浏览器中通过常驻标签页或书签使用的轻量 Web 单页应用（SPA）。\\n   - 交互快捷键严格限定为**页面获得焦点后的应用级快捷键**（如页面焦点下按 `N` 聚焦快速录入框、按 `/` 聚焦搜索框、按 `Ctrl/Cmd + Enter` 提交、按 `Ctrl/Cmd + S` 保存），彻底移除无法在浏览器单页沙箱内实现的“操作系统级全局唤起/全局快捷键”承诺。\\n\\n2. **视图层与响应式状态基座**：\\n   - 采用 React 19 + TypeScript 5.x 现代前端工程架构，严格启用类型校验。\\n   - 客户端响应式数据流：基于 Dexie.js 的 `useLiveQuery` 结合 React Context 进行轻量分发，本地数据读写后视图毫秒级自动响应。\\n\\n3. **客户端数据库引擎与 W3C 规范对齐（剔除 Boolean 无效索引）**：\\n   - 基于浏览器原生 IndexedDB，采用 Dexie.js 封装库管理对象仓库。\\n   - **Boolean 索引规范修正**：依据 W3C IndexedDB 官方规范（引用 evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2），IndexedDB 有效键类型仅支持 `string, date, float, binary, array`，`boolean` 不是有效键，禁止将 `isPinned` 与 `isFavorite` 声明为索引或使用 `where(...).equals(true)`。\\n   - `notes` 对象仓库索引严格精简为有效键：`id, updatedAt, createdAt, status, trashedAt, *tags`。\\n   - `isPinned` 与 `isFavorite` 作为便签实体普通属性保存，在活跃便签集合读取后由内存管道（`collection.filter()`）进行毫秒级过滤与置顶分拣，在 1,000 条基准规模下完全免除无效索引开销。\\n   - `trashedAt` 保持数值时间戳有效索引，供回收区 7 天到期筛选（`Date.now() - trashedAt \\u003e 7 * 86400 * 1000`）。\\n   - 宿主持久化防护：应用启动在安全上下文检测 `navigator.storage.persisted()` 并尝试调用 `persist()` 申请持久化授权，辅以 `StorageManager.estimate()` 监控配额。\\n\\n4. **部署、运行与离线能力真实边界**：\\n   - 构建命令 `vite build`，配置 `base: './'` 输出纯静态文件包。\\n   - **运行协议边界**：`base: './'` 仅确保静态资源相对路径解析正确，不代表 ESM 模块可在 `file://` 协议下免服务器直接双击运行（现代浏览器对本地文件跨源模块脚本存在严格 CORS 阻断）；应用必须通过本地轻量 HTTP 服务器（如 `localhost:5173` / `npm run preview`）或 HTTPS 静态托管平台运行。\\n   - **离线能力边界**：首版离线保证严格限定为“已在浏览器中打开/加载完成的页面，断网状态下所有本地数据读写、检索、打标与回收流转均可离线运行”；首次获取资源与脱机重新打开的 PWA Service Worker 离线缓存列为后续演进目标，首版不做既有离线启动保证。\\n\\n5. **数据一致性与并发控制基线**：\\n   - 分离数据结构版本 `schemaVersion`（当前为 1）与记录并发修订版本号 `revision`（单记录自增整型），并在持久化写入时支持乐观并发检测。\\n   - 统一导出与导入传输协议契约 `BackupPayload`（包含 `schemaVersion: 1`），全量覆盖导入必须在单一原子事务中完成。\\n\\n6. **性能目标与口径统一（待验证目标）**：\\n   - 统一通过边界：在常规桌面 PC 硬件（4核 CPU、8GB 内存）与最新稳定版 Chrome/Edge/Firefox 浏览器环境下，灌入 1,000 条便签样本规模下，包含 80ms 输入防抖的全文检索端到端耗时目标 `\\u003c 150ms`（`\\u003c 150ms` 为通过，`\\u003e= 150ms` 为失败并触发虚拟列表优化）。首屏冷启动 TTI 目标 `\\u003c 1.0s`。各项指标移入真实交付验证任务闭环实测。\",\"dependsOn\":[\"page-main-workspace\",\"block-scope-core-boundaries\"],\"evidenceIds\":[\"evidence-react-official\",\"evidence-vite-official\",\"evidence-typescript\",\"evidence-exp-docker-env-prep\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-storage-eviction-policy\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"tech-core-architecture\",\"kind\":\"technology\",\"requirementIds\":[\"block-scope-core-boundaries\",\"block-outcomes-lightweight-experience\"],\"stage\":\"technical\",\"title\":\"纯前端轻量 Web 单页应用技术栈与运行环境规范\"},{\"content\":\"### 核心模块划分与职责解耦设计（修订存储与状态流转职责）\\n\\n系统解耦为六大高内聚职责模块：\\n\\n1. **存储驱动服务模块 (`StorageService`)**：\\n   - **职责**：基于 Dexie.js 封装底层 IndexedDB 对象仓库（`notes` 与 `meta`）；严格落实 IndexedDB 键规范，仅对 `id, updatedAt, createdAt, status, trashedAt, *tags` 建立有效索引，移除 boolean 索引；对 `isPinned` 与 `isFavorite` 实施内存高效过滤。\\n   - **状态机与生命周期流转**：\\n     - `trashNote(id)`：原子记录移入时间戳 `trashedAt = Date.now()`，并将当前状态暂存至 `previousStatus: 'active' | 'archived'`，状态变更为 `status = 'trashed'`。\\n     - `restoreNote(id)`：依据 `previousStatus` 精准还原为原有的 `active` 或 `archived` 状态，恢复 `previousStatus = null` 与 `trashedAt = null`，杜绝一律无差别变回 active。\\n     - `saveNote(note, options)`：落地基于 `revision` 修订号的乐观并发检测；若检测到多标签页修改冲突抛出 `ConcurrencyConflictError`。\\n   - **原子事务保障**：单条/批量操作及全量导入覆盖均在统一 Dexie 读写事务（`db.transaction('rw', [db.notes, db.meta], ...)`）中执行，异常自动整体回滚，不使用不可靠的内存快照再回写机制。\\n\\n2. **便签领域业务模块 (`NoteService`)**：\\n   - **职责**：协调便签业务逻辑，包括正文标签提取、回收区剩余保留天数计算（`Math.max(0, 7 - Math.floor((Date.now() - trashedAt) / 86400000))`）、归档与撤销归档状态流转。\\n   - **编辑生命周期管理**：严格区分“保存并退出”、“放弃修改”与“继续编辑”，禁止在模态弹窗或卡片失焦关闭时一律隐式自动保存；写入受阻时协同前端组件保留内存草稿。\\n\\n3. **即时模糊检索引擎 (`SearchEngine`)**：\\n   - **职责**：维护内存搜索索引镜像；根据当前激活视图自动隔离数据源（常规视图与归档视图严格过滤排除 `status === 'trashed'` 便签；回收区视图限定在回收区暂存便签内检索）；挂载 80ms 输入防抖管道，执行正则安全黄色高亮。\\n\\n4. **备份管理与数据便携模块 (`BackupManager`)**：\\n   - **职责**：按照统一的 `schemaVersion: 1` 协议导出符合规范的 JSON 备份文件及 Markdown 文档，默认包含回收区暂存便签并支持排除选项；实现自导出文件 100% 自导入；执行导入文件的严格 Schema 校验；协调 StorageService 在单个原子事务内完成数据恢复；维护未备份变更计数器与时间戳。\\n\\n5. **Markdown 安全解析与排版模块 (`MarkdownRenderer`)**：\\n   - **职责**：集成 marked 与 DOMPurify 白名单过滤，防范 XSS 漏洞；集成 Prism.js 代码语法高亮与一键复制代码块；针对回收区便签详情强制实施只读保护。\\n\\n6. **工作区展现与交互编排模块 (`WorkspaceUI`)**：\\n   - **职责**：顶部操作栏、便签卡片流、侧边栏导航（含回收区超期琥珀色预警圆点、归档箱恢复入口、移动端触控多标签筛选支持）、常驻超期提示横幅、彻底删除二次确认对话框及详情编辑弹窗（含未保存确认对话框）。\",\"dependsOn\":[\"tech-core-architecture\"],\"evidenceIds\":[\"evidence-react-official\",\"evidence-vite-official\",\"evidence-indexeddb-spec\",\"evidence-mdn-storage-persist-api\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-aa854fb0-c683-487b-9f19-90974f40bc8e\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"module-system-decomposition\",\"kind\":\"module\",\"requirementIds\":[\"block-scope-core-boundaries\",\"page-main-workspace\"],\"stage\":\"technical\",\"title\":\"系统核心模块划分与职责边界规范\"},{\"content\":\"### 客户端持久化存储与模糊检索技术架构（修订规范与并发模型）\\n\\n1. **单一事实来源与 Dexie Schema 规范化**：\\n   - 数据库名称为 `SparkNotesDB`（数据库版本 1）。\\n   - **有效索引声明**：依据 IndexedDB 官方规范对有效键的要求（去除 boolean 索引），对象仓库定义如下：\\n     - `notes`: `id, updatedAt, createdAt, status, trashedAt, *tags`\\n     - `meta`: `key`\\n   - **置顶与收藏的内存分拣策略**：\\n     `isPinned` 与 `isFavorite` 保留为实体内部的 boolean 属性。查询活跃便签时，通过 `db.notes.where('status').equals('active').toArray()` 取得数据集，随后在内存中由 JavaScript 管道进行快速排序与布尔过滤（`notes.filter(n =\\u003e n.isPinned)`）。由于本地数据规模受控在 1,000 条左右，内存过滤耗时在 2ms 以内，完全消除 IndexedDB 对 boolean 键不支持的底层隐患。\\n   - **回收区时间戳范围索引**：\\n     `trashedAt` 保持数值整型索引，用于到期便签快速聚合：\\n     `db.notes.where('status').equals('trashed').and(note =\\u003e note.trashedAt !== null \\u0026\\u0026 (Date.now() - note.trashedAt \\u003e 7 * 86400 * 1000)).toArray()`。\\n\\n2. **并发修订版本与乐观冲突检测机制**：\\n   - 每条便签实体维护自增整型 `revision`。\\n   - 当调用 `saveNote(note, { expectedRevision })` 时，在 Dexie `readwrite` 事务内先读取既有记录：\\n     - 若数据库内现有记录的 `revision` 与提交的 `expectedRevision` 不一致，表明存在多标签页并发修改，立即中止写入并抛出 `ConcurrencyConflictError`。\\n     - 写入成功时，`revision` 自增 1，同时更新 `updatedAt = Date.now()`。\\n\\n3. **导入恢复的单事务原子性规范**：\\n   - 全量覆盖导入与元数据重置必须在同一个 Dexie 读写事务中完成：\\n     ```typescript\\n     await db.transaction('rw', [db.notes, db.meta], async () =\\u003e {\\n       await db.notes.clear();\\n       await db.notes.bulkAdd(payload.notes);\\n       await db.meta.put({ key: 'backup_tracker', value: updatedTracker, updatedAt: Date.now() });\\n     });\\n     ```\\n   - 若任何一步遇到配额不足或格式异常，底层事务自动回滚（Rollback），现有数据完好保持，严禁使用“先清空再内存回写”的伪事务方案。\\n\\n4. **纯前端全文模糊检索架构**：\\n   - 数据源隔离机制：主工作区常规视图仅加载 `status === 'active'` 便签，归档视图仅加载 `status === 'archived'` 便签，回收区视图仅加载 `status === 'trashed'` 便签，彻底杜绝已删除内容穿透至正常搜索。\\n   - 检索性能闭环：输入挂载 80ms 防抖，对特殊正则字符进行转义，在 1,000 条便签规模下，端到端耗时测量起止为“击键结束至 DOM 重新排版渲染完成”，目标 `\\u003c 150ms`（`\\u003c 150ms` 为通过，`\\u003e= 150ms` 为不通过）。\",\"dependsOn\":[\"tech-core-architecture\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-mdn-indexeddb\",\"evidence-mdn-using-indexeddb\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-storage-eviction-policy\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"tech-storage-and-search\",\"kind\":\"technology\",\"requirementIds\":[\"feature-quick-capture\",\"feature-search-filter\",\"feature-tag-organization\",\"feature-note-card-view\"],\"stage\":\"technical\",\"title\":\"客户端持久化存储与模糊检索技术架构\"},{\"content\":\"### 客户端持久化数据模型与实体关系架构（修订字段与版本契约）\\n\\n1. **便签实体定义 (`Note`)**：\\n```typescript\\nexport type NoteStatus = 'active' | 'archived' | 'trashed';\\n\\nexport interface Note {\\n  id: string;                                   // 唯一主键，UUID v4 格式，如 \\\"550e8400-e29b-41d4-a716-446655440000\\\"\\n  content: string;                              // 便签正文纯文本，包含行内 Markdown 语法与标签\\n  tags: string[];                               // 标签名称数组，去除 \\\"#\\\" 前缀，元素去重，单标签字符长度 1~20\\n  isPinned: boolean;                            // 是否置顶展示（非 IndexedDB 索引，由前端内存过滤分拣）\\n  isFavorite: boolean;                          // 是否加星收藏（非 IndexedDB 索引，由前端内存过滤分拣）\\n  status: NoteStatus;                           // 当前生命周期状态：active | archived | trashed\\n  previousStatus: 'active' | 'archived' | null; // 移入回收区前的原状态，非回收区时为 null；还原时据此精准恢复\\n  createdAt: number;                            // 创建时间戳（毫秒级整型，Date.now()），生成后不可变更\\n  updatedAt: number;                            // 最后修改时间戳（毫秒级整型），任何正文、标签或状态变动时更新\\n  trashedAt: number | null;                     // 移入回收区时间戳，活跃/归档状态时为 null；IndexedDB 数值索引键\\n  revision: number;                             // 记录并发修订版本号（整型，从 1 递增，用于乐观锁冲突检测）\\n}\\n```\\n\\n2. **全局元数据实体 (`AppMeta`)**：\\n```typescript\\nexport interface AppMeta {\\n  key: string;                                  // 主键标识符，如 \\\"backup_tracker\\\", \\\"user_preferences\\\"\\n  value: any;                                   // 强类型配置对象\\n  updatedAt: number;                            // 更新时间戳\\n}\\n\\nexport interface BackupTrackerMeta {\\n  lastBackupAt: number;                         // 上次成功导出备份的时间戳\\n  unbackedChangesCount: number;                 // 累计未备份变更次数（新增/编辑/归档/移入回收区/还原/清空均 +1）\\n  isPrivateModeDetected: boolean;               // 是否检测到处于无痕隐身模式\\n}\\n```\\n\\n3. **外部备份文件传输契约 (`BackupPayload`)**：\\n```typescript\\nexport interface BackupPayload {\\n  app: 'SparkNotes';                            // 固定应用标识符\\n  schemaVersion: 1;                             // 统一备份协议结构版本号（整型 1，结构层与记录 revision 彻底解耦）\\n  exportedAt: string;                           // ISO 8601 标准时间字符串，如 \\\"2026-10-05T08:00:00.000Z\\\"\\n  notesCount: number;                           // 包含的便签总记录数\\n  notes: Note[];                                // 便签完整数据数组（包含 status, previousStatus, trashedAt 与 revision）\\n}\\n```\\n\\n4. **实体生命周期状态机与流转约束规范**：\\n- **创建便签**：`status = 'active'`, `previousStatus = null`, `trashedAt = null`, `revision = 1`。\\n- **归档便签**：`status = 'archived'`, `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\\n- **取消归档**：从归档视图触发还原，`status = 'active'`, `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\\n- **移入回收区**：\\n  - 记录原状态：`previousStatus = (note.status === 'archived' ? 'archived' : 'active')`。\\n  - 更新状态：`status = 'trashed'`, `trashedAt = Date.now()`, `revision++`, `updatedAt = Date.now()`。\\n  - 未备份变更计数器自增 1。\\n- **从回收区还原**：\\n  - 依据 `previousStatus` 精准还原：`status = note.previousStatus || 'active'`。\\n  - 清空暂存字段：`previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\\n  - 标签、置顶（`isPinned`）与收藏（`isFavorite`）完好保留，未备份变更计数自增 1。\\n- **超期判定规则**：`Date.now() - trashedAt \\u003e 7 * 86400 * 1000` (604,800,000 毫秒)。\\n- **彻底删除**：经用户二次确认弹窗后，从 IndexedDB 执行物理主键删除（`db.notes.delete(id)`）。\",\"dependsOn\":[\"tech-storage-and-search\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-file-api\",\"evidence-typescript\",\"evidence-mdn-blob-spec\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"data-model-core-entities\",\"kind\":\"data_model\",\"requirementIds\":[\"feature-quick-capture\",\"feature-note-card-view\",\"feature-data-portability\"],\"stage\":\"technical\",\"title\":\"客户端持久化数据模型与实体关系架构（回收区与并发修订）\"},{\"content\":\"### 模块服务接口、契约定义与数据流转规范（修订并发与生命周期契约）\\n\\n1. **存储服务接口契约 (`IStorageService`)**：\\n```typescript\\nexport interface SaveNoteOptions {\\n  expectedRevision?: number; // 预期修订版本号；若提供且与数据库现有 revision 不一致，抛出 ConcurrencyConflictError\\n  forceOverwrite?: boolean;  // 用户在冲突弹窗中明确选择覆盖时设为 true\\n}\\n\\nexport interface IStorageService {\\n  // 数据库生命周期\\n  init(): Promise\\u003cvoid\\u003e;\\n  close(): Promise\\u003cvoid\\u003e;\\n\\n  // 持久化保护与配额感知\\n  requestPersistence(): Promise\\u003cboolean\\u003e;\\n  isPersisted(): Promise\\u003cboolean\\u003e;\\n  getStorageQuota(): Promise\\u003c{ usage: number; quota: number; percentUsed: number }\\u003e;\\n\\n  // 便签基础 CRUD 与并发控制\\n  getNoteById(id: string): Promise\\u003cNote | null\\u003e;\\n  listNotes(filter?: {\\n    status?: NoteStatus;\\n    isFavorite?: boolean;\\n    isPinned?: boolean;\\n    tags?: string[];\\n  }): Promise\\u003cNote[]\\u003e;\\n  saveNote(note: Note, options?: SaveNoteOptions): Promise\\u003c{ savedRevision: number }\\u003e;\\n\\n  // 归档与取消归档\\n  archiveNote(id: string): Promise\\u003cvoid\\u003e;\\n  unarchiveNote(id: string): Promise\\u003cvoid\\u003e;\\n\\n  // 回收区 7 天生命周期专用接口（支持 previousStatus 还原）\\n  trashNote(id: string): Promise\\u003cvoid\\u003e;                       // 记录 previousStatus 与 trashedAt，置 status='trashed'\\n  restoreNote(id: string): Promise\\u003c{ restoredStatus: 'active' | 'archived' }\\u003e; // 精准恢复至 previousStatus\\n  hardDeleteNote(id: string): Promise\\u003cvoid\\u003e;                  // 物理彻底删除单条便签\\n  listTrashedNotes(): Promise\\u003cNote[]\\u003e;                        // 获取回收区所有便签\\n  listExpiredTrashedNotes(retentionDays?: number): Promise\\u003cNote[]\\u003e; // 查询驻留超 7 天的超期便签\\n  purgeExpiredTrashedNotes(retentionDays?: number): Promise\\u003c{ purgedCount: number }\\u003e; // 批量清空已超期便签（单事务保证）\\n  emptyTrash(): Promise\\u003c{ purgedCount: number }\\u003e;             // 一键彻底清空回收区所有便签（单事务保证）\\n\\n  // 批量操作与原子导入\\n  batchUpdateTags(oldTag: string, newTag: string): Promise\\u003c{ affectedCount: number }\\u003e;\\n  batchImportNotes(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise\\u003c{ inserted: number; updated: number }\\u003e;\\n  clearAllData(): Promise\\u003cvoid\\u003e;\\n\\n  // 元数据管理\\n  getMeta\\u003cT\\u003e(key: string): Promise\\u003cT | null\\u003e;\\n  setMeta\\u003cT\\u003e(key: string, value: T): Promise\\u003cvoid\\u003e;\\n}\\n```\\n\\n2. **备份管理服务接口契约 (`IBackupService`)**：\\n```typescript\\nexport interface IBackupService {\\n  exportJsonBackup(options?: { includeTrash?: boolean }): Promise\\u003c{ blob: Blob; fileName: string; count: number; payload: BackupPayload }\\u003e;\\n  exportMarkdownBundle(): Promise\\u003c{ blob: Blob; fileName: string; count: number }\\u003e;\\n  validateBackupFile(rawJsonText: string): { valid: boolean; errorReason?: string; payload?: BackupPayload };\\n  executeImport(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise\\u003c{ success: boolean; insertedCount: number; updatedCount: number }\\u003e;\\n  checkBackupReminderNeeded(tracker: BackupTrackerMeta): boolean;\\n  detectPrivateMode(): Promise\\u003cboolean\\u003e;\\n}\\n```\\n\\n3. **编辑交互契约与关闭行为规则**：\\n- **明确的操作分流**：详情与编辑弹窗底部提供三个明确动作入口：\\n  - 【保存并退出】：触发校验与 `StorageService.saveNote(note, { expectedRevision })`；保存成功后关闭弹窗并提示保存成功。\\n  - 【放弃修改】：若内容有变动，弹出二次确认对话框“修改尚未保存，确定要放弃吗？”，用户确认后清空组件内存草稿并关闭弹窗；若内容无变动直接关闭。\\n  - 【继续编辑】：取消关闭动作，光标保留在文本框中。\\n- **严禁静默自动保存**：禁止在点击遮罩层、按下 `Esc` 或卡片失焦时在后台静默自动保存未确认的内容。若检测到未保存内容，按 `Esc` 触发未保存放弃确认对话框。\\n- **并发冲突消解契约**：当 `saveNote` 抛出 `ConcurrencyConflictError` 时，界面绝不关闭，弹出冲突弹窗并列出：【覆盖保存】（传递 `forceOverwrite: true`）、【另存为新便签】（重新生成 UUID 保存）及【复制我的草稿】。\",\"dependsOn\":[\"module-system-decomposition\",\"data-model-core-entities\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-file-api\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-blob-spec\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"interface-service-contracts\",\"kind\":\"interface\",\"requirementIds\":[\"feature-quick-capture\",\"feature-search-filter\",\"feature-data-portability\",\"feature-note-detail-edit\",\"feature-note-card-view\"],\"stage\":\"technical\",\"title\":\"模块服务接口、契约定义与数据流转规范\"},{\"content\":\"### 全局错误类型体系、降级策略与状态恢复机制（消除绝对承诺，规范草稿保留）\\n\\n1. **结构化受控错误字典**：\\n   - `StorageQuotaExceededError`（配额满载异常）：捕获底层 `QuotaExceededError`；快速录入卡片与详情编辑弹窗绝对不清空用户输入的文字，弹窗维持展开，卡片顶部浮出琥珀色告警横幅，提供【重试保存】、【复制草稿】与【导出备份】快捷入口。\\n   - `ConcurrencyConflictError`（多标签页并发冲突）：当另一个标签页已修改该便签导致 revision 不一致时抛出；当前草稿完整保留在组件内存中，弹出冲突消解对话框供用户选择覆盖或另存为新卡片。\\n   - `TrashOperationError`（回收区操作异常）：\\n     - **移入回收区失败**：卡片状态保持原状留在活跃或归档列表中，弹出 Toast 提示“移入回收区失败”，内容无损。\\n     - **便签还原失败**：便签继续留在回收区中，弹出 Toast 提示“还原失败，已保留在回收区”，`previousStatus` 完好保留。\\n     - **彻底删除与超期清空失败**：底层 IndexedDB 读写事务自动回滚（Rollback），未完成物理删除的便签完整保留在回收区中，绝不产生部分删除的不一致脏数据。\\n   - `BackupValidationError`（备份解析校验错误）：上传文件格式损坏、缺少 `schemaVersion: 1` 或必填字段缺失时立即阻断，不触碰本地既有数据。\\n   - `TransactionRollbackError`（事务中断回滚）：全量覆盖导入或批量打标中断时，Dexie 读写事务自动整体回滚，数据保持操作前状态。\\n\\n2. **组件内存草稿保留策略与恢复边界声明**：\\n   - **杜绝绝对化宣称**：彻底剔除“100% 保证零丢稿”、“绝对永不丢失”等无证据绝对化词汇。\\n   - **真实物理边界**：在浏览器本地持久化写入遇阻（如配额满载、锁死或并发冲突）时，系统通过 React 组件本地状态（`useState` 内存缓冲区）严格保留正在键入的文本、光标位置与提取标签，禁止关闭弹窗或折叠卡片；同时提供一键复制到剪贴板的能力。\\n   - **崩溃风险声明**：若在持久化成功前用户强行关闭当前标签页、刷新浏览器或操作系统直接杀掉浏览器进程，驻留在内存中的未持久化草稿将无法恢复。系统通过非阻断式未保存预警横幅与复制按钮最大化降低此类风险。\\n\\n3. **异常处理矩阵与失败后承诺**：\\n   - **快速捕获写入失败**：输入框文本完整保留在 DOM 文本域与内存状态中，卡片保持展开，按钮恢复可点击态，提示重试或导出。\\n   - **详情编辑保存失败**：弹窗强制阻止关闭，修改后的正文完整保留在编辑器文本域，展示错误原因与重试按钮。\\n   - **移入回收区/还原失败**：卡片回滚至操作前视觉位置，Toast 提示操作未落盘。\\n   - **清空回收区失败**：底层事务自动完整回滚，全部便签安全保留在回收区中。\\n   - **全量覆盖导入失败**：单个原子事务自动完整回滚，现有便签与元数据 100% 保持导入前状态不变。\",\"dependsOn\":[\"interface-service-contracts\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-mdn-storage-eviction-policy\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"error-architecture-and-recovery\",\"kind\":\"error\",\"requirementIds\":[\"feature-quick-capture\",\"feature-note-card-view\",\"feature-data-portability\",\"feature-note-detail-edit\"],\"stage\":\"technical\",\"title\":\"全局错误类型体系、降级策略与状态恢复机制\"},{\"content\":\"### 基础工程脚手架与 Dexie.js 存储驱动实现规范（回收区生命周期与并发控制）\\n\\n1. **工程基座与依赖配置**：\\n   - 使用 Vite + React 19 + TypeScript 5.x 初始化纯前端工程，启用严格类型模式。\\n   - 安装配置 Dexie.js、marked、DOMPurify、Prism.js、Lucide React 及 Tailwind CSS。\\n   - 配置构建输出相对路径 `base: './'`，明确开发与预览通过本地 HTTP 静态服务器（如 `npm run dev` / `npm run preview`）启动，不误导为 `file://` 直接双击免服务运行。\\n\\n2. **IndexedDB 强类型 Schema 与 Dexie 实例封装**：\\n   - 数据库类 `SparkNotesDB extends Dexie`：\\n     - `notes`: `id, updatedAt, createdAt, status, trashedAt, *tags`（依据规范剔除 boolean `isPinned` 与 `isFavorite` 索引）。\\n     - `meta`: `key`（保存 `backup_tracker`、用户偏好与存储状态）。\\n   - 实现 `IStorageService` 完整方法集，确保所有数据写入与状态流转均经过强类型校验。\\n\\n3. **回收区生命周期与 previousStatus 状态恢复实现**：\\n   - `trashNote(id)`：在事务中读取当前便签，记录 `previousStatus = (note.status === 'archived' ? 'archived' : 'active')`，原子更新 `status = 'trashed'`, `trashedAt = Date.now()`, `revision++`, `updatedAt = Date.now()`。\\n   - `restoreNote(id)`：在事务中读取便签，将状态精确还原为 `status = note.previousStatus || 'active'`，重置 `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`，保留原有 tags、isPinned、isFavorite。\\n   - `hardDeleteNote(id)`：调用 `db.notes.delete(id)` 物理清除。\\n   - `listExpiredTrashedNotes(retentionDays = 7)`：基于 `trashedAt` 索引执行范围过滤。\\n   - `purgeExpiredTrashedNotes(retentionDays = 7)`：采用单个 Dexie 事务批量删除超期便签，失败自动回滚。\\n   - `emptyTrash()`：事务清空回收区所有便签。\\n\\n4. **并发控制与原子导入导出事务实现**：\\n   - `saveNote(note, { expectedRevision, forceOverwrite })`：执行 revision 乐观锁比对，版本冲突抛出 `ConcurrencyConflictError`，保存成功 revision 自增。\\n   - `batchImportNotes(payload, 'overwrite')`：使用单个 `db.transaction('rw', [db.notes, db.meta], async () =\\u003e { ... })` 包含清空、批量插入及元数据更新，失败自动整体回滚，不使用内存快照回写。\\n   - 实现 `requestPersistence()` 与 `getStorageQuota()` 适配 StorageManager API。\",\"dependsOn\":[\"tech-core-architecture\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\"],\"evidenceIds\":[\"evidence-vite-official\",\"evidence-indexeddb-spec\",\"evidence-mdn-indexeddb\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"task-foundation-and-storage\",\"kind\":\"task\",\"requirementIds\":[\"tech-core-architecture\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\"],\"stage\":\"delivery\",\"task\":{\"assumptions\":[\"宿主环境支持标准 IndexedDB 2.0+ 与 StorageManager API\",\"应用运行于标准安全上下文（HTTPS 或 localhost 静态服务）\"],\"completionCriteria\":[\"StorageService 基础 CRUD、归档恢复与回收区方法集单元测试通过率 100%\",\"IndexedDB Schema 中无 boolean 索引，isPinned/isFavorite 内存过滤与分拣准确率 100%\",\"回收区便签移入与还原能 100% 精准恢复 previousStatus（active 或 archived）\",\"saveNote 乐观锁 revision 并发冲突拦截测试通过\",\"全量覆盖导入在单事务内原子执行，模拟失败 100% 自动回滚保持原状\"],\"environment\":\"Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境\",\"exclusions\":\"不包含具体的页面 UI 布局与样式渲染，不包含外部备份文件 UI 解析弹窗\",\"failureBehavior\":\"配额超限抛出受控 StorageQuotaExceededError；并发版本不一致抛出 ConcurrencyConflictError；批量操作或全量导入中断触发事务完整回滚，保持数据零损坏\",\"goal\":\"完成工程脚手架搭建，实现基于 Dexie.js 的强类型持久化驱动，剔除 boolean 无效索引（改用内存过滤），落地回收区 previousStatus 精准还原、revision 乐观锁并发检测与原子导入导出事务。\",\"modules\":[\"StorageService\",\"SparkNotesDB\",\"NoteEntity\"],\"normalBehavior\":\"初始化数据库连接；通过内存过滤实现置顶与收藏分拣；CRUD 精准执行；移入回收区记录 previousStatus，还原精准恢复原状态；saveNote 自增 revision；全量覆盖导入在单一原子事务中完成。\",\"onFailure\":\"存储驱动初始化异常抛出受控错误，UI 层捕获展示错误横幅，提示用户检查浏览器隐私配置或存储空间\",\"passCriteria\":[\"数据库初始化与有效索引查询通过率 100%\",\"previousStatus 还原与 revision 乐观并发测试全部通过\",\"全量覆盖单事务原子性与回滚测试全部通过\"],\"scope\":\"项目脚手架配置、Dexie.js Schema 定义（剔除 boolean 索引）、IStorageService 全部接口实现（包含 previousStatus、revision 乐观并发、原子导入事务与 StorageManager 配额感知）。\",\"steps\":[\"1. 初始化 Vite + React 19 + TypeScript 项目脚手架，安装 dexie 依赖并配置 strict 类型检查\",\"2. 编写 SparkNotesDB 强类型声明，声明索引 id, updatedAt, createdAt, status, trashedAt, *tags（排除 isPinned, isFavorite）\",\"3. 实现 IStorageService 核心接口：saveNote（带 revision 乐观锁）、trashNote（记录 previousStatus 与 trashedAt）、restoreNote（还原至 previousStatus）\",\"4. 实现 listExpiredTrashedNotes 与 purgeExpiredTrashedNotes 批量删除事务\",\"5. 实现 batchImportNotes 原子全量覆盖事务（单个 transaction 包含 clear、bulkAdd 与 meta 更新）\",\"6. 使用 Vitest 与 fake-indexeddb 编写自动化单元测试覆盖上述所有方法与回滚分支\"],\"verification\":[\"使用 fake-indexeddb 执行单元测试，核验 Schema 索引中无 boolean 字段\",\"测试 previousStatus 在原为 active 与 archived 时的还原准确性\",\"模拟并发保存测试 ConcurrencyConflictError 触发与数据防覆盖保护\",\"模拟写入中断验证 batchImportNotes 事务回滚后数据库原样保留\"]},\"title\":\"工程基座搭建与 Dexie 存储驱动封装实现任务\"},{\"content\":\"### 存储驱动与持久化基座验收标准（Given / When / Then）\\n\\n- **场景 1：数据库 Schema 初始化与 Boolean 索引剔除验证**\\n  - **Given** 应用主进程启动并挂载 StorageService，\\n  - **When** IndexedDB 成功创建名为 `SparkNotesDB` 的数据库，\\n  - **Then** `notes` 仓库成功创建包含 `updatedAt`、`createdAt`、`status`、`trashedAt`（数值时间戳）、`*tags` 的索引；仓库中**不存在** `isPinned` 与 `isFavorite` 索引；查询置顶便签时，服务层通过内存管道（`filter(n =\\u003e n.isPinned)`）快速分拣返回，控制台无任何非法键警告。\\n\\n- **场景 2：便签移入回收区与 previousStatus 精准还原流转**\\n  - **Given** 数据库中存在 1 条处于 `archived`（已归档）状态的便签，\\n  - **When** 用户调用 `trashNote(id)` 将其移入回收区，随后调用 `restoreNote(id)` 进行还原，\\n  - **Then** 移入回收区后 `status` 变为 `'trashed'`，`previousStatus` 记录为 `'archived'`，`trashedAt` 被赋予当前时间戳；还原后便签状态精准恢复为 `'archived'`，`previousStatus` 与 `trashedAt` 恢复为 `null`，绝不错误变更为 `'active'`。\\n\\n- **场景 3：多标签页并发修改 revision 乐观锁冲突拦截**\\n  - **Given** 标签页 A 与标签页 B 同时打开同一条便签（revision = 1），\\n  - **When** 标签页 B 先行修改并成功保存（数据库内 revision 递增为 2），随后标签页 A 尝试以旧版本（expectedRevision = 1）提交保存，\\n  - **Then** StorageService 准确拦截写入并抛出 `ConcurrencyConflictError`，数据库中保留标签页 B 的修改不被静默覆盖，标签页 A 捕获错误并维持当前草稿在内存中不被清空。\\n\\n- **场景 4：驻留超 7 天过期筛选与批量清理事务原子性**\\n  - **Given** 回收区存有 5 条便签（其中 2 条 `trashedAt` 距今超过 7 天，3 条未超期），\\n  - **When** 调用 `listExpiredTrashedNotes(7)`，精准返回该 2 条超期便签；当调用 `purgeExpiredTrashedNotes(7)` 时，若中途模拟注入异常，\\n  - **Then** 事务自动完整回滚，5 条便签均完整保留在数据库中，绝不产生部分删除的不一致脏数据。\\n\\n- **场景 5：全量覆盖导入单事务原子性与失败回滚**\\n  - **Given** 用户本地有 10 条现有便签，准备导入一份包含 20 条新便签的合法 `BackupPayload` 文件（schemaVersion: 1），\\n  - **When** 用户选择“全量覆盖恢复”，若在插入第 15 条便签时模拟注入配额超限异常，\\n  - **Then** Dexie 复合读写事务立即中止并触发自动回滚，本地原有的 10 条便签 100% 完整保留，元数据不被损坏。\\n\\n- **场景 6：配额满载受控异常转换与存储感知**\\n  - **Given** 浏览器处于模拟配额超限状态，\\n  - **When** 执行便签保存或导入，\\n  - **Then** StorageService 准确捕获底层的 QuotaExceededError 并转换为受控异常 `StorageQuotaExceededError`，未完成事务自动回滚，调用方组件保留输入草稿不丢失。\",\"dependsOn\":[\"task-foundation-and-storage\"],\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-storage-estimate\",\"evidence-mdn-storage-persist-api\",\"evidence-f54d9512-0313-47b4-b89b-a75fa782b2be\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"id\":\"acceptance-foundation-and-storage\",\"kind\":\"acceptance\",\"requirementIds\":[\"tech-core-architecture\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\"],\"stage\":\"delivery\",\"title\":\"存储驱动与持久化基座验收标准\"}],\"decisions\":[{\"aliases\":[],\"area\":\"storage_architecture\",\"decisionKey\":\"technical.indexeddb_key_and_concurrency_strategy\",\"evidenceIds\":[\"evidence-indexeddb-spec\",\"evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2\"],\"rationale\":\"依据 W3C IndexedDB 官方规范，Boolean 不是有效键类型（仅支持 string, date, float, binary, array），因此剔除 isPinned 与 isFavorite 的底层索引，采用内存高效过滤；同时引入记录级 revision 乐观锁，防止多标签页并发编辑静默覆盖；统一 schemaVersion 与 BackupPayload 契约并在单事务中完成全量导入。\",\"replaces\":[],\"statement\":\"在 IndexedDB (Dexie.js) 中仅对有效键（id, updatedAt, createdAt, status, trashedAt, *tags）声明索引，isPinned 与 isFavorite 改为内存过滤；实体引入 revision 乐观并发修订号；统一 BackupPayload (schemaVersion: 1) 并在单一读写事务中执行全量覆盖导入与元数据重置。\"}],\"dependsOn\":[],\"id\":\"task-e212c988-8ba8-4219-946e-4552c865adff-group-storage-foundation\",\"impact\":\"修订存储架构、模块分解、IndexedDB Schema、实体数据模型、服务接口契约、错误恢复机制以及基础存储实现任务与验收标准。\",\"rejectDecisionIds\":[],\"removeBlockIds\":[],\"status\":\"pending\",\"title\":\"存储驱动架构、实体契约、IndexedDB规范对齐与并发控制变更组\"}],\"questions\":[],\"summary\":\"已完成本登记范围（基础存储驱动、实体模型、服务契约、错误恢复及实现任务）的完整设计修订：1. 依据 W3C IndexedDB 官方规范明确的键类型约束（去除无效 boolean 索引），剔除 notes 仓库中 isPinned 与 isFavorite 的底层索引，改为内存高效分拣过滤；2. 数据实体与契约中严格分离数据结构版本 schemaVersion (固定为 1) 与记录并发修订号 revision，为 saveNote 引入乐观并发检测与 ConcurrencyConflictError；3. 规范回收区生命周期状态机，通过 previousStatus ('active' | 'archived') 确保还原时精准恢复移入前的原状态，杜绝无差别变回 active；4. 统一 BackupPayload 传输契约，全量覆盖导入必须在单个 Dexie 读写事务中原子执行，失败自动回滚；5. 明确组件内存草稿保留策略，杜绝绝对化“零丢稿”承诺；6. 澄清应用为页面聚焦快捷键与静态 HTTP 服务运行形态，消除系统级全局快捷键与 file:// 运行误导。所涵盖 8 个块保持稳定 ID 并维持完整可执行契约。\",\"toolAction\":\"Finalizing storage foundation design\",\"toolSummary\":\"Storage foundation update\",\"workItems\":[{\"blockIds\":[\"tech-core-architecture\",\"module-system-decomposition\",\"tech-storage-and-search\",\"data-model-core-entities\",\"interface-service-contracts\",\"error-architecture-and-recovery\",\"task-foundation-and-storage\",\"acceptance-foundation-and-storage\"],\"dependsOn\":[],\"goal\":\"完成轻量单页随手灵感工具基础存储驱动、核心数据实体、服务接口契约、IndexedDB规范对齐、乐观并发控制与错误恢复的完整设计与任务验收交付。\",\"id\":\"workitem-storage-foundation-and-contracts\"}]}\n",
+  "duration_seconds": 119.3179369,
+  "num_turns": 1,
+  "structured_output": {
+    "blockers": [],
+    "clarification": null,
+    "evidence": [
+      {
+        "applicability": "IndexedDB 规范明确 key 类型仅支持 string, date, float, binary, array，不支持 boolean 类型，因此 isPinned 与 isFavorite 不能作为直接的 IndexedDB 索引键。",
+        "content": "A key can be one of the following types: string , date , float, binary data (represented by an ArrayBuffer or a TypedArray view such as a Uint8Array ), and array .",
+        "environment": "Web APIs - MDN IndexedDB Key Characteristics",
+        "hash": "433c8b63f66becd8036bec947275803847b458e39319e52c208aed7a9e6c6812",
+        "id": "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2",
+        "kind": "official-source",
+        "location": "https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Terminology",
+        "obtainedAt": "2026-10-04T20:50:42.383Z",
+        "outcome": "passed",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Basic_Terminology"
+      }
+    ],
+    "followUp": [],
+    "groups": [
+      {
+        "blocks": [
+          {
+            "content": "### 核心技术栈与架构基准（修订 IndexedDB 规范与运行环境边界）\n\n1. **运行形态与平台边界**：\n   - 定位为个人开发者在桌面 PC 或移动端浏览器中通过常驻标签页或书签使用的轻量 Web 单页应用（SPA）。\n   - 交互快捷键严格限定为**页面获得焦点后的应用级快捷键**（如页面焦点下按 `N` 聚焦快速录入框、按 `/` 聚焦搜索框、按 `Ctrl/Cmd + Enter` 提交、按 `Ctrl/Cmd + S` 保存），彻底移除无法在浏览器单页沙箱内实现的“操作系统级全局唤起/全局快捷键”承诺。\n\n2. **视图层与响应式状态基座**：\n   - 采用 React 19 + TypeScript 5.x 现代前端工程架构，严格启用类型校验。\n   - 客户端响应式数据流：基于 Dexie.js 的 `useLiveQuery` 结合 React Context 进行轻量分发，本地数据读写后视图毫秒级自动响应。\n\n3. **客户端数据库引擎与 W3C 规范对齐（剔除 Boolean 无效索引）**：\n   - 基于浏览器原生 IndexedDB，采用 Dexie.js 封装库管理对象仓库。\n   - **Boolean 索引规范修正**：依据 W3C IndexedDB 官方规范（引用 evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2），IndexedDB 有效键类型仅支持 `string, date, float, binary, array`，`boolean` 不是有效键，禁止将 `isPinned` 与 `isFavorite` 声明为索引或使用 `where(...).equals(true)`。\n   - `notes` 对象仓库索引严格精简为有效键：`id, updatedAt, createdAt, status, trashedAt, *tags`。\n   - `isPinned` 与 `isFavorite` 作为便签实体普通属性保存，在活跃便签集合读取后由内存管道（`collection.filter()`）进行毫秒级过滤与置顶分拣，在 1,000 条基准规模下完全免除无效索引开销。\n   - `trashedAt` 保持数值时间戳有效索引，供回收区 7 天到期筛选（`Date.now() - trashedAt > 7 * 86400 * 1000`）。\n   - 宿主持久化防护：应用启动在安全上下文检测 `navigator.storage.persisted()` 并尝试调用 `persist()` 申请持久化授权，辅以 `StorageManager.estimate()` 监控配额。\n\n4. **部署、运行与离线能力真实边界**：\n   - 构建命令 `vite build`，配置 `base: './'` 输出纯静态文件包。\n   - **运行协议边界**：`base: './'` 仅确保静态资源相对路径解析正确，不代表 ESM 模块可在 `file://` 协议下免服务器直接双击运行（现代浏览器对本地文件跨源模块脚本存在严格 CORS 阻断）；应用必须通过本地轻量 HTTP 服务器（如 `localhost:5173` / `npm run preview`）或 HTTPS 静态托管平台运行。\n   - **离线能力边界**：首版离线保证严格限定为“已在浏览器中打开/加载完成的页面，断网状态下所有本地数据读写、检索、打标与回收流转均可离线运行”；首次获取资源与脱机重新打开的 PWA Service Worker 离线缓存列为后续演进目标，首版不做既有离线启动保证。\n\n5. **数据一致性与并发控制基线**：\n   - 分离数据结构版本 `schemaVersion`（当前为 1）与记录并发修订版本号 `revision`（单记录自增整型），并在持久化写入时支持乐观并发检测。\n   - 统一导出与导入传输协议契约 `BackupPayload`（包含 `schemaVersion: 1`），全量覆盖导入必须在单一原子事务中完成。\n\n6. **性能目标与口径统一（待验证目标）**：\n   - 统一通过边界：在常规桌面 PC 硬件（4核 CPU、8GB 内存）与最新稳定版 Chrome/Edge/Firefox 浏览器环境下，灌入 1,000 条便签样本规模下，包含 80ms 输入防抖的全文检索端到端耗时目标 `< 150ms`（`< 150ms` 为通过，`>= 150ms` 为失败并触发虚拟列表优化）。首屏冷启动 TTI 目标 `< 1.0s`。各项指标移入真实交付验证任务闭环实测。",
+            "dependsOn": [
+              "page-main-workspace",
+              "block-scope-core-boundaries"
+            ],
+            "evidenceIds": [
+              "evidence-react-official",
+              "evidence-vite-official",
+              "evidence-typescript",
+              "evidence-exp-docker-env-prep",
+              "evidence-mdn-storage-persist-api",
+              "evidence-mdn-storage-eviction-policy",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "tech-core-architecture",
+            "kind": "technology",
+            "requirementIds": [
+              "block-scope-core-boundaries",
+              "block-outcomes-lightweight-experience"
+            ],
+            "stage": "technical",
+            "title": "纯前端轻量 Web 单页应用技术栈与运行环境规范"
+          },
+          {
+            "content": "### 核心模块划分与职责解耦设计（修订存储与状态流转职责）\n\n系统解耦为六大高内聚职责模块：\n\n1. **存储驱动服务模块 (`StorageService`)**：\n   - **职责**：基于 Dexie.js 封装底层 IndexedDB 对象仓库（`notes` 与 `meta`）；严格落实 IndexedDB 键规范，仅对 `id, updatedAt, createdAt, status, trashedAt, *tags` 建立有效索引，移除 boolean 索引；对 `isPinned` 与 `isFavorite` 实施内存高效过滤。\n   - **状态机与生命周期流转**：\n     - `trashNote(id)`：原子记录移入时间戳 `trashedAt = Date.now()`，并将当前状态暂存至 `previousStatus: 'active' | 'archived'`，状态变更为 `status = 'trashed'`。\n     - `restoreNote(id)`：依据 `previousStatus` 精准还原为原有的 `active` 或 `archived` 状态，恢复 `previousStatus = null` 与 `trashedAt = null`，杜绝一律无差别变回 active。\n     - `saveNote(note, options)`：落地基于 `revision` 修订号的乐观并发检测；若检测到多标签页修改冲突抛出 `ConcurrencyConflictError`。\n   - **原子事务保障**：单条/批量操作及全量导入覆盖均在统一 Dexie 读写事务（`db.transaction('rw', [db.notes, db.meta], ...)`）中执行，异常自动整体回滚，不使用不可靠的内存快照再回写机制。\n\n2. **便签领域业务模块 (`NoteService`)**：\n   - **职责**：协调便签业务逻辑，包括正文标签提取、回收区剩余保留天数计算（`Math.max(0, 7 - Math.floor((Date.now() - trashedAt) / 86400000))`）、归档与撤销归档状态流转。\n   - **编辑生命周期管理**：严格区分“保存并退出”、“放弃修改”与“继续编辑”，禁止在模态弹窗或卡片失焦关闭时一律隐式自动保存；写入受阻时协同前端组件保留内存草稿。\n\n3. **即时模糊检索引擎 (`SearchEngine`)**：\n   - **职责**：维护内存搜索索引镜像；根据当前激活视图自动隔离数据源（常规视图与归档视图严格过滤排除 `status === 'trashed'` 便签；回收区视图限定在回收区暂存便签内检索）；挂载 80ms 输入防抖管道，执行正则安全黄色高亮。\n\n4. **备份管理与数据便携模块 (`BackupManager`)**：\n   - **职责**：按照统一的 `schemaVersion: 1` 协议导出符合规范的 JSON 备份文件及 Markdown 文档，默认包含回收区暂存便签并支持排除选项；实现自导出文件 100% 自导入；执行导入文件的严格 Schema 校验；协调 StorageService 在单个原子事务内完成数据恢复；维护未备份变更计数器与时间戳。\n\n5. **Markdown 安全解析与排版模块 (`MarkdownRenderer`)**：\n   - **职责**：集成 marked 与 DOMPurify 白名单过滤，防范 XSS 漏洞；集成 Prism.js 代码语法高亮与一键复制代码块；针对回收区便签详情强制实施只读保护。\n\n6. **工作区展现与交互编排模块 (`WorkspaceUI`)**：\n   - **职责**：顶部操作栏、便签卡片流、侧边栏导航（含回收区超期琥珀色预警圆点、归档箱恢复入口、移动端触控多标签筛选支持）、常驻超期提示横幅、彻底删除二次确认对话框及详情编辑弹窗（含未保存确认对话框）。",
+            "dependsOn": [
+              "tech-core-architecture"
+            ],
+            "evidenceIds": [
+              "evidence-react-official",
+              "evidence-vite-official",
+              "evidence-indexeddb-spec",
+              "evidence-mdn-storage-persist-api",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-aa854fb0-c683-487b-9f19-90974f40bc8e",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "module-system-decomposition",
+            "kind": "module",
+            "requirementIds": [
+              "block-scope-core-boundaries",
+              "page-main-workspace"
+            ],
+            "stage": "technical",
+            "title": "系统核心模块划分与职责边界规范"
+          },
+          {
+            "content": "### 客户端持久化存储与模糊检索技术架构（修订规范与并发模型）\n\n1. **单一事实来源与 Dexie Schema 规范化**：\n   - 数据库名称为 `SparkNotesDB`（数据库版本 1）。\n   - **有效索引声明**：依据 IndexedDB 官方规范对有效键的要求（去除 boolean 索引），对象仓库定义如下：\n     - `notes`: `id, updatedAt, createdAt, status, trashedAt, *tags`\n     - `meta`: `key`\n   - **置顶与收藏的内存分拣策略**：\n     `isPinned` 与 `isFavorite` 保留为实体内部的 boolean 属性。查询活跃便签时，通过 `db.notes.where('status').equals('active').toArray()` 取得数据集，随后在内存中由 JavaScript 管道进行快速排序与布尔过滤（`notes.filter(n => n.isPinned)`）。由于本地数据规模受控在 1,000 条左右，内存过滤耗时在 2ms 以内，完全消除 IndexedDB 对 boolean 键不支持的底层隐患。\n   - **回收区时间戳范围索引**：\n     `trashedAt` 保持数值整型索引，用于到期便签快速聚合：\n     `db.notes.where('status').equals('trashed').and(note => note.trashedAt !== null && (Date.now() - note.trashedAt > 7 * 86400 * 1000)).toArray()`。\n\n2. **并发修订版本与乐观冲突检测机制**：\n   - 每条便签实体维护自增整型 `revision`。\n   - 当调用 `saveNote(note, { expectedRevision })` 时，在 Dexie `readwrite` 事务内先读取既有记录：\n     - 若数据库内现有记录的 `revision` 与提交的 `expectedRevision` 不一致，表明存在多标签页并发修改，立即中止写入并抛出 `ConcurrencyConflictError`。\n     - 写入成功时，`revision` 自增 1，同时更新 `updatedAt = Date.now()`。\n\n3. **导入恢复的单事务原子性规范**：\n   - 全量覆盖导入与元数据重置必须在同一个 Dexie 读写事务中完成：\n     ```typescript\n     await db.transaction('rw', [db.notes, db.meta], async () => {\n       await db.notes.clear();\n       await db.notes.bulkAdd(payload.notes);\n       await db.meta.put({ key: 'backup_tracker', value: updatedTracker, updatedAt: Date.now() });\n     });\n     ```\n   - 若任何一步遇到配额不足或格式异常，底层事务自动回滚（Rollback），现有数据完好保持，严禁使用“先清空再内存回写”的伪事务方案。\n\n4. **纯前端全文模糊检索架构**：\n   - 数据源隔离机制：主工作区常规视图仅加载 `status === 'active'` 便签，归档视图仅加载 `status === 'archived'` 便签，回收区视图仅加载 `status === 'trashed'` 便签，彻底杜绝已删除内容穿透至正常搜索。\n   - 检索性能闭环：输入挂载 80ms 防抖，对特殊正则字符进行转义，在 1,000 条便签规模下，端到端耗时测量起止为“击键结束至 DOM 重新排版渲染完成”，目标 `< 150ms`（`< 150ms` 为通过，`>= 150ms` 为不通过）。",
+            "dependsOn": [
+              "tech-core-architecture"
+            ],
+            "evidenceIds": [
+              "evidence-indexeddb-spec",
+              "evidence-mdn-indexeddb",
+              "evidence-mdn-using-indexeddb",
+              "evidence-storage-estimate",
+              "evidence-mdn-storage-persist-api",
+              "evidence-mdn-storage-eviction-policy",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "tech-storage-and-search",
+            "kind": "technology",
+            "requirementIds": [
+              "feature-quick-capture",
+              "feature-search-filter",
+              "feature-tag-organization",
+              "feature-note-card-view"
+            ],
+            "stage": "technical",
+            "title": "客户端持久化存储与模糊检索技术架构"
+          },
+          {
+            "content": "### 客户端持久化数据模型与实体关系架构（修订字段与版本契约）\n\n1. **便签实体定义 (`Note`)**：\n```typescript\nexport type NoteStatus = 'active' | 'archived' | 'trashed';\n\nexport interface Note {\n  id: string;                                   // 唯一主键，UUID v4 格式，如 \"550e8400-e29b-41d4-a716-446655440000\"\n  content: string;                              // 便签正文纯文本，包含行内 Markdown 语法与标签\n  tags: string[];                               // 标签名称数组，去除 \"#\" 前缀，元素去重，单标签字符长度 1~20\n  isPinned: boolean;                            // 是否置顶展示（非 IndexedDB 索引，由前端内存过滤分拣）\n  isFavorite: boolean;                          // 是否加星收藏（非 IndexedDB 索引，由前端内存过滤分拣）\n  status: NoteStatus;                           // 当前生命周期状态：active | archived | trashed\n  previousStatus: 'active' | 'archived' | null; // 移入回收区前的原状态，非回收区时为 null；还原时据此精准恢复\n  createdAt: number;                            // 创建时间戳（毫秒级整型，Date.now()），生成后不可变更\n  updatedAt: number;                            // 最后修改时间戳（毫秒级整型），任何正文、标签或状态变动时更新\n  trashedAt: number | null;                     // 移入回收区时间戳，活跃/归档状态时为 null；IndexedDB 数值索引键\n  revision: number;                             // 记录并发修订版本号（整型，从 1 递增，用于乐观锁冲突检测）\n}\n```\n\n2. **全局元数据实体 (`AppMeta`)**：\n```typescript\nexport interface AppMeta {\n  key: string;                                  // 主键标识符，如 \"backup_tracker\", \"user_preferences\"\n  value: any;                                   // 强类型配置对象\n  updatedAt: number;                            // 更新时间戳\n}\n\nexport interface BackupTrackerMeta {\n  lastBackupAt: number;                         // 上次成功导出备份的时间戳\n  unbackedChangesCount: number;                 // 累计未备份变更次数（新增/编辑/归档/移入回收区/还原/清空均 +1）\n  isPrivateModeDetected: boolean;               // 是否检测到处于无痕隐身模式\n}\n```\n\n3. **外部备份文件传输契约 (`BackupPayload`)**：\n```typescript\nexport interface BackupPayload {\n  app: 'SparkNotes';                            // 固定应用标识符\n  schemaVersion: 1;                             // 统一备份协议结构版本号（整型 1，结构层与记录 revision 彻底解耦）\n  exportedAt: string;                           // ISO 8601 标准时间字符串，如 \"2026-10-05T08:00:00.000Z\"\n  notesCount: number;                           // 包含的便签总记录数\n  notes: Note[];                                // 便签完整数据数组（包含 status, previousStatus, trashedAt 与 revision）\n}\n```\n\n4. **实体生命周期状态机与流转约束规范**：\n- **创建便签**：`status = 'active'`, `previousStatus = null`, `trashedAt = null`, `revision = 1`。\n- **归档便签**：`status = 'archived'`, `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\n- **取消归档**：从归档视图触发还原，`status = 'active'`, `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\n- **移入回收区**：\n  - 记录原状态：`previousStatus = (note.status === 'archived' ? 'archived' : 'active')`。\n  - 更新状态：`status = 'trashed'`, `trashedAt = Date.now()`, `revision++`, `updatedAt = Date.now()`。\n  - 未备份变更计数器自增 1。\n- **从回收区还原**：\n  - 依据 `previousStatus` 精准还原：`status = note.previousStatus || 'active'`。\n  - 清空暂存字段：`previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`。\n  - 标签、置顶（`isPinned`）与收藏（`isFavorite`）完好保留，未备份变更计数自增 1。\n- **超期判定规则**：`Date.now() - trashedAt > 7 * 86400 * 1000` (604,800,000 毫秒)。\n- **彻底删除**：经用户二次确认弹窗后，从 IndexedDB 执行物理主键删除（`db.notes.delete(id)`）。",
+            "dependsOn": [
+              "tech-storage-and-search"
+            ],
+            "evidenceIds": [
+              "evidence-indexeddb-spec",
+              "evidence-file-api",
+              "evidence-typescript",
+              "evidence-mdn-blob-spec",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "data-model-core-entities",
+            "kind": "data_model",
+            "requirementIds": [
+              "feature-quick-capture",
+              "feature-note-card-view",
+              "feature-data-portability"
+            ],
+            "stage": "technical",
+            "title": "客户端持久化数据模型与实体关系架构（回收区与并发修订）"
+          },
+          {
+            "content": "### 模块服务接口、契约定义与数据流转规范（修订并发与生命周期契约）\n\n1. **存储服务接口契约 (`IStorageService`)**：\n```typescript\nexport interface SaveNoteOptions {\n  expectedRevision?: number; // 预期修订版本号；若提供且与数据库现有 revision 不一致，抛出 ConcurrencyConflictError\n  forceOverwrite?: boolean;  // 用户在冲突弹窗中明确选择覆盖时设为 true\n}\n\nexport interface IStorageService {\n  // 数据库生命周期\n  init(): Promise<void>;\n  close(): Promise<void>;\n\n  // 持久化保护与配额感知\n  requestPersistence(): Promise<boolean>;\n  isPersisted(): Promise<boolean>;\n  getStorageQuota(): Promise<{ usage: number; quota: number; percentUsed: number }>;\n\n  // 便签基础 CRUD 与并发控制\n  getNoteById(id: string): Promise<Note | null>;\n  listNotes(filter?: {\n    status?: NoteStatus;\n    isFavorite?: boolean;\n    isPinned?: boolean;\n    tags?: string[];\n  }): Promise<Note[]>;\n  saveNote(note: Note, options?: SaveNoteOptions): Promise<{ savedRevision: number }>;\n\n  // 归档与取消归档\n  archiveNote(id: string): Promise<void>;\n  unarchiveNote(id: string): Promise<void>;\n\n  // 回收区 7 天生命周期专用接口（支持 previousStatus 还原）\n  trashNote(id: string): Promise<void>;                       // 记录 previousStatus 与 trashedAt，置 status='trashed'\n  restoreNote(id: string): Promise<{ restoredStatus: 'active' | 'archived' }>; // 精准恢复至 previousStatus\n  hardDeleteNote(id: string): Promise<void>;                  // 物理彻底删除单条便签\n  listTrashedNotes(): Promise<Note[]>;                        // 获取回收区所有便签\n  listExpiredTrashedNotes(retentionDays?: number): Promise<Note[]>; // 查询驻留超 7 天的超期便签\n  purgeExpiredTrashedNotes(retentionDays?: number): Promise<{ purgedCount: number }>; // 批量清空已超期便签（单事务保证）\n  emptyTrash(): Promise<{ purgedCount: number }>;             // 一键彻底清空回收区所有便签（单事务保证）\n\n  // 批量操作与原子导入\n  batchUpdateTags(oldTag: string, newTag: string): Promise<{ affectedCount: number }>;\n  batchImportNotes(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise<{ inserted: number; updated: number }>;\n  clearAllData(): Promise<void>;\n\n  // 元数据管理\n  getMeta<T>(key: string): Promise<T | null>;\n  setMeta<T>(key: string, value: T): Promise<void>;\n}\n```\n\n2. **备份管理服务接口契约 (`IBackupService`)**：\n```typescript\nexport interface IBackupService {\n  exportJsonBackup(options?: { includeTrash?: boolean }): Promise<{ blob: Blob; fileName: string; count: number; payload: BackupPayload }>;\n  exportMarkdownBundle(): Promise<{ blob: Blob; fileName: string; count: number }>;\n  validateBackupFile(rawJsonText: string): { valid: boolean; errorReason?: string; payload?: BackupPayload };\n  executeImport(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise<{ success: boolean; insertedCount: number; updatedCount: number }>;\n  checkBackupReminderNeeded(tracker: BackupTrackerMeta): boolean;\n  detectPrivateMode(): Promise<boolean>;\n}\n```\n\n3. **编辑交互契约与关闭行为规则**：\n- **明确的操作分流**：详情与编辑弹窗底部提供三个明确动作入口：\n  - 【保存并退出】：触发校验与 `StorageService.saveNote(note, { expectedRevision })`；保存成功后关闭弹窗并提示保存成功。\n  - 【放弃修改】：若内容有变动，弹出二次确认对话框“修改尚未保存，确定要放弃吗？”，用户确认后清空组件内存草稿并关闭弹窗；若内容无变动直接关闭。\n  - 【继续编辑】：取消关闭动作，光标保留在文本框中。\n- **严禁静默自动保存**：禁止在点击遮罩层、按下 `Esc` 或卡片失焦时在后台静默自动保存未确认的内容。若检测到未保存内容，按 `Esc` 触发未保存放弃确认对话框。\n- **并发冲突消解契约**：当 `saveNote` 抛出 `ConcurrencyConflictError` 时，界面绝不关闭，弹出冲突弹窗并列出：【覆盖保存】（传递 `forceOverwrite: true`）、【另存为新便签】（重新生成 UUID 保存）及【复制我的草稿】。",
+            "dependsOn": [
+              "module-system-decomposition",
+              "data-model-core-entities"
+            ],
+            "evidenceIds": [
+              "evidence-indexeddb-spec",
+              "evidence-file-api",
+              "evidence-storage-estimate",
+              "evidence-mdn-storage-persist-api",
+              "evidence-mdn-blob-spec",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "interface-service-contracts",
+            "kind": "interface",
+            "requirementIds": [
+              "feature-quick-capture",
+              "feature-search-filter",
+              "feature-data-portability",
+              "feature-note-detail-edit",
+              "feature-note-card-view"
+            ],
+            "stage": "technical",
+            "title": "模块服务接口、契约定义与数据流转规范"
+          },
+          {
+            "content": "### 全局错误类型体系、降级策略与状态恢复机制（消除绝对承诺，规范草稿保留）\n\n1. **结构化受控错误字典**：\n   - `StorageQuotaExceededError`（配额满载异常）：捕获底层 `QuotaExceededError`；快速录入卡片与详情编辑弹窗绝对不清空用户输入的文字，弹窗维持展开，卡片顶部浮出琥珀色告警横幅，提供【重试保存】、【复制草稿】与【导出备份】快捷入口。\n   - `ConcurrencyConflictError`（多标签页并发冲突）：当另一个标签页已修改该便签导致 revision 不一致时抛出；当前草稿完整保留在组件内存中，弹出冲突消解对话框供用户选择覆盖或另存为新卡片。\n   - `TrashOperationError`（回收区操作异常）：\n     - **移入回收区失败**：卡片状态保持原状留在活跃或归档列表中，弹出 Toast 提示“移入回收区失败”，内容无损。\n     - **便签还原失败**：便签继续留在回收区中，弹出 Toast 提示“还原失败，已保留在回收区”，`previousStatus` 完好保留。\n     - **彻底删除与超期清空失败**：底层 IndexedDB 读写事务自动回滚（Rollback），未完成物理删除的便签完整保留在回收区中，绝不产生部分删除的不一致脏数据。\n   - `BackupValidationError`（备份解析校验错误）：上传文件格式损坏、缺少 `schemaVersion: 1` 或必填字段缺失时立即阻断，不触碰本地既有数据。\n   - `TransactionRollbackError`（事务中断回滚）：全量覆盖导入或批量打标中断时，Dexie 读写事务自动整体回滚，数据保持操作前状态。\n\n2. **组件内存草稿保留策略与恢复边界声明**：\n   - **杜绝绝对化宣称**：彻底剔除“100% 保证零丢稿”、“绝对永不丢失”等无证据绝对化词汇。\n   - **真实物理边界**：在浏览器本地持久化写入遇阻（如配额满载、锁死或并发冲突）时，系统通过 React 组件本地状态（`useState` 内存缓冲区）严格保留正在键入的文本、光标位置与提取标签，禁止关闭弹窗或折叠卡片；同时提供一键复制到剪贴板的能力。\n   - **崩溃风险声明**：若在持久化成功前用户强行关闭当前标签页、刷新浏览器或操作系统直接杀掉浏览器进程，驻留在内存中的未持久化草稿将无法恢复。系统通过非阻断式未保存预警横幅与复制按钮最大化降低此类风险。\n\n3. **异常处理矩阵与失败后承诺**：\n   - **快速捕获写入失败**：输入框文本完整保留在 DOM 文本域与内存状态中，卡片保持展开，按钮恢复可点击态，提示重试或导出。\n   - **详情编辑保存失败**：弹窗强制阻止关闭，修改后的正文完整保留在编辑器文本域，展示错误原因与重试按钮。\n   - **移入回收区/还原失败**：卡片回滚至操作前视觉位置，Toast 提示操作未落盘。\n   - **清空回收区失败**：底层事务自动完整回滚，全部便签安全保留在回收区中。\n   - **全量覆盖导入失败**：单个原子事务自动完整回滚，现有便签与元数据 100% 保持导入前状态不变。",
+            "dependsOn": [
+              "interface-service-contracts"
+            ],
+            "evidenceIds": [
+              "evidence-indexeddb-spec",
+              "evidence-storage-estimate",
+              "evidence-mdn-storage-persist-api",
+              "evidence-mdn-storage-eviction-policy",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "error-architecture-and-recovery",
+            "kind": "error",
+            "requirementIds": [
+              "feature-quick-capture",
+              "feature-note-card-view",
+              "feature-data-portability",
+              "feature-note-detail-edit"
+            ],
+            "stage": "technical",
+            "title": "全局错误类型体系、降级策略与状态恢复机制"
+          },
+          {
+            "content": "### 基础工程脚手架与 Dexie.js 存储驱动实现规范（回收区生命周期与并发控制）\n\n1. **工程基座与依赖配置**：\n   - 使用 Vite + React 19 + TypeScript 5.x 初始化纯前端工程，启用严格类型模式。\n   - 安装配置 Dexie.js、marked、DOMPurify、Prism.js、Lucide React 及 Tailwind CSS。\n   - 配置构建输出相对路径 `base: './'`，明确开发与预览通过本地 HTTP 静态服务器（如 `npm run dev` / `npm run preview`）启动，不误导为 `file://` 直接双击免服务运行。\n\n2. **IndexedDB 强类型 Schema 与 Dexie 实例封装**：\n   - 数据库类 `SparkNotesDB extends Dexie`：\n     - `notes`: `id, updatedAt, createdAt, status, trashedAt, *tags`（依据规范剔除 boolean `isPinned` 与 `isFavorite` 索引）。\n     - `meta`: `key`（保存 `backup_tracker`、用户偏好与存储状态）。\n   - 实现 `IStorageService` 完整方法集，确保所有数据写入与状态流转均经过强类型校验。\n\n3. **回收区生命周期与 previousStatus 状态恢复实现**：\n   - `trashNote(id)`：在事务中读取当前便签，记录 `previousStatus = (note.status === 'archived' ? 'archived' : 'active')`，原子更新 `status = 'trashed'`, `trashedAt = Date.now()`, `revision++`, `updatedAt = Date.now()`。\n   - `restoreNote(id)`：在事务中读取便签，将状态精确还原为 `status = note.previousStatus || 'active'`，重置 `previousStatus = null`, `trashedAt = null`, `revision++`, `updatedAt = Date.now()`，保留原有 tags、isPinned、isFavorite。\n   - `hardDeleteNote(id)`：调用 `db.notes.delete(id)` 物理清除。\n   - `listExpiredTrashedNotes(retentionDays = 7)`：基于 `trashedAt` 索引执行范围过滤。\n   - `purgeExpiredTrashedNotes(retentionDays = 7)`：采用单个 Dexie 事务批量删除超期便签，失败自动回滚。\n   - `emptyTrash()`：事务清空回收区所有便签。\n\n4. **并发控制与原子导入导出事务实现**：\n   - `saveNote(note, { expectedRevision, forceOverwrite })`：执行 revision 乐观锁比对，版本冲突抛出 `ConcurrencyConflictError`，保存成功 revision 自增。\n   - `batchImportNotes(payload, 'overwrite')`：使用单个 `db.transaction('rw', [db.notes, db.meta], async () => { ... })` 包含清空、批量插入及元数据更新，失败自动整体回滚，不使用内存快照回写。\n   - 实现 `requestPersistence()` 与 `getStorageQuota()` 适配 StorageManager API。",
+            "dependsOn": [
+              "tech-core-architecture",
+              "data-model-core-entities",
+              "interface-service-contracts",
+              "error-architecture-and-recovery"
+            ],
+            "evidenceIds": [
+              "evidence-vite-official",
+              "evidence-indexeddb-spec",
+              "evidence-mdn-indexeddb",
+              "evidence-storage-estimate",
+              "evidence-mdn-storage-persist-api",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "task-foundation-and-storage",
+            "kind": "task",
+            "requirementIds": [
+              "tech-core-architecture",
+              "data-model-core-entities",
+              "interface-service-contracts",
+              "error-architecture-and-recovery"
+            ],
+            "stage": "delivery",
+            "task": {
+              "assumptions": [
+                "宿主环境支持标准 IndexedDB 2.0+ 与 StorageManager API",
+                "应用运行于标准安全上下文（HTTPS 或 localhost 静态服务）"
+              ],
+              "completionCriteria": [
+                "StorageService 基础 CRUD、归档恢复与回收区方法集单元测试通过率 100%",
+                "IndexedDB Schema 中无 boolean 索引，isPinned/isFavorite 内存过滤与分拣准确率 100%",
+                "回收区便签移入与还原能 100% 精准恢复 previousStatus（active 或 archived）",
+                "saveNote 乐观锁 revision 并发冲突拦截测试通过",
+                "全量覆盖导入在单事务内原子执行，模拟失败 100% 自动回滚保持原状"
+              ],
+              "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+              "exclusions": "不包含具体的页面 UI 布局与样式渲染，不包含外部备份文件 UI 解析弹窗",
+              "failureBehavior": "配额超限抛出受控 StorageQuotaExceededError；并发版本不一致抛出 ConcurrencyConflictError；批量操作或全量导入中断触发事务完整回滚，保持数据零损坏",
+              "goal": "完成工程脚手架搭建，实现基于 Dexie.js 的强类型持久化驱动，剔除 boolean 无效索引（改用内存过滤），落地回收区 previousStatus 精准还原、revision 乐观锁并发检测与原子导入导出事务。",
+              "modules": [
+                "StorageService",
+                "SparkNotesDB",
+                "NoteEntity"
+              ],
+              "normalBehavior": "初始化数据库连接；通过内存过滤实现置顶与收藏分拣；CRUD 精准执行；移入回收区记录 previousStatus，还原精准恢复原状态；saveNote 自增 revision；全量覆盖导入在单一原子事务中完成。",
+              "onFailure": "存储驱动初始化异常抛出受控错误，UI 层捕获展示错误横幅，提示用户检查浏览器隐私配置或存储空间",
+              "passCriteria": [
+                "数据库初始化与有效索引查询通过率 100%",
+                "previousStatus 还原与 revision 乐观并发测试全部通过",
+                "全量覆盖单事务原子性与回滚测试全部通过"
+              ],
+              "scope": "项目脚手架配置、Dexie.js Schema 定义（剔除 boolean 索引）、IStorageService 全部接口实现（包含 previousStatus、revision 乐观并发、原子导入事务与 StorageManager 配额感知）。",
+              "steps": [
+                "1. 初始化 Vite + React 19 + TypeScript 项目脚手架，安装 dexie 依赖并配置 strict 类型检查",
+                "2. 编写 SparkNotesDB 强类型声明，声明索引 id, updatedAt, createdAt, status, trashedAt, *tags（排除 isPinned, isFavorite）",
+                "3. 实现 IStorageService 核心接口：saveNote（带 revision 乐观锁）、trashNote（记录 previousStatus 与 trashedAt）、restoreNote（还原至 previousStatus）",
+                "4. 实现 listExpiredTrashedNotes 与 purgeExpiredTrashedNotes 批量删除事务",
+                "5. 实现 batchImportNotes 原子全量覆盖事务（单个 transaction 包含 clear、bulkAdd 与 meta 更新）",
+                "6. 使用 Vitest 与 fake-indexeddb 编写自动化单元测试覆盖上述所有方法与回滚分支"
+              ],
+              "verification": [
+                "使用 fake-indexeddb 执行单元测试，核验 Schema 索引中无 boolean 字段",
+                "测试 previousStatus 在原为 active 与 archived 时的还原准确性",
+                "模拟并发保存测试 ConcurrencyConflictError 触发与数据防覆盖保护",
+                "模拟写入中断验证 batchImportNotes 事务回滚后数据库原样保留"
+              ]
+            },
+            "title": "工程基座搭建与 Dexie 存储驱动封装实现任务"
+          },
+          {
+            "content": "### 存储驱动与持久化基座验收标准（Given / When / Then）\n\n- **场景 1：数据库 Schema 初始化与 Boolean 索引剔除验证**\n  - **Given** 应用主进程启动并挂载 StorageService，\n  - **When** IndexedDB 成功创建名为 `SparkNotesDB` 的数据库，\n  - **Then** `notes` 仓库成功创建包含 `updatedAt`、`createdAt`、`status`、`trashedAt`（数值时间戳）、`*tags` 的索引；仓库中**不存在** `isPinned` 与 `isFavorite` 索引；查询置顶便签时，服务层通过内存管道（`filter(n => n.isPinned)`）快速分拣返回，控制台无任何非法键警告。\n\n- **场景 2：便签移入回收区与 previousStatus 精准还原流转**\n  - **Given** 数据库中存在 1 条处于 `archived`（已归档）状态的便签，\n  - **When** 用户调用 `trashNote(id)` 将其移入回收区，随后调用 `restoreNote(id)` 进行还原，\n  - **Then** 移入回收区后 `status` 变为 `'trashed'`，`previousStatus` 记录为 `'archived'`，`trashedAt` 被赋予当前时间戳；还原后便签状态精准恢复为 `'archived'`，`previousStatus` 与 `trashedAt` 恢复为 `null`，绝不错误变更为 `'active'`。\n\n- **场景 3：多标签页并发修改 revision 乐观锁冲突拦截**\n  - **Given** 标签页 A 与标签页 B 同时打开同一条便签（revision = 1），\n  - **When** 标签页 B 先行修改并成功保存（数据库内 revision 递增为 2），随后标签页 A 尝试以旧版本（expectedRevision = 1）提交保存，\n  - **Then** StorageService 准确拦截写入并抛出 `ConcurrencyConflictError`，数据库中保留标签页 B 的修改不被静默覆盖，标签页 A 捕获错误并维持当前草稿在内存中不被清空。\n\n- **场景 4：驻留超 7 天过期筛选与批量清理事务原子性**\n  - **Given** 回收区存有 5 条便签（其中 2 条 `trashedAt` 距今超过 7 天，3 条未超期），\n  - **When** 调用 `listExpiredTrashedNotes(7)`，精准返回该 2 条超期便签；当调用 `purgeExpiredTrashedNotes(7)` 时，若中途模拟注入异常，\n  - **Then** 事务自动完整回滚，5 条便签均完整保留在数据库中，绝不产生部分删除的不一致脏数据。\n\n- **场景 5：全量覆盖导入单事务原子性与失败回滚**\n  - **Given** 用户本地有 10 条现有便签，准备导入一份包含 20 条新便签的合法 `BackupPayload` 文件（schemaVersion: 1），\n  - **When** 用户选择“全量覆盖恢复”，若在插入第 15 条便签时模拟注入配额超限异常，\n  - **Then** Dexie 复合读写事务立即中止并触发自动回滚，本地原有的 10 条便签 100% 完整保留，元数据不被损坏。\n\n- **场景 6：配额满载受控异常转换与存储感知**\n  - **Given** 浏览器处于模拟配额超限状态，\n  - **When** 执行便签保存或导入，\n  - **Then** StorageService 准确捕获底层的 QuotaExceededError 并转换为受控异常 `StorageQuotaExceededError`，未完成事务自动回滚，调用方组件保留输入草稿不丢失。",
+            "dependsOn": [
+              "task-foundation-and-storage"
+            ],
+            "evidenceIds": [
+              "evidence-indexeddb-spec",
+              "evidence-storage-estimate",
+              "evidence-mdn-storage-persist-api",
+              "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "id": "acceptance-foundation-and-storage",
+            "kind": "acceptance",
+            "requirementIds": [
+              "tech-core-architecture",
+              "data-model-core-entities",
+              "interface-service-contracts",
+              "error-architecture-and-recovery"
+            ],
+            "stage": "delivery",
+            "title": "存储驱动与持久化基座验收标准"
+          }
+        ],
+        "decisions": [
+          {
+            "aliases": [],
+            "area": "storage_architecture",
+            "decisionKey": "technical.indexeddb_key_and_concurrency_strategy",
+            "evidenceIds": [
+              "evidence-indexeddb-spec",
+              "evidence-ea29d4ee-29ca-4f20-a179-b8003ef8aba2"
+            ],
+            "rationale": "依据 W3C IndexedDB 官方规范，Boolean 不是有效键类型（仅支持 string, date, float, binary, array），因此剔除 isPinned 与 isFavorite 的底层索引，采用内存高效过滤；同时引入记录级 revision 乐观锁，防止多标签页并发编辑静默覆盖；统一 schemaVersion 与 BackupPayload 契约并在单事务中完成全量导入。",
+            "replaces": [],
+            "statement": "在 IndexedDB (Dexie.js) 中仅对有效键（id, updatedAt, createdAt, status, trashedAt, *tags）声明索引，isPinned 与 isFavorite 改为内存过滤；实体引入 revision 乐观并发修订号；统一 BackupPayload (schemaVersion: 1) 并在单一读写事务中执行全量覆盖导入与元数据重置。"
+          }
+        ],
+        "dependsOn": [],
+        "id": "task-e212c988-8ba8-4219-946e-4552c865adff-group-storage-foundation",
+        "impact": "修订存储架构、模块分解、IndexedDB Schema、实体数据模型、服务接口契约、错误恢复机制以及基础存储实现任务与验收标准。",
+        "rejectDecisionIds": [],
+        "removeBlockIds": [],
+        "status": "pending",
+        "title": "存储驱动架构、实体契约、IndexedDB规范对齐与并发控制变更组"
+      }
+    ],
+    "questions": [],
+    "summary": "已完成本登记范围（基础存储驱动、实体模型、服务契约、错误恢复及实现任务）的完整设计修订：1. 依据 W3C IndexedDB 官方规范明确的键类型约束（去除无效 boolean 索引），剔除 notes 仓库中 isPinned 与 isFavorite 的底层索引，改为内存高效分拣过滤；2. 数据实体与契约中严格分离数据结构版本 schemaVersion (固定为 1) 与记录并发修订号 revision，为 saveNote 引入乐观并发检测与 ConcurrencyConflictError；3. 规范回收区生命周期状态机，通过 previousStatus ('active' | 'archived') 确保还原时精准恢复移入前的原状态，杜绝无差别变回 active；4. 统一 BackupPayload 传输契约，全量覆盖导入必须在单个 Dexie 读写事务中原子执行，失败自动回滚；5. 明确组件内存草稿保留策略，杜绝绝对化“零丢稿”承诺；6. 澄清应用为页面聚焦快捷键与静态 HTTP 服务运行形态，消除系统级全局快捷键与 file:// 运行误导。所涵盖 8 个块保持稳定 ID 并维持完整可执行契约。",
+    "workItems": [
+      {
+        "blockIds": [
+          "tech-core-architecture",
+          "module-system-decomposition",
+          "tech-storage-and-search",
+          "data-model-core-entities",
+          "interface-service-contracts",
+          "error-architecture-and-recovery",
+          "task-foundation-and-storage",
+          "acceptance-foundation-and-storage"
+        ],
+        "dependsOn": [],
+        "goal": "完成轻量单页随手灵感工具基础存储驱动、核心数据实体、服务接口契约、IndexedDB规范对齐、乐观并发控制与错误恢复的完整设计与任务验收交付。",
+        "id": "workitem-storage-foundation-and-contracts"
+      }
+    ]
+  },
+  "json_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "B3 Planning task result",
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "string"
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "impact": {
+              "type": "string"
+            },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "enum": [
+                      "product",
+                      "technical",
+                      "delivery"
+                    ]
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "target",
+                      "problem",
+                      "outcomes",
+                      "scope",
+                      "non_goals",
+                      "feature",
+                      "flow",
+                      "page",
+                      "technology",
+                      "module",
+                      "data_model",
+                      "interface",
+                      "error",
+                      "deployment",
+                      "task",
+                      "acceptance",
+                      "validation"
+                    ]
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "requirementIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "dependsOn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "task": {
+                    "type": "object",
+                    "properties": {
+                      "goal": {
+                        "type": "string"
+                      },
+                      "scope": {
+                        "type": "string"
+                      },
+                      "exclusions": {
+                        "type": "string"
+                      },
+                      "modules": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "normalBehavior": {
+                        "type": "string"
+                      },
+                      "failureBehavior": {
+                        "type": "string"
+                      },
+                      "verification": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "completionCriteria": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "assumptions": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "environment": {
+                        "type": "string"
+                      },
+                      "steps": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "passCriteria": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "evidenceRequired": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "onFailure": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "goal",
+                      "scope",
+                      "exclusions",
+                      "modules",
+                      "normalBehavior",
+                      "failureBehavior",
+                      "verification",
+                      "completionCriteria",
+                      "assumptions"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "stage",
+                  "kind",
+                  "title",
+                  "content",
+                  "requirementIds",
+                  "dependsOn",
+                  "evidenceIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "removeBlockIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "decisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "decisionKey": {
+                    "type": "string"
+                  },
+                  "area": {
+                    "type": "string"
+                  },
+                  "statement": {
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "replaces": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "decisionKey",
+                  "area",
+                  "statement",
+                  "rationale",
+                  "evidenceIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "status": {
+              "type": "string",
+              "const": "pending"
+            },
+            "rejectDecisionIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "id",
+            "title",
+            "impact",
+            "dependsOn",
+            "blocks",
+            "removeBlockIds",
+            "decisions",
+            "status"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "questions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "issueRef": {
+              "type": "string"
+            },
+            "importance": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "high",
+                "critical"
+              ]
+            },
+            "question": {
+              "type": "string"
+            },
+            "area": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "recommendationReason": {
+              "type": "string"
+            },
+            "recommendedOptionKey": {
+              "type": "string"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "approach": {
+                    "type": "string"
+                  },
+                  "gain": {
+                    "type": "string"
+                  },
+                  "sacrifice": {
+                    "type": "string"
+                  },
+                  "impact": {
+                    "type": "string"
+                  },
+                  "reversibility": {
+                    "type": "string",
+                    "enum": [
+                      "easy",
+                      "moderate",
+                      "hard"
+                    ]
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "approach",
+                  "gain",
+                  "sacrifice",
+                  "impact",
+                  "reversibility"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 2,
+              "maxItems": 4
+            },
+            "allowFreeInput": {
+              "type": "boolean",
+              "const": true
+            },
+            "decisionKey": {
+              "type": "string"
+            },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "selectionMode": {
+              "type": "string",
+              "enum": [
+                "single",
+                "multiple"
+              ]
+            },
+            "reopenReason": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "const": "proposed"
+            },
+            "createdAt": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "issueRef",
+            "importance",
+            "question",
+            "reason",
+            "recommendation",
+            "recommendationReason",
+            "recommendedOptionKey",
+            "options",
+            "allowFreeInput",
+            "decisionKey",
+            "dependsOn",
+            "status",
+            "createdAt"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 3
+      },
+      "evidence": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "user",
+                "material",
+                "official-source",
+                "experiment"
+              ]
+            },
+            "content": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "obtainedAt": {
+              "type": "string"
+            },
+            "hash": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "outcome": {
+              "type": "string",
+              "enum": [
+                "unexecuted",
+                "passed",
+                "failed",
+                "not-applicable"
+              ]
+            },
+            "applicability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "content",
+            "source",
+            "obtainedAt",
+            "applicability"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "blockers": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "followUp": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "research",
+                "validation"
+              ]
+            },
+            "goal": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "goal"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "clarification": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "target": {
+                "type": "string"
+              },
+              "problem": {
+                "type": "string"
+              },
+              "outcomes": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "constraints": {
+                "type": "string"
+              },
+              "delegated": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "target",
+              "problem",
+              "outcomes",
+              "scope",
+              "constraints",
+              "delegated"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "workItems": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "goal": {
+              "type": "string"
+            },
+            "blockIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "id",
+            "goal",
+            "blockIds",
+            "dependsOn"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "summary",
+      "groups",
+      "questions",
+      "evidence",
+      "blockers",
+      "followUp",
+      "clarification"
+    ],
+    "additionalProperties": false
+  },
+  "usage": {
+    "input_tokens": 137869,
+    "output_tokens": 37977,
+    "thinking_tokens": 14400,
+    "cache_read_tokens": 903862,
+    "total_tokens": 175846
+  }
+}

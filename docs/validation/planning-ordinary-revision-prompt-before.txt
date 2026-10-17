@@ -1,0 +1,135 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ × apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps all 44 same-run actions in each prompt through complementary 3/41 partial outputs (replace) 962ms
+   → expected null to deeply equal [ 'target', 'problem', …(42) ]
+ × apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps all 44 same-run actions in each prompt through complementary 3/41 partial outputs (remove) 1007ms
+   → expected null to deeply equal [ 'target', 'problem', …(42) ]
+ × apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > scopes a new feedback revision to its own three actions rather than 44 formal or earlier-run candidate actions 1225ms
+   → expected null to deeply equal [ 'accept-extra-25', …(2) ]
+ ✓ apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps clarification repair outside the ordinary complete-blueprint prompt 257ms
+ × apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps revision slices on their own registered partition prompt 852ms
+   → expected null to deeply equal [ 'accept-extra-25', …(2) ]
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps all 44 same-run actions in each prompt through complementary 3/41 partial outputs (replace)
+ FAIL  apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps all 44 same-run actions in each prompt through complementary 3/41 partial outputs (remove)
+AssertionError: expected null to deeply equal [ 'target', 'problem', …(42) ]
+
+- Expected: 
+[
+  "target",
+  "problem",
+  "outcomes",
+  "scope",
+  "non-goals",
+  "notes",
+  "notes-flow",
+  "editor",
+  "stack",
+  "notes-module",
+  "note-model",
+  "notes-api",
+  "notes-error",
+  "deployment",
+  "implement-notes",
+  "accept-notes",
+  "accept-extra-0",
+  "accept-extra-1",
+  "accept-extra-2",
+  "accept-extra-3",
+  "accept-extra-4",
+  "accept-extra-5",
+  "accept-extra-6",
+  "accept-extra-7",
+  "accept-extra-8",
+  "accept-extra-9",
+  "accept-extra-10",
+  "accept-extra-11",
+  "accept-extra-12",
+  "accept-extra-13",
+  "accept-extra-14",
+  "accept-extra-15",
+  "accept-extra-16",
+  "accept-extra-17",
+  "accept-extra-18",
+  "accept-extra-19",
+  "accept-extra-20",
+  "accept-extra-21",
+  "accept-extra-22",
+  "accept-extra-23",
+  "accept-extra-24",
+  "accept-extra-25",
+  "accept-extra-26",
+  "accept-extra-27",
+]
+
++ Received: 
+null
+
+ ❯ assertCompleteDuty apps/server/tests/planning-ordinary-revision-prompt.test.ts:44:31
+     42| }
+     43| function assertCompleteDuty(prompt: string, required: string[]) {
+     44|   expect(promptScope(prompt)).toEqual(required);
+       |                               ^
+     45|   expect(prompt).toContain('本任务目标列出的是待解决的问题，不是完整输出范围');
+     46|   expect(prompt).toContain('必须保留本 Run 已经修好的候选块及明确删除动作');
+ ❯ apps/server/tests/planning-ordinary-revision-prompt.test.ts:75:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > scopes a new feedback revision to its own three actions rather than 44 formal or earlier-run candidate actions
+AssertionError: expected null to deeply equal [ 'accept-extra-25', …(2) ]
+
+- Expected: 
+[
+  "accept-extra-25",
+  "accept-extra-26",
+  "accept-extra-27",
+]
+
++ Received: 
+null
+
+ ❯ assertCompleteDuty apps/server/tests/planning-ordinary-revision-prompt.test.ts:44:31
+     42| }
+     43| function assertCompleteDuty(prompt: string, required: string[]) {
+     44|   expect(promptScope(prompt)).toEqual(required);
+       |                               ^
+     45|   expect(prompt).toContain('本任务目标列出的是待解决的问题，不是完整输出范围');
+     46|   expect(prompt).toContain('必须保留本 Run 已经修好的候选块及明确删除动作');
+ ❯ apps/server/tests/planning-ordinary-revision-prompt.test.ts:105:62
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  apps/server/tests/planning-ordinary-revision-prompt.test.ts > Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps revision slices on their own registered partition prompt
+AssertionError: expected null to deeply equal [ 'accept-extra-25', …(2) ]
+
+- Expected: 
+[
+  "accept-extra-25",
+  "accept-extra-26",
+  "accept-extra-27",
+]
+
++ Received: 
+null
+
+ ❯ assertCompleteDuty apps/server/tests/planning-ordinary-revision-prompt.test.ts:44:31
+     42| }
+     43| function assertCompleteDuty(prompt: string, required: string[]) {
+     44|   expect(promptScope(prompt)).toEqual(required);
+       |                               ^
+     45|   expect(prompt).toContain('本任务目标列出的是待解决的问题，不是完整输出范围');
+     46|   expect(prompt).toContain('必须保留本 Run 已经修好的候选块及明确删除动作');
+ ❯ apps/server/tests/planning-ordinary-revision-prompt.test.ts:139:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  06:14:27
+   Duration  5.53s (transform 464ms, setup 0ms, collect 955ms, tests 4.30s, environment 0ms, prepare 77ms)
+

@@ -1,0 +1,40 @@
+{
+  "label": "flash-vague-final-consistency-20261005-10",
+  "checkedAt": "2026-10-05T09:59:29.390Z",
+  "scope": "Independent counterexamples in completed intermediate design only. Integration/review may repair these. This is not a final content verdict and does not edit any planning state.",
+  "status": "intermediate_findings",
+  "contentPassed": false,
+  "source": "D:\\Temp\\User\\pa-quality-copy-AA2hmZ\\vague\\runtime\\planning\\run-67e92d10-8a80-4fe8-881f-5ec50a9b1f5b\\tasks\\task-1b87c6b6-f4ff-449a-a36c-05b022c3cad2\\result.json",
+  "sourceSha256": "ee2ee72dbe8f01f71c5f943222e023d0e79f6f9d6ef8f45612fbebf7de87bf8a",
+  "runId": "run-67e92d10-8a80-4fe8-881f-5ec50a9b1f5b",
+  "taskId": "task-1b87c6b6-f4ff-449a-a36c-05b022c3cad2",
+  "findings": [
+    {
+      "id": "design-N1",
+      "blocks": [
+        "interface-service-contracts",
+        "feature-data-portability",
+        "tech-storage-and-search"
+      ],
+      "finding": "importBackup and batchImportNotes do not carry a preview revision/generation token; overwrite pseudocode clears before checking the displayed preview baseline. A competing edit after preview is not rejected by the written contract."
+    },
+    {
+      "id": "design-N2",
+      "blocks": [
+        "data-model-core-entities",
+        "tech-storage-and-search",
+        "feature-data-portability"
+      ],
+      "finding": "BackupPayload promises full metadata round-trip, but overwrite pseudocode resets backupTracker to now/zero and never writes verified appMeta. Preservation or deliberate replacement of backup tracker/settings lacks one explicit shared policy."
+    },
+    {
+      "id": "design-N3",
+      "blocks": [
+        "feature-data-portability",
+        "task-data-portability",
+        "interface-service-contracts"
+      ],
+      "finding": "Strong validation is named but the required rules for all Note fields, revision/generation integers, cross-field trash metadata, tag relationships and meta duplication remain unspecified."
+    }
+  ]
+}

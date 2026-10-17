@@ -160,27 +160,17 @@ describe('Document Compiler & Template Engine Unit Tests (Phase 4.3 & 4.4)', () 
     expect(valResult2.errors[0]).toContain('未解析的模板占位符');
   });
 
-  it('4. DocumentCompiler runs full compilation, generates markdown files, and persists documents.json', async () => {
+  it('4. DocumentCompiler rejects legacy disk publication before snapshot or disk access', async () => {
     const snapshot = createValidSnapshot();
     const projectDir = join(tempBaseDir, 'proj-compiled');
     await storage.ensureDir(projectDir);
 
-    const result = await compiler.compile(projectDir, snapshot);
+    await expect(compiler.compile(projectDir, snapshot)).rejects.toMatchObject({ code: 'LEGACY_WORKFLOW_RETIRED' });
+    await expect(compiler.compile('missing', null as any)).rejects.toMatchObject({ code: 'LEGACY_WORKFLOW_RETIRED' });
+    expect(await storage.exists(join(projectDir, 'AGENTS.md'))).toBe(false);
+    expect(await storage.exists(join(projectDir, 'documents', 'manifest.json'))).toBe(false);
+    expect(await storage.exists(join(projectDir, 'documents.json'))).toBe(false);
 
-    expect(result.readiness.ready).toBe(true);
-    expect(result.manifest.items.length).toBeGreaterThanOrEqual(7);
-
-    // Verify files on disk
-    expect(await storage.exists(join(projectDir, 'AGENTS.md'))).toBe(true);
-    expect(await storage.exists(join(projectDir, 'docs', 'PROJECT.md'))).toBe(true);
-    expect(await storage.exists(join(projectDir, 'docs', 'PRODUCT.md'))).toBe(true);
-    expect(await storage.exists(join(projectDir, 'docs', 'USER_FLOWS.md'))).toBe(true);
-    expect(await storage.exists(join(projectDir, 'docs', 'DEVELOPMENT_PLAN.md'))).toBe(true);
-    expect(await storage.exists(join(projectDir, 'docs', 'ACCEPTANCE.md'))).toBe(true);
-    expect(await storage.exists(join(projectDir, 'documents.json'))).toBe(true);
-
-    const agentsContent = await storage.readText(join(projectDir, 'AGENTS.md'));
-    expect(agentsContent).toContain('Local Markdown Editor');
   });
 
   it('5. Supports render-only compilation so the orchestrator cannot publish before revision commit', async () => {
@@ -194,5 +184,25 @@ describe('Document Compiler & Template Engine Unit Tests (Phase 4.3 & 4.4)', () 
     expect(await storage.exists(join(projectDir, 'AGENTS.md'))).toBe(false);
     expect(await storage.exists(join(projectDir, 'documents.json'))).toBe(false);
     expect(await storage.exists(join(projectDir, 'documents', 'manifest.json'))).toBe(false);
+  });
+
+  it('6. Injects custom engineering rules and notes into AGENTS.md', async () => {
+    const snapshot = createValidSnapshot();
+    const projectDir = join(tempBaseDir, 'proj-custom-rules');
+    await storage.ensureDir(projectDir);
+
+    const rendered = await compiler.compile(projectDir, snapshot, 6, false, {
+      customRules: [
+        '禁止引入外部未授权第三方 UI 组件库',
+        '必须保证全量离线本地运行',
+      ],
+      customNotes: '企业 2026 专属架构准则',
+    });
+
+    const agentsContent = rendered.renderedFiles.find(file => file.path === 'AGENTS.md')!.content;
+    expect(agentsContent).toContain('自定义项目工程红线与团队专属规范');
+    expect(agentsContent).toContain('禁止引入外部未授权第三方 UI 组件库');
+    expect(agentsContent).toContain('必须保证全量离线本地运行');
+    expect(agentsContent).toContain('企业 2026 专属架构准则');
   });
 });

@@ -1,0 +1,109 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "针对自动质量验收反馈中的 10 项缺陷及父任务输出超限与变更组依赖问题（INVALID_CHANGESET: 变更组依赖不存在），按领域高内聚、契约解耦与单次输出受控的原则，将全量蓝图的 44 个稳定块严格划分至 6 个独立工作项，无重叠、无遗漏，彻底避免单次输出截断与组依赖悬空：\n\n1. work-item-product-foundation（6 个块）：聚焦目标用户、边界与主工作区，落实单人本地使用定位，彻底移除系统级全局快捷键承诺，改为页面聚焦后快捷键与常驻标签，闭合性能描述指标。\n2. work-item-core-features（6 个块）：聚焦快速捕获、便签流与标签，实现页面聚焦捕获、归档常规取消路径、回收区按删除前状态（active/archived）无损还原及移动端触控多选标签。\n3. work-item-extended-features（6 个块）：聚焦检索、详情编辑与数据便携，统一全文检索防抖与响应口径，实现详情保存/放弃/继续三分支与草稿防丢，统一 JSON Schema 与全覆盖单事务原子导入。\n4. work-item-tech-architecture（8 个块）：聚焦技术架构、存储索引、数据模型与服务契约，修正 IndexedDB 非布尔索引规范（数字映射/内存过滤），引入并发编辑修订号（revision）与冲突策略，统一定义 BackupPayload 传输契约，明确 localhost/HTTP/HTTPS 宿主边界，理顺技术验证范围。\n5. work-item-delivery-core（8 个块）：聚焦底层存储、捕获、卡片流与标签交付，落地非布尔复合索引单元测试、删除前状态还原与 7 天回收生命周期验证、触控标签与配额满载草稿保留验收。\n6. work-item-delivery-extended（10 个块）：聚焦搜索、编辑、备份恢复、生产构建与集成基准，落地防抖检索实现、详情并发冲突拦截、自导出自导入与单事务回滚、完备构建依赖闭包及真实浏览器（含 Safari）性能与配额防御实测验收。\n\n所有工作项依赖关系呈严格有向无环图（DAG），每个块具有唯一所有者，各子任务可独立、完整输出设计与交付内容。",
+  "workItems": [
+    {
+      "blockIds": [
+        "block-target-user-scenarios",
+        "block-problem-fragmented-ideas",
+        "block-outcomes-lightweight-experience",
+        "block-non-goals-exclusions",
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "dependsOn": [],
+      "goal": "修订产品目标、痛点、成效、非目标与主工作区范围，明确单人本地使用定位，移除系统级全局唤起与快捷键承诺，改为页面获焦快捷键与常驻标签，消除矛盾性能描述并规范主工作区布局。",
+      "id": "work-item-product-foundation"
+    },
+    {
+      "blockIds": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "feature-tag-organization",
+        "flow-tag-organization"
+      ],
+      "dependsOn": [
+        "work-item-product-foundation"
+      ],
+      "goal": "修订快速捕获、便签流与标签功能及交互流：快速捕获改为页面聚焦快捷键与防抖校验；便签流增加归档常规取消归档/恢复路径，回收区还原按删除前状态（active/archived）无损恢复，落实7天保留与超期清空；标签组织补充移动端点击/触控多选机制。",
+      "id": "work-item-core-features"
+    },
+    {
+      "blockIds": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "feature-data-portability",
+        "flow-data-portability"
+      ],
+      "dependsOn": [
+        "work-item-product-foundation"
+      ],
+      "goal": "修订即时检索、详情编辑与数据便携功能及交互流：统一全文检索响应时间与防抖闭合指标；详情模态明确保存后退出、放弃修改与继续编辑三分支，拦截关闭保护未保存草稿；备份恢复统一顶层版本键与JSON Schema，确立全覆盖导入原子事务，消除版本字段不一致。",
+      "id": "work-item-extended-features"
+    },
+    {
+      "blockIds": [
+        "tech-core-architecture",
+        "deployment-and-build-specification",
+        "module-system-decomposition",
+        "tech-storage-and-search",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "val-browser-storage-and-search-perf"
+      ],
+      "dependsOn": [
+        "work-item-product-foundation",
+        "work-item-core-features",
+        "work-item-extended-features"
+      ],
+      "goal": "修订核心架构、存储检索技术、实体模型、服务契约、错误恢复、模块解耦与构建规范：修正IndexedDB布尔索引限制（采用数字映射或内存过滤），定义并发编辑修订号（revision）与冲突策略，统一BackupPayload契约与原子事务回滚，明确localhost/HTTP/HTTPS运行环境边界与Safari未验证声明，消除重复技术验证任务。",
+      "id": "work-item-tech-architecture"
+    },
+    {
+      "blockIds": [
+        "task-foundation-and-storage",
+        "acceptance-foundation-and-storage",
+        "task-quick-capture",
+        "acceptance-quick-capture",
+        "task-note-card-view",
+        "acceptance-note-card-view",
+        "task-tag-organization",
+        "acceptance-tag-organization"
+      ],
+      "dependsOn": [
+        "work-item-tech-architecture"
+      ],
+      "goal": "修订基础存储、快速捕获、便签卡片与标签组织的交付任务与验收标准：落实非布尔索引底层实现与测试，验证删除前状态（active/archived）还原与7天回收生命周期，实现移动端触控标签多选与页面聚焦捕获交互，补全配额失败草稿保留与错误回退验收场景。",
+      "id": "work-item-delivery-core"
+    },
+    {
+      "blockIds": [
+        "task-search-filter",
+        "acceptance-search-filter",
+        "task-note-detail-edit",
+        "acceptance-note-detail-edit",
+        "task-data-portability",
+        "acceptance-data-portability",
+        "task-build-and-deploy",
+        "acceptance-build-and-deploy",
+        "val-storage-and-search-benchmark",
+        "acceptance-storage-and-search-benchmark"
+      ],
+      "dependsOn": [
+        "work-item-delivery-core"
+      ],
+      "goal": "修订即时检索、详情编辑、数据备份、构建部署与性能基准的交付任务与验收标准：实现带防抖闭合边界的检索引擎，实现详情编辑退出/放弃/并发检测与草稿保护，实现自导出自导入闭环与单事务覆盖导入，完善构建部署对全部业务任务的依赖闭包，统一真实浏览器环境（含Safari）性能与配额防御实测基准。",
+      "id": "work-item-delivery-extended"
+    }
+  ]
+}

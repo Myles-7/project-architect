@@ -4,7 +4,15 @@ import type {
   DiscoveryResult,
 } from '@project-architect/contracts';
 
-export type WorkspaceTab = 'chat' | 'files' | 'readiness' | 'documents' | 'timeline' | 'settings';
+export type WorkspaceTab =
+  | 'chat'
+  | 'dag'
+  | 'diagrams'
+  | 'files'
+  | 'readiness'
+  | 'documents'
+  | 'timeline'
+  | 'settings';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 

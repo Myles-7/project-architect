@@ -1,0 +1,13 @@
+本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。核对对象是 flash-materials-quality-publish-20261005-04 的真实 sourceRevision 24 蓝图和 quality-reviewed-r2 开发包，独立证据为 MATERIALS_R2_CORE_INDEPENDENT_REVIEW.md 与 ime-contract-counterexample.json。此前 sourceRevision 20 继承包不代表最新设计，不得用其旧问题覆盖已经正确的 r2 修订。
+
+已经正确并应完整保留：即时单按钮清空、300ms实时展示、旧结果在手动删空时清除、纯空格原文保留、失败保留输入、经典脚本/IIFE与textContent、无确认按钮和Enter专属提交、前台测量、五轮均值唯一边界、明确8080参数和npx首次联网前提、十文件与真实任务DAG、原图SHA256和实际查看记录、历史证据及当前安全边界说明。保持30个当前有效块的稳定ID，仅修改下列两点及其真实相关契约；不要重写已有目标、范围、无关页面或正确的任务细节。普通实现继续委托AI，不新增用户选择题。当前目标应用尚未开发，任何未来浏览器或性能测试仍未执行。
+
+1. 输入法清空后迟到input的契约仍未闭合。blk-tech-interface 当前三个实际事件回调中，compositionend会检查currentSessionToken与activeSessionId，但input仅检查!isComposing && !e.isComposing，完全没有作废会话边界。用原始导出回调执行的合成VM允许：compositionstart→清空（activeSessionId递增、isComposing=false、value=''）→旧compositionend被拒绝→迟到noncomposing input仍schedule→300ms后新造空值错误；如果原生事件已经将旧草稿写回DOM，则又可展示旧文字。这是实际契约的合成反例，不是已经复现的原生浏览器/IME故障。
+
+请拟定可直接指导开发的最小一致策略，覆盖清空时作废输入会话以及相关input/beforeinput/composition尾随事件，不只在compositionend加一次令牌检查。策略需要说明事件如何关联已作废会话、新用户输入怎样恢复正常防抖、何时读取DOM或已接受草稿，以及旧事件对value的写回怎样隔离或恢复。可以选择明确的输入节点生命周期隔离（新节点/旧节点generation与event.target检查）、会话状态机与新输入意图边界，或其他具有具体可观察行为的方案；不要求特定技术，但不能声称普通InputEvent自带应用自增令牌，也不能用单个全局currentSessionToken证明任意旧事件身份。同步data_model、interface、error、相关flow/page、实现任务、验证与验收。保留新真实键入/粘贴/新中文组合输入可正常开始新300ms调度，不能以永远拒绝后续input规避问题。写清“旧会话尾随事件”和“新的用户输入”测试序列；原生IME、浏览器差异及无法在当前环境确认的顺序列为开发阶段实际验证，不写100%或彻底杜绝所有原生竞态的无证据承诺。复用已有官方证据，不重复启动已不可用Docker。
+
+2. 清空性能口径仍有残留。blk-deliv-val-perf-benchmark.passCriteria 写“清空重置渲染耗时”，但其steps测click事件起始→requestAnimationFrame重绘前回调，这只能是清空处理与重绘前调度的代理指标。将该指标在content、goal、normalBehavior、scope、verification、completionCriteria、steps、passCriteria和关联outcomes/acceptance中统一为准确名称，起止一致，保留五轮均值<=50ms及待验证状态，不声称physical paint或用户实际看见已经测得。DOM就绪和输入防抖的五轮均值标准已闭合，不擅自改次数或阈值。目标应用未实现，不能把合成回调测试或官方研究写成目标应用的性能实测通过。
+
+当前sourceRevision24中9个无关块及原23条历史证据经过独立完整对象比较未变；继续保持它们原样，不覆盖、改写或删除。START_HERE由实际compiler按DAG编译，不生成伪前置试验，不修改已经正确的依赖来绕过模板。
+
+独立评审需直接检查最新候选的有效视图并逐项比较上述可执行事件契约；blockers=[]不代表合成反例或原生待验证问题已自动解决。最后仍经公开Core审批（自动验收记录，不冒称真人批准），新版本本地编译；不要自行编辑正式文件或旧收据。

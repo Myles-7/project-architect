@@ -1,0 +1,66 @@
+{
+  "blockers": [
+    "缺口 1：清空状态事务两阶段提交与代际时序跨块冲突。受影响块 ID：blk-feat-input-display、blk-flow-input-display、blk-tech-module。依据：rawInputs[10] 与 rawInputs[9]。当前上述区块中仍残留先递增 inputGeneration 再执行替换新节点的旧时序描述，若 replaceWith 或后续步骤抛错，旧输入节点闭包中的 bornGeneration 将无法匹配已递增的 inputGeneration，导致回滚后用户在原输入框继续输入被永久拦截；必须统一为全流程（捕获快照→内存预制→取消旧任务→节点替换→呈现复位/清错/回焦）全部成功后才原子提交递增 inputGeneration，失败回滚保持原代际与原闭包一致。",
+    "缺口 2：公共方法契约与初始化显式装配接口完整性。受影响块 ID：blk-tech-module、blk-tech-interface。依据：rawInputs[9] 与 rawInputs[10]。精简内部实现伪代码为非执行短示意时，必须保留全部 16 个核心公共方法（包括 AppController.init 及其显式 DOM 依赖、InputController.bindInputNode/focusInput、DebounceScheduler.schedule/cancel/hasPending、ResetController.handleReset/captureSnapshot/rollback、DisplayRenderer.renderProjectName/renderPlaceholder、FeedbackBanner.showInputError/clearInputError/showGlobalError/showSevereFallbackDraft、ValidatorModule.validate）的完整参数签名、所属模块与前置/后置条件，确保交付蓝图公共契约自洽完备。",
+    "缺口 3：严重回滚失败草稿兜底容器装配与提示契约。受影响块 ID：blk-page-main-layout、blk-tech-interface、blk-deliv-task-error-handling。依据：MDN HTMLTextAreaElement 规范与 rawInputs[8]、rawInputs[10]。在节点替换后回插失败的极端异常场景下，系统必须提供显式准备的独立只读文本框（<textarea id=\"severe-fallback-draft\" readonly>），通过纯文本赋值呈现完整原始草稿（保留换行与空格），通知文案诚实表明主输入框未完全恢复，允许用户手动选中复制且不执行页面刷新，当前布局与初始化依赖需闭合该容器来源。",
+    "缺口 4：回滚待调度任务无差别恢复空白草稿。受影响块 ID：blk-tech-interface、blk-deliv-task-reset-workflow、blk-deliv-acc-full-e2e。依据：rawInputs[8] 与 rawInputs[10]。清空失败回滚重新排队原待校验任务时，严禁使用 draft.trim().length > 0 过滤，必须无差别覆盖原始草稿快照，确保空字符串（\\\"\\\"）与纯空格（\\\"   \\\"）在回滚后均能按原定 300ms 调度触发非空校验提示并清除旧展示结果。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "DOM替换与原子回滚机制官方规范依据：replaceWith 执行后原节点移出父级子列表，新节点插入。若后续呈现或焦点抛错，必须显式原子回插原节点并移除新节点，防止残留两个输入框。",
+      "content": "The Element.replaceWith() method replaces this Element in the children list of its parent with a set of Node objects or strings. Strings are inserted as equivalent Text nodes. Return value: None (undefined). Exceptions: HierarchyRequestError DOMException thrown when the node cannot be inserted at the specified point in the hierarchy.",
+      "hash": "b1e88b35313510cf7c5e5695a09ec18d2153016d0c0189ae451d3dd7206626a5",
+      "id": "evidence-mdn-element-replacewith-official",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T09:45:59.902Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+    },
+    {
+      "applicability": "DOM节点插入与拓扑恢复依据：在清空失败回滚时，通过 parent.insertBefore(oldNode, mountedReplacementNode) 将原节点精确恢复至原相对位置，随后移除已挂载的新节点，保障单一合法输入节点。",
+      "content": "The insertBefore() method of the Node interface inserts a node before a reference node as a child of a specified parent node. If the given node already exists in the document, insertBefore() moves it from its current position to the new position (automatically removed from its existing parent before appending it to the specified new parent). referenceNode is not an optional parameter; you must explicitly pass a Node or null.",
+      "hash": "40443693726f17fc6165ec49ebfcad45f9f8f4566d5df1e54bf20505b0e3b03c",
+      "id": "evidence-mdn-node-insertbefore-official",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T09:46:20.785Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore"
+    },
+    {
+      "applicability": "严重回滚失败草稿兜底机制依据：使用只读 textarea 呈现未恢复草稿，原生保留换行与空格字符，不执行任何 HTML 解析或脚本执行，提供零 XSS 风险的安全手动复制兜底。",
+      "content": "HTMLTextAreaElement properties: readOnly is a boolean indicating that the user cannot modify the value of the control. value is a string representing the raw value contained in the control. select() method selects the contents of the control. Textarea values are treated as pure string data, preserving newlines and whitespace without HTML script parsing.",
+      "hash": "a5bcc7d5e0cf7e4dfc689452be61a1ea1caf55461b30f9cb34c9115526c21c94",
+      "id": "evidence-mdn-htmltextareaelement-readonly-official",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T09:46:37.804Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement"
+    },
+    {
+      "applicability": "DOM节点连接状态验证依据：在事件闭包中检测 node.isConnected，用于识别已脱离主文档树的废弃输入节点，防止孤儿节点的迟到事件篡改当前活跃输入状态。",
+      "content": "The read-only isConnected property of the Node interface returns a boolean indicating whether the node is connected (directly or indirectly) to a Document object. Returns true if the node is connected to its relevant context object, and false if not.",
+      "hash": "f1125510cd7b3b00e87bf0e0f7a114c4572de329ddcc451c7f38ceefcf024627",
+      "id": "evidence-mdn-node-isconnected-official",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T09:46:55.333Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected"
+    },
+    {
+      "applicability": "受控试验执行环境可行性说明：如实记录规划工具本地 Docker 环境不可用状态，不冒充已执行或已通过，未执行的浏览器与端到端实测保留至后续真实环境开发验证任务。",
+      "content": "规划环境尝试通过 Node 运行时执行清空两阶段状态事务机受控试验，因本地 Docker 守护进程未启动（failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine），容器化隔离测试未执行。此限制属于当前规划工具运行环境，不属于用户项目约束；蓝图中的浏览器与性能测试应在交付阶段具备真实浏览器环境时执行。",
+      "environment": "{\"runtime\":\"node\",\"image\":\"node:24.13.0-bookworm-slim\",\"network\":\"none\"}",
+      "id": "evidence-exp-docker-env-unavailable-current",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-05T09:47:14.037Z",
+      "outcome": "unexecuted",
+      "source": "experiment:experiment-68cd1580-79d5-497b-82a7-49b9225bb2c7",
+      "hash": "8dd44caa1ac53ffb9c19b61bc3a2d51e49425be60a88769586a1ff80bce9cdb2"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "基于材料索引 inp-01 原文说明、精确查看 fixture.png 原始像素（白底、上方黑字 Q7M4-8261 仅作布局参考、左蓝右橙色块），以及最新自动质量验收反馈（rawInputs[10] 等输入）进行独立约束与异常可行性分析。所有结论均为建议，不确认需求，不修改正式项目。\n\n本次查证主要发现及适用契约建议如下：\n1. 清空状态事务（Reset Transaction）与阶段代际提交时序：官方查证 MDN Element.replaceWith 与 Node.insertBefore 规范，确立严格的两阶段事务流程。清空必须遵循“captureSnapshot 捕获快照→内存预制新节点并复制 5 类持久属性与绑定闭包（原代际未提交）→cancel 取消原定时器并递增 schedulerEpoch→replaceWith 替换节点→呈现复位/清错/回焦→全流程成功才提交递增 inputGeneration 与更新 activeInputNode”。若任一步骤抛错，通过 insertBefore 回插原节点并移除已挂载新节点，保证原子拓扑唯一（消除双输入框缺陷 R6-B1）；原代际保持不变，使旧节点闭包 bornGeneration === inputGeneration 契约自洽，用户可继续输入、手动删空与重试。\n2. 回滚无差别恢复空白任务：清空失败回滚重新排队待校验任务时，严禁使用 trim 过滤，必须无差别覆盖原始草稿快照，确保空字符串（\\\"\\\"）与纯空格（\\\"   \\\"）能正常恢复 300ms 防抖调度，触发非空校验提示并清除旧展示（消除丢失任务缺陷 R6-B2）。\n3. 严重回滚失败草稿兜底可行性：官方查证 MDN HTMLTextAreaElement 规范，readOnly 属性与 value 纯字符串赋值天然杜绝 HTML/脚本解析，保留所有换行符与连续空白。在回插失败等极端 DOM 异常下，通过显式准备的独立只读 textarea 容器呈现未恢复草稿供手动选中复制，通知文案诚实说明主输入框未恢复，禁止刷新页面。\n4. 闭包孤儿节点防护依据：官方查证 MDN Node.isConnected 规范，为闭包监听中校验 node.isConnected 提供了标准化依据，确保脱离文档树的废弃旧节点迟到事件不污染活跃状态。\n5. 公共接口完整性契约：精简内部实现为非执行短示意时，必须完整保留 AppController.init 及包含 captureSnapshot、rollback、showSevereFallbackDraft、validate 等全部 16 个公共方法的所属模块、参数签名与后置条件，确保蓝图契约完备。\n6. 原生平台与规划环境诚实边界：桌面优先单页面原型，无服务端、无数据库、无登录。浏览器原生 IME 重定向、真实焦点及辅助技术表现，以及性能指标（清空重置至重绘前调度延迟五轮均值 <= 50ms 代理指标）均属于目标应用开发后的实测范围，蓝图中保留为待验证（unexecuted）。规划工具本地 Docker 未启动导致容器试验未执行（unavailable/unexecuted），属于规划环境限制而非用户项目约束。受影响契约涵盖 14 块关联闭包，其余 16 块保持稳定，具体修改已整理至 blockers 交由登记整合任务处理。"
+}

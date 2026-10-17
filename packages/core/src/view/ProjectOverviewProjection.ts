@@ -5,6 +5,7 @@ import type {
   OverviewSectionView,
   OverviewItemView,
   SectionMaturity,
+  TypedRef,
 } from '@project-architect/contracts';
 
 /**
@@ -18,6 +19,7 @@ import type {
  */
 export function projectOverviewProjection(snapshot: ProjectSnapshot): ProjectOverviewView {
   const decisions = snapshot.decisions?.items || [];
+  const assumptions = (snapshot.assumptions?.items || []).filter((a) => a.status === 'active');
   const openGaps = (snapshot.gaps?.gaps || []).filter((g) => g.status === 'open');
   const openConflicts = (snapshot.gaps?.conflicts || []).filter((c) => c.status === 'open');
 
@@ -66,6 +68,24 @@ export function projectOverviewProjection(snapshot: ProjectSnapshot): ProjectOve
       };
     });
 
+    // P1-5: Map active assumptions to the section matching their area or itemRefs
+    const sectionAssumptions = assumptions.filter(
+      (a) =>
+        section.itemRefs.includes(`assumption:${a.id}`) ||
+        (a.area && AreaRegistry.normalize(a.area) === section.id) ||
+        (!a.area && (section.id === 'technical_boundary' || section.id === 'tech_boundary'))
+    );
+
+    const assumptionItems: OverviewItemView[] = sectionAssumptions.map((a) => ({
+      ref: `assumption:${a.id}` as TypedRef,
+      statement: a.statement,
+      status: 'candidate' as const,
+      origin: 'agent' as const,
+      isLocked: false,
+      hasWarning: true,
+      warningReason: a.reason ? `架构假设待验证: ${a.reason}` : '架构假设待验证',
+    }));
+
     const openGapsForSection = openGaps.filter((g) => AreaRegistry.normalize(g.area) === section.id);
 
     return {
@@ -73,7 +93,7 @@ export function projectOverviewProjection(snapshot: ProjectSnapshot): ProjectOve
       title: section.title,
       kind: section.kind,
       maturity: section.maturity,
-      items,
+      items: [...items, ...assumptionItems],
       hasUnresolvedGaps: openGapsForSection.length > 0,
       unresolvedGapCount: openGapsForSection.length,
     };

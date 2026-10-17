@@ -1,0 +1,185 @@
+{
+  "blockers": [],
+  "clarification": {
+    "constraints": "",
+    "delegated": [],
+    "outcomes": "",
+    "problem": "日常随手产生的灵感缺乏轻量集中的记录与归纳整理机制，容易散落丢失。",
+    "scope": "",
+    "target": "为用户个人提供一个随时记录与整理随手灵感的小工具。"
+  },
+  "evidence": [
+    {
+      "applicability": "用户原始需求输入，确立项目核心目标为个人随手灵感记录与整理工具。",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-86bacaab-1e80-4000-9f7c-1f7423d36287",
+      "kind": "user",
+      "location": "inputs/inp-01/source.txt",
+      "obtainedAt": "2026-10-04T14:42:35.734Z",
+      "source": "input:inp-01"
+    },
+    {
+      "applicability": "已归档的输入材料，确认用户意图与文本哈希一致。",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-408caf35-f350-4544-8ce2-241fa183a305",
+      "kind": "material",
+      "location": "inputs/inp-01/source.txt",
+      "obtainedAt": "2026-10-04T14:42:33.013Z",
+      "source": "material:input:inp-01"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "调研现代个人灵感记录与轻量整理工具的常见交互范式与最佳实践（如快速录入抽屉、标签流与卡片排版）。",
+      "kind": "research"
+    },
+    {
+      "goal": "调研不同平台形态（PWA vs 桌面轻量浮窗 vs 终端 CLI）在快捷呼出与跨平台适配上的技术实现路径。",
+      "kind": "research"
+    }
+  ],
+  "groups": [],
+  "questions": [
+    {
+      "allowFreeInput": true,
+      "area": "product",
+      "createdAt": "2026-10-04T14:42:35.000Z",
+      "decisionKey": "product.platform-form",
+      "dependsOn": [],
+      "id": "q-platform-form",
+      "importance": "critical",
+      "issueRef": "issue-platform-form",
+      "options": [
+        {
+          "approach": "开发响应式 Web 应用并配置 PWA 离线清单，手机与电脑浏览器均可直接访问并添加到主屏幕。",
+          "gain": "跨平台无安装成本，多端随处可用，界面开发与迭代速度快。",
+          "impact": "技术栈确定为 Web 前端技术，交付形态为单页应用（SPA）或全栈 Web。",
+          "key": "web-pwa",
+          "label": "响应式 Web 应用（支持 PWA）",
+          "reversibility": "moderate",
+          "sacrifice": "无法直接通过系统全局热键一秒唤起，与本地系统底层能力整合较弱。"
+        },
+        {
+          "approach": "基于轻量桌面框架（如 Tauri/Electron）构建托盘常驻应用，支持一键热键唤出随手记浮窗。",
+          "gain": "极速记录体验，与桌面工作流深度融合，支持本地文件系统直接访问与开机常驻。",
+          "impact": "需要引入桌面应用壳层及原生热键/托盘管理模块。",
+          "key": "desktop-floating",
+          "label": "桌面快捷轻量工具（托盘常驻/全局热键浮窗）",
+          "reversibility": "moderate",
+          "sacrifice": "无法原生在手机端使用，需要针对操作系统打包安装。"
+        },
+        {
+          "approach": "开发终端可执行程序，支持短命令快速追加灵感（如 idea add）及 TUI 列表管理。",
+          "gain": "对开发者极致轻量极速，内存占用极低，无任何 GUI 渲染开销，与终端工作流无缝融合。",
+          "impact": "交付物为单一可执行 CLI 工具，无图形界面设计需求。",
+          "key": "cli-terminal",
+          "label": "终端命令行工具（CLI / TUI）",
+          "reversibility": "easy",
+          "sacrifice": "无法直观浏览富文本、图片或进行拖拽重排，移动端不可用。"
+        }
+      ],
+      "question": "该灵感小工具的核心形态与主运行环境是什么？",
+      "reason": "由于用户仅提出做随手灵感小工具，尚未指明运行平台。运行形态直接决定交互模式（全局快捷唤起 vs 移动/浏览器访问 vs 终端命令行）以及后续技术选型，必须在规划前明确方向。",
+      "recommendation": "推荐采用响应式 Web 应用（支持 PWA），兼顾手机随手记与桌面端整理，跨平台无安装负担。",
+      "recommendationReason": "灵感往往在不同场景（手机随身、电脑工作）随时产生，Web/PWA 能够以最低的开发与维护成本覆盖多端访问，后期如需封装桌面端（如 Tauri）也非常平滑。",
+      "recommendedOptionKey": "web-pwa",
+      "selectionMode": "single",
+      "status": "proposed"
+    },
+    {
+      "allowFreeInput": true,
+      "area": "product",
+      "createdAt": "2026-10-04T14:42:35.000Z",
+      "decisionKey": "product.organization-model",
+      "dependsOn": [],
+      "id": "q-organization-model",
+      "importance": "high",
+      "issueRef": "issue-organization-model",
+      "options": [
+        {
+          "approach": "每条灵感作为一张独立微卡片，支持随手打上一个或多个标签，并提供全文搜索、标签过滤与归档功能。",
+          "gain": "录入零心智负担，界面直观轻快，碎片化信息查找迅速。",
+          "impact": "数据模型采用扁平灵感实体+标签关联，UI 核心为瀑布流或时间线卡片视图。",
+          "key": "tag-stream",
+          "label": "卡片流 + 自由标签 + 快速检索",
+          "reversibility": "easy",
+          "sacrifice": "当灵感需要发展为系统性长篇或复杂项目时，缺乏深层大纲与父子结构支撑。"
+        },
+        {
+          "approach": "提供类似笔记本的多级文件夹/大纲树结构，支持灵感归档入具体分类，并可在节点下延展细化。",
+          "gain": "条理清晰，结构化强，方便将碎片灵感逐步沉淀、合并为成体系的方案文档。",
+          "impact": "数据模型需支持树形层级或父子关系，UI 需包含导航树/大纲树编辑器。",
+          "key": "tree-notebook",
+          "label": "分层树形目录 / 大纲笔记本",
+          "reversibility": "moderate",
+          "sacrifice": "录入时需要选择目录或大纲层级，操作步骤稍多，随手记的即时性受影响。"
+        },
+        {
+          "approach": "用户只需随手输入纯文本，系统后台自动进行语义向量计算，给出智能分类标签、关联灵感推荐与摘要整理。",
+          "gain": "完全免除人工整理工作，能够自动发现不同灵感之间的隐藏关联与聚类。",
+          "impact": "架构需引入模型调用接口、异步任务或向量计算库，数据需增加 embedding/摘要字段。",
+          "key": "ai-assisted",
+          "label": "AI 辅助语义聚类与自动整理",
+          "reversibility": "moderate",
+          "sacrifice": "依赖外部 AI 模型 API 或本地向量模型，增加系统复杂度、成本及可能的网络/算力依赖。"
+        }
+      ],
+      "question": "灵感录入后，你期望主要通过哪种方式对它们进行组织和整理？",
+      "reason": "随手记录与后续整理是该工具的两个核心动作。不同整理方式决定了信息架构、数据模型以及核心页面的布局设计。",
+      "recommendation": "推荐轻量卡片流与灵活标签/状态过滤，兼顾随手记的零阻力和初期的快速归类。",
+      "recommendationReason": "灵感初期往往碎片化且不成熟，卡片流与标签让录入阻力降到最低，避免在记录瞬间因思考分类目录而打断思路，日后可平滑扩展更多整理维度。",
+      "recommendedOptionKey": "tag-stream",
+      "selectionMode": "single",
+      "status": "proposed"
+    },
+    {
+      "allowFreeInput": true,
+      "area": "technical",
+      "createdAt": "2026-10-04T14:42:35.000Z",
+      "decisionKey": "technical.storage-strategy",
+      "dependsOn": [],
+      "id": "q-storage-strategy",
+      "importance": "high",
+      "issueRef": "issue-storage-strategy",
+      "options": [
+        {
+          "approach": "数据直接保存在本地用户指定的目录（如纯 Markdown 文件或 SQLite 数据库），单机独立运行。",
+          "gain": "极致隐私安全，读写无网络延迟，无需服务器运维与费用，数据透明易于备份与脚本处理。",
+          "impact": "架构设计为纯本地单机应用，重点处理本地文件 I/O 或嵌入式数据库查询。",
+          "key": "local-file",
+          "label": "本地优先文件/数据库（Markdown / SQLite）",
+          "reversibility": "easy",
+          "sacrifice": "多设备自动同步需依赖第三方网盘（如 iCloud/坚果云/Syncthing）或 Git 手动同步。"
+        },
+        {
+          "approach": "在浏览器端利用 IndexedDB / LocalStorage 持久化，配合导入导出 JSON/Markdown 文件进行备份。",
+          "gain": "纯静态部署，无需任何后端服务器或本地文件系统权限，打开网址即用。",
+          "impact": "完全无后端架构（静态单页应用），依赖客户端数据库与备份还原机制。",
+          "key": "browser-storage",
+          "label": "纯浏览器端本地存储（IndexedDB + 导入导出）",
+          "reversibility": "easy",
+          "sacrifice": "浏览器若清理站点缓存存在丢失风险，多端数据完全独立，需手动导入导出迁移。"
+        },
+        {
+          "approach": "搭配轻量后端服务（如 Node/Go/Python + SQLite/PostgreSQL）或云 BaaS（如 Supabase），提供多端同步 API。",
+          "gain": "多端无缝实时同步，在任何联网设备登录即可看到完整灵感库，不易丢失。",
+          "impact": "系统转为前后端分离架构，需设计鉴权、RESTful/WebSocket API 与数据同步防冲突逻辑。",
+          "key": "cloud-sync",
+          "label": "自建轻量后端 / 云同步 API",
+          "reversibility": "moderate",
+          "sacrifice": "需要额外编写和部署后端服务，可能涉及账号鉴权、数据库运维与服务器成本。"
+        }
+      ],
+      "question": "灵感数据的存储与持久化方式你更倾向于哪种？",
+      "reason": "个人工具的存储方式直接决定了开发成本、部署难度、数据隐私与跨端同步体验，是技术架构的最关键分歧点。",
+      "recommendation": "推荐本地优先明文文件存储（如 Markdown/JSON 文件或本地 SQLite），确保数据隐私与掌控度。",
+      "recommendationReason": "对于个人开发者而言，随手灵感属于私密思考，本地明文或数据库存储无需部署云端服务，隐私绝对安全，文件能与其他工具无缝配合且易于备份。",
+      "recommendedOptionKey": "local-file",
+      "selectionMode": "single",
+      "status": "proposed"
+    }
+  ],
+  "summary": "已完整读取并核验用户输入材料。用户意图是为自己打造一款整理随手灵感的小工具。当前处于澄清（clarify）阶段，核心诉求明确，但产品形态、整理机制及存储架构存在关键分歧。已就应用形态（Web/PWA vs 桌面浮窗 vs CLI）、组织机制（卡片流标签 vs 树形大纲 vs AI辅助）和持久化方案（本地文件 vs 浏览器端 vs 云端同步）提出三道独立选择题以供决策，未提前生成完整方案。"
+}

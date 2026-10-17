@@ -1,0 +1,887 @@
+{
+  "id": "run-3a9bf179-44bd-4b09-8bb8-f20e644ac10d",
+  "projectId": "proj-1791125866356",
+  "stage": "feedback",
+  "basis": {
+    "revision": 25,
+    "hash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd"
+  },
+  "operationId": "real-flash-vague-quality-20261005-01-feedback-1791132094491",
+  "request": {
+    "stage": "feedback",
+    "expectedRevision": 24,
+    "operationId": "real-flash-vague-quality-20261005-01-feedback-1791132094491",
+    "feedback": "这是一轮自动质量验收反馈，不是真人新增需求，也不是人工批准。请依据原始“给自己整理随手灵感”的目标、已确认 local_web 选项的能力与代价、当前正式蓝图及真实官方证据核对下列缺陷。清单来自先前草案的独立审阅；当前已经正确解决的项应原样保留，未解决项仅修订相关依赖闭包，全部新内容仍作为待批准 ChangeSet。不得人为伪造已通过的试验、放松 Core 不可变证据契约或把技术建议宣称为已人工确认。普通技术实现由 AI 拟定，不再要求用户选普通库。\n\n1. 目标与平台边界：主要目标是本人使用，不扩成面向群体的发布产品。已选轻量 Web SPA，必须去掉系统级“全局唤起/全局快捷键”承诺；可保留页面获得焦点后的快捷键、常驻标签或书签。同步 target、scope、feature、flow、page、interface、task 与 acceptance，不能仅在非目标中补一句而保留相反使用场景。\n2. 归档与标签操作：归档后需要从归档视图提供常规取消归档/恢复路径，而不只有短暂撤销 Toast；移动端多标签选择提供点击/触控操作，不能仅依靠 Ctrl/Cmd。保留原有轻量整理范围。\n3. 删除与撤销状态：撤销删除或从回收区还原必须恢复删除前的 active/archived 状态，不一律恢复 active。遵守已经通过 API 自动接受的七天回收变更：删除记录持久化进入回收区，七天内可还原，过期时给出提示并执行明确的永久删除；不再混用“五秒倒计时结束物理主键删除”和“倒计时结束才落盘软删除”。界定倒计时、刷新/重开、失败回滚、过期提示与恢复状态，接口/数据/任务/验收一致。\n4. 编辑与并发：明确保存后退出、放弃修改、继续编辑，禁止所有关闭动作一律静默自动保存。保存失败拦截关闭并保留当前草稿、可复制/导出与重试。saveNote 等契约必须有两标签页并发版本冲突策略；结构 schemaVersion/version 不能冒充记录修订号。同步数据字段、服务输入输出、错误处理和可执行验收。\n5. 导入导出往返：统一备份顶层版本键、JSON Schema、BackupPayload、导出和导入验证规则，导出 version:1 与导入 schemaVersion:1 不得并存。合法的自导出文件必须可自导入。全覆盖导入的 clear/add/metadata 更新必须在同一原子事务内，失败时保留原数据；不能以临时内存快照再回写代替原子性。明确文件校验、取消、配额失败、事务回滚与重试。\n6. IndexedDB/Dexie 约束：依据真实官方规范处理可索引键类型。Boolean isPinned/isFavorite 不是有效 IndexedDB key，禁止直接建 boolean 索引或 where(...).equals(true)。AI 可选择不建 boolean 索引、用内存过滤，或以明确数字映射索引；所选策略必须同步 Schema、查询、数据/备份版本和相关验收，不能保留相反契约。\n7. 部署与离线前提：Vite base:'./' 不能证明 ESM 应用可直接 file:// 免服务器运行；明确 localhost/HTTP 或 HTTPS 的静态资源运行方式与 CORS/安全上下文边界。区分首次资源取得、已经打开/取得缓存的页面断网操作与离线重新打开。不要把尚待演进的 PWA/Service Worker 能力写成首版既有保证；如果首版仅保证已打开页面的本地数据操作，就据实缩小承诺并保持全包一致。\n8. 性能口径闭合：含 80ms 防抖的检索端到端目标统一一个通过边界，消除 <150ms、<=150ms、>250ms 等互相矛盾且 150–250ms 无定义的规则。明确设备、浏览器、数据规模、测量起止、分位/重复方法及通过/失败/降级结果；数字仍是待验证目标，不是已实测事实。应用冷启动与检索分别定义。\n9. 浏览器与草稿：如果支持 Safari，验证任务必须覆盖所承诺版本的 Safari/WebKit 与存储/安全上下文差异；若当前环境不能实测，标为未验证开发任务而非通过。配额失败时的 localStorage 草稿降级与“唯一 IndexedDB 持久化”声明必须一致，明确草稿所在位置、可用性边界和失败后如何恢复，禁止零丢稿/100% 保证。\n10. 可执行任务次序与重复验证：当前 START_HERE 将 val-browser-storage-and-search-perf 指作首个可执行任务，其步骤却要求构建和运行已经实现的 UI、Storage、Search 与 Backup，而 dependsOn 仅含技术与接口规范块。明确区分可单独搭最小验证程序的前置 spike 与完成实现后的性能/恢复集成验证；后者必须依赖真实工程、UI、搜索、备份及构建任务的稳定 task ID，不能把规范块当作已完成代码。task-build-and-deploy 应依赖 tag/search/detail 等所有需进入正式包的实现任务，不能未完成相关代码就声称全量构建与集成验证可执行。合并两个重复的性能 validation，统一指标、真实环境与测量步骤，保持实现→集成→验证的可执行依赖，不把同一功能拆成多个重复独立任务。同步 START_HERE、开发计划、tasks.json 对应的蓝图任务与验收。\n\n请真实查证需要的官方约束；当前容器/平台不可用时不要反复改写目标安排同类试验，将未验证能力和依赖写进开发验证任务。保留所有无关块稳定 ID 和精确内容。最终独立评审必须按上述跨契约逐项核对实际草案和依赖闭包，不能把 Runtime 完成、覆盖数量或无开放问题当作内容已通过。\n"
+  },
+  "effectiveConfig": {
+    "concurrency": 4,
+    "designModel": "gemini-3.8-flash-high",
+    "reviewModel": "gemini-3.8-flash-high",
+    "officialHosts": [
+      "antigravity.google",
+      "www.antigravity.google",
+      "modelcontextprotocol.io",
+      "ts.sdk.modelcontextprotocol.io",
+      "nodejs.org",
+      "docs.docker.com",
+      "docs.python.org",
+      "playwright.dev",
+      "react.dev",
+      "www.typescriptlang.org",
+      "vite.dev",
+      "expressjs.com",
+      "developer.mozilla.org",
+      "www.w3.org",
+      "www.rfc-editor.org",
+      "docs.github.com",
+      "docs.anthropic.com",
+      "ai.google.dev"
+    ]
+  },
+  "status": "cancelled",
+  "tasks": [
+    {
+      "id": "task-1083ecae-d680-4676-ac2e-20b45aa307f1",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 2,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T18:52:08.329Z",
+      "partitionPlanTaskId": "task-2310579e-4d62-4297-9bc8-d24be674a4e7",
+      "partitionTaskIds": [
+        "task-04a49b0c-2ca1-4d21-8176-056cc7a74fc6",
+        "task-e212c988-8ba8-4219-946e-4552c865adff",
+        "task-91581697-8851-4442-adb0-64d2db157e45",
+        "task-eaed5873-8bd2-400a-b560-49dcb7a672ca",
+        "task-cbbea244-e4a1-47d3-8c12-3a4caf2c93b8",
+        "task-8c4f6468-469c-4b85-9ca5-70cec2b0dbd1",
+        "task-020a7385-c7c9-481d-8105-b191c11bedc4",
+        "task-1fc49d8b-8947-4543-bb26-bbed0c80ea9d",
+        "task-c1ac9c6b-2301-48f6-bc60-77867c693a73"
+      ],
+      "outputOrigin": "assembly",
+      "outputHash": "e0e7e6242ef2648fcc8155f679c80f12331985d155195fd584f49c9bda4b2326",
+      "outputRef": "tasks/task-1083ecae-d680-4676-ac2e-20b45aa307f1/result.json",
+      "deferredQuestions": [],
+      "completedAt": "2026-10-04T21:21:38.818Z"
+    },
+    {
+      "id": "task-574ce60f-5d3b-4140-96b5-0caf3052a5a9",
+      "kind": "research",
+      "goal": "独立分析材料中的约束、异常使用场景与可行性风险；只返回证据和建议。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 2,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T18:52:08.419Z",
+      "completedAt": "2026-10-04T18:55:27.368Z",
+      "outputRef": "tasks/task-574ce60f-5d3b-4140-96b5-0caf3052a5a9/result.json",
+      "outputHash": "e79b596bb46bbf6f6fd9c8a60418e7c9c107609fc3013ec82df5e9b5ae646efd"
+    },
+    {
+      "id": "task-2310579e-4d62-4297-9bc8-d24be674a4e7",
+      "kind": "decomposition",
+      "goal": "任务拆分：生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n父范围：null",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T20:17:10.995Z",
+      "completedAt": "2026-10-04T20:18:14.031Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-2310579e-4d62-4297-9bc8-d24be674a4e7/result.json",
+      "outputHash": "5e26e43910508b1fe9128bc6494010d41a8aa01937408d44cc93ee47db922260"
+    },
+    {
+      "id": "task-04a49b0c-2ca1-4d21-8176-056cc7a74fc6",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订产品目标画像、痛点、预期成效、非目标边界、核心功能范围与主工作区页面规范。去除面向群体的发布设想与系统全局热键承诺，明确个人浏览器内轻量单页应用定位（仅支持页面焦点快捷键、书签与常驻标签）；界定已加载页面的离线本地操作边界，消除首版PWA与file://协议过度承诺；对齐回收区7天生命周期、常驻横幅与二次确认清理设计。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 2,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "block-target-user-scenarios",
+          "block-problem-fragmented-ideas",
+          "block-outcomes-lightweight-experience",
+          "block-non-goals-exclusions",
+          "block-scope-core-boundaries",
+          "page-main-workspace"
+        ],
+        "dependsOn": [],
+        "goal": "修订产品目标画像、痛点、预期成效、非目标边界、核心功能范围与主工作区页面规范。去除面向群体的发布设想与系统全局热键承诺，明确个人浏览器内轻量单页应用定位（仅支持页面焦点快捷键、书签与常驻标签）；界定已加载页面的离线本地操作边界，消除首版PWA与file://协议过度承诺；对齐回收区7天生命周期、常驻横幅与二次确认清理设计。",
+        "id": "work-item-product-foundation"
+      },
+      "requiredBlockIds": [
+        "block-target-user-scenarios",
+        "block-problem-fragmented-ideas",
+        "block-outcomes-lightweight-experience",
+        "block-non-goals-exclusions",
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "startedAt": "2026-10-04T20:48:01.208Z",
+      "completedAt": "2026-10-04T20:50:16.549Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-04a49b0c-2ca1-4d21-8176-056cc7a74fc6/result.json",
+      "outputHash": "477ef160f4f7d5e7570e4cc3b71df88ffb3992336669d5e75f687a09a692a071"
+    },
+    {
+      "id": "task-e212c988-8ba8-4219-946e-4552c865adff",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订技术栈架构、模块分解、IndexedDB/Dexie存储方案、核心数据实体模型、服务接口契约、全局错误与状态恢复机制，以及基础存储驱动实现任务与验收。依据IndexedDB官方规范剔除boolean类型无效索引（改用内存过滤或数字映射）；分离结构schemaVersion与并发修订号revision并建立乐观冲突检测；统一BackupPayload契约与原子导入事务要求；明确组件内存草稿保留策略，杜绝绝对化零丢稿宣称；规范回收区previousStatus还原状态与trashedAt时间戳。",
+      "dependsOn": [
+        "task-04a49b0c-2ca1-4d21-8176-056cc7a74fc6"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 2,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "tech-core-architecture",
+          "module-system-decomposition",
+          "tech-storage-and-search",
+          "data-model-core-entities",
+          "interface-service-contracts",
+          "error-architecture-and-recovery",
+          "task-foundation-and-storage",
+          "acceptance-foundation-and-storage"
+        ],
+        "dependsOn": [
+          "work-item-product-foundation"
+        ],
+        "goal": "修订技术栈架构、模块分解、IndexedDB/Dexie存储方案、核心数据实体模型、服务接口契约、全局错误与状态恢复机制，以及基础存储驱动实现任务与验收。依据IndexedDB官方规范剔除boolean类型无效索引（改用内存过滤或数字映射）；分离结构schemaVersion与并发修订号revision并建立乐观冲突检测；统一BackupPayload契约与原子导入事务要求；明确组件内存草稿保留策略，杜绝绝对化零丢稿宣称；规范回收区previousStatus还原状态与trashedAt时间戳。",
+        "id": "work-item-tech-foundation"
+      },
+      "requiredBlockIds": [
+        "tech-core-architecture",
+        "module-system-decomposition",
+        "tech-storage-and-search",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "task-foundation-and-storage",
+        "acceptance-foundation-and-storage"
+      ],
+      "startedAt": "2026-10-04T21:10:57.003Z",
+      "completedAt": "2026-10-04T21:13:31.046Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-e212c988-8ba8-4219-946e-4552c865adff/result.json",
+      "outputHash": "e199d7fbaaf52638a601922c45aeb3adae58e81c59ccff08bd99fcc59fab8d24"
+    },
+    {
+      "id": "task-91581697-8851-4442-adb0-64d2db157e45",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订秒级灵感极速捕获功能、交互流、组件开发任务与验收标准。去除系统级全局唤起描述，保留页面获得焦点后的N键聚焦与自适应展开；规范正文标签正则提取与快捷键提交；明确配额满或写入异常时输入框内容与标签在组件内完整保留不关闭的防御分支。",
+      "dependsOn": [
+        "task-e212c988-8ba8-4219-946e-4552c865adff"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-quick-capture",
+          "flow-quick-capture",
+          "task-quick-capture",
+          "acceptance-quick-capture"
+        ],
+        "dependsOn": [
+          "work-item-tech-foundation"
+        ],
+        "goal": "修订秒级灵感极速捕获功能、交互流、组件开发任务与验收标准。去除系统级全局唤起描述，保留页面获得焦点后的N键聚焦与自适应展开；规范正文标签正则提取与快捷键提交；明确配额满或写入异常时输入框内容与标签在组件内完整保留不关闭的防御分支。",
+        "id": "work-item-quick-capture"
+      },
+      "requiredBlockIds": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "task-quick-capture",
+        "acceptance-quick-capture"
+      ],
+      "startedAt": "2026-10-04T21:13:31.277Z",
+      "completedAt": "2026-10-04T21:16:02.213Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-91581697-8851-4442-adb0-64d2db157e45/result.json",
+      "outputHash": "d66b3b42688b3f1d83b49ef44d65841559328f47cb19407c5ef9503746023f67"
+    },
+    {
+      "id": "task-eaed5873-8bd2-400a-b560-49dcb7a672ca",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订便签卡片流展示、状态流转、回收区7天保留与清理功能、交互流、任务与验收标准。在归档视图中提供常规取消归档/恢复路径；实现便签移入回收区持久化与7天剩余天数计算；还原便签时精准恢复至删除前的active或archived状态（不一律重置为active）；落实回收区超期常驻横幅提示与二次确认彻底清空机制，杜绝5秒倒计时物理删除与软删除混淆；完善写入失败状态回滚保护。",
+      "dependsOn": [
+        "task-e212c988-8ba8-4219-946e-4552c865adff"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-note-card-view",
+          "flow-note-card-actions",
+          "task-note-card-view",
+          "acceptance-note-card-view"
+        ],
+        "dependsOn": [
+          "work-item-tech-foundation"
+        ],
+        "goal": "修订便签卡片流展示、状态流转、回收区7天保留与清理功能、交互流、任务与验收标准。在归档视图中提供常规取消归档/恢复路径；实现便签移入回收区持久化与7天剩余天数计算；还原便签时精准恢复至删除前的active或archived状态（不一律重置为active）；落实回收区超期常驻横幅提示与二次确认彻底清空机制，杜绝5秒倒计时物理删除与软删除混淆；完善写入失败状态回滚保护。",
+        "id": "work-item-note-feed-lifecycle"
+      },
+      "requiredBlockIds": [
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "task-note-card-view",
+        "acceptance-note-card-view"
+      ],
+      "startedAt": "2026-10-04T21:13:31.098Z",
+      "completedAt": "2026-10-04T21:15:37.069Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-eaed5873-8bd2-400a-b560-49dcb7a672ca/result.json",
+      "outputHash": "fdd1524d05cbc5b8c3a63a966fc9db1ece47fcc6d4258973a05b4f920fa13341"
+    },
+    {
+      "id": "task-cbbea244-e4a1-47d3-8c12-3a4caf2c93b8",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订多维标签聚合、过滤与重命名功能、交互流、任务与验收标准。增加移动端/触控环境下的点击切换多标签选择支持（不强制依赖Ctrl/Cmd）；侧边栏标签聚合严格排除处于回收区的便签；实现标签全局原子重命名与事务回滚保护，保持轻量扁平标签组织体验。",
+      "dependsOn": [
+        "task-e212c988-8ba8-4219-946e-4552c865adff"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-tag-organization",
+          "flow-tag-organization",
+          "task-tag-organization",
+          "acceptance-tag-organization"
+        ],
+        "dependsOn": [
+          "work-item-tech-foundation"
+        ],
+        "goal": "修订多维标签聚合、过滤与重命名功能、交互流、任务与验收标准。增加移动端/触控环境下的点击切换多标签选择支持（不强制依赖Ctrl/Cmd）；侧边栏标签聚合严格排除处于回收区的便签；实现标签全局原子重命名与事务回滚保护，保持轻量扁平标签组织体验。",
+        "id": "work-item-tag-management"
+      },
+      "requiredBlockIds": [
+        "feature-tag-organization",
+        "flow-tag-organization",
+        "task-tag-organization",
+        "acceptance-tag-organization"
+      ],
+      "startedAt": "2026-10-04T21:13:31.226Z",
+      "completedAt": "2026-10-04T21:15:12.270Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-cbbea244-e4a1-47d3-8c12-3a4caf2c93b8/result.json",
+      "outputHash": "2c9e466fe94f092d1fa26a9faddf44449b064cf75c5d4bc37d0104d14d9626c6"
+    },
+    {
+      "id": "task-8c4f6468-469c-4b85-9ca5-70cec2b0dbd1",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订即时全文模糊检索与关键词高亮功能、交互流、任务与验收标准。统一含80ms防抖的端到端检索性能目标边界（统一为<=150ms单一基准）；落实常规视图严格隔离回收区便签、回收区视图限定在回收区内搜索的作用域划分；强化特殊正则符号安全转义与Esc快捷键重置交互。",
+      "dependsOn": [
+        "task-e212c988-8ba8-4219-946e-4552c865adff"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-search-filter",
+          "flow-search-filter",
+          "task-search-filter",
+          "acceptance-search-filter"
+        ],
+        "dependsOn": [
+          "work-item-tech-foundation"
+        ],
+        "goal": "修订即时全文模糊检索与关键词高亮功能、交互流、任务与验收标准。统一含80ms防抖的端到端检索性能目标边界（统一为<=150ms单一基准）；落实常规视图严格隔离回收区便签、回收区视图限定在回收区内搜索的作用域划分；强化特殊正则符号安全转义与Esc快捷键重置交互。",
+        "id": "work-item-instant-search"
+      },
+      "requiredBlockIds": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "task-search-filter",
+        "acceptance-search-filter"
+      ],
+      "startedAt": "2026-10-04T21:13:31.169Z",
+      "completedAt": "2026-10-04T21:15:19.753Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-8c4f6468-469c-4b85-9ca5-70cec2b0dbd1/result.json",
+      "outputHash": "be01ad63f894ce920fd6342fd414a31d95017abb311e28d30bdbc759298d64bd"
+    },
+    {
+      "id": "task-020a7385-c7c9-481d-8105-b191c11bedc4",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订便签详情模态展示与Markdown编辑功能、交互流、任务与验收标准。规范详情弹窗明确的“保存后退出”、“放弃修改”与“继续编辑”交互，禁止任意关闭动作一律静默自动保存；回收区便签强制展示只读保护条并提供还原与彻底删除入口；保存失败时拦截弹窗关闭并保留当前编辑草稿与重试入口；对接双标签页并发修订冲突检测与提示。",
+      "dependsOn": [
+        "task-e212c988-8ba8-4219-946e-4552c865adff"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-note-detail-edit",
+          "flow-note-detail-edit",
+          "task-note-detail-edit",
+          "acceptance-note-detail-edit"
+        ],
+        "dependsOn": [
+          "work-item-tech-foundation"
+        ],
+        "goal": "修订便签详情模态展示与Markdown编辑功能、交互流、任务与验收标准。规范详情弹窗明确的“保存后退出”、“放弃修改”与“继续编辑”交互，禁止任意关闭动作一律静默自动保存；回收区便签强制展示只读保护条并提供还原与彻底删除入口；保存失败时拦截弹窗关闭并保留当前编辑草稿与重试入口；对接双标签页并发修订冲突检测与提示。",
+        "id": "work-item-note-detail-edit"
+      },
+      "requiredBlockIds": [
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "task-note-detail-edit",
+        "acceptance-note-detail-edit"
+      ],
+      "startedAt": "2026-10-04T21:15:12.334Z",
+      "completedAt": "2026-10-04T21:17:07.617Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-020a7385-c7c9-481d-8105-b191c11bedc4/result.json",
+      "outputHash": "6b9bf06be5cf601f389fb7c39cd9b6b461f8a30c7944d5fc1c05a4e710f90852"
+    },
+    {
+      "id": "task-1fc49d8b-8947-4543-bb26-bbed0c80ea9d",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订数据备份导出、恢复、回收区策略与温和防丢提醒功能、交互流、任务与验收标准。统一顶层契约BackupPayload为schemaVersion: 1，保障合法的自导出文件100%可自导入；全量覆盖导入必须在单一Dexie原子事务内执行（彻底移除临时内存快照代替原子性的做法）；默认导出包含回收区便签并提供排除选项；导入超期便签即时激活回收区预警；规范累计变更计数追踪与防丢提醒点亮。",
+      "dependsOn": [
+        "task-e212c988-8ba8-4219-946e-4552c865adff"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-data-portability",
+          "flow-data-portability",
+          "task-data-portability",
+          "acceptance-data-portability"
+        ],
+        "dependsOn": [
+          "work-item-tech-foundation"
+        ],
+        "goal": "修订数据备份导出、恢复、回收区策略与温和防丢提醒功能、交互流、任务与验收标准。统一顶层契约BackupPayload为schemaVersion: 1，保障合法的自导出文件100%可自导入；全量覆盖导入必须在单一Dexie原子事务内执行（彻底移除临时内存快照代替原子性的做法）；默认导出包含回收区便签并提供排除选项；导入超期便签即时激活回收区预警；规范累计变更计数追踪与防丢提醒点亮。",
+        "id": "work-item-data-portability"
+      },
+      "requiredBlockIds": [
+        "feature-data-portability",
+        "flow-data-portability",
+        "task-data-portability",
+        "acceptance-data-portability"
+      ],
+      "startedAt": "2026-10-04T21:15:19.841Z",
+      "completedAt": "2026-10-04T21:17:42.260Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-1fc49d8b-8947-4543-bb26-bbed0c80ea9d/result.json",
+      "outputHash": "4db4a6f5222d887743dda611f097a72d1771f8560c8d82feb5066922d95b752b"
+    },
+    {
+      "id": "task-c1ac9c6b-2301-48f6-bc60-77867c693a73",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：修订静态构建打包、本地运行与静态托管部署规范，调整构建任务依赖与浏览器端性能验证。明确Vite构建产物基于localhost/HTTP/HTTPS运行上下文（说明ESM在file://协议下的安全限制，去除首版过度承诺的PWA保证）；更新task-build-and-deploy依赖全部特性开发任务；合并重复的性能验证任务，统一端到端检索延迟（<=150ms含80ms防抖）与冷启动TTI测试口径；明确测试环境、设备基准与Safari WebKit未验证开发任务状态。",
+      "dependsOn": [
+        "task-91581697-8851-4442-adb0-64d2db157e45",
+        "task-eaed5873-8bd2-400a-b560-49dcb7a672ca",
+        "task-cbbea244-e4a1-47d3-8c12-3a4caf2c93b8",
+        "task-8c4f6468-469c-4b85-9ca5-70cec2b0dbd1",
+        "task-020a7385-c7c9-481d-8105-b191c11bedc4",
+        "task-1fc49d8b-8947-4543-bb26-bbed0c80ea9d"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "deployment-and-build-specification",
+          "task-build-and-deploy",
+          "acceptance-build-and-deploy",
+          "val-browser-storage-and-search-perf",
+          "val-storage-and-search-benchmark",
+          "acceptance-storage-and-search-benchmark"
+        ],
+        "dependsOn": [
+          "work-item-quick-capture",
+          "work-item-note-feed-lifecycle",
+          "work-item-tag-management",
+          "work-item-instant-search",
+          "work-item-note-detail-edit",
+          "work-item-data-portability"
+        ],
+        "goal": "修订静态构建打包、本地运行与静态托管部署规范，调整构建任务依赖与浏览器端性能验证。明确Vite构建产物基于localhost/HTTP/HTTPS运行上下文（说明ESM在file://协议下的安全限制，去除首版过度承诺的PWA保证）；更新task-build-and-deploy依赖全部特性开发任务；合并重复的性能验证任务，统一端到端检索延迟（<=150ms含80ms防抖）与冷启动TTI测试口径；明确测试环境、设备基准与Safari WebKit未验证开发任务状态。",
+        "id": "work-item-build-deploy-verification"
+      },
+      "requiredBlockIds": [
+        "deployment-and-build-specification",
+        "task-build-and-deploy",
+        "acceptance-build-and-deploy",
+        "val-browser-storage-and-search-perf",
+        "val-storage-and-search-benchmark",
+        "acceptance-storage-and-search-benchmark"
+      ],
+      "startedAt": "2026-10-04T21:17:42.322Z",
+      "completedAt": "2026-10-04T21:21:38.744Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-c1ac9c6b-2301-48f6-bc60-77867c693a73/result.json",
+      "outputHash": "f16b33867c171bf2e93596e639a94493e49fcc8b8a2132aa8b63bf1df84d4c48"
+    },
+    {
+      "id": "task-8edc25c1-6f3a-4635-a3d4-830520d578bc",
+      "kind": "integration",
+      "goal": "整合当前工作者产物，交付本阶段完整、自洽的待批准变更包。",
+      "dependsOn": [
+        "task-1083ecae-d680-4676-ac2e-20b45aa307f1",
+        "task-574ce60f-5d3b-4140-96b5-0caf3052a5a9"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 0,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partitionTaskIds": [
+        "task-1083ecae-d680-4676-ac2e-20b45aa307f1",
+        "task-574ce60f-5d3b-4140-96b5-0caf3052a5a9"
+      ],
+      "outputOrigin": "assembly",
+      "outputHash": "7b1fe52745d57e76a5eb29bcd07470b5e2d5756523ee6bd895c0b0428ed4f5c7",
+      "outputRef": "tasks/task-8edc25c1-6f3a-4635-a3d4-830520d578bc/result.json",
+      "deferredQuestions": [],
+      "completedAt": "2026-10-04T21:21:38.902Z"
+    },
+    {
+      "id": "task-b41f285d-908e-48f3-bd20-ae98f8db48cf",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T21:21:39.029Z",
+      "assemblyBaseTaskId": "task-8edc25c1-6f3a-4635-a3d4-830520d578bc",
+      "partitionPlanTaskId": "task-038430d6-ed8a-498c-9b71-5e36835fa119",
+      "partitionTaskIds": [
+        "task-caf4ee41-ca84-4af8-bce9-24e503df1e2b",
+        "task-cf2b609d-9985-4450-8dfc-44aaf73f6aff",
+        "task-ea1b5754-b084-4722-b64c-f23edffcedfe",
+        "task-b63edcb2-44bf-4e20-a048-51917f936475",
+        "task-e3ebdc69-53d8-4db7-a059-b8900c6b7a8d",
+        "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9"
+      ],
+      "outputOrigin": "assembly",
+      "outputHash": "22b08ddc75b6925fccb151150386011043e759a85ada3981bbad108a8f022499",
+      "outputRef": "tasks/task-b41f285d-908e-48f3-bd20-ae98f8db48cf/result.json",
+      "deferredQuestions": [],
+      "completedAt": "2026-10-04T21:41:10.261Z"
+    },
+    {
+      "id": "task-038430d6-ed8a-498c-9b71-5e36835fa119",
+      "kind": "decomposition",
+      "goal": "任务拆分：修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n父范围：null",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T21:26:59.256Z",
+      "completedAt": "2026-10-04T21:28:18.490Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-038430d6-ed8a-498c-9b71-5e36835fa119/result.json",
+      "outputHash": "3dbefc0c4194d8e6ecacbfee8812d224a44ddeb7b791b0d5acf21b5d101ecbb7"
+    },
+    {
+      "id": "task-caf4ee41-ca84-4af8-bce9-24e503df1e2b",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n本登记范围：修订产品目标、痛点、成效、非目标与主工作区范围，明确单人本地使用定位，移除系统级全局唤起与快捷键承诺，改为页面获焦快捷键与常驻标签，消除矛盾性能描述并规范主工作区布局。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "block-target-user-scenarios",
+          "block-problem-fragmented-ideas",
+          "block-outcomes-lightweight-experience",
+          "block-non-goals-exclusions",
+          "block-scope-core-boundaries",
+          "page-main-workspace"
+        ],
+        "dependsOn": [],
+        "goal": "修订产品目标、痛点、成效、非目标与主工作区范围，明确单人本地使用定位，移除系统级全局唤起与快捷键承诺，改为页面获焦快捷键与常驻标签，消除矛盾性能描述并规范主工作区布局。",
+        "id": "work-item-product-foundation"
+      },
+      "requiredBlockIds": [
+        "block-target-user-scenarios",
+        "block-problem-fragmented-ideas",
+        "block-outcomes-lightweight-experience",
+        "block-non-goals-exclusions",
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "startedAt": "2026-10-04T21:28:18.580Z",
+      "completedAt": "2026-10-04T21:30:26.272Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-caf4ee41-ca84-4af8-bce9-24e503df1e2b/result.json",
+      "outputHash": "1cffd2f4b62fe831c1a6715b38fea78a57147ada6900290c927d0882848a5dea"
+    },
+    {
+      "id": "task-cf2b609d-9985-4450-8dfc-44aaf73f6aff",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n本登记范围：修订快速捕获、便签流与标签功能及交互流：快速捕获改为页面聚焦快捷键与防抖校验；便签流增加归档常规取消归档/恢复路径，回收区还原按删除前状态（active/archived）无损恢复，落实7天保留与超期清空；标签组织补充移动端点击/触控多选机制。",
+      "dependsOn": [
+        "task-caf4ee41-ca84-4af8-bce9-24e503df1e2b"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-quick-capture",
+          "flow-quick-capture",
+          "feature-note-card-view",
+          "flow-note-card-actions",
+          "feature-tag-organization",
+          "flow-tag-organization"
+        ],
+        "dependsOn": [
+          "work-item-product-foundation"
+        ],
+        "goal": "修订快速捕获、便签流与标签功能及交互流：快速捕获改为页面聚焦快捷键与防抖校验；便签流增加归档常规取消归档/恢复路径，回收区还原按删除前状态（active/archived）无损恢复，落实7天保留与超期清空；标签组织补充移动端点击/触控多选机制。",
+        "id": "work-item-core-features"
+      },
+      "requiredBlockIds": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "feature-tag-organization",
+        "flow-tag-organization"
+      ],
+      "startedAt": "2026-10-04T21:30:26.324Z",
+      "completedAt": "2026-10-04T21:32:37.587Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-cf2b609d-9985-4450-8dfc-44aaf73f6aff/result.json",
+      "outputHash": "f68b9c31e7e6e2e3b0509d0ffdc471ad5333ab052dedfae9ef23819913b56218"
+    },
+    {
+      "id": "task-ea1b5754-b084-4722-b64c-f23edffcedfe",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n本登记范围：修订即时检索、详情编辑与数据便携功能及交互流：统一全文检索响应时间与防抖闭合指标；详情模态明确保存后退出、放弃修改与继续编辑三分支，拦截关闭保护未保存草稿；备份恢复统一顶层版本键与JSON Schema，确立全覆盖导入原子事务，消除版本字段不一致。",
+      "dependsOn": [
+        "task-caf4ee41-ca84-4af8-bce9-24e503df1e2b"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-search-filter",
+          "flow-search-filter",
+          "feature-note-detail-edit",
+          "flow-note-detail-edit",
+          "feature-data-portability",
+          "flow-data-portability"
+        ],
+        "dependsOn": [
+          "work-item-product-foundation"
+        ],
+        "goal": "修订即时检索、详情编辑与数据便携功能及交互流：统一全文检索响应时间与防抖闭合指标；详情模态明确保存后退出、放弃修改与继续编辑三分支，拦截关闭保护未保存草稿；备份恢复统一顶层版本键与JSON Schema，确立全覆盖导入原子事务，消除版本字段不一致。",
+        "id": "work-item-extended-features"
+      },
+      "requiredBlockIds": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "feature-data-portability",
+        "flow-data-portability"
+      ],
+      "startedAt": "2026-10-04T21:30:26.400Z",
+      "completedAt": "2026-10-04T21:32:47.467Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-ea1b5754-b084-4722-b64c-f23edffcedfe/result.json",
+      "outputHash": "999b33a99687a0416a1dcfe762f7f2a7c19e0f912879f71cff3328b7c90c24dd"
+    },
+    {
+      "id": "task-b63edcb2-44bf-4e20-a048-51917f936475",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n本登记范围：修订核心架构、存储检索技术、实体模型、服务契约、错误恢复、模块解耦与构建规范：修正IndexedDB布尔索引限制（采用数字映射或内存过滤），定义并发编辑修订号（revision）与冲突策略，统一BackupPayload契约与原子事务回滚，明确localhost/HTTP/HTTPS运行环境边界与Safari未验证声明，消除重复技术验证任务。",
+      "dependsOn": [
+        "task-caf4ee41-ca84-4af8-bce9-24e503df1e2b",
+        "task-cf2b609d-9985-4450-8dfc-44aaf73f6aff",
+        "task-ea1b5754-b084-4722-b64c-f23edffcedfe"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "tech-core-architecture",
+          "deployment-and-build-specification",
+          "module-system-decomposition",
+          "tech-storage-and-search",
+          "data-model-core-entities",
+          "interface-service-contracts",
+          "error-architecture-and-recovery",
+          "val-browser-storage-and-search-perf"
+        ],
+        "dependsOn": [
+          "work-item-product-foundation",
+          "work-item-core-features",
+          "work-item-extended-features"
+        ],
+        "goal": "修订核心架构、存储检索技术、实体模型、服务契约、错误恢复、模块解耦与构建规范：修正IndexedDB布尔索引限制（采用数字映射或内存过滤），定义并发编辑修订号（revision）与冲突策略，统一BackupPayload契约与原子事务回滚，明确localhost/HTTP/HTTPS运行环境边界与Safari未验证声明，消除重复技术验证任务。",
+        "id": "work-item-tech-architecture"
+      },
+      "requiredBlockIds": [
+        "tech-core-architecture",
+        "deployment-and-build-specification",
+        "module-system-decomposition",
+        "tech-storage-and-search",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "val-browser-storage-and-search-perf"
+      ],
+      "startedAt": "2026-10-04T21:32:47.532Z",
+      "completedAt": "2026-10-04T21:35:37.176Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-b63edcb2-44bf-4e20-a048-51917f936475/result.json",
+      "outputHash": "7ad484afd193f7ffbf58ff91ef053b7dbc5edd40600c2930d368778de08bc221"
+    },
+    {
+      "id": "task-e3ebdc69-53d8-4db7-a059-b8900c6b7a8d",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n本登记范围：修订基础存储、快速捕获、便签卡片与标签组织的交付任务与验收标准：落实非布尔索引底层实现与测试，验证删除前状态（active/archived）还原与7天回收生命周期，实现移动端触控标签多选与页面聚焦捕获交互，补全配额失败草稿保留与错误回退验收场景。",
+      "dependsOn": [
+        "task-b63edcb2-44bf-4e20-a048-51917f936475"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "task-foundation-and-storage",
+          "acceptance-foundation-and-storage",
+          "task-quick-capture",
+          "acceptance-quick-capture",
+          "task-note-card-view",
+          "acceptance-note-card-view",
+          "task-tag-organization",
+          "acceptance-tag-organization"
+        ],
+        "dependsOn": [
+          "work-item-tech-architecture"
+        ],
+        "goal": "修订基础存储、快速捕获、便签卡片与标签组织的交付任务与验收标准：落实非布尔索引底层实现与测试，验证删除前状态（active/archived）还原与7天回收生命周期，实现移动端触控标签多选与页面聚焦捕获交互，补全配额失败草稿保留与错误回退验收场景。",
+        "id": "work-item-delivery-core"
+      },
+      "requiredBlockIds": [
+        "task-foundation-and-storage",
+        "acceptance-foundation-and-storage",
+        "task-quick-capture",
+        "acceptance-quick-capture",
+        "task-note-card-view",
+        "acceptance-note-card-view",
+        "task-tag-organization",
+        "acceptance-tag-organization"
+      ],
+      "startedAt": "2026-10-04T21:35:37.255Z",
+      "completedAt": "2026-10-04T21:37:56.032Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-e3ebdc69-53d8-4db7-a059-b8900c6b7a8d/result.json",
+      "outputHash": "2dd8862201314301046521a3019620e3cbdd8a10af87a205c78b58ce05838a48"
+    },
+    {
+      "id": "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：INVALID_CHANGESET: 变更组依赖不存在。保留完整产物和真实证据。\n本登记范围：修订即时检索、详情编辑、数据备份、构建部署与性能基准的交付任务与验收标准：实现带防抖闭合边界的检索引擎，实现详情编辑退出/放弃/并发检测与草稿保护，实现自导出自导入闭环与单事务覆盖导入，完善构建部署对全部业务任务的依赖闭包，统一真实浏览器环境（含Safari）性能与配额防御实测基准。",
+      "dependsOn": [
+        "task-e3ebdc69-53d8-4db7-a059-b8900c6b7a8d"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "task-search-filter",
+          "acceptance-search-filter",
+          "task-note-detail-edit",
+          "acceptance-note-detail-edit",
+          "task-data-portability",
+          "acceptance-data-portability",
+          "task-build-and-deploy",
+          "acceptance-build-and-deploy",
+          "val-storage-and-search-benchmark",
+          "acceptance-storage-and-search-benchmark"
+        ],
+        "dependsOn": [
+          "work-item-delivery-core"
+        ],
+        "goal": "修订即时检索、详情编辑、数据备份、构建部署与性能基准的交付任务与验收标准：实现带防抖闭合边界的检索引擎，实现详情编辑退出/放弃/并发检测与草稿保护，实现自导出自导入闭环与单事务覆盖导入，完善构建部署对全部业务任务的依赖闭包，统一真实浏览器环境（含Safari）性能与配额防御实测基准。",
+        "id": "work-item-delivery-extended"
+      },
+      "requiredBlockIds": [
+        "task-search-filter",
+        "acceptance-search-filter",
+        "task-note-detail-edit",
+        "acceptance-note-detail-edit",
+        "task-data-portability",
+        "acceptance-data-portability",
+        "task-build-and-deploy",
+        "acceptance-build-and-deploy",
+        "val-storage-and-search-benchmark",
+        "acceptance-storage-and-search-benchmark"
+      ],
+      "startedAt": "2026-10-04T21:37:56.089Z",
+      "completedAt": "2026-10-04T21:41:10.189Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9/result.json",
+      "outputHash": "924fc6ea053e2589488cd6984c57cfa8835402893aab92cf8afb6a136ada68db"
+    },
+    {
+      "id": "task-a4f85525-a669-44aa-918f-24ade7e75761",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：DEPENDENCY_CONFLICT: 变更分组存在循环依赖。保留完整产物和真实证据。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T21:41:10.404Z",
+      "completedAt": "2026-10-04T21:46:25.768Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-a4f85525-a669-44aa-918f-24ade7e75761/result.json",
+      "outputHash": "916a225de085c594ef1a454db48cb9e095ead46750509bad92d166fd4ce690da"
+    },
+    {
+      "id": "task-1c70452b-7a2b-4166-9c22-7822594986c0",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：登记范围尚未完成：block-problem-fragmented-ideas；登记范围尚未完成：block-non-goals-exclusions；登记范围尚未完成：module-system-decomposition。保留完整产物和真实证据。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T21:46:25.864Z",
+      "completedAt": "2026-10-04T21:48:10.392Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-1c70452b-7a2b-4166-9c22-7822594986c0/result.json",
+      "outputHash": "516740db6ce9b0f39b6b1bed44b3075890a78174cf699fff759dd93782d3015b"
+    },
+    {
+      "id": "task-25119c1f-6345-48d2-ad4e-e8728aaf5cb7",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：登记范围尚未完成：block-target-user-scenarios；登记范围尚未完成：block-outcomes-lightweight-experience；登记范围尚未完成：block-scope-core-boundaries；登记范围尚未完成：page-main-workspace；登记范围尚未完成：tech-core-architecture；登记范围尚未完成：tech-storage-and-search；登记范围尚未完成：data-model-core-entities；登记范围尚未完成：interface-service-contracts；登记范围尚未完成：error-architecture-and-recovery；登记范围尚未完成：task-foundation-and-storage；登记范围尚未完成：acceptance-foundation-and-storage；登记范围尚未完成：feature-quick-capture；登记范围尚未完成：flow-quick-capture；登记范围尚未完成：task-quick-capture；登记范围尚未完成：acceptance-quick-capture；登记范围尚未完成：feature-note-card-view；登记范围尚未完成：flow-note-card-actions；登记范围尚未完成：task-note-card-view；登记范围尚未完成：acceptance-note-card-view；登记范围尚未完成：feature-tag-organization；登记范围尚未完成：flow-tag-organization；登记范围尚未完成：task-tag-organization；登记范围尚未完成：acceptance-tag-organization；登记范围尚未完成：feature-search-filter；登记范围尚未完成：flow-search-filter；登记范围尚未完成：task-search-filter；登记范围尚未完成：acceptance-search-filter；登记范围尚未完成：feature-note-detail-edit；登记范围尚未完成：flow-note-detail-edit；登记范围尚未完成：task-note-detail-edit；登记范围尚未完成：acceptance-note-detail-edit；登记范围尚未完成：feature-data-portability；登记范围尚未完成：flow-data-portability；登记范围尚未完成：task-data-portability；登记范围尚未完成：acceptance-data-portability；登记范围尚未完成：deployment-and-build-specification；登记范围尚未完成：task-build-and-deploy；登记范围尚未完成：acceptance-build-and-deploy；登记范围尚未完成：val-browser-storage-and-search-perf；登记范围尚未完成：val-storage-and-search-benchmark；登记范围尚未完成：acceptance-storage-and-search-benchmark。保留完整产物和真实证据。",
+      "dependsOn": [],
+      "status": "cancelled",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T21:48:10.483Z"
+    }
+  ],
+  "createdAt": "2026-10-04T16:41:34.641Z",
+  "updatedAt": "2026-10-04T21:49:12.620Z",
+  "pendingQuestions": [],
+  "nextEventSeq": 121,
+  "progressSignatures": [
+    "536bb2ba6e74b99851688b3df31e7f88996837eee7ed617ee7812ca91b950a5f",
+    "6c3596a60fb32220bea3584dc195a398d01fa7e235936140f2d6048407fb64fe",
+    "6f3ad28054ffd48de3ffe6fd1f8a5ef1c4ae46bd9b7c50aa3d2d26d97fb6bd29",
+    "a3a68bf36fdcbe9e67a3910f08aefe60dca91db1a74432e0b4e11ad0cd520d65"
+  ],
+  "error": "Cancelled",
+  "deliveryGeneration": 4,
+  "unfinishedBlockIds": [
+    "block-target-user-scenarios",
+    "block-outcomes-lightweight-experience",
+    "block-scope-core-boundaries",
+    "page-main-workspace",
+    "tech-core-architecture",
+    "tech-storage-and-search",
+    "data-model-core-entities",
+    "interface-service-contracts",
+    "error-architecture-and-recovery",
+    "task-foundation-and-storage",
+    "acceptance-foundation-and-storage",
+    "feature-quick-capture",
+    "flow-quick-capture",
+    "task-quick-capture",
+    "acceptance-quick-capture",
+    "feature-note-card-view",
+    "flow-note-card-actions",
+    "task-note-card-view",
+    "acceptance-note-card-view",
+    "feature-tag-organization",
+    "flow-tag-organization",
+    "task-tag-organization",
+    "acceptance-tag-organization",
+    "feature-search-filter",
+    "flow-search-filter",
+    "task-search-filter",
+    "acceptance-search-filter",
+    "feature-note-detail-edit",
+    "flow-note-detail-edit",
+    "task-note-detail-edit",
+    "acceptance-note-detail-edit",
+    "feature-data-portability",
+    "flow-data-portability",
+    "task-data-portability",
+    "acceptance-data-portability",
+    "deployment-and-build-specification",
+    "task-build-and-deploy",
+    "acceptance-build-and-deploy",
+    "val-browser-storage-and-search-perf",
+    "val-storage-and-search-benchmark",
+    "acceptance-storage-and-search-benchmark"
+  ],
+  "deferredQuestions": []
+}

@@ -8,6 +8,7 @@ import { WorkspaceGuard, ProjectStateEngine, FileStorage } from '@project-archit
 import { MockAIProvider, AIOrchestrator } from '@project-architect/agent';
 import { ErrorCode } from '@project-architect/contracts';
 import type { Express } from 'express';
+import { approvedPlanningFixture } from '../fixtures/approved-planning.js';
 
 describe('Reliability Suite 6: API Protocol, Status Codes & Sanitized Responses', () => {
   let tempBaseDir: string;
@@ -92,25 +93,24 @@ describe('Reliability Suite 6: API Protocol, Status Codes & Sanitized Responses'
     expect(res409.status).toBe(409);
     expect(res409.body.error.code).toBe(ErrorCode.STATE_REVISION_CONFLICT);
 
-    // 422 Unprocessable (Readiness Gate Blocked)
-    await post(`/api/projects/${projectId}/readiness/review`, {});
+    // 422 Unprocessable (Unapproved Planning stages)
     const res422 = await post(`/api/projects/${projectId}/documents/generate`, {
-      expectedRevision: rev + 1,
+      expectedRevision: rev, operationId: 'unapproved-package',
     });
     expect(res422.status).toBe(422);
-    expect(res422.body.error.code).toBe(ErrorCode.READINESS_NOT_APPROVED);
+    expect(res422.body.error.code).toBe('STAGE_NOT_APPROVED');
 
     // 502 Bad Gateway (Provider Process Failure)
     mockProvider.setMockResponse(null);
     const res502 = await post(`/api/projects/${projectId}/discovery`, {
       userMessage: 'fail',
-      expectedRevision: rev + 1,
+      expectedRevision: rev,
     });
     expect(res502.status).toBe(502);
     expect(res502.body.error.code).toBe(ErrorCode.PROVIDER_PROCESS_FAILED);
   });
 
-  it('2. Complete API Contracts: Executes full Discovery -> Answer -> Review -> Approve -> Generate -> Read lifecycle', async () => {
+  it('2. Complete API Contracts: Explicit facts -> Approved Planning -> Package -> File Read', async () => {
     // Create project
     const createRes = await post('/api/projects', {
       name: 'Full Contract App',
@@ -121,39 +121,26 @@ describe('Reliability Suite 6: API Protocol, Status Codes & Sanitized Responses'
 
     // Add decisions
     const pPath = guard.resolveProjectPath(projectId);
+    const initial = (await engine.getSnapshot(pPath)).decisions.items.find((decision) => decision.statement === 'End to end API test');
+    expect(initial?.status).toBe('candidate');
+    const confirmRes = await post(`/api/projects/${projectId}/decisions/confirm`, {
+      targetRef: `decision:${initial!.id}`,
+      expectedRevision: rev,
+    });
+    expect(confirmRes.status).toBe(200);
+    expect(confirmRes.body.data.snapshot.decisions.items.find((decision: any) => decision.id === initial!.id)?.confirmedBy).toBe('user');
+    rev = confirmRes.body.stateRevision;
     await engine.addDecision(pPath, 'target_user', 'Engineers', rev, 'confirmed');
     rev++;
     await engine.addDecision(pPath, 'mvp_scope', 'Scope', rev, 'confirmed');
     rev++;
 
-    // Review readiness
-    const reviewRes = await post(`/api/projects/${projectId}/readiness/review`, {
-      expectedRevision: rev,
-    });
-    expect(reviewRes.status).toBe(200);
-    rev = reviewRes.body.stateRevision;
+    rev = (await approvedPlanningFixture(engine, pPath)).metadata.stateRevision;
+    const generated = await post(`/api/projects/${projectId}/documents/generate`, { expectedRevision: rev, operationId: 'contracts-package' });
+    expect(generated.status).toBe(200); expect(generated.body.data.manifest.files.length).toBeGreaterThanOrEqual(10);
+    const read = await fetch(`${baseUrl}/api/projects/${projectId}/planning/package/files/AGENTS.md`);
+    expect(read.status).toBe(200); expect(await read.text()).toContain('Full Contract App');
 
-    // Approve
-    const approveRes = await post(`/api/projects/${projectId}/readiness/approve`, {
-      disposition: 'approved',
-      expectedRevision: rev,
-    });
-    expect(approveRes.status).toBe(200);
-    rev = approveRes.body.stateRevision;
-
-    // Generate documents
-    const genRes = await post(`/api/projects/${projectId}/documents/generate`, {
-      expectedRevision: rev,
-    });
-    expect(genRes.status).toBe(200);
-    expect(genRes.body.data.manifest.items.length).toBeGreaterThan(0);
-
-    // Read generated document
-    const readRes = await post(`/api/projects/${projectId}/documents/read`, {
-      docPath: 'AGENTS.md',
-    });
-    expect(readRes.status).toBe(200);
-    expect(readRes.body.data.content).toContain('Coding Agent Guidelines');
   });
 
   it('3. Error Response Sanitization: Error responses never expose raw provider envelopes, prompts, or stack traces', async () => {

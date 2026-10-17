@@ -1,0 +1,42 @@
+### Page
+- Page URL: http://127.0.0.1:4179/tests/fixtures/pending-draft-revision.html
+- Page Title: 草案修订隔离交互检查
+### Snapshot
+```yaml
+- main [ref=f2e3]:
+  - heading "草案修订隔离交互检查" [level=1] [ref=f2e4]
+  - paragraph [ref=f2e5]: 仅渲染当前源码组件，传输由本页内存夹具返回。
+  - generic [ref=f2e6]:
+    - checkbox "模拟 API 失败" [ref=f2e7]
+    - text: 模拟 API 失败
+  - status [ref=f2e8]: 草案修订已启动，仍待批准
+  - article "变更包：浏览器隔离夹具：草案仍未批准" [ref=f2e9]:
+    - generic [ref=f2e10]:
+      - heading "产品与体验变更包" [level=3] [ref=f2e11]
+      - text: 待审批草案
+    - paragraph [ref=f2e12]: 浏览器隔离夹具：草案仍未批准
+    - paragraph [ref=f2e13]: 依据版本 4 · 2026/10/4 08:00:00
+    - generic [ref=f2e14]:
+      - generic [ref=f2e15]:
+        - text: 草案修订反馈
+        - textbox "草案修订反馈" [ref=f2e16]:
+          - /placeholder: 说明要调整的内容，AI 会继续修订这份待批准草案…
+      - paragraph [ref=f2e17]: 保留当前草案中已完成的内容，修订结果仍待批准。
+      - button "让 AI 修订当前草案" [disabled] [ref=f2e18]
+    - generic [ref=f2e19]:
+      - generic [ref=f2e20]:
+        - checkbox "个人笔记草案" [ref=f2e21]
+        - strong [ref=f2e22]: 个人笔记
+        - text: 草案
+      - paragraph [ref=f2e23]: 影响：保留当前候选
+      - generic [ref=f2e24]:
+        - heading "笔记管理新增" [level=4] [ref=f2e43]
+        - generic [ref=f2e44]:
+          - text: 建议草案
+          - paragraph [ref=f2e46]: 人工未保存编辑内容，必须保留
+    - generic [ref=f2e29]:
+      - button "批准选中分组" [disabled] [ref=f2e47]
+      - button "拒绝选中分组" [disabled] [ref=f2e48]
+      - button "编辑草案" [ref=f2e49]
+  - generic "隔离调用记录" [ref=f2e33]: "[ { \"url\": \"/isolated/api/projects/isolated-project/planning/runs\", \"intent\": { \"stage\": \"product\", \"draftChangeSetId\": \"draft-browser-one\", \"feedback\": \" 请修订草案\\n保留正确内容。 \", \"expectedRevision\": 4, \"operationId\": \"isolated-revision\" } }, { \"url\": \"/isolated/api/projects/isolated-project/planning/runs\", \"intent\": { \"stage\": \"product\", \"draftChangeSetId\": \"draft-browser-one\", \"feedback\": \" 请修订草案\\n保留正确内容。 \", \"expectedRevision\": 4, \"operationId\": \"isolated-revision\" } } ]"
+```

@@ -1,0 +1,64 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ apps/server/tests/planning-blueprint-context.test.ts (7 tests | 2 failed) 791ms
+   × supplies the pending view and an explicitly historical comparison baseline to review while preserving formal state 786ms
+     → Cannot read properties of undefined (reading 'status')
+   × shows removed approved scope only in the review comparison baseline and keeps it out of the effective candidate 3ms
+     → expected undefined to deeply equal [ { id: 'target', …(7) } ]
+   ✓ keeps the complete approved context when no actual candidate is supplied 0ms
+   ✓ omits explicit removals and missing-scope replacements while preserving formal metadata, untouched bodies and both raw sources 1ms
+   ✓ keeps conflicting replacement and removal actions visible without choosing or rewriting either 0ms
+   ✓ never lets legacy support bodies or a paused authoring result shadow the approved plan 1ms
+   ✓ also shadows real authoring dependency bodies supplied to a design fragment while leaving support bodies excluded 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/server/tests/planning-blueprint-context.test.ts > supplies the pending view and an explicitly historical comparison baseline to review while preserving formal state
+TypeError: Cannot read properties of undefined (reading 'status')
+ ❯ apps/server/tests/planning-blueprint-context.test.ts:45:45
+     43|   expect(reviewContext).toBeDefined();
+     44|   expect(JSON.stringify(reviewContext.blueprint)).not.toContain(old.co…
+     45|   expect(reviewContext.changeReviewBaseline.status).toBe('previous-app…
+       |                                             ^
+     46|   expect(reviewContext.changeReviewBaseline.blocks.find((block: any) =…
+     47|   expect(reviewContext.workerResults.draft.groups.flatMap((item: any) …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  apps/server/tests/planning-blueprint-context.test.ts > shows removed approved scope only in the review comparison baseline and keeps it out of the effective candidate
+AssertionError: expected undefined to deeply equal [ { id: 'target', …(7) } ]
+
+- Expected: 
+[
+  {
+    "content": "原批准边界：不做目录树，不做重型富文本编辑",
+    "dependsOn": [],
+    "evidenceIds": [],
+    "id": "target",
+    "kind": "target",
+    "requirementIds": [],
+    "stage": "product",
+    "title": "目标用户",
+  },
+]
+
++ Received: 
+undefined
+
+ ❯ apps/server/tests/planning-blueprint-context.test.ts:65:47
+     63|   const review = planningBlueprintContext(approved, draft, [], [], tru…
+     64|   expect(review.blueprint.blocks.some(block => block.id === blocks[0].…
+     65|   expect(review.changeReviewBaseline?.blocks).toEqual([blocks[0]]);
+       |                                               ^
+     66|   expect(review.changeReviewBaseline?.status).toBe('previous-approved-…
+     67|   expect([hashValue(approved), hashValue(draft)]).toEqual(hashes);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  06:58:17
+   Duration  2.16s (transform 527ms, setup 0ms, collect 1.05s, tests 791ms, environment 0ms, prepare 102ms)
+

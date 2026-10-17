@@ -199,7 +199,8 @@ describe('Product Hardening Phase 2: Discovery Persistence & Input Immutability'
 
       const snapshotAfterCancel = await stateEngine.loadProject(testProjectDir);
       // Project state must have NO candidates or assumptions generated from this cancelled turn
-      expect(snapshotAfterCancel.decisions.items.filter((d) => d.status === 'candidate').length).toBe(0);
+      expect(snapshotAfterCancel.decisions.items).toEqual(s0.decisions.items);
+      expect(snapshotAfterCancel.decisions.items.every((decision) => decision.status === 'candidate' && decision.confirmedBy === undefined)).toBe(true);
       expect(snapshotAfterCancel.assumptions.items.length).toBe(0);
 
       // But the turn record in TurnStore must reflect cancelled

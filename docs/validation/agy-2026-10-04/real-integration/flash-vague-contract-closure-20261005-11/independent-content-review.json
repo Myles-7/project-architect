@@ -1,0 +1,68 @@
+{
+  "label": "flash-vague-contract-closure-20261005-11",
+  "checkedAt": "2026-10-05T12:40:09.283Z",
+  "status": "blocked",
+  "contentPassed": false,
+  "scope": "Independent verification of concrete cross-contract counterexamples in the candidate bodies and related task fields. This blocked report is not a complete final semantic pass; full candidate and compiled-document reading is still required. Provider review has no successful terminal result. No final compiled-package or human acceptance is implied.",
+  "finalReviewStatus": "pending",
+  "humanReview": "pending",
+  "targetApplicationExecution": "unexecuted",
+  "candidateContextSha256": "7dafdf756a5db79ba0c85c66038a80dd2f0f6135aed2199d34bc835923d0bc4d",
+  "candidatePreviewSha256": "d12f4bb8859a4fbd0be0a749c77f527a9ab3e24f9926829fe81cd765b973b318",
+  "taskId": "task-ae7e2517-083a-43fe-8f39-4ef6ea0a85ec",
+  "blockCount": 43,
+  "findings": [
+    {
+      "id": "N9",
+      "blocks": [
+        "data-model-core-entities",
+        "feature-data-portability",
+        "interface-service-contracts",
+        "acceptance-data-portability"
+      ],
+      "reason": "Count/revision-sum/max/time aggregates are not a reliable write version; the saved collision counterexample preserves all aggregates after deletion and creation. Preview payload ownership/execution integrity is also unspecified.",
+      "evidence": "../../../import-preview-collision-20261005.json"
+    },
+    {
+      "id": "N11",
+      "blocks": [
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "acceptance-quick-capture"
+      ],
+      "reason": "SessionDraft shape is now consistent, but corrupt/version/key validation and sessionStorage itself failing remain unspecified. The success message and file export cannot assume an unavailable session store worked."
+    },
+    {
+      "id": "N12",
+      "blocks": [
+        "data-model-core-entities",
+        "feature-data-portability",
+        "task-data-portability"
+      ],
+      "reason": "Canonical backupTracker is duplicated by optional appMeta containing that same key, without equality/rejection rules. appSettings remains untyped and full strong validation is claimed without complete field rules."
+    },
+    {
+      "id": "N14",
+      "blocks": [
+        "acceptance-storage-and-search-benchmark",
+        "val-storage-and-search-benchmark",
+        "block-outcomes-lightweight-experience"
+      ],
+      "reason": "Acceptance calls a requestAnimationFrame callback physical drawing completion and simulated keydown a physical key press. The full-keyword typing duration/startpoint is inconsistent with the bounded processing latency."
+    },
+    {
+      "id": "N15",
+      "blocks": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "tech-storage-and-search",
+        "page-main-workspace"
+      ],
+      "reason": "Favorite search feature/flow use only isFavorite=true, while technology/page explicitly exclude trashed favorite records."
+    }
+  ],
+  "proposedQualityFeedback": "..\\quality-feedback-notes-final-contract-20261005.txt",
+  "feedbackSha256": "30a39c3ff7007b300b49f7dcf174f3bf362ce5c078f6246277fe67656e46f691",
+  "feedbackApplied": false
+}

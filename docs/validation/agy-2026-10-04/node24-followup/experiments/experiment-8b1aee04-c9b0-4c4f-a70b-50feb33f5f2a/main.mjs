@@ -1,0 +1,1 @@
+console.log(JSON.stringify({node:process.version,experimentMcp:true}));

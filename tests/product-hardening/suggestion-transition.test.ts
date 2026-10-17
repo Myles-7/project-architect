@@ -24,7 +24,7 @@ describe('Product Hardening Phase 2: Suggestion Transition & Reference-based Aut
 
   describe('Task 2.1: B3 Schema Structure Verification', () => {
     it('requires structured objects for candidates, assumptions, and risks', async () => {
-      const schemaPath = join(process.cwd(), 'experiments', 'agent-benchmark', 'schemas', 'b3-discovery.schema.json');
+      const schemaPath = join(process.cwd(), 'experiments', 'agent-benchmark', 'schemas', 'legacy-b3-discovery.schema.json');
       const schema = JSON.parse(await readFile(schemaPath, 'utf8'));
 
       // 1. Candidate must be an object with decision_key, area, statement, rationale
@@ -87,8 +87,9 @@ describe('Product Hardening Phase 2: Suggestion Transition & Reference-based Aut
         s0.metadata.stateRevision
       );
 
-      const candidate = afterTurn.decisions.items.find((d) => d.status === 'candidate');
+      const candidate = afterTurn.decisions.items.find((d) => d.statement === 'Drag-and-drop workflow canvas for visual node editing');
       expect(candidate).toBeDefined();
+      expect(candidate!.status).toBe('candidate');
       expect(candidate!.area).toBe('user_flows');
       expect(candidate!.decisionKey).toBe('dk-flow');
 
@@ -106,9 +107,10 @@ describe('Product Hardening Phase 2: Suggestion Transition & Reference-based Aut
       // Must retain its declared area, NOT default to mvp_scope!
       expect(promoted!.area).toBe('user_flows');
 
-      // Candidate count should decrease to 0
+      // Approving this suggestion leaves the unrelated raw idea unconfirmed.
       const remainingCandidates = confirmedSnapshot.decisions.items.filter((d) => d.status === 'candidate');
-      expect(remainingCandidates.length).toBe(0);
+      expect(remainingCandidates.map((decision) => decision.id)).toEqual(s0.decisions.items.map((decision) => decision.id));
+      expect(remainingCandidates[0]?.statement).toBe('Testing candidate promotion');
     });
 
     it('converts an Assumption to Confirmed via assumption:<id> and marks assumption resolved', async () => {
@@ -340,12 +342,13 @@ describe('Product Hardening Phase 2: Suggestion Transition & Reference-based Aut
         s1.metadata.stateRevision
       );
 
-      const locked = afterTurn.decisions.items.find((d) => d.statement.includes('Zero database'));
+      const locked = afterTurn.decisions.items.find((d) => d.statement === 'Zero database, file-only persistence');
       expect(locked).toBeDefined();
       expect(locked!.status).toBe('locked');
       // Must not create candidate with same statement
       const candidates = afterTurn.decisions.items.filter((d) => d.status === 'candidate');
-      expect(candidates.length).toBe(0);
+      expect(candidates.some((decision) => decision.statement === 'Zero database, file-only persistence')).toBe(false);
+      expect(candidates.map((decision) => decision.id)).toEqual(s0.decisions.items.map((decision) => decision.id));
     });
   });
 });

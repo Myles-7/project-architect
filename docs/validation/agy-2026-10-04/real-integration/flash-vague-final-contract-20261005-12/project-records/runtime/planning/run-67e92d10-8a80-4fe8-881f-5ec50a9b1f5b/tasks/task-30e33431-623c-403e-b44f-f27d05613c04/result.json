@@ -1,0 +1,105 @@
+{
+  "blockers": [
+    "block-target-user-scenarios 与 block-page-main-workspace：受影响于 Web 平台事件模型限制。依据 MDN KeyboardEvent 规范，浏览器在未聚焦或后台运行时无法截获系统全局按键，草案中宣称的“操作系统级全局快捷键唤起”无法在纯 Web SPA 中成立；必须修正为页面处于前台焦点状态下的快捷键（N），并确保在快速记录框及详情编辑框处于活动输入时按字母 N 不劫持输入字符；全字段统一提交快捷键修正为 Ctrl/Cmd+Enter。",
+    "block-tech-stack-core、block-tech-architecture、block-architecture-storage 与 block-interfaces-storage：受影响于 W3C IndexedDB 规范。IndexedDB 明确规定 Boolean 并非合法键（Valid Key）类型，草案中直接在 isPinned/isFavorite 上建立布尔索引并使用 where('isPinned').equals(true) 在规范上不成立；存储层必须调整为内存过滤或明确数字映射（0/1）索引；此外，数据修改需在同一事务内完成基于 expectedRevision 与 expectedLibraryGeneration 的 CAS 原子校验，新建必须使用独立 create 契约，禁止通过 save 隐式 upsert 复活已被物理删除的实体。",
+    "block-deployment-runtime 与 block-non-functional-requirements：受影响于 ESM 模块加载与 Service Worker 安全上下文限制。依据 MDN Modules 规范，原生 ES 模块在 file:// 协议下会因 CORS 报错而无法免服务器运行，蓝图声称的 Vite base:'./' 无法支撑本地双击打开；必须明确运行前提为本地 HTTP/HTTPS 或 localhost 服务；同时 Service Worker 仅支持安全上下文，离线冷重启依赖预先缓存激活，与已打开页面的断网离线操作存在严格技术前提划分，未安装激活前不能承诺 100% 离线冷重启。",
+    "block-data-model、block-backup-restore 与 block-interfaces-backup：受影响于备份还原往返一致性与 sessionStorage 生命周期契约。全量 BackupPayload 必须与校验器字段（schemaVersion: 1、notes、appMeta、backupTracker、tags、回收期元数据）严格镜像；全量导入必须在单事务内原子替换，若失败完全回滚且本地单调递增 libraryGeneration 使旧编辑会话失效；未保存草稿受 sessionStorage 标签页销毁与 QuotaExceeded 异常约束，不可承诺跨关闭 100% 恢复，需提供独立草稿手动导出与隔离机制。",
+    "block-interfaces-system：受影响于无痕模式检测能力边界。Web 标准未提供可靠的 detectPrivateMode 官方 API，现代浏览器不断修补隐私探测漏洞；系统接口不能承诺 100% 检测出所有浏览器的无痕/隐身模式，必须明确标注待验证与降级策略，不得做虚假承诺。",
+    "block-test-plan 与 block-verification-tasks：受影响于规划环境 Docker 不可用事实（Docker daemon未启动）。检索时延 1000 条 P95<=150ms（含 80ms 防抖）与冷启动 TTI<=1.0s（基于 PerformanceNavigationTiming 导航起始点）目前为待验证技术目标而非已实测事实；蓝图必须将验证任务标记为 unexecuted 并移交后续开发工程前置验证任务，解耦独立 Spike 与全量构建集成验证，消除任务次序倒置。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "IndexedDB 键类型规范与事务原子性支持：W3C 规范明确有效键类型仅限 number, date, string, binary, array，Boolean 并非合法键类型，禁止直接在 isPinned/isFavorite 布尔字段上建立索引；同时规范 readwrite 模式提供原子与持久化事务保障，支持跨 notes 与 meta 进行读-比对-写 CAS 并发控制及全量备份导入原子回滚。",
+      "content": "W3C Indexed Database API 3.0 (2.4 Keys & 2.7 Transactions): 规范定义合法键类型为 number, date, string, binary 或 array，不支持 Boolean。尝试将其他 ECMAScript 值转换为键将失败。readwrite 事务代表原子且持久的数据访问与修改操作，作用域涵盖关联 object stores，事务失败或 abort 时完整回滚。",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-9ebc4dc8-ab21-4423-9e31-816e610bb43d",
+      "kind": "official-source",
+      "location": "https://www.w3.org/TR/IndexedDB/",
+      "obtainedAt": "2026-10-05T09:45:31.234Z",
+      "outcome": "passed",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    },
+    {
+      "applicability": "验证静态单页构建产物部署前提：ESM 模块无法直接通过 file:// 协议免服务器本地双击运行，必须通过 HTTP/HTTPS 或 localhost 服务加载。",
+      "content": "MDN JavaScript modules 规范官方文档明确指出：在本地测试中，如果尝试直接通过本地文件加载（即使用 file:// URL），由于 JavaScript 模块的安全与同源策略要求，浏览器会抛出 CORS 跨域错误。必须通过 Web 服务器提供服务。",
+      "hash": "9ef5fd99b6bfe7ea6eb63a48a64e37edbf3a66c409584d1806a9f6499153037c",
+      "id": "evidence-2efc4360-5e89-48e5-aa36-a7f9083cd669",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
+      "obtainedAt": "2026-10-05T09:44:42.096Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+    },
+    {
+      "applicability": "规范 Service Worker 安全上下文与离线重启前提：Service Worker 仅支持 HTTPS 与 http://localhost，且断网冷重启依赖已激活缓存，与已打开页面的离线操作存在严格阶段划分。",
+      "content": "MDN Service Worker API 官方文档：Service workers 仅在安全上下文 (Secure Contexts，即 HTTPS 或 http://localhost) 中可用；在普通非安全 HTTP 或 file:// 环境下无法注册。应用在离线重新打开（冷重启）必须依赖已安装并激活的 Service Worker，而首次访问或未注册前无法离线打开。",
+      "hash": "c306d5d60744058752baf4bbb9207ee02a69fbd07452967b03ad9a7cb9ac8e4f",
+      "id": "evidence-b1913939-b3fb-43df-9d15-cce21c37f8e4",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API",
+      "obtainedAt": "2026-10-05T09:45:14.860Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API"
+    },
+    {
+      "applicability": "规范未保存草稿在 sessionStorage 中的隔离与生命周期：sessionStorage 随标签页隔离，刷新保留但关闭销毁，且存在 QuotaExceededError 与 SecurityError 异常，不可承诺关闭后 100% 恢复。",
+      "content": "MDN Window.sessionStorage 官方文档：sessionStorage 作用域限定于当前标签页上下文，页面刷新可保留数据，但关闭标签页或窗口时会话结束并彻底清除数据；在不支持持久化或被用户禁用的隐私策略下会抛出 SecurityError，空间超限时抛出 QuotaExceededError。未保存草稿无法保证跨标签页关闭恢复。",
+      "hash": "6bd80328159dbb8b1367e115cd8a3d20a0adfd7b0f6c6d5191256f1f5052bfc5",
+      "id": "evidence-6b828513-73a6-427e-8fe9-8dfe2f4a9c8a",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage",
+      "obtainedAt": "2026-10-05T09:44:55.957Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"
+    },
+    {
+      "applicability": "规范持久化授权机制与无痕模式边界：persist() 仅向浏览器申请授权且依赖浏览器规则，Web 标准不存在通用的 detectPrivateMode API，无痕模式与数据保护不能做绝对承诺。",
+      "content": "MDN StorageManager.persist() 官方文档：该方法仅在安全上下文 (HTTPS) 中可用，返回的 Promise 解析为布尔值代表是否被授予持久化权限，浏览器根据内部规则自主决定是否授权；规范未定义全浏览器通用的 detectPrivateMode API，无痕/隐私模式识别存在平台差异。",
+      "hash": "29a8f9be0765588be212957e920ba728d9d698d2d0b22f225852c5843669a87c",
+      "id": "evidence-4361c9c3-363a-4c1b-87b4-9135f1708e72",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist",
+      "obtainedAt": "2026-10-05T09:46:20.968Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist"
+    },
+    {
+      "applicability": "证明纯 Web SPA 快捷键范围限定于页面获得焦点的状态，无法捕获操作系统级全局快捷键，且全局聚焦按键不得劫持活动输入控件。",
+      "content": "MDN keydown event 官方文档：keydown 事件目标为当前具有焦点的元素，按键事件由焦点元素向上传播至 Document 与 Window。浏览器未激活或处于后台时无法捕获键盘事件，Web 应用无法实现操作系统级全局快捷键唤起。",
+      "hash": "f46c5ab1ee1a8ac90e6d34e9514166b5a4aa4c1b7c54674cdce66bfa69f9f335",
+      "id": "evidence-3995dd0b-9949-417c-91e0-e0189cfc5586",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event",
+      "obtainedAt": "2026-10-05T09:46:33.951Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event"
+    },
+    {
+      "applicability": "规范冷启动性能测量标准：冷启动性能指标度量必须以 PerformanceNavigationTiming 导航起始点为基准，准确观测至应用首屏可交互就绪状态（TTI<=1.0s），消除以骨架屏出现或模糊估计充当测量依据的歧义。",
+      "content": "MDN PerformanceNavigationTiming 官方文档：PerformanceNavigationTiming 记录文档导航事件的高精度时间戳，其 startTime 为 0（相对于 performance.timeOrigin 导航起始点），提供从导航请求发起至 domInteractive、loadEventEnd 的标准化度量链路，用于科学测量前端单页应用的冷启动与首屏可交互时延。",
+      "hash": "2c5062aaf2eb27f39eb4ce544cc20f4838a25f84f1ec9bdfc5630c43314ccd0b",
+      "id": "evidence-4b2594e6-16eb-4db9-89ca-a0a2316e222a",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming",
+      "obtainedAt": "2026-10-05T09:47:41.757Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming"
+    },
+    {
+      "applicability": "记录规划环境 Docker 守护进程未启动事实；明确说明性能与多浏览器兼容性测试在规划阶段未执行（unexecuted），不得宣称已实测通过，相关验证任务须在真实工程和浏览器环境中作为前置验证执行。",
+      "content": "调用 environment_prepare 准备 Node 容器测试环境返回 unavailable：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; Docker 守护进程未启动。沙盒容器基准测试在当前规划环境无法执行。依据不可变证据契约，实测指标必须如实标记为 unexecuted，移交后续工程开发阶段的前置验证任务执行。",
+      "environment": "node:24.13.0-bookworm-slim (unavailable)",
+      "hash": "eb6a14fa50386e93601a3c3fc23f4241178ace2202c48bf1edac7c7a8d179993",
+      "id": "evidence-f678693c-c095-4f0e-bfac-3e87e0af8e0b",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-05T09:47:20.885Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-a6175a95-21c0-4968-b0ae-5fcdc9023684"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本阶段针对反馈中提出的官方约束、异常场景及可行性风险完成查证：1. 存储与事务：W3C IndexedDB 规范证实 Boolean 并非合法键类型，isPinned/isFavorite 禁止直接建立布尔索引，必须采用内存过滤或数字映射；同时 readwrite 事务支持跨 notes 与 meta 进行原子 CAS 校验（结合 expectedRevision 与 libraryGeneration）及导入全量替换回滚。2. 部署与离线：MDN 规范证实 ESM 应用在 file:// 协议下因 CORS 错误无法免服务器直接运行，必须依赖 HTTP/HTTPS 或 localhost 服务；Service Worker 仅支持安全上下文，离线冷重启依赖预先缓存激活，与已打开页面的断网离线操作存在阶段划分。3. 快捷键与焦点：Web SPA 无法捕获系统级全局热键，快捷键仅在页面聚焦时生效，且在输入控件处于活动焦点时严禁劫持输入字符。4. 草稿与无痕：sessionStorage 随标签页隔离且关闭后销毁，草稿不能承诺跨关闭 100% 恢复；Web 标准无通用 detectPrivateMode API，不可夸大无痕识别能力。5. 性能与环境：规划沙盒 Docker 未启动，性能与兼容性测试如实标记为 unexecuted，移交后续开发前置任务在真实浏览器中基于 PerformanceNavigationTiming 导航原点测量。"
+}

@@ -14,9 +14,11 @@ export interface InitialProjectIntent {
 }
 
 export interface CreateProjectRequest {
+  materialOnly?: boolean;
   name: string;
   idea?: string;
   initialIntent?: InitialProjectIntent;
+  presetId?: string;                // Architectural Seed Preset ID
   projectId?: string;               // Optional explicit safe identifier
   projectTags?: string[];
   projectPath?: string;             // Deprecated: explicit paths must reside within workspace boundary
@@ -106,6 +108,17 @@ export interface EditOverviewItemResponse {
   snapshot: ProjectSnapshot;
 }
 
+export interface DeprecateDecisionRequest {
+  projectId: string;
+  decisionRef: DecisionRef;
+  expectedRevision: number;
+}
+
+export interface DeprecateDecisionResponse {
+  snapshot: ProjectSnapshot;
+  deprecatedRef: DecisionRef;
+}
+
 export interface AnswerQuestionRequest {
   projectId: string;
   questionRef: QuestionRef;
@@ -145,6 +158,7 @@ export interface RecordDiscoveryInputRequest {
   projectId: string;
   text: string;
   expectedRevision: number;
+  clientTurnId?: string;
 }
 
 export interface RecordDiscoveryInputResponse {
@@ -158,6 +172,8 @@ export interface ScheduleDiscoveryJobRequest {
   turnId?: string;
   expectedRevision: number;
   userMessage?: string;
+  intensity?: import('./discovery.js').DiscoveryIntensity;
+  allowRebase?: boolean;
 }
 
 export interface GetDiscoveryTurnsResponse {
@@ -168,9 +184,14 @@ export interface GetDiscoveryProgressResponse {
   progress: import('./views.js').DiscoveryProgressView;
 }
 
+export interface GetContextDiagnosticsResponse {
+  diagnostics: import('./views.js').ContextDiagnosticsView;
+}
+
 export interface RunDiscoveryTurnRequest {
   projectId: string;
   userMessage?: string;
+  intensity?: import('./discovery.js').DiscoveryIntensity;
   questionAnswer?: {
     questionRef: TypedRef;
     selectedOption?: string;
@@ -227,7 +248,43 @@ export interface DiscoveryJobView {
     durationMs?: number;
     totalTokens?: number | 'unavailable';
   };
+  currentPhase?: import('./discovery.js').DiscoveryExecutionPhase;
   message?: string;
+}
+
+export interface RetractQuestionRequest {
+  projectId: string;
+  questionRef: QuestionRef;
+  expectedRevision: number;
+}
+
+export interface RetractQuestionResponse {
+  snapshot: ProjectSnapshot;
+  retractedQuestionId: string;
+  reopenedGapRef?: TypedRef;
+}
+
+export interface ValidatePathRequest {
+  path: string;
+}
+
+export interface ValidatePathResponse {
+  valid: boolean;
+  exists: boolean;
+  isDirectory: boolean;
+  isEmpty: boolean;
+  error?: string;
+}
+
+export interface FsDirectoryItem {
+  name: string;
+  path: string;
+}
+
+export interface ListDirectoriesResponse {
+  currentPath: string;
+  parentPath?: string;
+  items: FsDirectoryItem[];
 }
 
 export interface AnswerQuestionAsAssumptionRequest {
@@ -241,12 +298,6 @@ export interface AnswerQuestionAsAssumptionRequest {
 export interface AnswerQuestionAsAssumptionResponse {
   assumptionRef: TypedRef;
   snapshot: ProjectSnapshot;
-}
-
-export interface ScheduleDiscoveryJobRequest {
-  projectId: string;
-  expectedRevision: number;
-  userMessage?: string;
 }
 
 export interface ScheduleDiscoveryJobResponse {
@@ -288,10 +339,25 @@ export interface ApproveDevelopmentPackageResponse {
 export interface GenerateDocumentsRequest {
   projectId: string;
   expectedRevision: number;
+  customRules?: string[];
+  customNotes?: string;
+  autoReApprove?: boolean;
+  isDraft?: boolean;
+  forceOverwrite?: boolean;
+}
+
+export interface DocumentDiffItem {
+  document: string;
+  path: string;
+  hasDiff: boolean;
+  unifiedDiff?: string;
+  diskContent?: string;
+  newContent?: string;
 }
 
 export interface GenerateDocumentsResponse {
   manifest: DocumentsState;
+  backupPath?: string;
 }
 
 export interface ReadDocumentRequest {
@@ -301,6 +367,18 @@ export interface ReadDocumentRequest {
 
 export interface ReadDocumentResponse {
   content: string;
+}
+
+export interface ExportProjectResponse {
+  projectId: string;
+  filename: string;
+  sizeBytes: number;
+}
+
+export interface ImportProjectResponse {
+  project: RecentProjectItem;
+  snapshot: ProjectSnapshot;
+  renamed?: boolean;
 }
 
 // Project Management Lifecycle

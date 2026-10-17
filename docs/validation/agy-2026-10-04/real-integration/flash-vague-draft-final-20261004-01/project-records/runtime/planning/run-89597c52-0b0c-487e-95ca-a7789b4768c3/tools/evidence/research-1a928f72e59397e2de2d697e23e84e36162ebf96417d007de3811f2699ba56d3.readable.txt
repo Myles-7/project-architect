@@ -1,0 +1,532 @@
+PerformanceNavigationTiming - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ PerformanceNavigationTiming 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Français 
+
+ 日本語 
+
+ 中文 (简体) 
+
+ PerformanceNavigationTiming
+
+ Baseline
+
+ Widely available
+
+ *
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since October 2021.
+
+ * Some parts of this feature may have varying levels of support.
+
+ See full compatibility
+
+ Learn more
+
+ The PerformanceNavigationTiming interface provides methods and properties to store and retrieve metrics regarding the browser's document navigation events. For example, this interface can be used to determine how much time it takes to load or unload a document.
+
+ Only the current document is included in the performance timeline, so there is only one PerformanceNavigationTiming object in the performance timeline. It inherits all of the properties and methods of PerformanceResourceTiming and PerformanceEntry .
+
+ The following diagram shows all of the timestamp properties defined in PerformanceNavigationTiming .
+
+ In this article
+
+ Instance properties 
+
+ Instance methods 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Instance properties 
+
+ This interface extends the following PerformanceEntry properties by qualifying and constraining them as follows:
+
+ PerformanceEntry.entryType Read only 
+
+ Returns "navigation" .
+
+ PerformanceEntry.name Read only 
+
+ Returns the document's URL .
+Note that text fragments , and any other fragment directives, are stripped from the URL.
+
+ PerformanceEntry.startTime Read only 
+
+ Returns a DOMHighResTimeStamp with a value of 0 .
+
+ PerformanceEntry.duration Read only 
+
+ Returns a timestamp that is the difference between the PerformanceNavigationTiming.loadEventEnd and PerformanceEntry.startTime properties.
+
+ This interface also extends the following PerformanceResourceTiming properties by qualifying and constraining them as follows:
+
+ PerformanceResourceTiming.initiatorType Read only 
+
+ Returns "navigation" .
+
+ The interface also supports the following properties:
+
+ PerformanceNavigationTiming.activationStart Read only 
+
+ A DOMHighResTimeStamp representing the time between when a document starts prerendering and when it is activated.
+
+ PerformanceNavigationTiming.confidence Read only 
+
+ A PerformanceTimingConfidence object containing information that indicates whether a performance record reflects typical application performance, or is likely affected by external factors.
+
+ PerformanceNavigationTiming.criticalCHRestart Read only 
+
+ A DOMHighResTimeStamp representing the time at which the connection restart occurred due to Critical-CH HTTP response header mismatch.
+
+ PerformanceNavigationTiming.domComplete Read only 
+
+ A DOMHighResTimeStamp representing the time immediately before the user agent sets the document's readyState to "complete" .
+
+ PerformanceNavigationTiming.domContentLoadedEventEnd Read only 
+
+ A DOMHighResTimeStamp representing the time immediately after the current document's DOMContentLoaded event handler completes.
+
+ PerformanceNavigationTiming.domContentLoadedEventStart Read only 
+
+ A DOMHighResTimeStamp representing the time immediately before the current document's DOMContentLoaded event handler starts.
+
+ PerformanceNavigationTiming.domInteractive Read only 
+
+ A DOMHighResTimeStamp representing the time immediately before the user agent sets the document's readyState to "interactive" .
+
+ PerformanceNavigationTiming.loadEventEnd Read only 
+
+ A DOMHighResTimeStamp representing the time immediately after the current document's load event handler completes.
+
+ PerformanceNavigationTiming.loadEventStart Read only 
+
+ A DOMHighResTimeStamp representing the time immediately before the current document's load event handler starts.
+
+ PerformanceNavigationTiming.notRestoredReasons Read only 
+
+ A NotRestoredReasons object providing report data on reasons why the current document was blocked from using the back/forward cache ( bfcache ) on navigation.
+
+ PerformanceNavigationTiming.redirectCount Read only 
+
+ A number representing the number of redirects since the last non-redirect navigation in the current browsing context.
+
+ PerformanceNavigationTiming.type Read only 
+
+ A string representing the navigation type. Either "navigate" , "reload" , or "back_forward" .
+
+ PerformanceNavigationTiming.unloadEventEnd Read only 
+
+ A DOMHighResTimeStamp representing the time immediately after the current document's unload event handler completes.
+
+ PerformanceNavigationTiming.unloadEventStart Read only 
+
+ A DOMHighResTimeStamp representing the time immediately before the current document's unload event handler starts.
+
+ Instance methods 
+
+ PerformanceNavigationTiming.toJSON() 
+
+ Returns a JSON-serializable plain object representing the PerformanceNavigationTiming object. Automatically called by JSON.stringify() .
+
+ Specifications 
+
+ Specification
+
+ Navigation Timing Level 2 
+# sec-PerformanceNavigationTiming 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Performance.navigation 
+
+ PerformanceNavigation 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Sep 28, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Performance APIs 
+ PerformanceNavigationTiming 
+ Instance properties activationStart 
+ confidence 
+ criticalCHRestart 
+ domComplete 
+ domContentLoadedEventEnd 
+ domContentLoadedEventStart 
+ domInteractive 
+ loadEventEnd 
+ loadEventStart 
+ notRestoredReasons 
+ redirectCount 
+ type 
+ unloadEventEnd 
+ unloadEventStart 
+
+ Instance methods toJSON() 
+
+ Inheritance PerformanceResourceTiming 
+ PerformanceEntry 
+
+ Related pages for Performance API EventCounts 
+ InteractionContentfulPaint 
+ LargestContentfulPaint 
+ LayoutShift 
+ LayoutShiftAttribution 
+ NotRestoredReasonDetails 
+ NotRestoredReasons 
+ Performance 
+ PerformanceElementTiming 
+ PerformanceEntry 
+ PerformanceEventTiming 
+ PerformanceLongAnimationFrameTiming 
+ PerformanceLongTaskTiming 
+ PerformanceMark 
+ PerformanceMeasure 
+ PerformanceNavigation 
+ PerformanceObserver 
+ PerformanceObserverEntryList 
+ PerformancePaintTiming 
+ PerformanceResourceTiming 
+ PerformanceScriptTiming 
+ PerformanceServerTiming 
+ PerformanceSoftNavigation 
+ PerformanceTiming 
+ TaskAttributionTiming 
+ VisibilityStateEntry 
+ Window .performance 
+ WorkerGlobalScope .performance 
+
+ Guides Performance data 
+ High precision timing 
+ Long animation frame timing 
+ Resource timing 
+ Navigation timing 
+ User timing 
+ Server timing 
+ Monitoring bfcache blocking reasons 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

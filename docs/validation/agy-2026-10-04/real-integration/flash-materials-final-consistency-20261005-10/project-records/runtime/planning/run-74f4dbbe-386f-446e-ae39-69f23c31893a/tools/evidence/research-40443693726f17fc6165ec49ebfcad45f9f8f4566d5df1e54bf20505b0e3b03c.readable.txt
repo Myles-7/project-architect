@@ -1,0 +1,609 @@
+Node: insertBefore() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Node 
+
+ insertBefore() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ Node: insertBefore() method
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The insertBefore() method of the Node interface
+inserts a node before a reference node as a child of a specified parent node .
+
+ If the given node already exists in the document,
+ insertBefore() moves it from its current position to the new position.
+(That is, it will automatically be removed from its existing parent
+before appending it to the specified new parent.)
+
+ This means that a node cannot be in two locations of the document simultaneously.
+
+ Note: 
+The Node.cloneNode() can be used to make a copy
+of the node before appending it under the new parent. Note that the copies made with
+ cloneNode() will not be automatically kept in sync.
+
+ If the given child is a DocumentFragment , the entire contents of the
+ DocumentFragment are moved into the child list of the specified parent
+node.
+
+ In this article
+
+ Syntax 
+
+ Example 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ js 
+ insertBefore(newNode, referenceNode)
+
+ Parameters 
+
+ newNode 
+
+ The node to be inserted.
+
+ referenceNode 
+
+ The node before which newNode is inserted. If this is
+ null , then newNode is inserted at the end of
+node's child nodes.
+
+ Note: 
+ referenceNode is not an optional parameter.
+You must explicitly pass a Node or null .
+Failing to provide it or passing invalid values may behave differently in different browser versions.
+
+ Return value 
+
+ Returns the added child (unless newNode is a DocumentFragment ,
+in which case the empty DocumentFragment is returned).
+
+ Exceptions 
+
+ Pre-insert validity
+
+ Example 
+
+ Example 1 
+
+ html 
+ <div id="parentElement">
+ <span id="childElement">foo bar</span>
+</div>
+
+ js 
+ // Create the new node to insert
+const newNode = document.createElement("span");
+
+// Get a reference to the parent node
+const parentDiv = document.getElementById("childElement").parentNode;
+
+// Begin test case [ 1 ] : Existing childElement (all works correctly)
+let sp2 = document.getElementById("childElement");
+parentDiv.insertBefore(newNode, sp2);
+// End test case [ 1 ]
+
+// Begin test case [ 2 ] : childElement is of Type undefined
+sp2 = undefined; // Non-existent node of id "childElement"
+parentDiv.insertBefore(newNode, sp2); // Implicit dynamic cast to type Node
+// End test case [ 2 ]
+
+// Begin test case [ 3 ] : childElement is of Type "undefined" (string)
+sp2 = "undefined"; // Non-existent node of id "childElement"
+parentDiv.insertBefore(newNode, sp2); // Generates "Type Error: Invalid Argument"
+// End test case [ 3 ]
+
+ Example 2 
+
+ html 
+ <div id="parentElement">
+ <span id="childElement">foo bar</span>
+</div>
+
+ js 
+ // Create a new, plain <span> element
+const sp1 = document.createElement("span");
+
+// Get the reference element
+const sp2 = document.getElementById("childElement");
+// Get the parent element
+const parentDiv = sp2.parentNode;
+
+// Insert the new element into before sp2
+parentDiv.insertBefore(sp1, sp2);
+
+ Note: 
+There is no insertAfter() method.
+It can be emulated by combining the insertBefore method
+with Node.nextSibling .
+
+ In the previous example, sp1 could be inserted after sp2 using:
+
+ js 
+ parentDiv.insertBefore(sp1, sp2.nextSibling);
+
+ If sp2 does not have a next sibling, then it must be the last child —
+ sp2.nextSibling returns null , and sp1 is inserted
+at the end of the child node list (immediately after sp2 ).
+
+ Example 3 
+
+ Insert an element before the first child element, using the
+ firstChild property.
+
+ js 
+ // Get the parent element
+const parentElement = document.getElementById("parentElement");
+// Get the parent's first child
+const theFirstChild = parentElement.firstChild;
+
+// Create a new element
+const newElement = document.createElement("div");
+
+// Insert the new element before the first child
+parentElement.insertBefore(newElement, theFirstChild);
+
+ When the element does not have a first child, then firstChild is
+ null . The element is still appended to the parent, after the last child.
+
+ Since the parent element did not have a first child, it did not have a last child,
+either. Consequently, the newly inserted element is the only element.
+
+ Specifications 
+
+ Specification
+
+ DOM 
+# dom-node-insertbefore 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Node.removeChild() 
+
+ Node.replaceChild() 
+
+ Node.appendChild() 
+
+ Node.hasChildNodes() 
+
+ Element.insertAdjacentElement() 
+
+ Element.prepend() 
+
+ Element.before() 
+
+ Element.after() 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Jun 24, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Document Object Model (DOM) 
+ Node 
+ Instance properties baseURI 
+ childNodes 
+ firstChild 
+ isConnected 
+ lastChild 
+ nextSibling 
+ nodeName 
+ nodeType 
+ nodeValue 
+ ownerDocument 
+ parentElement 
+ parentNode 
+ previousSibling 
+ textContent 
+
+ Instance methods appendChild() 
+ cloneNode() 
+ compareDocumentPosition() 
+ contains() 
+ getRootNode() 
+ hasChildNodes() 
+ insertBefore() 
+ isDefaultNamespace() 
+ isEqualNode() 
+ isSameNode() 
+ lookupNamespaceURI() 
+ lookupPrefix() 
+ normalize() 
+ removeChild() 
+ replaceChild() 
+
+ Events selectstart 
+
+ Inheritance EventTarget 
+
+ Related pages for DOM AbortController 
+ AbortSignal 
+ AbstractRange 
+ Attr 
+ CDATASection 
+ CharacterData 
+ Comment 
+ CustomEvent 
+ DOMError 
+ DOMException 
+ DOMImplementation 
+ DOMParser 
+ DOMTokenList 
+ Document 
+ DocumentFragment 
+ DocumentType 
+ Element 
+ Event 
+ EventTarget 
+ HTMLCollection 
+ MutationObserver 
+ MutationRecord 
+ NamedNodeMap 
+ NodeIterator 
+ NodeList 
+ ProcessingInstruction 
+ QuotaExceededError 
+ Range 
+ ShadowRoot 
+ StaticRange 
+ Text 
+ TreeWalker 
+ XMLDocument 
+ XPathEvaluator 
+ XPathExpression 
+ XPathResult 
+ XSLTProcessor 
+
+ Guides Anatomy of the DOM 
+ Attribute reflection 
+ Selection and traversal on the DOM tree 
+ Building and updating the DOM tree 
+ Working with events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

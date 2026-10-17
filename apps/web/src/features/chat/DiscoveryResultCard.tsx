@@ -71,9 +71,9 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
   if (tags.length === 0) tags.push('本地架构', '规范推演');
 
   return (
-    <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#17181D] overflow-hidden shadow-xs space-y-0">
+    <div className="rounded-2xl border border-border-subtle bg-surface-card overflow-hidden shadow-elevation-card space-y-0 animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
       {/* Header */}
-      <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-50/70 via-zinc-50/50 to-zinc-50/70 dark:from-orange-950/20 dark:via-[#15161A]/70 dark:to-[#15161A]/70 border-b border-zinc-200 dark:border-zinc-800 flex items-start justify-between gap-3">
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-50/50 via-surface-card to-surface-card border-b border-border-subtle flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-xs shrink-0 mt-0.5">
             <Sparkles className="w-4 h-4" />
@@ -83,7 +83,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
               <h3 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
                 AI 构思透视与架构推演
               </h3>
-              <span className="text-[10px] px-2 py-0.2 rounded-full bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 font-medium">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 font-medium">
                 智能推演总结
               </span>
               {projectName && (
@@ -95,8 +95,8 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
 
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
               AI 已为您提炼出 <span className="font-semibold text-zinc-800 dark:text-zinc-200">{candidatesCount}</span> 项候选建议、
-              <span className="font-semibold text-purple-700 dark:text-purple-300"> {assumptionsCount}</span> 项技术假设，并识别出
-              <span className="font-semibold text-amber-700 dark:text-amber-300"> {gapsCount}</span> 项待决缺口。
+              <span className="font-medium text-zinc-700 dark:text-zinc-300"> {assumptionsCount}</span> 项技术假设，并识别出
+              <span className="font-medium text-zinc-700 dark:text-zinc-300"> {gapsCount}</span> 项待决缺口。
             </p>
 
             {/* Architecture Tags */}
@@ -105,7 +105,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
               {tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.2 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/60"
+                  className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800/80 text-xs font-medium text-zinc-600 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700/60"
                 >
                   #{tag}
                 </span>
@@ -152,11 +152,11 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'candidates'
                     ? 'bg-orange-600 text-white font-semibold'
-                    : 'text-orange-700 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/40'
+                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <span>建议</span>
-                <span className="text-[10px] font-mono">({candidatesCount})</span>
+                <span className="text-xs font-mono">({candidatesCount})</span>
               </button>
             )}
             {assumptionsCount > 0 && (
@@ -165,12 +165,12 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 onClick={() => setActiveTab('assumptions')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'assumptions'
-                    ? 'bg-purple-600 text-white font-semibold'
-                    : 'text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40'
+                    ? 'bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <span>假设</span>
-                <span className="text-[10px] font-mono">({assumptionsCount})</span>
+                <span className="text-xs font-mono">({assumptionsCount})</span>
               </button>
             )}
             {gapsCount > 0 && (
@@ -179,12 +179,12 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 onClick={() => setActiveTab('gaps')}
                 className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer ${
                   activeTab === 'gaps'
-                    ? 'bg-amber-600 text-white font-semibold'
-                    : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                    ? 'bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <span>待决缺口</span>
-                <span className="text-[10px] font-mono">({gapsCount})</span>
+                <span className="text-xs font-mono">({gapsCount})</span>
               </button>
             )}
             {conflictsCount > 0 && (
@@ -198,7 +198,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 }`}
               >
                 <span>张力与冲突</span>
-                <span className="text-[10px] font-mono">({conflictsCount})</span>
+                <span className="text-xs font-mono">({conflictsCount})</span>
               </button>
             )}
             {risksCount > 0 && (
@@ -212,7 +212,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 }`}
               >
                 <span>风险</span>
-                <span className="text-[10px] font-mono">({risksCount})</span>
+                <span className="text-xs font-mono">({risksCount})</span>
               </button>
             )}
             {confirmedCount > 0 && (
@@ -226,7 +226,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                 }`}
               >
                 <span>已确立</span>
-                <span className="text-[10px] font-mono">({confirmedCount})</span>
+                <span className="text-xs font-mono">({confirmedCount})</span>
               </button>
             )}
           </div>
@@ -293,7 +293,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                             </div>
                           )}
                           {area && (
-                            <span className="inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400">
+                            <span className="inline-block text-xs font-mono px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400">
                               {area}
                             </span>
                           )}
@@ -302,7 +302,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                           <button
                             type="button"
                             onClick={() => onConfirmCandidate(ref, stmt)}
-                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-orange-600 hover:bg-orange-700 text-white transition-colors cursor-pointer shadow-2xs"
+                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-600 hover:bg-orange-700 text-white transition-colors cursor-pointer shadow-2xs"
                           >
                             <CheckCircle2 className="w-3 h-3" />
                             <span>采纳</span>
@@ -346,7 +346,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                             </div>
                           )}
                           {area && (
-                            <span className="inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400">
+                            <span className="inline-block text-xs font-mono px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400">
                               {area}
                             </span>
                           )}
@@ -355,7 +355,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                           <button
                             type="button"
                             onClick={() => onConfirmAssumption(ref, stmt)}
-                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-purple-600 hover:bg-purple-700 text-white transition-colors cursor-pointer shadow-2xs"
+                            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-600 hover:bg-purple-700 text-white transition-colors cursor-pointer shadow-2xs"
                           >
                             <CheckCircle2 className="w-3 h-3" />
                             <span>转为决策</span>
@@ -385,7 +385,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                         <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                           {gap.area}
                         </span>
-                        <span className="font-mono text-[10px] px-1.5 py-0.2 rounded uppercase font-semibold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        <span className="font-mono text-xs px-1.5 py-0.5 rounded uppercase font-semibold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                           {gap.severity}
                         </span>
                       </div>
@@ -393,7 +393,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                         {gap.reason}
                       </div>
                       {gap.impact && (
-                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400">
+                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
                           影响: {gap.impact}
                         </div>
                       )}
@@ -425,7 +425,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-medium text-zinc-900 dark:text-zinc-100">{stmt}</span>
-                          <span className="font-mono text-[10px] px-1.5 py-0.2 rounded uppercase font-semibold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                          <span className="font-mono text-xs px-1.5 py-0.5 rounded uppercase font-semibold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                             {severity}
                           </span>
                         </div>
@@ -435,7 +435,7 @@ export const DiscoveryResultCard: React.FC<DiscoveryResultCardProps> = ({
                           </div>
                         )}
                         {area && (
-                          <span className="inline-block text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                          <span className="inline-block text-xs font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                             {area}
                           </span>
                         )}

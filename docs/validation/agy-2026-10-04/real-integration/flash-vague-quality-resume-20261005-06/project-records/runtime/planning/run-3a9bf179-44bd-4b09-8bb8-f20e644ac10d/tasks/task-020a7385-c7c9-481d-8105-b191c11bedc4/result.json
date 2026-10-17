@@ -1,0 +1,187 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "便签详情模态展示与Markdown编辑功能、交互流、任务与验收规范修订依据",
+      "content": "自动质量验收反馈要求：详情弹窗明确“保存后退出”、“放弃修改”与“继续编辑”，禁止关闭动作一律静默自动保存；回收区便签强制展示只读保护条并提供还原与彻底删除；保存失败拦截关闭并保留编辑草稿；两标签页并发版本冲突策略（记录修订号）；还原恢复删除前 active/archived 状态。",
+      "hash": "2638ecb655847363c37b90fa2d2195685c4bb13d237aa0420b8df7abdbffb19f",
+      "id": "evidence-cb5efe73-02a0-428a-934d-ad1a300b3c78",
+      "kind": "user",
+      "obtainedAt": "2026-10-04T21:15:40.550Z",
+      "source": "input:554e81ee-2cc8-4e01-b708-b71b835f7c9b"
+    },
+    {
+      "applicability": "双标签页并发修订通知与冲突检测的技术支撑",
+      "content": "MDN BroadcastChannel API 规范：同源下不同浏览上下文（标签页、窗口、Worker）之间的双向通信与消息广播机制，可用于跨标签页数据变更通知与并发冲突检测。",
+      "hash": "67b34d89809bf5830ed84cbdbf5fb5d10d951a1fef9142fc84dc69683e2e47dc",
+      "id": "evidence-mdn-broadcastchannel",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T21:15:48.912Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 功能定义与交互规范\n\n1. **详情模态窗口与阅读/编辑模式切换**：\n   - 点击主工作区便签卡片正文，平滑弹出居中模态窗口（NoteDetailModal），展示便签完整正文、标签列表与时间元信息。\n   - **阅读/预览模式**：集成 marked + DOMPurify 安全白名单排版渲染，支持标题、列表、GFM 待办清单（Todo Checkbox）、行内代码与代码块 Prism.js 语法高亮，代码块右上角常驻一键复制代码按钮；外部链接强制附带 `rel=\"noopener noreferrer\"` 并新标签页安全打开。\n   - **编辑模式**：非回收区便签提供【编辑/预览】切换开关；编辑模式采用自适应等宽文本域，支持实时正文修改与行内 `#标签` 解析。\n\n2. **回收区只读保护与状态精准还原**：\n   - 当便签处于回收区（`status === 'trashed'`）时，详情模态弹窗强制以【只读保护模式】打开，彻底禁用编辑切换与 GFM 待办复选框交互。\n   - 弹窗顶部固定呈现醒目黄色警示提示条：“此便签处于回收区，不可直接编辑。请先【还原】后再行修改，或点击【彻底删除】物理清理”。\n   - 弹窗右上角提供【还原便签】与【彻底删除】入口：\n     - 点击【还原】：系统读取便签进入回收区前暂存的原状态属性 `preTrashStatus`（精准还原为 `active` 或 `archived`，严禁一律恢复为 active），清除 `trashedAt` 并同步标签与置顶收藏，弹窗即刻解除只读保护并切入正常编辑状态；\n     - 点击【彻底删除】：居中弹出二次确认对话框，经用户明确确认后执行本地 IndexedDB 物理删除并关闭弹窗。\n\n3. **明确的“保存后退出”、“放弃修改”与“继续编辑”关闭拦截交互（严禁静默自动保存）**：\n   - 弹窗内置脏状态（`isDirty`）追踪器，实时监听正文与标签相比打开/保存基线的变动。\n   - **严禁任何关闭动作（点击遮罩层背景、点击右上角关闭按钮 `×`、按下键盘 `Esc` 键）一律静默自动保存草稿！**\n   - **未修改退出分支**：若 `isDirty === false`，点击 `×`、点击遮罩或按 `Esc` 立即平滑关闭详情弹窗，无任何二次确认打扰。\n   - **修改后退出拦截分支**：若 `isDirty === true`，任何退出触发均被系统强制拦截，屏幕居中弹出非模态防丢确认对话框，提供三个明确的操作选项：\n     - a. 【保存后退出】（Save & Exit）：触发数据持久化保存流程，入库成功后同步更新主工作区并安全关闭详情模态框；\n     - b. 【放弃修改】（Discard Changes）：撤销本次打开以来的全部未保存修改，恢复为初始数据，重置 `isDirty` 为 false 并平滑关闭弹窗；\n     - c. 【继续编辑】（Keep Editing）：关闭确认对话框，维持详情弹窗开启，光标重新聚焦于编辑文本域，允许用户继续撰写。\n\n4. **本地存储写入失败拦截与草稿绝对保留**：\n   - 当用户在编辑模式点击【保存】、敲击键盘 `Ctrl/Cmd + S` 或在退出确认框中选择【保存后退出】时，若底层 IndexedDB 写入遭遇异常（如 `QuotaExceededError` 存储配额满载或事务锁死）：\n     - 详情弹窗绝对强制维持开启，坚决拦截任何关闭动作；\n     - 用户正在编辑的长文草稿与标签完整保留在编辑文本框中，绝不发生内容重置、丢弃或清空；\n     - 弹窗顶部浮出红色受控错误横幅“本地存储空间已满，修改未能保存”，横幅内提供【重试保存】与【复制草稿内容】（写入剪贴板或本地文本文件）快捷入口，确保极端故障下用户劳动成果零丢失。\n\n5. **双标签页并发修订版本冲突检测与处理**：\n   - 数据模型将便签实体修订版本 `revision: number`（自增整型）与数据库 Schema 结构版本 `version: 1` 明确分离。\n   - 用户打开编辑弹窗时记录基线版本 `baseRevision = note.revision`。\n   - 编辑器通过同源 `BroadcastChannel` 监听跨标签页更新事件，并在保存提交事务内执行乐观锁校验（比对底层最新 `dbNote.revision` 与 `baseRevision`）：\n     - 若 `dbNote.revision !== baseRevision`（即另一个标签页已先一步修改并保存了该便签），系统立即拦截直接覆盖写入，详情弹窗保持开启，草稿完好保留；\n     - 弹窗顶部浮现黄色并发冲突提示栏：“该便签已在另一个标签页中被修改（版本冲突）”，提供三种裁决路径：\n       - a. 【覆盖为我的版本】（Force Overwrite）：以当前草稿覆盖，并将 revision 更新为 `dbNote.revision + 1`；\n       - b. 【放弃并载入最新版本】（Load Latest）：丢弃当前草稿，加载另一个标签页保存的最新版本；\n       - c. 【对比并复制内容】（Diff & Copy）：并排查看两版差异，复制当前草稿后进行人工合并。\n\n6. **键盘与触控全平台交互适配**：\n   - 页面获得焦点时支持键盘快捷键：`Ctrl/Cmd + S` 快捷保存、`Esc` 唤起退出确认流程。\n   - 针对移动端或触控设备，弹窗底部常驻高度不低于 44px 的可触控操作条（包含【保存】、【预览/编辑】、【退出】按钮），所有交互操作均具备完整的触控点击对应路径，不依赖单一物理键盘。",
+          "dependsOn": [
+            "page-main-workspace"
+          ],
+          "evidenceIds": [
+            "evidence-capture-modality",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-cb5efe73-02a0-428a-934d-ad1a300b3c78",
+            "evidence-mdn-broadcastchannel"
+          ],
+          "id": "feature-note-detail-edit",
+          "kind": "feature",
+          "requirementIds": [
+            "block-scope-core-boundaries"
+          ],
+          "stage": "product",
+          "title": "便签详情模态展示与 Markdown 实时编辑功能（关闭控制、只读保护与并发冲突处理）"
+        },
+        {
+          "content": "### 交互流程步骤拆解\n\n1. **步骤 1（弹窗唤出与状态判定）**：\n   - 用户在便签流中点击某便签卡片；\n   - 详情模态弹窗以 200ms 淡入缩放动效居中展开；\n   - 系统检查该便签的生命周期状态 `status`：\n     - 若 `status === 'trashed'`：进入步骤 2 只读保护流；\n     - 若 `status === 'active' || status === 'archived'`：进入步骤 3 正常浏览与编辑流。\n\n2. **步骤 2（回收区只读保护流与按原状态还原）**：\n   - 弹窗顶部常驻黄色警示条：“此便签处于回收区，不可直接编辑。请先【还原】后再行修改，或点击【彻底删除】物理清理”；\n   - 正文强制展示为 Markdown 编译后的静态视图，禁用编辑切换，禁用待办复选框点击；\n   - 用户点击【还原便签】按钮：系统读取该便签记录的原状态 `preTrashStatus`（默认为 `active`，若原为 `archived` 则恢复为 `archived`），原子更新 `status = preTrashStatus`，`trashedAt = null`，`updatedAt = Date.now()`；写入 IndexedDB 并通过 BroadcastChannel 广播状态变动；弹窗黄色警示条消失，解除只读限制，允许用户就地切换编辑；\n   - 用户点击【彻底删除】按钮：系统弹出红色模态二次确认框：“彻底删除后将无法恢复，是否确认？”，用户点击确认后执行物理删除，关闭弹窗并广播通知主列表移除卡片；用户点击取消则保持回收区只读状态。\n\n3. **步骤 3（常规便签阅读与编辑切换）**：\n   - 默认以预览阅读模式打开，Markdown 格式化排版呈现，代码块提供【复制】按钮；\n   - 用户点击右上角【编辑】按钮，界面平滑切换为等宽编辑器 TextArea；\n   - 系统记录基线状态：`baseContent = note.content`，`baseRevision = note.revision`，初始化脏标记 `isDirty = false`；\n   - 用户键入修改正文或标签，系统比对内容变动，一旦检测到与 `baseContent` 不一致，即时将 `isDirty` 置为 `true`，弹窗标题旁点亮微型未保存状态指示点。\n\n4. **步骤 4（弹窗关闭拦截与退出三态决策流 - 杜绝静默自动保存）**：\n   - 用户尝试关闭弹窗（点击遮罩层背景、点击弹窗右上角 `×` 或按下 `Esc` 键）；\n   - 系统检查 `isDirty` 状态：\n     - **未修改分支（isDirty === false）**：直接执行弹窗平滑关闭，恢复主工作区滚动与焦点；\n     - **已修改拦截分支（isDirty === true）**：严禁静默自动保存！系统阻断关闭操作，弹窗中央浮现防丢二次确认面板：“您有未保存的修改，请选择操作”：\n       - **分支 4A【保存后退出】**：触发步骤 5 数据持久化保存流，入库成功后将 `isDirty` 置为 `false` 并关闭弹窗；\n       - **分支 4B【放弃修改】**：内存草稿立即回滚至 `baseContent`，重置 `isDirty = false`，确认面板与详情弹窗同步安全关闭；\n       - **分支 4C【继续编辑】**：关闭确认面板，详情模态弹窗保持开启，草稿完好保留，编辑光标重新聚焦于文本域。\n\n5. **步骤 5（保存提交与并发版本冲突检测流）**：\n   - 用户点击【保存】按钮、按快捷键 `Ctrl/Cmd + S` 或在确认框中点击【保存后退出】；\n   - 系统向 IndexedDB 发起读写事务，首先比对数据库中当前记录的 `dbNote.revision` 与打开时的 `baseRevision`：\n     - **正常无冲突分支（dbNote.revision === baseRevision）**：\n       - 事务原子写入更新：`content = draftContent`，`tags = extractedTags`，`revision = baseRevision + 1`，`updatedAt = Date.now()`；\n       - 事务提交成功，未备份变更计数器 `unbackedChangesCount` 递增 1；\n       - 更新本地基线 `baseRevision = note.revision`，`baseContent = draftContent`，`isDirty = false`；\n       - 通过同源 `BroadcastChannel` 广播 `{ type: 'NOTE_UPDATED', id: note.id, revision: note.revision }` 事件通知其他标签页；\n       - 若由【保存后退出】触发，则执行关闭弹窗；若由常规保存触发，弹窗顶部弹出轻量绿色 Toast 提示“已保存”，弹窗维持开启供继续编辑。\n     - **并发冲突分支（dbNote.revision !== baseRevision）**：\n       - 事务拦截写入并回滚，弹窗维持开启，正在编辑的草稿 100% 完整保留；\n       - 弹窗顶部浮现黄色冲突告警横幅：“此便签已在其他标签页中被更新（检测到并发版本冲突）”；\n       - 横幅内提供三个操作选项：\n         - a. 【强制覆盖为我的版本】：系统将修订号重新设定为 `dbNote.revision + 1`，再次提交写入；\n         - b. 【放弃并载入最新版本】：读取 `dbNote` 最新内容覆盖当前编辑器，重置 `baseRevision = dbNote.revision`，`isDirty = false`；\n         - c. 【对比并复制内容】：唤出轻量并排文本对比弹窗，支持一键复制当前编辑草稿，随后人工裁决。\n\n6. **步骤 6（存储配额超限与异常防御保留流）**：\n   - 若在步骤 5 保存时抛出 `StorageQuotaExceededError` 或底层写异常：\n     - 弹窗绝对强制维持开启，绝不执行关闭操作；\n     - 编辑文本框与标签数据完整保留在界面中，光标保持不动；\n     - 弹窗顶部弹出醒目红色错误提示：“保存失败：本地存储已满或数据库异常”，并提供【重试保存】与【一键复制草稿正文】按钮，支持用户将内容复制到剪贴板或导出为临时文件，杜绝灵感丢失。",
+          "dependsOn": [
+            "feature-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-capture-modality",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-cb5efe73-02a0-428a-934d-ad1a300b3c78",
+            "evidence-mdn-broadcastchannel"
+          ],
+          "id": "flow-note-detail-edit",
+          "kind": "flow",
+          "requirementIds": [
+            "feature-note-detail-edit"
+          ],
+          "stage": "product",
+          "title": "详情浏览、Markdown 解析、保存退出拦截与并发冲突处理交互流"
+        },
+        {
+          "content": "### 详情模态弹窗与 Markdown 编辑器开发与交互加固规范\n\n1. **模态弹窗架构与 Markdown 安全渲染管道**：\n   - 开发 `NoteDetailModal` 组件，集成 marked 语法编译器、DOMPurify 白名单安全过滤及 Prism.js 语法着色引擎。\n   - 规范 Markdown 解析：支持 GitHub Flavored Markdown (GFM) 任务清单交互；代码块右上角浮动一键复制按钮（调用 Navigator.clipboard API，失败时优雅降级为 selection 提示）；外部超链接强制补齐 `target=\"_blank\" rel=\"noopener noreferrer\"` 安全属性。\n\n2. **回收区便签只读防护条与原状态还原机制**：\n   - 当 `note.status === 'trashed'` 时，弹窗强制切入只读模式，禁用内联编辑及 GFM Checkbox 交互。\n   - 弹窗顶部常驻展示黄色警示条：“此便签处于回收区，不可直接编辑。请先【还原】后再行修改，或点击【彻底删除】物理清理”。\n   - 顶部提供【还原便签】与【彻底删除】按钮：\n     - 还原交互：依据 `note.preTrashStatus`（默认为 active，若原为 archived 则还原为 archived）恢复对应状态并清除 `trashedAt`，恢复成功后自动移除警示条并允许就地进入编辑；\n     - 彻底删除交互：弹出二次确认模态弹窗 `ConfirmDialog`，确认后调用 `StorageService.hardDeleteNote(id)` 物理清除并同步关闭弹窗。\n\n3. **脏检查与三态关闭拦截交互（严禁静默自动保存）**：\n   - 内部维护 `isDirty: boolean` 状态（比对 `currentContent !== initialContent || currentTags !== initialTags`）。\n   - 监听模态框遮罩点击、右上角 `×` 按钮点击及键盘 `Esc` 按键：\n     - 当 `isDirty === false` 时，平滑关闭弹窗；\n     - 当 `isDirty === true` 时，强制拦截关闭动作，弹出非模态防丢确认对话框 `UnsavedChangesDialog`，提供【保存后退出】、【放弃修改】、【继续编辑】三项显式操作，严禁在任意关闭动作下一律静默自动保存草稿。\n\n4. **并发版本冲突检测与 BroadcastChannel 跨标签页同步**：\n   - 在便签实体与持久化层引入 `revision: number`（自增修订版本号，与 Schema 结构版本分离）。\n   - 打开编辑弹窗时记录 `baseRevision = note.revision`。\n   - 实例化同源 `BroadcastChannel('spark_notes_channel')`，监听其他标签页广播的更新事件；在执行 `saveNote` 事务时比对底层当前 `dbNote.revision`：\n     - 若 `dbNote.revision !== baseRevision`，事务拦截写入，弹窗保持开启且草稿完好保留，顶部浮出冲突提示条，提供【强制覆盖】、【放弃并载入最新】及【对比并复制】操作。\n\n5. **受控写入失败与草稿绝对保留**：\n   - 在 `saveNote` 遇到 `StorageQuotaExceededError` 或写入中断时，弹窗维持开启，文本框与标签 100% 完整保留，展示错误告警与重试按钮，杜绝丢稿。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "feature-note-detail-edit",
+            "flow-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-capture-modality",
+            "evidence-react-official",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-cb5efe73-02a0-428a-934d-ad1a300b3c78",
+            "evidence-mdn-broadcastchannel"
+          ],
+          "id": "task-note-detail-edit",
+          "kind": "task",
+          "requirementIds": [
+            "feature-note-detail-edit",
+            "flow-note-detail-edit",
+            "interface-service-contracts",
+            "error-architecture-and-recovery"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "浏览器支持标准 DOM Focus/Keyboard 事件与 IndexedDB 事务",
+              "浏览器同源支持 BroadcastChannel API 进行跨标签页事件通知",
+              "便签数据包含 revision 修订版本号字段用于并发版本检测"
+            ],
+            "completionCriteria": [
+              "未保存修改触发关闭时拦截率 100%，必须明确由用户选择保存后退出、放弃修改或继续编辑",
+              "禁止任何任意关闭动作静默自动保存草稿",
+              "回收区便签详情弹窗只读保护生效且还原精确恢复至 preTrashStatus 原状态",
+              "存储写入异常时详情弹窗防关闭与草稿保留率 100%",
+              "多标签页并发修改同一便签时版本冲突拦截率 100%"
+            ],
+            "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+            "exclusions": "不包含全量富文本绘图与实时协同光标画板，不引入 CRDT/OT 复杂分布式网络协同算法（坚守纯前端轻量单页应用范围）。",
+            "failureBehavior": "编辑保存遇到存储配额满或写入中断时，弹窗绝对不关闭，草稿完整保留在编辑域中，浮出错误警告、重试按钮与复制入口；并发冲突时拦截覆盖并提供对比与覆盖选择；剪贴板受阻时提供文本选区手动复制引导。",
+            "goal": "交付便签详情展示与 Markdown 编辑模态弹窗，实现明确的“保存后退出/放弃修改/继续编辑”关闭拦截交互、回收区只读保护与状态还原、存储失败草稿绝对保留，以及基于 revision 的双标签页并发冲突检测与提示。",
+            "modules": [
+              "NoteDetailModal",
+              "MarkdownRenderer",
+              "ConflictResolutionModal",
+              "NoteService",
+              "StorageService"
+            ],
+            "normalBehavior": "点击便签卡片居中弹出详情；非回收区便签支持查看与切换编辑；编辑时追踪 isDirty；按 Ctrl/Cmd+S 或点击保存后无冲突完成入库；未修改时点击遮罩或 Esc 直接关闭；修改后触发关闭弹出保存退出/放弃/继续选项；回收区便签强制只读展示并提供还原与彻底删除；还原恢复至删除前 active 或 archived 原状态。",
+            "onFailure": "Markdown 解析异常回退为纯文本等宽展示，保证正文可读；弹窗交互异常时提供关闭重置通道",
+            "passCriteria": [
+              "DOMPurify 拦截恶意脚本注入",
+              "关闭拦截与三态防丢选项正确触发且无静默保存",
+              "回收区只读保护生效且还原状态精确保留原 active/archived 属性",
+              "跨标签页并发冲突拦截与解决方案面板正常呈现",
+              "保存失败草稿 100% 保留且弹窗强制维持开启"
+            ],
+            "scope": "NoteDetailModal 组件开发、MarkdownRenderer 白名单与 GFM 渲染、isDirty 脏状态追踪与防丢关闭拦截对话框、保存失败草稿保留与重试机制、BroadcastChannel 与 revision 乐观锁并发冲突检测 UI、回收区便签只读防护条及按 preTrashStatus 原状态还原与彻底删除触发。",
+            "steps": [
+              "1. 封装 NoteDetailModal 组件结构，实现阅读模式与编辑模式切换，集成 MarkdownRenderer（GFM 与 DOMPurify 白名单）",
+              "2. 引入 isDirty 状态追踪，监听点击关闭按钮、遮罩点击及 Esc 按键，当 isDirty 为 true 时拦截关闭并弹出保存退出/放弃修改/继续编辑对话框",
+              "3. 对接回收区 status === 'trashed' 判定，强制启用只读保护条，禁用直接编辑，接入按 preTrashStatus 还原与彻底删除二次确认流",
+              "4. 实现 StorageService.saveNoteWithRevision 乐观并发控制，结合 BroadcastChannel 监听跨标签页变更，出现版本差异时展示并发冲突面板与解决方案",
+              "5. 编写受控存储异常分支，确保写入失败时弹窗保持开启、文本框草稿完好保留，并提供重试和复制草稿功能",
+              "6. 编写 Vitest + React Testing Library 单元与集成测试覆盖关闭拦截、草稿防丢、并发冲突与只读保护"
+            ],
+            "verification": [
+              "组件交互测试验证修改内容后按 Esc 触发防丢选择弹窗，点击放弃修改内容回滚，点击保存后退出正确写入并关闭",
+              "测试回收区便签在详情弹窗中的只读保护与还原回 active/archived 状态",
+              "模拟写入抛出 QuotaExceededError 验证详情弹窗不关闭且草稿保留在文本框中",
+              "模拟双标签页并发更新场景验证 revision 不一致时触发冲突拦截横幅"
+            ]
+          },
+          "title": "详情模态弹窗与 Markdown 编辑器开发任务（关闭控制、只读保护与并发冲突）"
+        },
+        {
+          "content": "### 便签详情展示与 Markdown 编辑验收标准（Given / When / Then）\n\n- **场景 1：Markdown 安全排版、语法高亮与外部链接安全防跳**\n  - **Given** 某便签正文中包含 GFM 待办复选框、二级标题与一段 JavaScript 代码块，\n  - **When** 用户在主工作区点击该便签卡片打开详情弹窗，\n  - **Then** 弹窗在 200ms 内平滑呈现，正文格式化排版整洁，代码块高亮且右上角呈现复制按钮；点击外部链接在新标签页以安全属性 `noopener noreferrer` 打开。\n\n- **场景 2：回收区便签只读保护与按原状态还原**\n  - **Given** 回收区中存在一条进入回收区前为已归档状态（`preTrashStatus === 'archived'`）的便签，\n  - **When** 用户在回收区视图点击该便签卡片打开详情弹窗，\n  - **Then** 弹窗顶部呈现醒目黄色警示条“此便签处于回收区，不可直接编辑”，禁用直接编辑与待办勾选；当用户点击弹窗中的【还原便签】按钮，便签即刻还原为 `status: 'archived'`（精准保留归档状态而非恢复为 active），警示条消失，解除只读限制并允许直接编辑。\n\n- **场景 3：未保存修改拦截与三项选择交互（严禁静默自动保存）**\n  - **Given** 用户在编辑模式下修改了正文内容（使 `isDirty === true`），\n  - **When** 用户点击遮罩背景、弹窗右上角 `×` 或按下键盘 `Esc` 键，\n  - **Then** 系统绝对不执行静默自动保存，弹窗关闭动作被强制拦截，居中弹出防丢确认面板，提供【保存后退出】、【放弃修改】、【继续编辑】三个选项；\n  - **When** 用户点击【继续编辑】，\n  - **Then** 确认面板关闭，详情弹窗保持开启，已修改的草稿内容完好保留在文本域中；\n  - **When** 用户再次触发关闭并点击【放弃修改】，\n  - **Then** 弹窗丢弃修改并安全关闭，主列表卡片保持原内容不变；\n  - **When** 用户再次修改并触发关闭，点击【保存后退出】，\n  - **Then** 系统执行持久化写入，成功后弹窗平滑关闭，主列表卡片内容同步更新。\n\n- **场景 4：持久化保存失败拦截关闭与草稿绝对保留**\n  - **Given** 本地数据库处于模拟配额超限异常状态，\n  - **When** 用户在编辑弹窗点击【保存】或在退出确认框中选择【保存后退出】，\n  - **Then** 系统捕获受控异常，详情弹窗强制维持开启不被关闭，用户编辑的长篇草稿与标签 100% 完整保留在文本域中，弹窗顶部展示红色错误提示“保存失败：本地存储已满”，并提供【重试保存】与【复制草稿内容】按钮。\n\n- **场景 5：双标签页并发修订版本冲突检测与提示**\n  - **Given** 用户在浏览器标签页 A 打开某便签编辑弹窗（记录基线版本 `baseRevision = 2`），\n  - **When** 用户在标签页 B 对同一便签进行了修改并成功保存（数据库记录更新为 `revision = 3`），随后用户在标签页 A 尝试点击【保存】，\n  - **Then** 标签页 A 系统比对发现 `baseRevision !== currentRevision`，立即拦截覆盖写入，编辑弹窗维持开启且草稿内容完好保留，顶部浮出黄色并发冲突提示条“检测到该便签已在另一个标签页中被修改”，并提供【覆盖为我的版本】、【放弃并载入最新版本】与【对比并复制内容】三项解决方案供用户裁决。",
+          "dependsOn": [
+            "task-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-capture-modality",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-cb5efe73-02a0-428a-934d-ad1a300b3c78",
+            "evidence-mdn-broadcastchannel"
+          ],
+          "id": "acceptance-note-detail-edit",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-note-detail-edit",
+            "flow-note-detail-edit"
+          ],
+          "stage": "delivery",
+          "title": "便签详情展示与 Markdown 编辑验收标准（关闭控制、只读保护与并发冲突）"
+        }
+      ],
+      "decisions": [
+        {
+          "area": "product_specification",
+          "decisionKey": "product.detail_modal_exit_and_revision_policy",
+          "evidenceIds": [
+            "evidence-cb5efe73-02a0-428a-934d-ad1a300b3c78",
+            "evidence-mdn-broadcastchannel"
+          ],
+          "rationale": "全面落实自动质量验收反馈要求。在纯前端单页架构中，静默自动保存极易在误触关闭时将半成品覆盖正式数据，三态拦截提供完全可控的数据保护；双标签页使用独立的 revision 递增号与同源广播能有效拦截脏覆盖；回收区依据 preTrashStatus 精确恢复删除前状态保证生命周期流转一致性。",
+          "statement": "便签详情模态弹窗采用显式‘保存后退出/放弃修改/继续编辑’三态交互，严禁任意关闭静默保存；引入实体 revision 修订号与 BroadcastChannel 进行双标签页并发冲突检测与人工裁决分支；回收区便签强制只读展示并依据 preTrashStatus 还原至原 active 或 archived 状态。"
+        }
+      ],
+      "dependsOn": [
+        "page-main-workspace",
+        "task-foundation-and-storage"
+      ],
+      "id": "task-020a7385-c7c9-481d-8105-b191c11bedc4-group-note-detail-edit",
+      "impact": "规范便签详情模态展示与Markdown编辑功能、交互流、开发任务与验收标准：彻底杜绝任意关闭静默自动保存，建立未保存三态防丢确认；回收区便签强制只读保护并支持按 preTrashStatus 原状态还原；存储写入失败拦截弹窗关闭并100%保留草稿；建立基于 revision 修订号与 BroadcastChannel 的双标签页并发冲突检测与裁决机制。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "便签详情模态展示与 Markdown 编辑交互加固变更组"
+    }
+  ],
+  "questions": [],
+  "summary": "已完成便签详情模态展示与 Markdown 编辑功能（feature-note-detail-edit）、交互流（flow-note-detail-edit）、开发任务（task-note-detail-edit）与验收标准（acceptance-note-detail-edit）的加固修订：规范显式“保存后退出”、“放弃修改”与“继续编辑”关闭拦截交互，严禁静默自动保存；实现回收区强制只读保护与按 preTrashStatus 精准原状态还原；实现存储写入失败防关闭与草稿绝对保留；建立基于 revision 修订号与 BroadcastChannel 的双标签页并发冲突检测与裁决机制。所有变更已打包为待批准变更组。"
+}

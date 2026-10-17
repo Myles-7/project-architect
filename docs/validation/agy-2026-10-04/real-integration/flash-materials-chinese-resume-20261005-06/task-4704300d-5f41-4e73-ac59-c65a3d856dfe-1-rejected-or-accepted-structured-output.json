@@ -1,0 +1,26 @@
+{
+  "blockers": [
+    "具体缺口 1【代码产物尚未开发】：本任务目标依赖的单页面代码产物（index.html、styles.css、app.js）及核心组件（DebounceScheduler 防抖调度器、InputController 输入法监听、ResetController 清空调度）尚未进入开发实现阶段，当前无落地构建产物可供执行实测。验证时机：后续技术开发任务实现完成后。所需证据：交付根目录下包含完整自包含纯原生代码文件并通过本地加载验证。受影响块 ID：blk-tech-task-impl, blk-tech-module, blk-tech-interface, blk-task-input-display, blk-task-reset。依据：已批准决策 dec-tech-stack-native-esm (dec-cb1eb212-815a-490e-a829-0219a93de6f5)、dec-tech-deployment-zero-server (dec-b5363cf6-4c99-493b-816b-92f82b05cd30) 及 dec-visual-layout-mapping (dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0)。",
+    "具体缺口 2【真实桌面浏览器与中文输入法交互环境缺失】：规划工具沙箱 Docker 守护进程不可用（Docker unavailable），且规划环境无法替代物理桌面操作系统下的真实现代浏览器（Chrome/Edge/Firefox）与中文输入法（IME）物理选词交互引擎。验证时机：开发完成后的交付前置多浏览器兼容性验证阶段。所需证据：在真实现代桌面主流浏览器无痕模式下，使用中文输入法进行拼音输入与选词测试，验证 compositionstart 期间暂停防抖、compositionend 选词上屏后启动 300ms 防抖并正确大字呈现，控制台 0 报错的用例记录表或录屏。受影响块 ID：blk-feat-input-display, blk-acc-input-display, blk-deliv-val-standalone-runtime。依据：MDN 官方标准 compositionend (evidence-cf38fd73-5436-4097-b701-8d67abaebf39)、验收规范 blk-acc-input-display 及试验记录 evidence-4412e1a1-b3e8-43f5-97f1-8fcefeed9250。",
+    "具体缺口 3【防抖延迟与 clearTimeout 防幽灵渲染性能实测基准数据缺失】：当前缺乏在真实运行环境中通过 Performance Navigation Timing 与 Performance.now() 连续 5 次打点实测防抖整体响应耗时（t_render - t_input ≤ 350ms，渲染延迟 ≤ 50ms）与清空重置延迟（≤ 50ms）的实际数据日志，亦缺乏在输入中途（100~150ms 内）点击清空按钮实测 clearTimeout 销毁定时器、防止 300ms 后幽灵覆写的断言日志。验证时机：交付前置性能实测阶段。所需证据：Chrome DevTools Performance 面板 Trace 导出的 JSON 记录、控制台打印的 5 轮毫秒级交互耗时均值日志，以及倒计时中点击清空后 500ms 持续保持占位符的实测断言日志。受影响块 ID：blk-prod-outcomes, blk-feat-reset, blk-task-reset, blk-acc-reset, blk-tech-val-performance, blk-deliv-val-perf-benchmark。依据：MDN 官方标准 Window.clearTimeout (evidence-f8fad84e-5558-4aea-9ba0-eec72c4adf6f)、已批准决策 dec-clear-interaction-mode (dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d) 及成效指标 blk-prod-outcomes。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "规划环境受控试验沙箱 Docker 守护进程未启动，规划阶段无法执行浏览器沙箱实测，需移入开发与交付验证任务并在真实本地桌面浏览器中实测。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "chromium (Docker unavailable)",
+      "hash": "2ce2a6b4c57ac2a3e6f5f8ba59f1b5c7846d26196355762c7f3964088b3f1b7c",
+      "id": "evidence-4412e1a1-b3e8-43f5-97f1-8fcefeed9250",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tools\\experiments\\experiment-97e4fb99-127b-4d3c-86ab-ade94384e8b4\\events.ndjson",
+      "obtainedAt": "2026-10-04T21:27:34.446Z",
+      "outcome": "unexecuted",
+      "source": "experiment:experiment-97e4fb99-127b-4d3c-86ab-ade94384e8b4"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本任务针对“在后续开发与交付阶段，在本地现代主流桌面浏览器真实环境中实测 300ms 防抖响应延迟、中文输入法选词上屏与 clearTimeout 清除定时器防幽灵渲染逻辑”的目标进行了受控验证核对与环境评估。经调用受控试验环境准备与最小试验工具实测，宿主机报告 Docker 守护进程未启动（Docker unavailable），沙箱试验记录为 unexecuted（未执行）。更重要的是，本任务目标属于后续开发与交付阶段在真实桌面浏览器宿主与输入法交互引擎下的动态测量，当前规划阶段缺乏已开发的前端单页面静态代码产物（index.html/styles.css/app.js）、缺乏真实桌面主流浏览器与中文输入法交互环境、缺乏实际性能测量打点数据。依据指示，严禁将未来才能执行的真实应用测量当作当前规划可执行试验，亦不换写同一目标反复试验；因此本阶段如实将未执行状态与环境原因记录为实验证据，将具体缺口、验证时机、所需证据及受影响蓝图块 ID 完整登记至 blockers 交给整合任务处理，groups 置空，不设延长规划期的 followUp 任务。"
+}

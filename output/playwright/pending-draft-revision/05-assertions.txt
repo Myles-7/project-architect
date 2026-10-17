@@ -1,0 +1,25 @@
+### Ran Playwright code
+```js
+await (async (page) => {
+const feedback = "  请修订草案\n保留正确内容。  ";
+const revision = page.getByRole("button", { name: "让 AI 修订当前草案", exact: true });
+const field = page.getByRole("textbox", { name: "草案修订反馈", exact: true });
+if (!(await revision.isDisabled())) throw new Error("AI revision was enabled during unsaved editing");
+if (await page.getByRole("textbox", { name: "草案内容", exact: true }).inputValue() !== "人工未保存编辑内容，必须保留") throw new Error("Unsaved edit was lost");
+if (await field.inputValue() !== feedback) throw new Error("Feedback whitespace/newline changed");
+if (JSON.parse(await page.getByLabel("隔离调用记录").textContent()).length !== 0) throw new Error("Unexpected API call during editing");
+await page.getByRole("button", { name: "保存草案编辑", exact: true }).click();
+await revision.click();
+await page.getByRole("status").filter({ hasText: "API 失败，反馈原文应保留" }).waitFor();
+if (await field.inputValue() !== feedback) throw new Error("Feedback lost after API failure");
+await page.getByRole("checkbox", { name: "模拟 API 失败", exact: true }).uncheck();
+await revision.click();
+await page.getByRole("status").filter({ hasText: "草案修订已启动，仍待批准" }).waitFor();
+if (await field.inputValue() !== "") throw new Error("Feedback not cleared after accepted start");
+const calls = JSON.parse(await page.getByLabel("隔离调用记录").textContent());
+if (calls.length !== 2 || calls.some(call => call.intent.feedback !== feedback || call.intent.stage !== "product" || call.intent.draftChangeSetId !== "draft-browser-one")) throw new Error("Revision transport identity/stage/raw input changed");
+if (!(await page.getByText("人工未保存编辑内容，必须保留", { exact: true }).isVisible())) throw new Error("Saved manual edit was lost");
+await page.screenshot({ path: "D:/桌面/项目构思/output/playwright/pending-draft-revision/final.png", fullPage: true });
+console.log(JSON.stringify({ checks: 8, status: "passed", calls }, null, 2));
+})(page);
+```

@@ -1,0 +1,165 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/ProjectForkService.test.ts (3 tests | 1 failed) 678ms
+   × ProjectForkService Unit Tests > derives an omitted fork name from the exact verified snapshot metadata 84ms
+     → New project name is required
+   ✓ ProjectForkService Unit Tests > atomically forks project, rewrites all state file projectIds, resets readiness, and injects forkedFrom  423ms
+   ✓ ProjectForkService Unit Tests > rejects fork if target project directory already exists 170ms
+ ❯ packages/core/tests/ProjectArchiveLimits.test.ts (6 tests | 5 failed) 159ms
+   × rejects a classic ZIP entry count overflow before returning a malformed successful archive 155ms
+     → expected [Function] to throw an error
+   × checks UTF-8 bytes rather than characters before writing a 16-bit ZIP file name length 1ms
+     → expected [Function] to throw an error
+   × preflights the 32-bit file size without allocating or scanning multi-gigabyte payloads 1ms
+     → expected [Function] to throw error matching /ZIP.*32-bit/i but got 'validate is not a function'
+   × preflights the 32-bit local records without allocating or scanning multi-gigabyte payloads 0ms
+     → expected [Function] to throw error matching /ZIP.*32-bit/i but got 'validate is not a function'
+   × preflights the 32-bit central directory without allocating or scanning multi-gigabyte payloads 0ms
+     → expected [Function] to throw error matching /ZIP.*32-bit/i but got 'validate is not a function'
+   ✓ retains valid UTF-8 archive paths and data after layout validation 1ms
+ ❯ apps/server/tests/project-transfer-source-protection.test.ts (6 tests | 6 failed) 1901ms
+   × rejects corrupt current state without recovering any source bytes (registered=true, route=duplicate) 460ms
+     → expected 200 to be 400 // Object.is equality
+   × rejects corrupt current state without recovering any source bytes (registered=false, route=duplicate) 358ms
+     → expected 200 to be 400 // Object.is equality
+   × rejects corrupt current state without recovering any source bytes (registered=true, route=export) 161ms
+     → expected 200 to be 400 // Object.is equality
+   × rejects corrupt current state without recovering any source bytes (registered=false, route=export) 169ms
+     → expected 200 to be 400 // Object.is equality
+   × uses verified snapshot metadata for the default fork name and keeps valid source bytes intact (registered=true) 369ms
+     → expected { …(41) } to deeply equal { …(41) }
+   × uses verified snapshot metadata for the default fork name and keeps valid source bytes intact (registered=false) 383ms
+     → expected { …(41) } to deeply equal { …(41) }
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/server/tests/project-transfer-source-protection.test.ts > rejects corrupt current state without recovering any source bytes (registered=true, route=duplicate)
+ FAIL  apps/server/tests/project-transfer-source-protection.test.ts > rejects corrupt current state without recovering any source bytes (registered=false, route=duplicate)
+ FAIL  apps/server/tests/project-transfer-source-protection.test.ts > rejects corrupt current state without recovering any source bytes (registered=true, route=export)
+ FAIL  apps/server/tests/project-transfer-source-protection.test.ts > rejects corrupt current state without recovering any source bytes (registered=false, route=export)
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ apps/server/tests/project-transfer-source-protection.test.ts:54:27
+     52|     ? await request(app).post('/api/projects/transfer-source/duplicate…
+     53|     : await request(app).get('/api/projects/transfer-source/export');
+     54|   expect(response.status).toBe(400);
+       |                           ^
+     55|   expect(response.body.error.code).toBe('STATE_VALIDATION_FAILED');
+     56|   expect(response.body.error.message).toMatch(/snapshot 2 failed verif…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  apps/server/tests/project-transfer-source-protection.test.ts > uses verified snapshot metadata for the default fork name and keeps valid source bytes intact (registered=true)
+ FAIL  apps/server/tests/project-transfer-source-protection.test.ts > uses verified snapshot metadata for the default fork name and keeps valid source bytes intact (registered=false)
+AssertionError: expected { …(41) } to deeply equal { …(41) }
+
+- Expected
++ Received
+
+@@ -1,9 +1,9 @@
+  {
+    "inputs/inp-01/extraction.json": "0b6bb1068c1ddf2fefb229b72103b83b9e351e02d6976b3b1fb8d164b0959df8",
+    "inputs/inp-01/source.txt": "f84972d9d4807bc9f9b3da104d0de45c37ced3e280cef840b76c46b1c69e49c5",
+-   "project.json": "18c799d1783ee589484ac9008f9b9963a148d202b9a29265b62cacdeac5b1ed4",
++   "project.json": "0b18162aa30627e27b144480c540775260063357bb935aaa3efbfabb337b4e08",
+    "state/assumptions.json": "465177f8b53e6782f081ceba015b86cd94092d2ffa4421af8dc9d8d0ae67e6dd",
+    "state/blueprint.json": "f2b59a12b8454226f6bc0f93d06958ee68adde1414aab1cdf1a387942937c367",
+    "state/changesets.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "state/current.json": "2211c6181c3c1dcd2693e61c3b7c924d79a5c4e2ffe1d09b5392fc01109585df",
+    "state/decisions.json": "a4354fe17b83380e8be66dbfc04cd9bcbbabd335ca0a10460c382a68d101ab21",
+
+ ❯ apps/server/tests/project-transfer-source-protection.test.ts:78:33
+     76|   }).expect(200);
+     77|   expect(Buffer.isBuffer(exported.body)).toBe(true);
+     78|   expect(await inventory(path)).toEqual(before);
+       |                                 ^
+     79| });
+     80| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  packages/core/tests/ProjectArchiveLimits.test.ts > rejects a classic ZIP entry count overflow before returning a malformed successful archive
+AssertionError: expected [Function] to throw an error
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ packages/core/tests/ProjectArchiveLimits.test.ts:11:47
+      9| it('rejects a classic ZIP entry count overflow before returning a malf…
+     10|   const files = Array.from({ length: 65536 }, (_, index) => ({ path: `…
+     11|   expect(() => service.buildZipBuffer(files)).toThrow(/ZIP.*entry coun…
+       |                                               ^
+     12| });
+     13| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  packages/core/tests/ProjectArchiveLimits.test.ts > checks UTF-8 bytes rather than characters before writing a 16-bit ZIP file name length
+AssertionError: expected [Function] to throw an error
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ packages/core/tests/ProjectArchiveLimits.test.ts:15:95
+     13| 
+     14| it('checks UTF-8 bytes rather than characters before writing a 16-bit …
+     15|   expect(() => service.buildZipBuffer([{ path: '界'.repeat(21846), data…
+       |                                                                                               ^
+     16| });
+     17| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  packages/core/tests/ProjectArchiveLimits.test.ts > preflights the 32-bit file size without allocating or scanning multi-gigabyte payloads
+ FAIL  packages/core/tests/ProjectArchiveLimits.test.ts > preflights the 32-bit local records without allocating or scanning multi-gigabyte payloads
+ FAIL  packages/core/tests/ProjectArchiveLimits.test.ts > preflights the 32-bit central directory without allocating or scanning multi-gigabyte payloads
+AssertionError: expected [Function] to throw error matching /ZIP.*32-bit/i but got 'validate is not a function'
+
+- Expected: 
+/ZIP.*32-bit/i
+
++ Received: 
+"validate is not a function"
+
+ ❯ packages/core/tests/ProjectArchiveLimits.test.ts:24:35
+     22| ])('preflights the 32-bit %s without allocating or scanning multi-giga…
+     23|   const validate = (archive as any).validateProjectZipLayout;
+     24|   expect(() => validate(entries)).toThrow(/ZIP.*32-bit/i);
+       |                                   ^
+     25| });
+     26| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  packages/core/tests/ProjectForkService.test.ts > ProjectForkService Unit Tests > derives an omitted fork name from the exact verified snapshot metadata
+Error: New project name is required
+ ❯ ProjectForkService.forkProject packages/core/src/projects/ProjectForkService.ts:32:21
+     30|     const { sourcePath, newName, storage, guard, engine } = options;
+     31|     if (typeof newName !== 'string' || !newName.trim()) {
+     32|       const error = new Error('New project name is required') as Error…
+       |                     ^
+     33|       error.code = ErrorCode.STATE_VALIDATION_FAILED;
+     34|       throw error;
+ ❯ packages/core/tests/ProjectForkService.test.ts:34:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  12 failed | 3 passed (15)
+   Start at  07:29:23
+   Duration  3.68s (transform 609ms, setup 0ms, collect 2.21s, tests 2.74s, environment 0ms, prepare 267ms)
+

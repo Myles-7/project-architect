@@ -1,0 +1,146 @@
+{
+  "blockers": [
+    "用户证据 ev-dec-platform 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。"
+  ],
+  "clarification": {
+    "constraints": "delegated:data-persistence, delegated:idea-structure",
+    "delegated": [
+      "data-persistence",
+      "idea-structure"
+    ],
+    "outcomes": "能快速记录灵感、方便回顾和检索已有灵感。",
+    "problem": "日常灵感（想法、点子、片段）零散分布，缺少统一的快速捕捉和回顾手段。",
+    "scope": "个人自用的 Web 应用，浏览器访问。",
+    "target": "一个面向个人开发者自用的、用于随手记录和整理灵感的 Web 小工具。"
+  },
+  "evidence": [
+    {
+      "applicability": "项目目标和定位的唯一原始输入，确立了“个人自用”“整理灵感”“小工具”三个核心约束。",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "id": "ev-inp01-text",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T12:45:44.356Z",
+      "source": "material:input:inp-01",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a"
+    },
+    {
+      "applicability": "已确认平台形态为 Web 应用，后续技术选型在此约束下进行。",
+      "content": "Web 应用（浏览器访问）：用前端框架（如 React/Vue）+ 后端或纯前端构建，部署在服务器或静态托管上",
+      "id": "ev-dec-platform",
+      "kind": "user",
+      "obtainedAt": "2026-10-04T12:44:59.452Z",
+      "source": "input:dec-ce1bae42-23c3-48a5-8859-908f57e4d6ad"
+    },
+    {
+      "applicability": "数据持久化方案已委托 AI 拟定，后续设计阶段需提出具体建议供用户批准。",
+      "content": "普通细节交给 AI 拟定，结果仍作为待批准建议。",
+      "id": "ev-delegation-persistence",
+      "kind": "user",
+      "obtainedAt": "2026-10-04T12:44:59.452Z",
+      "source": "input:11bee05d-b21c-44ab-ac23-a9f97a8aa48b"
+    },
+    {
+      "applicability": "灵感组织方式已委托 AI 拟定，后续设计阶段需提出具体建议供用户批准。",
+      "content": "普通细节交给 AI 拟定，结果仍作为待批准建议。",
+      "id": "ev-delegation-structure",
+      "kind": "user",
+      "obtainedAt": "2026-10-04T12:44:59.452Z",
+      "source": "input:36edcfff-79f5-4326-9fe0-0100abd89262"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [
+    {
+      "allowFreeInput": true,
+      "createdAt": "2026-10-04T12:45:11.000Z",
+      "decisionKey": "interaction-mode",
+      "dependsOn": [],
+      "id": "run-1e2cf17c-8da9-489d-986b-21d4f161acbd-clarify-1-q-01",
+      "importance": "high",
+      "issueRef": "clarify/interaction-mode",
+      "options": [
+        {
+          "approach": "提供一个极简输入框，按回车或点击即保存，专注速度",
+          "gain": "开发成本最低，交互最快，零学习成本",
+          "impact": "前端只需基础表单组件，无额外依赖",
+          "key": "text-quick",
+          "label": "纯文本快速输入",
+          "reversibility": "easy",
+          "sacrifice": "不支持格式排版、图片等富内容"
+        },
+        {
+          "approach": "内嵌 Markdown 编辑器（如 Milkdown / Tiptap），支持标题、列表、代码块等",
+          "gain": "灵感可包含结构化内容和代码片段，适合开发者",
+          "impact": "需引入编辑器库，增加前端依赖和调试成本",
+          "key": "markdown",
+          "label": "Markdown 编辑器",
+          "reversibility": "moderate",
+          "sacrifice": "编辑器集成增加复杂度和包体积"
+        },
+        {
+          "approach": "默认纯文本，可选附加图片或链接预览",
+          "gain": "覆盖多种灵感形式，灵活度高",
+          "impact": "需要文件存储方案和 OG 解析，架构变复杂",
+          "key": "mixed",
+          "label": "文本 + 可选附件（图片/链接）",
+          "reversibility": "moderate",
+          "sacrifice": "需处理文件上传和链接解析，开发量增加"
+        }
+      ],
+      "question": "你期望用什么方式快速捕捉灵感？",
+      "reason": "输入交互方式直接决定前端核心组件和技术选型（如是否需要 Markdown 编辑器），不同方向的实现成本和体验差距大，需要在此阶段明确。",
+      "recommendation": "对于个人小工具，建议从纯文本快速输入起步，最小化开发成本，后续按需扩展。",
+      "recommendationReason": "纯文本方案实现最简、交付最快，且不排斥未来增加富文本或 Markdown 支持。",
+      "recommendedOptionKey": "text-quick",
+      "selectionMode": "single",
+      "status": "proposed"
+    },
+    {
+      "allowFreeInput": true,
+      "createdAt": "2026-10-04T12:45:11.000Z",
+      "decisionKey": "user-device-scope",
+      "dependsOn": [],
+      "id": "run-1e2cf17c-8da9-489d-986b-21d4f161acbd-clarify-1-q-02",
+      "importance": "high",
+      "issueRef": "clarify/user-device-scope",
+      "options": [
+        {
+          "approach": "数据存在浏览器本地（IndexedDB），无需后端",
+          "gain": "零服务器成本，零运维，离线可用",
+          "impact": "架构极简，纯前端即可，但数据安全完全依赖浏览器",
+          "key": "single-device",
+          "label": "只在一台设备上用",
+          "reversibility": "moderate",
+          "sacrifice": "换设备或清浏览器数据会丢失，无法多端同步"
+        },
+        {
+          "approach": "搭建轻量后端或使用 BaaS（如 Supabase/Firebase）存储和同步数据",
+          "gain": "任何设备都能访问，数据有云端备份",
+          "impact": "架构需包含后端或 BaaS、认证、API 层",
+          "key": "multi-device",
+          "label": "多设备同步使用",
+          "reversibility": "moderate",
+          "sacrifice": "需要部署和维护服务端，增加成本和复杂度"
+        },
+        {
+          "approach": "数据存本地，提供 JSON 导出/导入功能用于迁移",
+          "gain": "折中方案，保持简单的同时支持手动迁移",
+          "impact": "前端增加导出导入模块，但无需后端",
+          "key": "export-import",
+          "label": "手动导出导入",
+          "reversibility": "easy",
+          "sacrifice": "非实时同步，迁移需手动操作"
+        }
+      ],
+      "question": "你会在多个设备上使用这个工具吗？",
+      "reason": "这个选择直接影响是否需要后端服务和数据同步能力。纯单设备方案可完全在浏览器内完成（零运维），多设备同步则必须引入服务端，架构差异根本性。",
+      "recommendation": "如果只在一台电脑上使用，纯浏览器本地存储方案最省事；需要多设备则考虑轻量后端。",
+      "recommendationReason": "个人工具若固定在一台设备使用，IndexedDB 方案零部署成本，最契合“小工具”定位。",
+      "recommendedOptionKey": "single-device",
+      "selectionMode": "single",
+      "status": "proposed"
+    }
+  ],
+  "summary": "继续 clarify 阶段。三个初始问题已获回答：平台=Web应用（已确认），数据持久化和灵感组织方式（均已委托AI拟定）。据此整理 clarification 字段，并提出两个新的关键独立选择题——灵感输入交互方式和多设备使用范围——它们会显著影响技术架构方向，且无法从现有材料推断。"
+}

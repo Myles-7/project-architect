@@ -1,0 +1,13 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {createHash} from 'node:crypto';
+const root=resolve('docs/validation/agy-2026-10-04/real-integration',process.argv[2]??'html-research');
+const r=JSON.parse(await readFile(join(root,'result.json'),'utf8'));
+const events=(await readFile(join(root,'evidence','tool-events.ndjson'),'utf8')).split('\n').filter(Boolean).map(JSON.parse);
+const reads=events.filter(e=>e.action==='research_read').map(e=>e.details);
+const o=r.rawEnvelope?.structured_output;
+const record=events.find(e=>e.action==='evidence_record'&&e.details.id===o?.evidenceId)?.details;
+const bytes=await readFile(reads[0].evidencePath);
+let covered=0;for(const v of [...reads].sort((a,b)=>a.offset-b.offset))if(v.offset<=covered)covered=Math.max(covered,v.offset+v.length);
+const diagnostic={acceptedAsSuccess:r.structuredSuccess===true,providerStatus:r.status,terminalStatus:r.rawEnvelope?.status,error:r.rawEnvelope?.error,actualHtmlFetched:bytes.toString().includes('<'),readableCharacterCount:reads[0].totalCharacters,allRangesActuallyRequested:covered>=reads[0].totalCharacters,sourceMatches:o?.source===reads[0].source,hashMatches:o?.sha256===createHash('sha256').update(bytes).digest('hex'),fetchTimeMatches:o?.fetchedAt===reads[0].fetchedAt,actualCandidateEvidenceRecorded:!!record,candidateEvidenceId:record?.id,findings:o?.findings,notes:r.structuredSuccess?'Actual terminal SUCCESS and candidate evidence verified; this does not approve any project fact.':'The ERROR terminal is never accepted by Provider. These checks diagnose actual fetched source and candidate record, not a successful planning result.'};
+await writeFile(join(root,'diagnostic-evidence-validation.json'),JSON.stringify(diagnostic,null,2));console.log(JSON.stringify(diagnostic,null,2));

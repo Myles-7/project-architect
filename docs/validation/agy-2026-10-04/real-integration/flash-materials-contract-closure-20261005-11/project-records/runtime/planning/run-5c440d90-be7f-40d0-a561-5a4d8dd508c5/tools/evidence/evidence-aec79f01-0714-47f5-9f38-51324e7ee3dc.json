@@ -1,0 +1,11 @@
+{
+  "id": "evidence-aec79f01-0714-47f5-9f38-51324e7ee3dc",
+  "source": "input:a8c5e2fa-9643-9e9b-6522-78d749826df4",
+  "capturedAt": "2026-10-05T11:38:13.696Z",
+  "sha256": "d61a2713020a1dc1174f6b3d0de57a8478830995fbdec2b7d367ca24b6f7406b",
+  "scope": "反馈阶段质量验收缺口核对与异常场景契约依据",
+  "path": "D:\\Temp\\User\\pa-quality-copy-RJKkqZ\\materials\\runtime\\planning\\run-5c440d90-be7f-40d0-a561-5a4d8dd508c5\\tools\\evidence\\evidence-aec79f01-0714-47f5-9f38-51324e7ee3dc.json",
+  "approval": "candidate",
+  "content": "自动独立质量验收反馈，不是真人新增需求、真人审阅或批准。M4：AppController.init 的 schedulerEpoch = 0, isInitialized = true 发生在节点绑定、reset监听、render、clear和focus之前，而这些步骤可能抛错。明确初始化事务阶段和ready提交点，全部装配成功后才ready=true；定义监听的注册句柄/解除责任、安全清理、重复init与失败后retry规则。M5：rollback(snapshot: ResetTransactionSnapshot, ...)要求非空，但blk-flow-reset的快照捕获失败分支传snapshot为null。若captureSnapshot本身失败且尚无变更，直接可见报错并保持原节点/文本/代际/定时任务，不调用需要快照的rollback。M6：产品承诺兜底缺失/呈现失败时明确可见报错，技术模块却只console输出草稿。定义用户可见失败通知通路与依赖，readonly textarea挂载成功才宣称可以复制。同步showSevereFallbackDraft返回/失败契约与showGlobalError责任。",
+  "conclusion": "自动独立质量验收反馈指出 M4（AppController.init 提前提交导致无法重试且可能重复绑定）、M5（快照捕获失败分支传递 null 违背 rollback 强契约）、M6（严重回滚草稿仅 console 输出违背用户可见承诺）三项待闭合质量缺口。"
+}

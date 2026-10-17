@@ -1,0 +1,36 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ✓ packages/core/tests/PlanningDependencyGraph.test.ts (4 tests) 7ms
+ ✓ packages/core/tests/PlanningBoundaries.test.ts (17 tests) 6258ms
+   ✓ Planning state boundaries on real files > keeps untouched downstream design pending when feedback combines a decision change with product-only revision  971ms
+   ✓ Planning state boundaries on real files > keeps complete three-stage feedback approved when it also changes a decision  929ms
+   ✓ Planning state boundaries on real files > keeps all three stages approved when one feedback package explicitly revises every affected stage  992ms
+   ✓ Planning state boundaries on real files > allows separate answers to an approved project batch while invalidating affected design  542ms
+   ✓ Planning state boundaries on real files > preserves delegate topic across reload and requires a reason to ask it again  303ms
+   ✓ Planning state boundaries on real files > refuses newly colliding aliases and overlapping blocks before any commit  323ms
+   ✓ Planning state boundaries on real files > finishes a partial package after rejecting its optional group, without reviving stale readiness  324ms
+   ✓ Planning state boundaries on real files > makes decision-only feedback require redesign while preserving history  457ms
+ ✓ packages/core/tests/PlanningService.test.ts (9 tests) 2973ms
+   ✓ Planning approval safety > draft never confirms; approval is atomic and idempotent and preserves provenance  378ms
+   ✓ Planning approval safety > refuses stale proposals and locked replacement without partial writes  646ms
+   ✓ Planning approval safety > free text and delegation preserve raw input without confirmed decisions  450ms
+ ✓ apps/server/tests/planning-package.test.ts (12 tests) 11140ms
+   ✓ Approved development package publication > rejects 'a non-task-only cycle unreachable fro…' before publishing any package artifacts  819ms
+   ✓ Approved development package publication > rejects 'a missing dependency reference unreac…' before publishing any package artifacts  674ms
+   ✓ Approved development package publication > projects indirect approved blueprint prerequisites, stops at the first task, and shares the order across entry and plan  1067ms
+   ✓ Approved development package publication > topologically orders shuffled inputs with deterministic multiple roots and a validation prerequisite  1465ms
+   ✓ Approved development package publication > does not invent task edges from shared or task-valued requirementIds  958ms
+   ✓ Approved development package publication > keeps historical schemaVersion 1 bytes readable and does not upgrade an existing manifest  868ms
+   ✓ Approved development package publication > refuses to reissue an old approved blueprint after unreviewed input or material changes  1008ms
+   ✓ Approved development package publication > compiles distinct documents, matching task data, hashes and actual ZIP  897ms
+   ✓ Approved development package publication > checks idempotent requests against revision and all file contents  951ms
+   ✓ Approved development package publication > recovers only verified artifacts after publication failure and permits a new operation  853ms
+   ✓ Approved development package publication > refuses damaged unpublished output without publishing half a package  741ms
+   ✓ Approved development package publication > invalidates exports when requirements change after approval  840ms
+
+ Test Files  4 passed (4)
+      Tests  42 passed (42)
+   Start at  01:42:50
+   Duration  12.07s (transform 390ms, setup 0ms, collect 1.56s, tests 20.38s, environment 1ms, prepare 355ms)
+

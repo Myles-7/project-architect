@@ -1,0 +1,10 @@
+{
+  "id": "evidence-d5bb23fa-fa23-4bf4-bcb4-f12dfd9f32fa",
+  "source": "https://raw.githubusercontent.com/docker/docs/main/content/manuals/engine/network/drivers/none.md",
+  "capturedAt": "2026-10-04T12:27:47.746Z",
+  "sha256": "ad5803211c9e3bc9f6c20c69be660e6046885295bcf96b7d7b6c87d79295851a",
+  "scope": "container network isolation",
+  "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\node24-followup\\research-raw-evidence\\evidence-d5bb23fa-fa23-4bf4-bcb4-f12dfd9f32fa.json",
+  "approval": "candidate",
+  "content": "---\ntitle: None network driver\ndescription: How to isolate the networking stack of a container using the none driver\nkeywords: network, none, standalone\naliases:\n  - /network/none/\n  - /network/drivers/none/\n---\n\nIf you want to completely isolate the networking stack of a container, you can\nuse the `--network none` flag when starting the container. Within the container,\nonly the loopback device is created.\n\nThe following example shows the output of `ip link show` in an `alpine`\ncontainer using the `none` network driver.\n\n```console\n$ docker run --rm --network none alpine:latest ip link show\n1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000\n    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00\n```\n\nNo IPv6 loopback address is configured for containers using the `none` driver.\n\n```console\n$ docker run --rm --network none --name no-net-alpine alpine:latest ip addr show\n1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000\n    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00\n    inet 127.0.0.1/8 scope host lo\n       valid_lft forever preferred_lft forever\n```\n\n## Next steps\n\n- Learn about [networking from the container's point of view](../_index.md)\n- Learn about [host networking](host.md)\n- Learn about [bridge networks](bridge.md)\n- Learn about [overlay networks](overlay.md)\n- Learn about [Macvlan networks](macvlan.md)\n"
+}

@@ -1,0 +1,776 @@
+<mark> HTML mark text element - HTML | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ HTML 
+
+ Reference 
+
+ Elements 
+
+ <mark> 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ <mark> HTML mark text element
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The <mark> HTML element represents text which is marked or highlighted for reference or notation purposes due to the marked passage's relevance in the enclosing context.
+
+ In this article
+
+ Try it 
+
+ Attributes 
+
+ Usage notes 
+
+ Accessibility 
+
+ Examples 
+
+ Technical summary 
+
+ Specifications 
+
+ Browser compatibility 
+
+ Try it 
+
+ <p>Search results for "salamander":</p>
+
+<hr />
+
+<p>
+ Several species of <mark>salamander</mark> inhabit the temperate rainforest of
+ the Pacific Northwest.
+</p>
+
+<p>
+ Most <mark>salamander</mark>s are nocturnal, and hunt for insects, worms, and
+ other small creatures.
+</p>
+
+ mark {
+ /* Add your styles here */
+}
+
+ Attributes 
+
+ This element only includes the global attributes .
+
+ Usage notes 
+
+ Typical use cases for <mark> include:
+
+ When used in a quotation ( <q> ) or block quote ( <blockquote> ), it generally indicates text which is of special interest but is not marked in the original source material, or material which needs special scrutiny even though the original author didn't think it was of particular importance. Think of this like using a highlighter pen in a book to mark passages that you find of interest.
+
+ Otherwise, <mark> indicates a portion of the document's content which is likely to be relevant to the user's current activity. This might be used, for example, to indicate the words that matched a search operation.
+
+ Don't use <mark> for syntax highlighting purposes; instead, use the <span> element with appropriate CSS applied to it.
+
+ Note: 
+Don't confuse <mark> with the <strong> element; <mark> is used to denote content which has a degree of relevance , while <strong> indicates spans of text of importance .
+
+ Accessibility 
+
+ The presence of the mark element is not announced by most screen reading technology in its default configuration. It can be made to be announced by using the CSS content property, along with the ::before and ::after pseudo-elements.
+
+ css 
+ mark::before,
+mark::after {
+ clip-path: inset(100%);
+ clip: rect(1px, 1px, 1px, 1px);
+ height: 1px;
+ overflow: hidden;
+ position: absolute;
+ white-space: nowrap;
+ width: 1px;
+}
+
+mark::before {
+ content: " [highlight start] ";
+}
+
+mark::after {
+ content: " [highlight end] ";
+}
+
+ Some people who use screen readers deliberately disable announcing content that creates extra verbosity. Because of this, it is important to not abuse this technique and only apply it in situations where not knowing content has been highlighted would adversely affect understanding.
+
+ Tweaking Text Level Styles, Reprised via Adrian Roselli (2025)
+
+ Examples 
+
+ Marking text of interest 
+
+ In this first example, a <mark> element is used to mark some text within a quote which is of particular interest to the user.
+
+ html 
+ <blockquote>
+ It is a period of civil war. Rebel spaceships, striking from a hidden base,
+ have won their first victory against the evil Galactic Empire. During the
+ battle, <mark>Rebel spies managed to steal secret plans</mark> to the Empire's
+ ultimate weapon, the DEATH STAR, an armored space station with enough power to
+ destroy an entire planet.
+</blockquote>
+
+ Result
+
+ Identifying context-sensitive passages 
+
+ This example demonstrates using <mark> to mark search results within a passage.
+
+ html 
+ <p>
+ It is a dark time for the Rebellion. Although the Death Star has been
+ destroyed, <mark class="match">Imperial</mark> troops have driven the Rebel
+ forces from their hidden base and pursued them across the galaxy.
+</p>
+
+<p>
+ Evading the dreaded <mark class="match">Imperial</mark> Starfleet, a group of
+ freedom fighters led by Luke Skywalker has established a new secret base on
+ the remote ice world of Hoth.
+</p>
+
+ To help distinguish the use of <mark> for search results from other potential usage, this example applies the custom class "match" to each match.
+
+ Result
+
+ Technical summary 
+
+ Content categories 
+
+ Flow content ,
+ phrasing content , palpable content.
+
+ Permitted content 
+
+ Phrasing content .
+
+ Tag omission 
+ None, both the starting and ending tag are mandatory. 
+
+ Permitted parents 
+
+ Any element that accepts
+ phrasing content .
+
+ Implicit ARIA role 
+
+ No corresponding role 
+
+ Permitted ARIA roles 
+ Any 
+
+ DOM interface 
+ HTMLElement 
+
+ Specifications 
+
+ Specification
+
+ HTML 
+# the-mark-element 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Sep 28, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ HTML 
+ Guides Cheatsheet 
+ Comments 
+ Constraint validation 
+ Content categories 
+ Date and time formats 
+ Microdata 
+ Microformats 
+ Quirks and standards modes 
+ Responsive images 
+
+ How to 
+ Define terms with HTML 
+ Use data attributes 
+ Use cross-origin images 
+ Add a hitmap on top of an image 
+ Author fast-loading HTML pages 
+ Add JavaScript 
+ Reference 
+ Elements <a> 
+ <abbr> 
+ <acronym> 
+ <address> 
+ <area> 
+ <article> 
+ <aside> 
+ <audio> 
+ <b> 
+ <base> 
+ <bdi> 
+ <bdo> 
+ <big> 
+ <blockquote> 
+ <body> 
+ <br> 
+ <button> 
+ <canvas> 
+ <caption> 
+ <center> 
+ <cite> 
+ <code> 
+ <col> 
+ <colgroup> 
+ <data> 
+ <datalist> 
+ <dd> 
+ <del> 
+ <details> 
+ <dfn> 
+ <dialog> 
+ <dir> 
+ <div> 
+ <dl> 
+ <dt> 
+ <em> 
+ <embed> 
+ <fencedframe> 
+ <fieldset> 
+ <figcaption> 
+ <figure> 
+ <font> 
+ <footer> 
+ <form> 
+ <frame> 
+ <frameset> 
+ <geolocation> 
+ <h1>–<h6> 
+ <head> 
+ <header> 
+ <hgroup> 
+ <hr> 
+ <html> 
+ <i> 
+ <iframe> 
+ <img> 
+ <input> 
+ <ins> 
+ <kbd> 
+ <label> 
+ <legend> 
+ <li> 
+ <link> 
+ <main> 
+ <map> 
+ <mark> 
+ <marquee> 
+ <menu> 
+ <meta> 
+ <meter> 
+ <nav> 
+ <nobr> 
+ <noembed> 
+ <noframes> 
+ <noscript> 
+ <object> 
+ <ol> 
+ <optgroup> 
+ <option> 
+ <output> 
+ <p> 
+ <param> 
+ <picture> 
+ <plaintext> 
+ <pre> 
+ <progress> 
+ <q> 
+ <rb> 
+ <rp> 
+ <rt> 
+ <rtc> 
+ <ruby> 
+ <s> 
+ <samp> 
+ <script> 
+ <search> 
+ <section> 
+ <select> 
+ <selectedcontent> 
+ <slot> 
+ <small> 
+ <source> 
+ <span> 
+ <strike> 
+ <strong> 
+ <style> 
+ <sub> 
+ <summary> 
+ <sup> 
+ <table> 
+ <tbody> 
+ <td> 
+ <template> 
+ <textarea> 
+ <tfoot> 
+ <th> 
+ <thead> 
+ <time> 
+ <title> 
+ <tr> 
+ <track> 
+ <tt> 
+ <u> 
+ <ul> 
+ <var> 
+ <video> 
+ <wbr> 
+ <xmp> 
+
+ Attributes accept 
+ autocomplete 
+ capture 
+ content 
+ crossorigin 
+ dirname 
+ disabled 
+ elementtiming 
+ fetchpriority 
+ for 
+ form 
+ integrity 
+ max 
+ maxlength 
+ min 
+ minlength 
+ multiple 
+ pattern 
+ placeholder 
+ readonly 
+ rel 
+ required 
+ size 
+ step 
+
+ Global attributes accesskey 
+ anchor 
+ autocapitalize 
+ autocorrect 
+ autofocus 
+ class 
+ contenteditable 
+ data-* 
+ dir 
+ draggable 
+ enterkeyhint 
+ exportparts 
+ headingoffset 
+ headingreset 
+ hidden 
+ id 
+ inert 
+ inputmode 
+ is 
+ itemid 
+ itemprop 
+ itemref 
+ itemscope 
+ itemtype 
+ lang 
+ nonce 
+ part 
+ popover 
+ slot 
+ spellcheck 
+ style 
+ tabindex 
+ title 
+ translate 
+ virtualkeyboardpolicy 
+ writingsuggestions 
+
+ Attributes by element <input type> <input type="button"> 
+ <input type="checkbox"> 
+ <input type="color"> 
+ <input type="date"> 
+ <input type="datetime-local"> 
+ <input type="email"> 
+ <input type="file"> 
+ <input type="hidden"> 
+ <input type="image"> 
+ <input type="month"> 
+ <input type="number"> 
+ <input type="password"> 
+ <input type="radio"> 
+ <input type="range"> 
+ <input type="reset"> 
+ <input type="search"> 
+ <input type="submit"> 
+ <input type="tel"> 
+ <input type="text"> 
+ <input type="time"> 
+ <input type="url"> 
+ <input type="week"> 
+
+ <script type> importmap 
+ speculationrules 
+
+ <meta name> color-scheme 
+ referrer 
+ responsive-embedded-sizing 
+ robots 
+ text-scale 
+ theme-color 
+ viewport 
+
+ <meta http-equiv> 
+
+ Attribute values <link rel> keywords alternate stylesheet 
+ compression-dictionary 
+ dns-prefetch 
+ manifest 
+ me 
+ modulepreload 
+ noopener 
+ noreferrer 
+ preconnect 
+ prefetch 
+ preload 
+ prerender 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

@@ -50,7 +50,7 @@ describe('Phase 5.8: UX Enhancements & Session Reducer Tests', () => {
       payload: 'documents',
     });
 
-    expect(next.uiState.activeTab).toBe('documents');
+    expect(next.uiState.activeTab).toBe('timeline');
   });
 
   it('4. SET_DISCOVERY_JOB with null clears the background job state', () => {

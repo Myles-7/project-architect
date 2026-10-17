@@ -1,0 +1,131 @@
+{
+  "blockers": [],
+  "clarification": {
+    "constraints": "运行形态确认为轻量 Web 单页应用（浏览器即开即用），支持本地运行或静态托管（依据已确认决策 dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d）。",
+    "delegated": [
+      "scope",
+      "product.organization_model",
+      "product.capture_modality"
+    ],
+    "outcomes": "构建一个即开即用、随手捕捉、易于整理与回顾的轻量 Web 单页灵感管理工具。",
+    "problem": "日常随手产生的零散灵感缺乏即开即用的轻量收集与整理工具，容易遗忘或凌乱。",
+    "scope": "轻量 Web 单页应用，包含灵感即时记录、列表浏览、检索与组织整理等核心体验（具体记录形态与整理模型已委托 AI 拟定待后续批准）。",
+    "target": "有即时灵感捕捉与整理需求的个人开发者或个人记录者。"
+  },
+  "evidence": [
+    {
+      "applicability": "用户原始诉求起点，确立工具核心价值为随手记录与整理灵感",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-0fa445c0-000b-4374-89fb-03a9b3d99d5d",
+      "kind": "user",
+      "obtainedAt": "2026-10-04T15:07:21.500Z",
+      "source": "input:inp-01"
+    },
+    {
+      "applicability": "确定系统运行形态为纯前端单页 Web 应用，明确数据优先本地存储（IndexedDB/LocalStorage）的技术基调",
+      "content": "用户已确认：轻量 Web 单页应用（浏览器即开即用），开发本地运行或静态托管，通过浏览器书签或常驻标签页随手记录与整理；技术选型聚焦前端轻量框架，数据优先存储于浏览器本地。",
+      "hash": "98065e16d30aede337d8eaa26d339761aeec1ef752b3ceebff8caf27f77a40f1",
+      "id": "evidence-cb7c0cfe-5458-4d9f-aa0a-a5679a57b5aa",
+      "kind": "user",
+      "obtainedAt": "2026-10-04T15:07:33.396Z",
+      "source": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form"
+    },
+    {
+      "applicability": "为本地持久化方案选型提供官方标准依据：主存储应选 IndexedDB 以打破 5MB 限制并避免主线程卡顿，同时需引入 persist() 持久化申请与 JSON 备份机制防范 Safari/LRU 驱逐",
+      "content": "MDN官方文档指出：Web Storage (localStorage) 每个域名通常被严格限制在约 5 MiB，且为同步阻塞调用，超限时抛出 QuotaExceededError。相比之下，IndexedDB 采用动态配额系统：Chromium 允许使用高达磁盘 60% 空间，Firefox 允许 10%（上限 10 GiB，持久化后可达 50%），Safari 约 60%。但默认在 best-effort 模式下受 LRU 存储压力驱逐，且 Safari 在开启防追踪时若连续 7 天无用户交互会主动清除脚本数据。可通过 navigator.storage.persist() 申请常驻存储保护数据，并通过 navigator.storage.estimate() 获取使用量与配额。",
+      "hash": "a47182c320ef508003bba9bfbebda838ded8982e4a1992679aa56293edd55a6c",
+      "id": "evidence-e39b4151-a862-4d7d-ad80-2460bfce59db",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T15:06:12.051Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria"
+    },
+    {
+      "applicability": "证明在浏览器纯前端环境下实现全量 JSON 备份导出与导入恢复在 Web 标准下完全可行且无需后端支持",
+      "content": "MDN官方文档指出：Blob 接口表示不可变的原始数据类文件对象，可通过 Blob([data], {type: 'application/json'}) 在浏览器内存中构建 JSON 导出数据，并配合 a.download / URL.createObjectURL 触发本地文件下载；通过 FileReader 或 File.text() 异步读取用户导入的本地 JSON 文本，实现无需服务端参与的本地数据备份与导入恢复闭环。",
+      "hash": "bc8bddd1332c0cf7b69e8ce90ba6d014009294c62a36d7fc8509b19d03c134a4",
+      "id": "evidence-6ddb77ee-acc4-4ae3-a560-e67f902a47ad",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T15:06:39.851Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Blob"
+    },
+    {
+      "applicability": "明确受控容器环境未就绪的事实，确认自动化压测尚未执行，避免假造验证成功，并建立后续跟踪验证任务",
+      "content": "尝试通过 environment_prepare 准备 node 和 chromium 运行时，均返回 unavailable：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine。受控沙箱实验当前无法执行。",
+      "hash": "d7c1af710e0a12b51031748e96979b59d251dfba757c03c91f4cc6928aa7d1c4",
+      "id": "evidence-bce487ff-ee11-49a5-89b4-0f7c7c22b6f3",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-04T15:07:57.432Z",
+      "outcome": "unexecuted",
+      "source": "project:constraints"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "在真实浏览器或本地环境就绪后，验证 IndexedDB 在 10,000 条级灵感记录下的增删改查吞吐量、索引过滤性能及 navigator.storage.estimate() 配额监控表现",
+      "kind": "validation"
+    },
+    {
+      "goal": "验证纯前端基于 Blob 与 a.download 导出大体积 JSON（>20MB）及基于 File.text() 导入解析校验的内存消耗与交互流畅度",
+      "kind": "validation"
+    },
+    {
+      "goal": "调研轻量级前端 IndexedDB 封装方案（如 idb、Dexie.js）在纯静态单页打包体积与 API 人体工学上的综合权衡",
+      "kind": "research"
+    },
+    {
+      "goal": "调研随手灵感记录与轻量分类整理的 UI/交互模式（如快捷输入框、标签过滤、卡片流式视图）",
+      "kind": "research"
+    }
+  ],
+  "groups": [],
+  "questions": [
+    {
+      "allowFreeInput": true,
+      "area": "data_persistence",
+      "createdAt": "2026-10-04T15:08:00.000Z",
+      "decisionKey": "product.backup_restore_strategy",
+      "dependsOn": [],
+      "id": "q-backup-restore-strategy",
+      "importance": "high",
+      "issueRef": "product.backup_restore_strategy",
+      "options": [
+        {
+          "approach": "在工具栏或设置面板提供显式的‘导出数据(JSON)’与‘导入恢复(JSON)’按钮，完全由用户按需主动触发下载或文件上传还原，平时界面保持纯粹，不作任何主动弹窗提醒。",
+          "gain": "界面与交互极其干净清爽，零被打扰感；实现逻辑最简且全浏览器 100% 兼容。",
+          "impact": "仅在界面次级入口提供基础导入导出按钮，对主流程记录无任何干扰。",
+          "key": "manual_json",
+          "label": "轻量手动 JSON 导入导出（纯按需自理）",
+          "reversibility": "easy",
+          "sacrifice": "若用户长期忘记手动备份，一旦遭遇浏览器清空缓存或极端系统清理，可能造成灵感永久丢失。"
+        },
+        {
+          "approach": "提供标准的 JSON 导出与导入校验能力，同时在前端追踪自上次备份以来的新增/修改灵感数量与时间；当积累较多未备份内容（如新增超20条或超7天未备份）时，在侧边/底部状态栏温和显示‘未备份’状态点与一键导出快捷操作。",
+          "gain": "兼顾极速记录与数据安全，温和化解纯前端本地存储可能被浏览器清除缓存的隐患，大幅增强用户安全感。",
+          "impact": "需在持久化元数据中记录上次导出时间戳与变更计数，并在界面增加低侵入的状态提示。",
+          "key": "manual_with_reminder",
+          "label": "标准 JSON 导入导出 + 温和防丢备份提醒（推荐）",
+          "reversibility": "easy",
+          "sacrifice": "引入轻量变更追踪逻辑与细微的状态栏视觉元素。"
+        },
+        {
+          "approach": "在 Chromium 系浏览器中优先调用现代 File System Access API 绑定用户本地磁盘上的指定 JSON 文件，每次记录自动异步写回本地文件；其他浏览器（如 Safari/Firefox）自动降级为手动 JSON 导入导出。",
+          "gain": "桌面端使用体验高度类似原生软件，灵感直接以单一文件保存在用户电脑硬盘上，方便第三方网盘同步。",
+          "impact": "需处理文件读写权限声明、生命周期句柄丢失与不同浏览器的分支降级逻辑。",
+          "key": "filesystem_sync",
+          "label": "File System Access API 本地文件关联绑定（支持现代桌面浏览器）",
+          "reversibility": "moderate",
+          "sacrifice": "跨浏览器与移动端兼容性不一致，需维护双套读写逻辑；且每次重新访问网页时需重新获取用户授权。"
+        }
+      ],
+      "question": "基于浏览器本地存储（IndexedDB）无服务端数据库的特性，您偏好哪种本地数据备份与导入恢复策略？",
+      "reason": "浏览器本地存储虽然容量充裕且离线可用，但受浏览器清理缓存、存储压力 LRU 淘汰以及 Safari 7 天无交互主动驱逐机制影响；作为纯前端单页应用，必须在产品体验层明确数据备份与恢复的交互方案，确保用户灵感资产安全。",
+      "recommendation": "推荐选项 B：标准 JSON 导入导出 + 温和防丢备份提醒",
+      "recommendationReason": "兼顾了 100% 的全浏览器兼容性与高数据安全性，既保留纯前端即开即记的轻量无感体验，又通过温和的轻提示有效避免长期不备份导致的意外丢数据风险。",
+      "recommendedOptionKey": "manual_with_reminder",
+      "selectionMode": "single",
+      "status": "proposed"
+    }
+  ],
+  "summary": "本轮针对‘基于浏览器本地存储（IndexedDB/LocalStorage）的数据持久化方案与容量限制，以及 JSON 格式的本地导入导出与备份恢复机制’完成了官方规范调研与方案论证：\n\n1. 本地存储方案与容量限制调研结论：\n- LocalStorage：受限于单域名 5 MiB 严格配额，且读写为同步阻塞主线程操作，超出直接抛出 QuotaExceededError，仅适合存放极简配置项，不适合作为灵感内容的主存储。\n- IndexedDB：基于浏览器动态配额管理系统，存储上限极大（Chromium 系可达磁盘 60%，Firefox 默认 10% 上限 10 GiB，Safari 约 60%），且原生异步非阻塞、支持对象结构与二级索引，是轻量 Web 单页灵感工具的主存储最优解。\n- 关键风险与防护：IndexedDB 默认处于 best-effort（尽力而为）模式，在磁盘存储压力下受 LRU 驱逐，且 Safari 开启防追踪时存在 7 天无交互主动驱逐风险。必须在应用层调用 navigator.storage.persist() 申请常驻存储保护，并配合 navigator.storage.estimate() 探测已用与剩余空间。\n\n2. JSON 本地导入导出与备份恢复机制：\n- 零后端文件导出：纯前端通过 Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}) 在内存构建文件对象，利用 URL.createObjectURL 与带有 download 属性的 <a> 标签触发系统保存，实现毫秒级本地下载。\n- 安全导入与校验：通过 input[type=file] 或 File.text() 异步读取本地文件，执行 JSON Schema 与语义版本比对，支持‘覆盖恢复’与‘增量合并’双模式，并在解析异常时进行友好阻断与提示。\n\n3. 试验环境状态声明：\n- 本机 Docker daemon 未就绪，自动化容器压测环境（node/chromium）当前处于 unavailable，相关吞吐量自动化实验未执行，如实记录为未验证状态并已登记后续 validation 任务。\n\n4. 待决策问题：\n- 针对纯本地存储被误清缓存的客观风险，提出了关于‘本地数据备份与导入恢复策略’的 1 道关键决策选择题（推荐：标准 JSON 导入导出 + 温和防丢备份提醒）。"
+}

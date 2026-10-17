@@ -1,0 +1,37 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/PlanningMigration.test.ts (3 tests | 1 failed) 797ms
+   × Old-format project migration on copies > reads additively without modifying files, retains history and diagnoses ambiguous records 175ms
+     → expected '主题 storage:location 有多个有效旧决定，需审阅合并。\n…' to contain 'legacy-unlinked'
+   ✓ Old-format project migration on copies > persists the new files only at a normal commit and retains the recoverable old revision 259ms
+   ✓ Old-format project migration on copies > requires explicit cleanup approval and unlock, preserving all original records as history  362ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/core/tests/PlanningMigration.test.ts > Old-format project migration on copies > reads additively without modifying files, retains history and diagnoses ambiguous records
+AssertionError: expected '主题 storage:location 有多个有效旧决定，需审阅合并。\n…' to contain 'legacy-unlinked'
+
+- Expected
++ Received
+
+- legacy-unlinked
++ 主题 storage:location 有多个有效旧决定，需审阅合并。
++ 旧决定 legacy-research-question 可能把问题、委托或不确定表达当作事实，需审阅后清理。
+
+ ❯ packages/core/tests/PlanningMigration.test.ts:32:48
+     30|     expect(s.planning!.diagnostics.join('\n')).toContain('多个有效旧决定');
+     31|     expect(s.planning!.diagnostics.join('\n')).toContain('legacy-resea…
+     32|     expect(s.planning!.diagnostics.join('\n')).toContain('legacy-unlin…
+       |                                                ^
+     33|     const cleanup = s.planning!.changeSets.find(c => c.runId === 'migr…
+     34|     expect(cleanup.status).toBe('pending'); expect(cleanup.approvals).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  01:15:37
+   Duration  1.68s (transform 328ms, setup 0ms, collect 605ms, tests 797ms, environment 0ms, prepare 79ms)
+

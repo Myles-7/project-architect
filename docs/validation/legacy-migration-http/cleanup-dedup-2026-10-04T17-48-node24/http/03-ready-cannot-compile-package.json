@@ -1,0 +1,20 @@
+{
+  "name": "ready-cannot-compile-package",
+  "method": "POST",
+  "route": "/api/projects/proj-legacy-planning-copy/planning/package",
+  "expectedStatus": 422,
+  "status": 422,
+  "request": {
+    "expectedRevision": 1,
+    "operationId": "legacy-ready-no-package"
+  },
+  "response": {
+    "success": false,
+    "error": {
+      "code": "STAGE_NOT_APPROVED",
+      "message": "三个设计阶段均需批准",
+      "recoverable": true
+    }
+  },
+  "responseSha256": "95522280ae17c268183c0acda34866c0ce9a180b22f0463e8be738215d555e51"
+}

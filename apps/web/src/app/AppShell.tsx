@@ -2,23 +2,31 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useProjectSession } from '../state/ProjectSessionContext.js';
 import { TopNav } from '../components/layout/TopNav.js';
 import { LeftSidebar } from '../components/layout/LeftSidebar.js';
-import { OverviewDrawer } from '../features/overview/OverviewDrawer.js';
 import { ResponsiveDrawer } from '../components/layout/ResponsiveDrawer.js';
 import { WorkspaceView } from './WorkspaceView.js';
+import { useGlobalShortcuts } from '../hooks/useGlobalShortcuts.js';
+import type { InitialSetupStatus } from '../features/planning/PlanningWorkspace.js';
 
 interface AppShellProps {
   onNavigateHome: () => void;
   onNewProject: () => void;
+  initialSetup?: InitialSetupStatus;
 }
 
 export const getBreakpointCollapseActions = (previousWidth: number | null, currentWidth: number) => ({
   left: currentWidth < 768 && (previousWidth === null || previousWidth >= 768),
-  overview: currentWidth < 1200 && (previousWidth === null || previousWidth >= 1200),
+  overview: currentWidth < 1280 && (previousWidth === null || previousWidth >= 1280),
 });
 
-export const AppShell: React.FC<AppShellProps> = ({ onNavigateHome, onNewProject }) => {
-  const { state, toggleLeftSidebar, toggleOverview } = useProjectSession();
+export const AppShell: React.FC<AppShellProps> = ({ onNavigateHome, onNewProject, initialSetup }) => {
+  const { state, toggleLeftSidebar, setActiveTab } = useProjectSession();
   const { uiState } = state;
+
+  useGlobalShortcuts({
+    activeProjectId: state.activeProjectId,
+    onSelectTab: (tab) => setActiveTab(tab),
+    onToggleLeftSidebar: toggleLeftSidebar,
+  });
 
   const [windowWidth, setWindowWidth] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth : 1280
@@ -31,8 +39,9 @@ export const AppShell: React.FC<AppShellProps> = ({ onNavigateHome, onNewProject
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const isDesktop = windowWidth >= 1200;
-  const isTablet = windowWidth >= 768 && windowWidth < 1200;
+  const isDesktop = windowWidth >= 1280;
+  const isCompactDesktop = windowWidth >= 1024 && windowWidth < 1280;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
   const isMobile = windowWidth < 768;
 
   useEffect(() => {
@@ -41,28 +50,28 @@ export const AppShell: React.FC<AppShellProps> = ({ onNavigateHome, onNewProject
     if (collapse.left && !uiState.isLeftSidebarCollapsed) {
       toggleLeftSidebar();
     }
-    if (collapse.overview && !uiState.isOverviewCollapsed) {
-      toggleOverview();
-    }
     previousWidthRef.current = windowWidth;
   }, [windowWidth]);
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#FAF9F6] dark:bg-[#0C0D0F] text-[#0F1115] dark:text-[#EDEDED]">
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-canvas text-text-primary">
+      {/* Screen Reader Live Region */}
+      <div id="sr-global-announcer" role="status" aria-live="polite" className="sr-only" />
+
       {/* Top Header */}
       <TopNav onNavigateHome={onNavigateHome} />
 
       {/* Main Responsive Body */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left Column:
-            - Desktop (>= 1200px): Standard sidebar unless collapsed
-            - Tablet (768-1199px): Icon-only compact navigation
+            - Desktop (>= 1280px): Standard sidebar unless collapsed
+            - Compact Desktop (1024-1279px) & Tablet (768-1023px): Icon-only compact navigation (64px)
             - Mobile (< 768px): Modal ResponsiveDrawer
         */}
         {isDesktop && !uiState.isLeftSidebarCollapsed && (
           <LeftSidebar onNewProject={onNewProject} />
         )}
-        {isTablet && (
+        {(isCompactDesktop || isTablet) && (
           <LeftSidebar onNewProject={onNewProject} isIconOnly={true} />
         )}
         {isMobile && (
@@ -86,35 +95,14 @@ export const AppShell: React.FC<AppShellProps> = ({ onNavigateHome, onNewProject
         )}
 
         {/* Center Column: Active Workspace Content
-            Center minimum width: >= 640px on desktop (>=1200px), >= 320px on tablet/mobile.
+            Center minimum width: >= 640px on desktop / compact desktop (>=1024px), >= 320px on tablet/mobile.
         */}
         <main
-          className={`flex-1 flex flex-col overflow-hidden ${
-            isDesktop ? 'min-w-[640px]' : 'min-w-[320px]'
-          }`}
+          className="flex-1 min-w-0 flex flex-col overflow-hidden"
         >
-          <WorkspaceView />
+          <WorkspaceView initialSetup={initialSetup} />
         </main>
 
-        {/* Right Column: Project Overview
-            - Desktop (>= 1200px): In-flow 3rd column
-            - Tablet (768-1199px) & Mobile (< 768px): Overlay / Modal ResponsiveDrawer
-        */}
-        {isDesktop && !uiState.isOverviewCollapsed && (
-          <OverviewDrawer />
-        )}
-        {!isDesktop && (
-          <ResponsiveDrawer
-            isOpen={!uiState.isOverviewCollapsed}
-            onClose={toggleOverview}
-            side="right"
-            width="w-80 sm:w-96"
-            title="项目架构全景概览"
-            aria-label="项目架构全景概览侧边抽屉"
-          >
-            <OverviewDrawer inDrawer={true} />
-          </ResponsiveDrawer>
-        )}
       </div>
     </div>
   );

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1791129999032",
+  "items": [
+    {
+      "allowFreeInput": true,
+      "createdAt": "2026-10-04T21:00:49.928Z",
+      "decisionKey": "dec-visual-layout-mapping",
+      "dependsOn": [],
+      "id": "run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+      "importance": "critical",
+      "issueRef": "dec-visual-layout-mapping",
+      "options": [
+        {
+          "approach": "采纳用户需求变更材料提议，从 HTML DOM、CSS 样式与交互控制器中彻底删除确认按钮，仅保留顶部大字展示区、居中输入框与底部右侧橙色圆形清空按钮，完全通过 300ms 防抖触发自动展示。",
+          "gain": "界面最精简，操作动线最顺畅，输入即所得，避免无意义的冗余确认点击。",
+          "impact": "将正式替代已批准决策 dec-visual-layout-mapping，更新产品范围、页面映射、样式表与交付代码结构。",
+          "key": "opt-remove-confirm-realtime",
+          "label": "彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）",
+          "reversibility": "easy",
+          "sacrifice": "彻底放弃通过独立按钮显式手动提交的路径，界面失去原参考截图左下蓝色矩形色块。"
+        },
+        {
+          "approach": "保留 fixture.png 对应的底部左侧蓝色确认按钮与右侧橙色清空按钮双色块；既支持输入 300ms 自动防抖展示，也允许用户随时点击确认按钮或按 Enter 键立即强制展示（跳过防抖等待）。",
+          "gain": "100% 忠实保留参考截图全部视觉色块映射，同时兼顾实时自动展示与主动即刻提交两种使用习惯。",
+          "impact": "部分调整决策 dec-visual-layout-mapping，保留双按钮空间排布，扩展其交互行为。",
+          "key": "opt-retain-confirm-dual",
+          "label": "保留确认按钮与双按钮布局，作为实时防抖的显式快捷提交通道",
+          "reversibility": "easy",
+          "sacrifice": "界面多保留一个按钮，代码需同时维护防抖计时与手动点击两套触发流转。"
+        },
+        {
+          "approach": "不采纳实时防抖需求变更，维持原已批准的确认提交方案，仅在用户点击蓝色确认按钮或按 Enter 键时触发核对大字展示。",
+          "gain": "与现行正式批准决策 dec-visual-layout-mapping 完全一致，无任何决策漂移与风险。",
+          "impact": "撤销本次 feedback 阶段的实时防抖草案，维持原已批准基准蓝图不变。",
+          "key": "opt-keep-original-manual",
+          "label": "维持现行已批准决策不变，仅支持手动点击确认按钮提交核对",
+          "reversibility": "easy",
+          "sacrifice": "无法享受实时输入防抖的即时反馈便利，每次输入核对均需额外手动点击一次按钮。"
+        }
+      ],
+      "question": "关于页面视觉布局映射与确认按钮的存在形式，是否采纳需求变更提议彻底删除蓝色确认按钮并重构为单按钮实时反馈排布？",
+      "reason": "用户需求变更材料 input:b33f1cd7-dee5-49e5-ab04-da05e30564c5 提议将核对交互升级为 300ms 防抖实时反馈并删除确认按钮，但材料明确声明‘此原文不是直接批准’；而当前系统已批准正式生效的决策 dec-visual-layout-mapping（dec-72513e55-a5a7-44e1-90ad-087b5927447e）仍规定采纳包含左侧蓝色确认按钮的双按钮空间映射。由于此变更直接改变了核心页面布局、按钮数量与空间结构，且与现行已批准决策产生决议级冲突，必须由用户正式裁决确认。",
+      "recommendation": "推荐选项 opt-remove-confirm-realtime（采纳需求变更提议，彻底移除确认按钮并重构为单清空按钮极简布局）。",
+      "recommendationReason": "在引入 300ms 防抖实时反馈后，用户每次输入停止均可自动安全展示结果，确认按钮已失去核心业务职责；彻底移除确认按钮能精简界面元素，使单页面原型更加轻量聚焦，完全符合个人开发者敏捷原型验证诉求。",
+      "recommendedOptionKey": "opt-remove-confirm-realtime",
+      "reopenReason": "用户需求变更材料 input:b33f1cd7-dee5-49e5-ab04-da05e30564c5 提议将核对交互升级为 300ms 防抖实时反馈并删除确认按钮，但材料明确声明‘此原文不是直接批准’；而当前系统已批准正式生效的决策 dec-visual-layout-mapping（dec-72513e55-a5a7-44e1-90ad-087b5927447e）仍规定采纳包含左侧蓝色确认按钮的双按钮空间映射。为消除草案与现行已批准决策的决议级冲突，特此重开该议题由用户裁决。",
+      "selectionMode": "single",
+      "status": "shown",
+      "batchId": "run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4",
+      "basisRevision": 13,
+      "basisHash": "9498b9068779f5078281c8373a7378f1d6179a0074b50d4e1ed7c200b1db2450"
+    },
+    {
+      "allowFreeInput": true,
+      "area": "交互体验",
+      "createdAt": "2026-10-04T16:12:46.183Z",
+      "decisionKey": "dec-clear-interaction-mode",
+      "dependsOn": [],
+      "id": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "importance": "normal",
+      "issueRef": "blk-feat-reset",
+      "options": [
+        {
+          "approach": "用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+          "gain": "极速流畅，测试流转零等待零多余点击，最符合单人敏捷本地核对场景。",
+          "impact": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+          "key": "opt-instant-clear",
+          "label": "即时直接清空",
+          "reversibility": "easy",
+          "sacrifice": "如发生手误误触，当前展示与输入内容将立即消失，需重新输入。"
+        },
+        {
+          "approach": "点击清空后立即清空视图，但悬浮显示 3 秒轻量撤销条（可点击'撤销清空'恢复前次内容）。",
+          "gain": "兼顾操作效率与防误触安全性，手误时一键恢复。",
+          "impact": "增加前端临时快照暂存状态，不影响主流程数据流向。",
+          "key": "opt-undo-toast",
+          "label": "轻量即时清空带悬浮撤销（Undo Toast）",
+          "reversibility": "easy",
+          "sacrifice": "需要额外维护一个前次快照状态及 3 秒定时器清理机制，增加轻微视觉元素。"
+        },
+        {
+          "approach": "点击清空时弹出轻量原生/自定义确认对话框，用户确认后才执行清空。",
+          "gain": "误触安全性最高，绝不发生非预期的清空动作。",
+          "impact": "引入模态交互状态，影响桌面快速快捷键操作流。",
+          "key": "opt-modal-confirm",
+          "label": "模态对话框二次确认",
+          "reversibility": "moderate",
+          "sacrifice": "每次清空都需要额外点击一次，显著降低反复核对的流转效率。"
+        }
+      ],
+      "question": "在点击清空按钮时，采用何种重置交互保护机制？",
+      "reason": "清空操作会立即清除已展示核对的项目名与输入框内容。由于该原型定位于开发者快速核对，过于繁琐的弹窗会拖慢流转，但若完全无保护则在误触时需重新键入。在产品规划阶段确定此交互方式，有助于直接界定清空流程的状态机设计。",
+      "recommendation": "推荐方案 A（即时直接清空），兼顾快速本地核对的高频测试效率与低干扰体验。",
+      "recommendationReason": "本地核对工具核心诉求是极速反馈，单人操作场景下弹窗二次确认会产生阻断感；且失败保留输入机制已覆盖提交异常场景，清空后光标自动回焦即可顺畅重测。",
+      "recommendedOptionKey": "opt-instant-clear",
+      "selectionMode": "single",
+      "status": "answered",
+      "batchId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+      "basisRevision": 3,
+      "basisHash": "4d9d1a99e5ac8c5964ef73a8142ebed2668aed0df492566e9b2a5bbdeb1613cb",
+      "batchStage": "legacy",
+      "answeredAt": "2026-10-04T16:12:46.337Z",
+      "answer": "即时直接清空"
+    }
+  ],
+  "updatedAt": "2026-10-04T16:06:39.032Z"
+}

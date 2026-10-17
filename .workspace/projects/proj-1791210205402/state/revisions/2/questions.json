@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1791210205402",
+  "items": [
+    {
+      "allowFreeInput": true,
+      "area": "product_scope",
+      "createdAt": "2026-10-17T05:08:32.487Z",
+      "decisionKey": "cli_domain_scope",
+      "dependsOn": [],
+      "id": "run-a972df84-6bd8-4886-a979-dbaa70d294b1-delivery-0-q-cli-domain-scope",
+      "importance": "critical",
+      "issueRef": "issue-cli-domain-scope",
+      "options": [
+        {
+          "approach": "提供现代项目结构初始化、技术栈模板套用、规范配置（TypeScript/ESLint/Prettier/Git Hooks）一键生成及配置更新功能。",
+          "gain": "使用频次明确，能充分结合交互式多选配置与 CI 自动化脚本，用户体验感最强。",
+          "impact": "MVP 聚焦于工程模板渲染、依赖探测与规则文件生成。",
+          "key": "opt-domain-scaffold",
+          "label": "现代工程脚手架与规范生成器 (Project Scaffolder & Linter Setup)",
+          "reversibility": "moderate",
+          "sacrifice": "模板维护和生态演进成本较高，需要持续更新最佳实践模板。"
+        },
+        {
+          "approach": "基于轻量配置文件或流水线语法，统一管理多仓库/多包的构建、测试、部署等并行与串行开发任务。",
+          "gain": "贯穿整个开发周期日常高频使用，与 stdin/stdout 管道数据及 CI 流水线深度契合。",
+          "impact": "MVP 聚焦于任务依赖图解析、多进程并发执行与终端流式输出捕获。",
+          "key": "opt-domain-task-runner",
+          "label": "本地多任务编排与脚本工作流工具 (Task Runner & Workflow Orchestrator)",
+          "reversibility": "moderate",
+          "sacrifice": "对并发任务调度、输出流隔离与进程退出的稳定性要求极高。"
+        },
+        {
+          "approach": "自动化检测开发者本地工具链版本、环境依赖、网络连通性与配置冲突，并给出修复建议或自动修复。",
+          "gain": "排障价值立竿见影，新成员入职与跨团队环境对齐极为实用。",
+          "impact": "MVP 聚焦于系统环境探测、规则匹配树与诊断报告格式化呈现。",
+          "key": "opt-domain-doctor",
+          "label": "本地开发环境与依赖健康诊断工具 (Environment Doctor & Diagnostics)",
+          "reversibility": "easy",
+          "sacrifice": "日常使用频率较低，主要集中在环境初始化与排障时段。"
+        }
+      ],
+      "question": "本项目当前命名为 Modern CLI Developer Tool 且输入仅为“风格”，请问该 CLI 工具主要解决哪类开发场景的核心痛点？",
+      "reason": "用户原始输入仅包含“风格”，尚未定义该现代 CLI 工具的具体业务领域与解决的核心问题，这直接决定了 MVP 范围与功能流程。",
+      "recommendation": "推荐聚焦于“现代工程脚手架与规范初始化工具”，可充分展现现代 CLI 交互风格与管道自动化优势。",
+      "recommendationReason": "脚手架工具兼具丰富的交互式引导体验（模板选择、特性开关）与 CI 无头自动化场景（静默生成），能最直观地体现现代 CLI 的设计美感与规范约束。",
+      "recommendedOptionKey": "opt-domain-scaffold",
+      "selectionMode": "single",
+      "status": "shown",
+      "batchId": "run-a972df84-6bd8-4886-a979-dbaa70d294b1-delivery-0",
+      "basisRevision": 2,
+      "basisHash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4"
+    },
+    {
+      "allowFreeInput": true,
+      "area": "user_experience",
+      "createdAt": "2026-10-17T05:08:32.487Z",
+      "decisionKey": "terminal_presentation_style",
+      "dependsOn": [],
+      "id": "run-a972df84-6bd8-4886-a979-dbaa70d294b1-delivery-0-q-cli-presentation-style",
+      "importance": "high",
+      "issueRef": "issue-cli-presentation-style",
+      "options": [
+        {
+          "approach": "采用现代终端设计语言，包含优雅的高亮色彩、加载动画、步骤折叠与高密度摘要卡片，并在非 TTY 管道模式下自动降级。",
+          "gain": "视觉现代高级，操作反馈明确，新手友好度高。",
+          "impact": "UI 层引入轻量终端渲染适配器，需实现完整的 TTY 感知与降级策略。",
+          "key": "opt-style-modern-rich",
+          "label": "现代渐进高表现力 (Modern Rich CLI: 动效 Spinner、彩色卡片与步骤条)",
+          "reversibility": "moderate",
+          "sacrifice": "需要处理不同终端仿真器（Windows Terminal、iTerm、Linux 控制台）的 ANSI 转义与字符宽度兼容。"
+        },
+        {
+          "approach": "遵循经典 Unix 哲学，仅输出必要信息，严禁使用阻塞性动效或复杂颜色，强调极致轻量与即时流式输出。",
+          "gain": "兼容性最高，执行开销极低，输出零干扰，非常适合极客与重度管道集成。",
+          "impact": "终端输出仅依赖标准 stdout/stderr 格式化，完全移除动画与复杂 TUI 依赖。",
+          "key": "opt-style-minimal-posix",
+          "label": "极简纯净 Unix 风格 (Minimalist POSIX: 纯文本流、零花哨动效、纯粹紧凑)",
+          "reversibility": "easy",
+          "sacrifice": "缺少交互趣味与直观的进度引导，对新手略显冰冷生硬。"
+        },
+        {
+          "approach": "以规整对齐的 ASCII/Unicode 表格、键值卡片和状态指示标签呈现信息，侧重数据密度与结果概览。",
+          "gain": "信息层级清晰，结构整洁严谨，适合大量结构化状态的快速比对与阅读。",
+          "impact": "重点构建自适应终端宽度的表格与列对齐引擎。",
+          "key": "opt-style-structured-dashboard",
+          "label": "结构化仪表盘风格 (Structured Tables & Status Matrix: 紧凑表格与状态矩阵)",
+          "reversibility": "moderate",
+          "sacrifice": "在窄屏终端或移动端 SSH 会话中可能存在折行溢出或表格错位。"
+        }
+      ],
+      "question": "基于您提出的“风格”要求，本 CLI 工具在终端交互与界面视觉呈现上偏向哪种风格？",
+      "reason": "用户原始输入明确提出了“风格”，终端交互的视觉设计风格直接决定组件库选型、动效复杂度、信息密度与用户第一印象。",
+      "recommendation": "推荐采用“现代化高表现力交互风格 (Rich TUI / Modern CLI)”，兼具直观视觉与优雅反馈。",
+      "recommendationReason": "在现代终端中提供平滑的 Spinner 动效、柔和高对比度着色、步骤指示器与表格卡片，能给开发者带来现代化的工具质感，且在非 TTY 管道环境中自动优雅降级为纯文本/JSON。",
+      "recommendedOptionKey": "opt-style-modern-rich",
+      "selectionMode": "single",
+      "status": "shown",
+      "batchId": "run-a972df84-6bd8-4886-a979-dbaa70d294b1-delivery-0",
+      "basisRevision": 2,
+      "basisHash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4"
+    },
+    {
+      "allowFreeInput": true,
+      "area": "user_experience",
+      "createdAt": "2026-10-17T05:08:32.487Z",
+      "decisionKey": "command_hierarchy_model",
+      "dependsOn": [],
+      "id": "run-a972df84-6bd8-4886-a979-dbaa70d294b1-delivery-0-q-cli-command-model",
+      "importance": "normal",
+      "issueRef": "issue-cli-command-model",
+      "options": [
+        {
+          "approach": "主命令作为统一调度入口，各业务功能拆分为独立子命令（如 init, create, inspect 等），各自具备独立的参数与帮助文档。",
+          "gain": "结构清晰，命名空间明确，易于随着工具功能演进持续拓展新命令而不产生冲突。",
+          "impact": "需建立标准化的子命令注册、路由分发与独立的子命令上下文机制。",
+          "key": "opt-cmd-git-style",
+          "label": "分层子命令体系 (Git-style: tool <subcommand> [flags])",
+          "reversibility": "moderate",
+          "sacrifice": "命令层级较深，单次简单调用的输入按键数略多。"
+        },
+        {
+          "approach": "无复杂子命令，主命令即为唯一执行入口，通过选项标志（flags）和输入参数组合控制具体行为（类似 ripgrep、curl）。",
+          "gain": "调用极为敏捷，命令动线直接，特别适合高频单点任务与 Shell 管道组合。",
+          "impact": "命令解析集中在主命令参数解析器，配置项通过 options 驱动。",
+          "key": "opt-cmd-single-purpose",
+          "label": "专注单命令与组合式参数 (Single-purpose Utility: tool [inputs] [flags])",
+          "reversibility": "hard",
+          "sacrifice": "未来若新增正交功能，容易导致参数标志膨胀或语义冲突，横向扩展性受限。"
+        }
+      ],
+      "question": "在命令调用形态与命令行动线上，倾向于采用哪种命令组织模式？",
+      "reason": "命令架构直接决定用户的使用心智模型、参数解析规则以及未来功能的扩展模式，与具体业务领域完全解耦且互不依赖。",
+      "recommendation": "推荐采用“Git 风格的分层子命令体系 (Multi-command Workspace)”。",
+      "recommendationReason": "多子命令结构具备极强的扩展性与清晰的职责边界（如 init, check, run），便于未来平滑扩展新功能而不破坏向后兼容性。",
+      "recommendedOptionKey": "opt-cmd-git-style",
+      "selectionMode": "single",
+      "status": "shown",
+      "batchId": "run-a972df84-6bd8-4886-a979-dbaa70d294b1-delivery-0",
+      "basisRevision": 2,
+      "basisHash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4"
+    }
+  ],
+  "updatedAt": "2026-10-05T14:23:25.402Z"
+}

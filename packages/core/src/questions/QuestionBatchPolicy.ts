@@ -14,32 +14,39 @@ export interface QuestionBatchPolicyResult {
 
 /** Local deterministic B3 stage/budget policy. The Agent cannot raise these limits. */
 export class QuestionBatchPolicy {
-  evaluate(snapshot: ProjectSnapshot): QuestionBatchPolicyResult {
+  evaluate(snapshot: ProjectSnapshot, intensity?: import('@project-architect/contracts').DiscoveryIntensity): QuestionBatchPolicyResult {
     const clearAreaCount = snapshot.overview.sections.filter((section) =>
       AreaRegistry.isDiscoveryArea(AreaRegistry.normalize(section.id))
       && ['mostly-clear', 'clear', 'locked'].includes(section.maturity)
     ).length;
 
+    if (intensity === 'lite') {
+      return { stage: 'converge', targetMin: 1, maxQuestions: 2, clearAreaCount };
+    }
+    if (intensity === 'deep') {
+      return { stage: 'explore', targetMin: 1, maxQuestions: 3, clearAreaCount };
+    }
+
     if (['readiness-review', 'approved', 'documents-generated'].includes(snapshot.metadata.stage)) {
       return { stage: 'readiness', targetMin: 0, maxQuestions: 2, clearAreaCount };
     }
     if (clearAreaCount <= 2) {
-      return { stage: 'initial', targetMin: 8, maxQuestions: 12, clearAreaCount };
+      return { stage: 'initial', targetMin: 1, maxQuestions: 3, clearAreaCount };
     }
     if (clearAreaCount <= 5) {
-      return { stage: 'explore', targetMin: 5, maxQuestions: 8, clearAreaCount };
+      return { stage: 'explore', targetMin: 1, maxQuestions: 3, clearAreaCount };
     }
-    return { stage: 'converge', targetMin: 2, maxQuestions: 4, clearAreaCount };
+    return { stage: 'converge', targetMin: 1, maxQuestions: 3, clearAreaCount };
   }
 
   getBudgetForStage(stage: QuestionBatchStage): { targetMin: number; maxQuestions: number } {
     switch (stage) {
       case 'initial':
-        return { targetMin: 8, maxQuestions: 12 };
+        return { targetMin: 1, maxQuestions: 3 };
       case 'explore':
-        return { targetMin: 5, maxQuestions: 8 };
+        return { targetMin: 1, maxQuestions: 3 };
       case 'converge':
-        return { targetMin: 2, maxQuestions: 4 };
+        return { targetMin: 1, maxQuestions: 3 };
       case 'readiness':
       default:
         return { targetMin: 0, maxQuestions: 2 };
@@ -49,8 +56,9 @@ export class QuestionBatchPolicy {
   getBatchInfo(snapshot: ProjectSnapshot): QuestionBatchInfo {
     const allQuestions = snapshot.questions?.items || [];
     let activeBatchId: string | null = null;
-    for (let i = allQuestions.length - 1; i >= 0; i--) {
-      const q = allQuestions[i];
+    const byRecency = [...allQuestions].filter((q) => q.status !== 'superseded')
+      .sort((a, b) => (b.basisRevision ?? 0) - (a.basisRevision ?? 0) || b.createdAt.localeCompare(a.createdAt));
+    for (const q of byRecency) {
       if (q && q.batchId) {
         activeBatchId = q.batchId;
         break;

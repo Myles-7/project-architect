@@ -1,0 +1,15 @@
+本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。只针对 flash-materials-quality-20261005-06 的 sourceRevision28 / quality-reviewed-r3 最新真实蓝图，旧证据和旧包保留。原生目标应用尚未开发；本轮只有导出契约的静态/合成反例，不能称浏览器实测。
+
+已修正确内容完整保留：300ms实时反馈、即时单按钮清空、手动删空清除旧结果、纯空格原文保留、失败保留输入、无确认按钮和Enter专属提交、经典defer/IIFE/textContent、完整官方证据、端口8080命令、npx首次安装前提、10文件及任务DAG。性能全部字段目前已统一“清空重置至重绘前调度延迟”代理指标，五轮均值<=50ms；该项通过，不再改指标或夸成物理绘制实测。保留原30块稳定ID和28条历史证据原完整对象，新增证据另附。
+
+现在仅输入节点生命周期/定时器隔离契约仍阻断。r3隔离态期间会拒绝尾随input，但解除隔离之后仍使用一个全局currentSessionToken。反例A：旧compositionstart→reset→新keydown解除隔离→新input('Brand-New')并schedule→旧compositionend被拒绝分支强写当前value=''→挂起timer读DOM空值→新输入丢失且产生empty错误。反例B：旧会话reset后新compositionstart覆盖global token→旧compositionend误通过相等检查并置新会话isComposing=false。scheduler仅clearTimeout且直接callback，没检查generation/session/句柄快照；inputGeneration只是声明和清空递增却从未使用，末尾却说有双重守卫。不得继续用这种策略重新声称彻底杜绝竞态。
+
+请在待批准方案中采用明确的“清空时替换输入节点＋节点代际闭包隔离”作为最小修订建议，AI完成普通实现细节。技术契约至少准确表达：
+1. activeInputNode、单调递增inputGeneration、每节点独立组合输入状态；事件绑定时闭包捕获node和bornGeneration。input/beforeinput/compositionstart/compositionend的处理前先核对event.currentTarget、node===activeInputNode、bornGeneration===inputGeneration及节点仍在当前页面；失败立即返回，不能写新节点、改新会话状态或取消新timer。普通InputEvent没有应用自增token，不能假称其自带会话身份。
+2. 清空操作先增加代际并取消/作废定时器，再用新input节点替换旧节点，正确保留id、name、label关联、样式、可访问属性、监听绑定与焦点行为；新节点value=''/trustedDraft=''，清结果和错误。旧节点迟到事件只能到旧闭包并被拒绝，不操作activeInputNode。新节点键入、粘贴、组合输入均正常，不要求用户额外keydown才能解除永久隔离。组合输入状态属于节点闭包，旧end不可能重写新isComposing。不要把强制清新DOM作为拒绝旧事件动作。
+3. schedule接受“已接受的原始草稿快照、node、generation”，保存单调schedulerEpoch/本次timer身份；schedule替代、cancel、clear、compositionstart均使旧epoch失效。即使旧回调已经进入队列、clearTimeout来不及，执行时仍先检查epoch/generation/active node，过期立即return。有效回调只验证capturedDraft，再textContent输出；不要到期读取可能被旧事件更改的DOM。clear同步清空，失败保留对应已接受原文；新用户输入能正常300ms调度。
+4. 给出内部自洽、可以直接指导实现的事件/清空/scheduler接口与伪代码；所有被引用变量有定义且校验实际被使用。不得在正文声称守卫存在而示例缺失。同步data_model、interface、errors、相关flow/page、任务spec全部字段、validation及acceptance；只改真实关联句子，不整块删除原目标、范围和已正确验收。
+5. 精确测试：清空后旧节点end与input不得重显/造错；新节点input之后旧节点end不得抹新草稿/取消新timer；新节点compositionstart之后旧节点end不得结束新composition；旧timer已出队后clear/新输入再执行旧callback无效；新键入/粘贴/完整新中文composition仍可显示；清空替换后label/焦点/ARIA/布局保留。断言写具体状态与输出，不能只写“无竞态”。
+6. 该策略是待批准的技术建议，合成事件只能验证书面事件契约。浏览器是否把旧原生IME事件重新定向到新节点、替换节点能否结束原生会话、实际焦点/辅助技术行为，必须作为Chrome/Edge/Firefox和Safari适用环境的开发验证任务，说明证据与失败后修订策略；不得写100%/彻底杜绝所有浏览器竞态或已验证通过。不要重新运行不可用Docker。
+
+独立review必须核对真正的最新候选正文/字段及实际守卫代码，明确上述每个反例的对应规则。blockers=[]本身不证明内容通过。完成后仍由公开Core自动验收审批并编译新版本，不冒称真人批准，不编辑旧产物或收据。

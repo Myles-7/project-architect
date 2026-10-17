@@ -1,0 +1,10 @@
+{
+  "id": "evidence-37699c07-e70f-4d97-b809-4d68ad503428",
+  "source": "feedback:1488ed35-6288-4173-b10a-48bcd6cd16a4",
+  "capturedAt": "2026-10-05T00:42:06.949Z",
+  "sha256": "2591fc223523e85ff1f1bd136a09895acf3d8a28ff1d2a3860d792cefa984907",
+  "scope": "清空重置状态事务提交点与失败原子回滚机制验证",
+  "path": "D:\\Temp\\User\\pa-quality-copy-NFD8mD\\materials\\runtime\\planning\\run-80094931-1ed4-4b40-bfe3-14a90886e7da\\tools\\evidence\\evidence-37699c07-e70f-4d97-b809-4d68ad503428.json",
+  "approval": "candidate",
+  "content": "合成 DOM 异常注入复核证据：在清空重置 handleReset 中，当 oldNode.replaceWith 或随后的 renderPlaceholder 抛出异常时，若仅提前递增 inputGeneration 而未进行状态事务回滚，会导致原输入框既有闭包的 bornGeneration 与全局代际永久失配，后续键盘事件被守卫丢弃，输入框丧失可编辑性；采纳 captureSnapshot 与 rollbackReset 原子回滚机制后，异常时原节点、草稿文本、闭包代际、调度纪元与拓扑位置完整还原，用户继续键入可正常调度 300ms 防抖更新。"
+}

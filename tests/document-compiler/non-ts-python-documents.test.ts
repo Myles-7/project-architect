@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 import type { DiscoveryResult } from '@project-architect/contracts';
+import { renderHistoricalDocuments } from '../fixtures/historical-documents.js';
 
-describe('Document Compiler E2E — Python Cloud Microservice (Zero-Bias Verification)', () => {
+describe('Historical Document Renderer — Python Cloud Microservice (Zero-Bias Verification)', () => {
   let tempBaseDir: string;
   let storage: FileStorage;
   let stateEngine: ProjectStateEngine;
@@ -34,6 +35,11 @@ describe('Document Compiler E2E — Python Cloud Microservice (Zero-Bias Verific
       projectTags: ['Python', 'Cloud Service', 'Backend', 'Database'],
     });
 
+    const initialIdea = s0.decisions.items.find((decision) => decision.statement === 'Python-based asynchronous event processing service streaming events to PostgreSQL');
+    expect(initialIdea?.status).toBe('candidate');
+    const confirmedInitial = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, s0.metadata.stateRevision);
+    expect(confirmedInitial.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
+
     const mockOutput: DiscoveryResult = {
       confirmed: ['Cloud Data Pipeline', 'Python-based asynchronous event processing service'],
       candidates: ['Kafka connector'],
@@ -49,7 +55,7 @@ describe('Document Compiler E2E — Python Cloud Microservice (Zero-Bias Verific
 
     // Turn 1
     await orchestrator.runDiscoveryTurn(projectPath, {
-      expectedRevision: s0.metadata.stateRevision,
+      expectedRevision: confirmedInitial.metadata.stateRevision,
       userMessage: 'Target user is backend platform teams. MVP scope is FastAPI ingestion and PostgreSQL persistence.',
     });
 
@@ -90,36 +96,39 @@ describe('Document Compiler E2E — Python Cloud Microservice (Zero-Bias Verific
       'confirmed'
     );
 
-    // Compile Documents
-    const compileResult = await orchestrator.compileDocuments(projectPath);
+    // Render the historical fixture without publication
+    const compileResult = await renderHistoricalDocuments(projectPath, storage);
+    expect(compileResult.filesAfter).toEqual(compileResult.filesBefore);
+    expect(compileResult.manifest.sourceRevision).toBe(compileResult.snapshot.metadata.stateRevision);
+    expect(new Set(compileResult.renderedFiles.map(file => file.content)).size).toBe(compileResult.renderedFiles.length);
 
     expect(compileResult.readiness.ready).toBe(true);
     // Should have 8 core documents (no dynamic specs since no AI/desktop/etc)
     expect(compileResult.manifest.items.length).toBe(8);
 
-    // Verify 8 core markdown documents on disk
-    expect(await storage.exists(join(projectPath, 'AGENTS.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'PROJECT.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'PRODUCT.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'USER_FLOWS.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'UX_UI_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'DEVELOPMENT_PLAN.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'ACCEPTANCE.md'))).toBe(true);
+    // Verify the complete historical document set rendered in memory
+    expect(compileResult.has('AGENTS.md')).toBe(true);
+    expect(compileResult.has('docs/PROJECT.md')).toBe(true);
+    expect(compileResult.has('docs/PRODUCT.md')).toBe(true);
+    expect(compileResult.has('docs/USER_FLOWS.md')).toBe(true);
+    expect(compileResult.has('docs/UX_UI_SPEC.md')).toBe(true);
+    expect(compileResult.has('docs/TECHNICAL_GUIDE.md')).toBe(true);
+    expect(compileResult.has('docs/DEVELOPMENT_PLAN.md')).toBe(true);
+    expect(compileResult.has('docs/ACCEPTANCE.md')).toBe(true);
 
     // 1. Verify ACCEPTANCE.md is objective and has NO TypeScript bias
-    const acceptanceContent = await storage.readText(join(projectPath, 'docs', 'ACCEPTANCE.md'));
+    const acceptanceContent = compileResult.content('docs/ACCEPTANCE.md');
     expect(acceptanceContent).not.toContain('TypeScript compilation');
     expect(acceptanceContent).toContain('Python code builds cleanly with static type checks');
     expect(acceptanceContent).toContain('Database transactions and relational consistency');
 
     // 2. Verify TECHNICAL_GUIDE.md includes platform and delegated freedom
-    const techGuideContent = await storage.readText(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'));
+    const techGuideContent = compileResult.content('docs/TECHNICAL_GUIDE.md');
     expect(techGuideContent).toContain('Python 3.12, FastAPI, Asyncpg, PostgreSQL database');
     expect(techGuideContent).toContain('Delegated Technical Freedom for Coding Agents');
 
     // 3. Verify AGENTS.md does NOT impose "Local Data First" on cloud service
-    const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));
+    const agentsContent = compileResult.content('AGENTS.md');
     expect(agentsContent).not.toContain('Local Data First');
     expect(agentsContent).toContain('Strictly respect the platform, data, and runtime boundaries');
     expect(agentsContent).toContain('docs/TECHNICAL_GUIDE.md');

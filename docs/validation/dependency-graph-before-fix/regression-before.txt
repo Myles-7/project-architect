@@ -1,0 +1,55 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/PlanningDependencyGraph.test.ts (4 tests | 2 failed) 11ms
+   × Planning dependency validation over shared prerequisites > accepts a complete shared-prerequisite blueprint without expanding every path 4ms
+     → Repeated dependency paths exceeded the registered graph work budget
+   × Planning dependency validation over shared prerequisites > accepts shared change-group prerequisites with bounded deterministic validation work 5ms
+     → Repeated dependency paths exceeded the registered graph work budget
+   ✓ Planning dependency validation over shared prerequisites > still detects cycles and absent references in non-task components of the complete graph 1ms
+   ✓ Planning dependency validation over shared prerequisites > still rejects independent group cycles, self-cycles and missing groups 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/core/tests/PlanningDependencyGraph.test.ts > Planning dependency validation over shared prerequisites > accepts a complete shared-prerequisite blueprint without expanding every path
+Error: Repeated dependency paths exceeded the registered graph work budget
+ ❯ Object.get [as dependsOn] packages/core/tests/PlanningDependencyGraph.test.ts:26:37
+     24|     Object.defineProperty(node, 'dependsOn', {
+     25|       enumerable: true, get() {
+     26|         if (++reads > budget) throw new Error('Repeated dependency pat…
+       |                                     ^
+     27|         return dependencies;
+     28|       },
+ ❯ visit packages/core/src/planning/PlanningValidation.ts:61:35
+ ❯ packages/core/src/planning/PlanningValidation.ts:61:63
+ ❯ visit packages/core/src/planning/PlanningValidation.ts:61:48
+ ❯ packages/core/src/planning/PlanningValidation.ts:61:63
+ ❯ visit packages/core/src/planning/PlanningValidation.ts:61:48
+ ❯ packages/core/src/planning/PlanningValidation.ts:61:63
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  packages/core/tests/PlanningDependencyGraph.test.ts > Planning dependency validation over shared prerequisites > accepts shared change-group prerequisites with bounded deterministic validation work
+Error: Repeated dependency paths exceeded the registered graph work budget
+ ❯ Object.get [as dependsOn] packages/core/tests/PlanningDependencyGraph.test.ts:26:37
+     24|     Object.defineProperty(node, 'dependsOn', {
+     25|       enumerable: true, get() {
+     26|         if (++reads > budget) throw new Error('Repeated dependency pat…
+       |                                     ^
+     27|         return dependencies;
+     28|       },
+ ❯ visit packages/core/src/planning/PlanningService.ts:160:31
+ ❯ packages/core/src/planning/PlanningService.ts:160:57
+ ❯ visit packages/core/src/planning/PlanningService.ts:160:44
+ ❯ packages/core/src/planning/PlanningService.ts:160:57
+ ❯ visit packages/core/src/planning/PlanningService.ts:160:44
+ ❯ packages/core/src/planning/PlanningService.ts:160:57
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 2 passed (4)
+   Start at  01:41:29
+   Duration  933ms (transform 338ms, setup 0ms, collect 620ms, tests 11ms, environment 0ms, prepare 98ms)
+

@@ -1,0 +1,533 @@
+{
+  "id": "run-89597c52-0b0c-487e-95ca-a7789b4768c3",
+  "projectId": "proj-1791125866356",
+  "stage": "feedback",
+  "basis": {
+    "revision": 27,
+    "hash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf"
+  },
+  "operationId": "real-flash-vague-draft-final-20261004-01-feedback-1791157684687",
+  "request": {
+    "stage": "feedback",
+    "expectedRevision": 26,
+    "operationId": "real-flash-vague-draft-final-20261004-01-feedback-1791157684687",
+    "feedback": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。通过draftChangeSetId修订 flash-vague-quality-resume-20261005-08 的未批准候选，原ChangeSet全部组仍未批准；不能先批准坏草案。上一轮宽QA的影响闭包确可达全44块，不用“必须至少留一块”作判据，但不能用闭包为无关痛点、约束、接口或验收丢失免责。请对照changeReviewBaseline中原正式批准正文和本轮冻结currentDraft，修复下列实际缺陷；AI处理普通细节，无需新选择题。\n\n已正确内容保留：只服务本人、页面焦点快捷键N/Ctrl或Cmd+Enter、常驻取消归档、触控多选标签AND过滤、七天回收需确认物理删除、IndexedDB不建boolean索引、schemaVersion:1、包装任务在全部业务实现之后、删除重复验证任务、检索1000条P95<=150ms含80ms、Safari真实验证未执行。保留稳定块ID与历史证据原文；技术/任务只改相关规则、不要简写替代原明确能力。\n\n1. 恢复原4个痛点，尤其“无序堆积导致灵感沉没与查找困难”、标签/模糊检索/状态标记及回顾价值，不能改成只有3痛点。恢复产品明确不做复杂树形文件夹/无限嵌套、重量级WYSIWYG排版编辑器。全字段提交快捷键统一Ctrl/Cmd+Enter，不写回车保存。保留AppMeta {key,value,updatedAt}、BackupTrackerMeta原有效数据、requestPersistence/isPersisted/detectPrivateMode/checkBackupReminderNeeded接口、Markdown显示与代码一键复制验收。原detectPrivateMode若无法可靠实现，需要明确能力限制/待验证与诚实状态，不能宣称能识别所有浏览器隐私模式，也不能静默删接口。\n2. IndexedDB保存契约：编辑现有note时expectedRevision必填且在同一个readwrite事务内get→比较→put，失败不写；不存在/已永久删除不得复活。新建采用独立create动作，不能用save的upsert隐式复活。force覆盖仍需用户明确操作，并以刚显示的当前revision再次CAS，期间再变报冲突。pin/favorite/archive/标签批量/还原/回收等任何修改都以当前实体版本进行同事务CAS并递增；批量原子/部分成功选定一种明确规则并闭合反馈。重复trash不得把previousStatus改成trash或重置deletedAt/到期；编辑和删除竞争不能无提示复活旧状态。\n3. 增加库代际/libraryGeneration；替换导入成功时本地单调更新代际而不是采用备份旧代际。所有旧编辑会话携带打开时代际，导入后失效，即使noteId/revision与备份一样也拒绝旧保存。合并导入的版本冲突/ID重合规则、取消前不写、事务失败全回滚、清理/导入/编辑竞争同步定义。不能直接把旧备份revision覆盖回去后允许陈旧编辑匹配。\n4. BackupPayload.notes/meta完整列明元数据字段及往返承诺，包括appMeta、backupTracker、tags和notes实体/回收字段。实现结构/类型/schemaVersion/ID唯一/枚举/时间戳/关联校验的具体失败规则，不只JSON.parse或Array.isArray；导出与校验器/导入一致。导入预览后明确替换或合并、取消无改动、失败不留半库。未保存草稿不在数据库备份中，不能声称数据库export能恢复该草稿；提供“导出当前未保存草稿”独立动作保留原文、noteId/状态/版本/代际等必要恢复信息，区分正式备份与草稿恢复文件。\n5. sessionStorage草稿必须按noteId/新建草稿ID和libraryGeneration隔离，防两记录互相覆盖。记录schema、savedAt、baseRevision及完整原文；打开匹配编辑器时明确提示恢复/丢弃，批准恢复仅载入编辑器并仍受CAS，不默默写数据库。set/get损坏或容量/访问失败有显式提示与手动草稿导出，不能假装自动恢复可靠。说明刷新可保留、标签页关闭可能丢失/浏览器策略差异，未保存工作不得被承诺跨关闭必恢复。\n6. 保留安全上下文部署要求：HTTPS或localhost受信任本地来源，不能泛称任意HTTP都支持SW；file://不支持该目标部署。已打开页面在离线使用与完全关闭后从SW缓存冷重启是两种状态，列前提/失败/未缓存时提示。首次安装和材料读取条件明确，不写100%离线绝对保证。\n7. 冷启动仍导航起始→首屏可交互<=1s，不能改成骨架屏消失以后起算。明确观测navigation/performance.now时间原点、应用可交互标记和验证操作。检索时延从实际输入动作起算，包含80ms防抖、筛选和DOM结果可见的观测终点，使用1000条固定种子数据、预热/重复次数、样本计算方法（nearest-rank P95、排序索引）、前台浏览器/实际设备与版本、原始样本及超标失败处理。冷启动与检索场景各自记录条件；不能由虚拟性能或AI评审声称目标已实测。原150ms边界不改。\n8. 七天规则形成具体Given/When/Then：删除并刷新/重开仍可还原；回收页停留跨到期自动标出待清理但不暗删；到期执行用户确认物理清理，取消不写；重复删除不延长七天；到期清理/还原/编辑并发版本冲突可见，永久删除之后旧编辑不得重新创建。定义七天毫秒区间、边界>=、本地时钟偏移限制并保留相关实测/失败策略，用户不用回答普通实现问题。\n9. 所有上述正文、data_model、interfaces、errors、flows、page states、task全部字段、validation、acceptance同步；不同文件不得相互矛盾。保留原明确接口与体验验收，并逐项列具体可观察行为。不要只在任务scope加一句而接口仍可选expectedRevision。不要新增与需求无关登录/数据库服务/云同步；该目标应用本身可用IndexedDB，不误套工作台自身禁止数据库规则。\n10. 评审接收完整当前候选与旧批准变更基线，核对上述缺陷及原无关内容是否保留，不能只blockers=[]。保存本轮建议为pending变更包；自动验收经公开Core审批和新的compiler导出，不冒称真人审阅。START_HERE/tasks.json/DEVELOPMENT_PLAN由真实DAG一致生成。目标应用和CodingAgent仍未开发，所有实际兼容性/性能/隐私检测验证任务继续unexecuted并说明失败后影响与修订路径。\n",
+    "draftChangeSetId": "change-3a9bf179-44bd-4b09-8bb8-f20e644ac10d-delivery-7"
+  },
+  "draftSource": {
+    "changeSetId": "change-3a9bf179-44bd-4b09-8bb8-f20e644ac10d-delivery-7",
+    "sourceRunId": "run-3a9bf179-44bd-4b09-8bb8-f20e644ac10d",
+    "stage": "feedback",
+    "basis": {
+      "revision": 25,
+      "hash": "3cd9327f3c8484b331047998723167cb3a47cb375ccbbe465d4e44978fceb6cd"
+    },
+    "hash": "88161d6d6b2540124d5c80b3843ac06ec4f9197d9689006d17733070da669a51",
+    "groupIds": [
+      "group-product-foundation",
+      "group-tech-and-storage",
+      "group-quick-capture",
+      "group-feed-and-lifecycle",
+      "group-tag-organization",
+      "group-search-filter",
+      "group-detail-and-edit",
+      "group-data-portability",
+      "group-build-deploy-and-benchmark"
+    ]
+  },
+  "effectiveConfig": {
+    "concurrency": 4,
+    "designModel": "gemini-3.8-flash-high",
+    "reviewModel": "gemini-3.8-flash-high",
+    "officialHosts": [
+      "antigravity.google",
+      "www.antigravity.google",
+      "modelcontextprotocol.io",
+      "ts.sdk.modelcontextprotocol.io",
+      "nodejs.org",
+      "docs.docker.com",
+      "docs.python.org",
+      "playwright.dev",
+      "react.dev",
+      "www.typescriptlang.org",
+      "vite.dev",
+      "expressjs.com",
+      "developer.mozilla.org",
+      "www.w3.org",
+      "www.rfc-editor.org",
+      "docs.github.com",
+      "docs.anthropic.com",
+      "ai.google.dev"
+    ]
+  },
+  "status": "paused",
+  "tasks": [
+    {
+      "id": "task-d77a05ce-8a58-42ff-bac6-428e46ff636d",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。",
+      "dependsOn": [],
+      "status": "paused",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "requiredBlockIds": [
+        "block-target-user-scenarios",
+        "block-problem-fragmented-ideas",
+        "block-outcomes-lightweight-experience",
+        "block-non-goals-exclusions",
+        "block-scope-core-boundaries",
+        "page-main-workspace",
+        "tech-core-architecture",
+        "module-system-decomposition",
+        "tech-storage-and-search",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "task-foundation-and-storage",
+        "acceptance-foundation-and-storage",
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "task-quick-capture",
+        "acceptance-quick-capture",
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "task-note-card-view",
+        "acceptance-note-card-view",
+        "feature-tag-organization",
+        "flow-tag-organization",
+        "task-tag-organization",
+        "acceptance-tag-organization",
+        "feature-search-filter",
+        "flow-search-filter",
+        "task-search-filter",
+        "acceptance-search-filter",
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "task-note-detail-edit",
+        "acceptance-note-detail-edit",
+        "feature-data-portability",
+        "flow-data-portability",
+        "task-data-portability",
+        "acceptance-data-portability",
+        "deployment-and-build-specification",
+        "task-build-and-deploy",
+        "acceptance-build-and-deploy",
+        "val-storage-and-search-benchmark",
+        "acceptance-storage-and-search-benchmark",
+        "val-browser-storage-and-search-perf"
+      ],
+      "startedAt": "2026-10-04T23:48:05.132Z",
+      "partitionPlanTaskId": "task-1769113e-a87f-424f-96a7-4352d64a2464",
+      "partitionTaskIds": [
+        "task-2dad356a-4c63-491b-aa79-b9a211eafa50",
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937",
+        "task-b65ac1bc-ef09-4ab2-8706-7d310c4ee6d2",
+        "task-0de8b2c8-03aa-4856-b57d-75fd2af09f42",
+        "task-5e78b05b-0f63-4660-a5bd-2365b71b9679",
+        "task-ee9d240b-96e6-4fde-a0be-47a11e86d60d",
+        "task-9caceb3c-a74c-4271-b199-d17a1e96412c",
+        "task-b7eb4250-246d-4aac-80e2-4c61e72dbd49",
+        "task-4a530025-eee3-418e-92ef-92dff326340b"
+      ]
+    },
+    {
+      "id": "task-5dd5e64f-ffe4-4bbe-8903-db6ead50d0bc",
+      "kind": "research",
+      "goal": "独立分析材料中的约束、异常使用场景与可行性风险；只返回证据和建议。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:48:05.051Z",
+      "completedAt": "2026-10-04T23:51:24.563Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-5dd5e64f-ffe4-4bbe-8903-db6ead50d0bc/result.json",
+      "outputHash": "0667cf397f2ac88daf54f3c814162dfe68fe712b3a2f494dc2562b4055a42b2c"
+    },
+    {
+      "id": "task-1769113e-a87f-424f-96a7-4352d64a2464",
+      "kind": "decomposition",
+      "goal": "任务拆分：生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n父范围：null",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:54:04.915Z",
+      "completedAt": "2026-10-04T23:55:10.310Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-1769113e-a87f-424f-96a7-4352d64a2464/result.json",
+      "outputHash": "0ee2c91baa024544f3b4c8aa92bf497358aee95c5821a5aa8956f4f02e78b667"
+    },
+    {
+      "id": "task-2dad356a-4c63-491b-aa79-b9a211eafa50",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责产品目标定位与主工作区页面规范。恢复原4个痛点（包含碎片堆积沉没与查找困难、多标签与模糊检索回顾价值），明确非目标（不做复杂目录树、层级文件夹或重量级富文本）；确立个人浏览器轻量单页应用定位，去除非浏览器激活的全局唤起，统一全字段快捷键为 Ctrl/Cmd+Enter（页面焦点按 N 聚焦）；界定主工作区五大区域、系统视图、归档常驻取消归档恢复路径、回收区7天超期提示与状态规范、冷启动导航起始至首屏可交互 <= 1.0s 口径，以及配额满载状态下草稿保留与恢复诚实说明。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "block-target-user-scenarios",
+          "block-problem-fragmented-ideas",
+          "block-outcomes-lightweight-experience",
+          "block-non-goals-exclusions",
+          "block-scope-core-boundaries",
+          "page-main-workspace"
+        ],
+        "dependsOn": [],
+        "goal": "负责产品目标定位与主工作区页面规范。恢复原4个痛点（包含碎片堆积沉没与查找困难、多标签与模糊检索回顾价值），明确非目标（不做复杂目录树、层级文件夹或重量级富文本）；确立个人浏览器轻量单页应用定位，去除非浏览器激活的全局唤起，统一全字段快捷键为 Ctrl/Cmd+Enter（页面焦点按 N 聚焦）；界定主工作区五大区域、系统视图、归档常驻取消归档恢复路径、回收区7天超期提示与状态规范、冷启动导航起始至首屏可交互 <= 1.0s 口径，以及配额满载状态下草稿保留与恢复诚实说明。",
+        "id": "work-item-product-foundation"
+      },
+      "requiredBlockIds": [
+        "block-target-user-scenarios",
+        "block-problem-fragmented-ideas",
+        "block-outcomes-lightweight-experience",
+        "block-non-goals-exclusions",
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "startedAt": "2026-10-04T23:55:10.422Z",
+      "completedAt": "2026-10-04T23:57:02.604Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-2dad356a-4c63-491b-aa79-b9a211eafa50/result.json",
+      "outputHash": "68474071a8d0a9f139be0042668bd19b5102120c52b97362c1e4fb9af19a2f81"
+    },
+    {
+      "id": "task-7d972ece-9dfa-4c3b-8947-bb58509bc937",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责技术架构基座、持久化数据模型、核心接口、全局错误体系及存储驱动实现任务与验收。落实 W3C 规范消除 boolean 索引（置顶与加星在内存中排序过滤）；引入单调递增库代际 libraryGeneration 与单条便签 revision 乐观锁；确立编辑 note 时 expectedRevision 必填并在同 readwrite 事务内 get→比较→put 执行 CAS，新建使用独立 create 动作禁止 upsert 隐式复活；force 覆盖需用户明确操作再次 CAS；pin/favorite/archive/批量标签/还原/回收均以当前版本执行同事务 CAS 并递增；重复 trash 不重置 previousStatus 与 trashedAt；保留 AppMeta、BackupTrackerMeta、requestPersistence、isPersisted、detectPrivateMode（诚实声明检测局限与待验证状态）及 checkBackupReminderNeeded 接口；sessionStorage 草稿按 noteId 与 libraryGeneration 隔离，记录 schema、savedAt、baseRevision 及原文；落实七天回收期毫秒区间定义（>= 7*86400*1000）、时钟偏移防御及单原子全量事务回滚。",
+      "dependsOn": [
+        "task-2dad356a-4c63-491b-aa79-b9a211eafa50"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "tech-core-architecture",
+          "module-system-decomposition",
+          "tech-storage-and-search",
+          "data-model-core-entities",
+          "interface-service-contracts",
+          "error-architecture-and-recovery",
+          "task-foundation-and-storage",
+          "acceptance-foundation-and-storage"
+        ],
+        "dependsOn": [
+          "work-item-product-foundation"
+        ],
+        "goal": "负责技术架构基座、持久化数据模型、核心接口、全局错误体系及存储驱动实现任务与验收。落实 W3C 规范消除 boolean 索引（置顶与加星在内存中排序过滤）；引入单调递增库代际 libraryGeneration 与单条便签 revision 乐观锁；确立编辑 note 时 expectedRevision 必填并在同 readwrite 事务内 get→比较→put 执行 CAS，新建使用独立 create 动作禁止 upsert 隐式复活；force 覆盖需用户明确操作再次 CAS；pin/favorite/archive/批量标签/还原/回收均以当前版本执行同事务 CAS 并递增；重复 trash 不重置 previousStatus 与 trashedAt；保留 AppMeta、BackupTrackerMeta、requestPersistence、isPersisted、detectPrivateMode（诚实声明检测局限与待验证状态）及 checkBackupReminderNeeded 接口；sessionStorage 草稿按 noteId 与 libraryGeneration 隔离，记录 schema、savedAt、baseRevision 及原文；落实七天回收期毫秒区间定义（>= 7*86400*1000）、时钟偏移防御及单原子全量事务回滚。",
+        "id": "work-item-tech-and-storage"
+      },
+      "requiredBlockIds": [
+        "tech-core-architecture",
+        "module-system-decomposition",
+        "tech-storage-and-search",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "task-foundation-and-storage",
+        "acceptance-foundation-and-storage"
+      ],
+      "startedAt": "2026-10-04T23:57:02.658Z",
+      "completedAt": "2026-10-04T23:59:31.246Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-7d972ece-9dfa-4c3b-8947-bb58509bc937/result.json",
+      "outputHash": "3b8a3ab6f20445f0d533508f591ff1e7809367d657c879cdf2f33a25dc4bf123"
+    },
+    {
+      "id": "task-b65ac1bc-ef09-4ab2-8706-7d310c4ee6d2",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责秒级随手灵感极速捕获功能、交互流、开发任务与验收标准。实现窗口激活下按 N 键聚焦、输入框多行自适应撑开、统一快捷键 Ctrl/Cmd+Enter 提交（回车仅换行不保存）；调用独立 createNote 接口携带当前 libraryGeneration 写入数据库；正文智能提取 #标签；输入为空时红色抖动拦截；本地存储满载或写入失败时文本完整保留在输入框中不被清空，同时在 sessionStorage 中按草稿 ID 与 libraryGeneration 隔离暂存，提供手动复制文本与导出草稿入口。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-quick-capture",
+          "flow-quick-capture",
+          "task-quick-capture",
+          "acceptance-quick-capture"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage"
+        ],
+        "goal": "负责秒级随手灵感极速捕获功能、交互流、开发任务与验收标准。实现窗口激活下按 N 键聚焦、输入框多行自适应撑开、统一快捷键 Ctrl/Cmd+Enter 提交（回车仅换行不保存）；调用独立 createNote 接口携带当前 libraryGeneration 写入数据库；正文智能提取 #标签；输入为空时红色抖动拦截；本地存储满载或写入失败时文本完整保留在输入框中不被清空，同时在 sessionStorage 中按草稿 ID 与 libraryGeneration 隔离暂存，提供手动复制文本与导出草稿入口。",
+        "id": "work-item-quick-capture"
+      },
+      "requiredBlockIds": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "task-quick-capture",
+        "acceptance-quick-capture"
+      ],
+      "startedAt": "2026-10-04T23:59:31.311Z",
+      "completedAt": "2026-10-05T00:01:22.962Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-b65ac1bc-ef09-4ab2-8706-7d310c4ee6d2/result.json",
+      "outputHash": "780693de9de36b57df7c6727596d00e74b86cbb7824286b42a1a34b74bd6d320"
+    },
+    {
+      "id": "task-0de8b2c8-03aa-4856-b57d-75fd2af09f42",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责便签流展示、归档与 7 天回收期生命周期流转功能、交互流、开发任务与验收标准。实现瀑布流与紧凑列表切换；内存中按 isPinned 与 updatedAt 降序排版；归档视图提供常驻明确的“取消归档”恢复按钮（不单依赖短暂 Toast）；删除便签记录 previousStatus 并移入回收区，7 天内随时一键还原并精确恢复删除前状态（active 或 archived）；重复删除不重置 trashedAt 或 previousStatus；超过 7 天在侧边栏显示琥珀色红点，回收区顶部常驻超期提示横幅，提供清空超期与一键彻底清空按钮，经模态二次确认后物理删除；到期清理、还原与并发编辑版本冲突可见，永久删除后旧编辑不得复活；回收区页面停留跨到期自动标出待清理但不暗删。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-note-card-view",
+          "flow-note-card-actions",
+          "task-note-card-view",
+          "acceptance-note-card-view"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage"
+        ],
+        "goal": "负责便签流展示、归档与 7 天回收期生命周期流转功能、交互流、开发任务与验收标准。实现瀑布流与紧凑列表切换；内存中按 isPinned 与 updatedAt 降序排版；归档视图提供常驻明确的“取消归档”恢复按钮（不单依赖短暂 Toast）；删除便签记录 previousStatus 并移入回收区，7 天内随时一键还原并精确恢复删除前状态（active 或 archived）；重复删除不重置 trashedAt 或 previousStatus；超过 7 天在侧边栏显示琥珀色红点，回收区顶部常驻超期提示横幅，提供清空超期与一键彻底清空按钮，经模态二次确认后物理删除；到期清理、还原与并发编辑版本冲突可见，永久删除后旧编辑不得复活；回收区页面停留跨到期自动标出待清理但不暗删。",
+        "id": "work-item-feed-and-lifecycle"
+      },
+      "requiredBlockIds": [
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "task-note-card-view",
+        "acceptance-note-card-view"
+      ],
+      "startedAt": "2026-10-04T23:59:31.403Z",
+      "completedAt": "2026-10-05T00:01:46.595Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-0de8b2c8-03aa-4856-b57d-75fd2af09f42/result.json",
+      "outputHash": "03f0c03d3378a74220a7cfae9f7a1079a59a425a229afdbb4ad654218de49c11"
+    },
+    {
+      "id": "task-5e78b05b-0f63-4660-a5bd-2365b71b9679",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责多维标签聚合、触控交集过滤与全局重命名功能、交互流、开发任务与验收标准。侧边栏标签统计池严格排除回收区便签，便签移入回收区即时扣减，还原时加回；桌面端支持 Ctrl/Cmd 点击多标签开启交集（AND）过滤，移动端/触控屏幕提供“多选模式”开关，开启后直接触摸点选标签实现交集筛选；实现事务级标签全局原子重命名与失败回滚保护，对关联便签执行版本 CAS 更新。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-tag-organization",
+          "flow-tag-organization",
+          "task-tag-organization",
+          "acceptance-tag-organization"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage"
+        ],
+        "goal": "负责多维标签聚合、触控交集过滤与全局重命名功能、交互流、开发任务与验收标准。侧边栏标签统计池严格排除回收区便签，便签移入回收区即时扣减，还原时加回；桌面端支持 Ctrl/Cmd 点击多标签开启交集（AND）过滤，移动端/触控屏幕提供“多选模式”开关，开启后直接触摸点选标签实现交集筛选；实现事务级标签全局原子重命名与失败回滚保护，对关联便签执行版本 CAS 更新。",
+        "id": "work-item-tag-organization"
+      },
+      "requiredBlockIds": [
+        "feature-tag-organization",
+        "flow-tag-organization",
+        "task-tag-organization",
+        "acceptance-tag-organization"
+      ],
+      "startedAt": "2026-10-04T23:59:31.476Z",
+      "completedAt": "2026-10-05T00:01:16.549Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-5e78b05b-0f63-4660-a5bd-2365b71b9679/result.json",
+      "outputHash": "c894b7043c0df1bc6abbd39faf8ce65ed5b18a8031ab2d5fc7b5b749d4a1bf19"
+    },
+    {
+      "id": "task-ee9d240b-96e6-4fde-a0be-47a11e86d60d",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责即时全文模糊检索与高亮功能、交互流、开发任务与验收标准。实现 80ms 防抖的全文检索与关键词黄色 mark 高亮，连续正则特殊符号安全转义；统一性能口径为在 1,000 条混合便签基准下从击键起算含 80ms 防抖至 DOM 可见的 P95 <= 150ms；确立严格的检索作用域隔离：常规视图（全部/收藏/归档）检索严格排除回收区便签，回收区视图检索限定在回收区内部；支持快捷键 / 聚焦与 Esc 清空重置。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-search-filter",
+          "flow-search-filter",
+          "task-search-filter",
+          "acceptance-search-filter"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage"
+        ],
+        "goal": "负责即时全文模糊检索与高亮功能、交互流、开发任务与验收标准。实现 80ms 防抖的全文检索与关键词黄色 mark 高亮，连续正则特殊符号安全转义；统一性能口径为在 1,000 条混合便签基准下从击键起算含 80ms 防抖至 DOM 可见的 P95 <= 150ms；确立严格的检索作用域隔离：常规视图（全部/收藏/归档）检索严格排除回收区便签，回收区视图检索限定在回收区内部；支持快捷键 / 聚焦与 Esc 清空重置。",
+        "id": "work-item-search-filter"
+      },
+      "requiredBlockIds": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "task-search-filter",
+        "acceptance-search-filter"
+      ],
+      "startedAt": "2026-10-04T23:59:31.538Z",
+      "completedAt": "2026-10-05T00:01:29.677Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-ee9d240b-96e6-4fde-a0be-47a11e86d60d/result.json",
+      "outputHash": "1c244624d9d57718741d3111fc2ed34c9778546182a31f36d7355dc4abe75245"
+    },
+    {
+      "id": "task-9caceb3c-a74c-4271-b199-d17a1e96412c",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责便签详情模态展示与 Markdown 编辑功能、交互流、开发任务与验收标准。支持 Markdown 渲染、GFM 任务清单勾选与 Prism 代码块高亮及一键复制验收；明确提供【保存并退出】、【放弃修改】（存在未保存修改时弹出二次确认拦截对话框）与【继续编辑】，严禁所有关闭动作一律静默自动保存；回收区便签强制以只读模式展示并提供还原入口；编辑保存时必填 expectedRevision 并在同事务内 CAS 校验；多标签页并发编辑版本冲突时锁定弹窗并展示冲突告警，提供强制覆盖（再次 CAS）、放弃并重新加载最新版、另存为新便签（保留副本）三个选项；若发生替换导入导致 libraryGeneration 失效，拒绝陈旧保存；sessionStorage 草稿按 noteId 和 libraryGeneration 隔离，打开编辑器提示恢复/丢弃，提供独立的“导出当前未保存草稿”动作。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-note-detail-edit",
+          "flow-note-detail-edit",
+          "task-note-detail-edit",
+          "acceptance-note-detail-edit"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage"
+        ],
+        "goal": "负责便签详情模态展示与 Markdown 编辑功能、交互流、开发任务与验收标准。支持 Markdown 渲染、GFM 任务清单勾选与 Prism 代码块高亮及一键复制验收；明确提供【保存并退出】、【放弃修改】（存在未保存修改时弹出二次确认拦截对话框）与【继续编辑】，严禁所有关闭动作一律静默自动保存；回收区便签强制以只读模式展示并提供还原入口；编辑保存时必填 expectedRevision 并在同事务内 CAS 校验；多标签页并发编辑版本冲突时锁定弹窗并展示冲突告警，提供强制覆盖（再次 CAS）、放弃并重新加载最新版、另存为新便签（保留副本）三个选项；若发生替换导入导致 libraryGeneration 失效，拒绝陈旧保存；sessionStorage 草稿按 noteId 和 libraryGeneration 隔离，打开编辑器提示恢复/丢弃，提供独立的“导出当前未保存草稿”动作。",
+        "id": "work-item-detail-and-edit"
+      },
+      "requiredBlockIds": [
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "task-note-detail-edit",
+        "acceptance-note-detail-edit"
+      ],
+      "startedAt": "2026-10-05T00:01:16.629Z",
+      "completedAt": "2026-10-05T00:03:54.072Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-9caceb3c-a74c-4271-b199-d17a1e96412c/result.json",
+      "outputHash": "6c1dd4435759bac2156380cbe8b15013d5c674ed7a32b4a30cc960350a8ededa"
+    },
+    {
+      "id": "task-b7eb4250-246d-4aac-80e2-4c61e72dbd49",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责本地数据备份导出、恢复、回收区策略与温和防丢提醒功能、交互流、开发任务与验收标准。统一备份顶层协议版本键 schemaVersion: 1 与 BackupPayload 强类型契约，完整列明 appMeta、backupTracker、tags 及 notes 所有字段，导出与导入校验规则一致，自导出文件 100% 可自导入；落实回收区便签默认全量导出并提供【排除回收区便签】复选框，导入后超期便签即时激活提示横幅；全量覆盖导入在单原子 Dexie 事务中执行 clear、bulkAdd 与 meta 更新，失败全回滚；替换导入成功时单调更新本地 libraryGeneration 使旧编辑会话失效；追踪未备份变更数（超 20 条）与时间（超 7 天），侧边栏温和点亮状态小圆点与快捷导出入口；提供独立的“导出当前未保存草稿”动作，区分正式数据库备份与未保存草稿恢复。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "feature-data-portability",
+          "flow-data-portability",
+          "task-data-portability",
+          "acceptance-data-portability"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage"
+        ],
+        "goal": "负责本地数据备份导出、恢复、回收区策略与温和防丢提醒功能、交互流、开发任务与验收标准。统一备份顶层协议版本键 schemaVersion: 1 与 BackupPayload 强类型契约，完整列明 appMeta、backupTracker、tags 及 notes 所有字段，导出与导入校验规则一致，自导出文件 100% 可自导入；落实回收区便签默认全量导出并提供【排除回收区便签】复选框，导入后超期便签即时激活提示横幅；全量覆盖导入在单原子 Dexie 事务中执行 clear、bulkAdd 与 meta 更新，失败全回滚；替换导入成功时单调更新本地 libraryGeneration 使旧编辑会话失效；追踪未备份变更数（超 20 条）与时间（超 7 天），侧边栏温和点亮状态小圆点与快捷导出入口；提供独立的“导出当前未保存草稿”动作，区分正式数据库备份与未保存草稿恢复。",
+        "id": "work-item-data-portability"
+      },
+      "requiredBlockIds": [
+        "feature-data-portability",
+        "flow-data-portability",
+        "task-data-portability",
+        "acceptance-data-portability"
+      ],
+      "startedAt": "2026-10-05T00:01:23.087Z",
+      "completedAt": "2026-10-05T00:03:13.418Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-b7eb4250-246d-4aac-80e2-4c61e72dbd49/result.json",
+      "outputHash": "596d35eebe94f89eab9fb435eb82109fe772657fe03cdaa51d5367932ae06985"
+    },
+    {
+      "id": "task-4a530025-eee3-418e-92ef-92dff326340b",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。\n本登记范围：负责静态构建打包部署规范、全量构建任务、存储与检索性能交付验证任务及显式移除重复验证块。明确运行于 HTTP/HTTPS 安全上下文（如 localhost 或静态托管），首版不支持免服务器 file:// 运行；区分已打开离线使用与脱机冷重启，不写未验证的 100% 离线冷重启保证；显式移除重复的性能验证块 val-browser-storage-and-search-perf；理顺可执行任务依赖，task-build-and-deploy 严格依赖所有业务实现任务，val-storage-and-search-benchmark 依赖全量构建产物；统一冷启动口径（导航起始至首屏可交互 <= 1.0s）与检索性能口径（1000 条种子数据 nearest-rank P95 <= 150ms 含 80ms 防抖）；真实浏览器前台测量，若当前环境不可实测标为未验证开发任务（unexecuted）并说明影响与修复路径。",
+      "dependsOn": [
+        "task-7d972ece-9dfa-4c3b-8947-bb58509bc937",
+        "task-b65ac1bc-ef09-4ab2-8706-7d310c4ee6d2",
+        "task-0de8b2c8-03aa-4856-b57d-75fd2af09f42",
+        "task-5e78b05b-0f63-4660-a5bd-2365b71b9679",
+        "task-ee9d240b-96e6-4fde-a0be-47a11e86d60d",
+        "task-9caceb3c-a74c-4271-b199-d17a1e96412c",
+        "task-b7eb4250-246d-4aac-80e2-4c61e72dbd49"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "1170c779e090b8f51216f663c0b3f7968a2fca2cdcc8ef91df4eea574e0932bf",
+      "inputRefs": [],
+      "partition": {
+        "blockIds": [
+          "deployment-and-build-specification",
+          "task-build-and-deploy",
+          "acceptance-build-and-deploy",
+          "val-storage-and-search-benchmark",
+          "acceptance-storage-and-search-benchmark",
+          "val-browser-storage-and-search-perf"
+        ],
+        "dependsOn": [
+          "work-item-tech-and-storage",
+          "work-item-quick-capture",
+          "work-item-feed-and-lifecycle",
+          "work-item-tag-organization",
+          "work-item-search-filter",
+          "work-item-detail-and-edit",
+          "work-item-data-portability"
+        ],
+        "goal": "负责静态构建打包部署规范、全量构建任务、存储与检索性能交付验证任务及显式移除重复验证块。明确运行于 HTTP/HTTPS 安全上下文（如 localhost 或静态托管），首版不支持免服务器 file:// 运行；区分已打开离线使用与脱机冷重启，不写未验证的 100% 离线冷重启保证；显式移除重复的性能验证块 val-browser-storage-and-search-perf；理顺可执行任务依赖，task-build-and-deploy 严格依赖所有业务实现任务，val-storage-and-search-benchmark 依赖全量构建产物；统一冷启动口径（导航起始至首屏可交互 <= 1.0s）与检索性能口径（1000 条种子数据 nearest-rank P95 <= 150ms 含 80ms 防抖）；真实浏览器前台测量，若当前环境不可实测标为未验证开发任务（unexecuted）并说明影响与修复路径。",
+        "id": "work-item-build-deploy-and-benchmark"
+      },
+      "requiredBlockIds": [
+        "deployment-and-build-specification",
+        "task-build-and-deploy",
+        "acceptance-build-and-deploy",
+        "val-storage-and-search-benchmark",
+        "acceptance-storage-and-search-benchmark",
+        "val-browser-storage-and-search-perf"
+      ],
+      "startedAt": "2026-10-05T00:03:54.126Z",
+      "completedAt": "2026-10-05T00:06:34.670Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-4a530025-eee3-418e-92ef-92dff326340b/result.json",
+      "outputHash": "23ebe80bb9006bbcee26b66614307beb9381e950e8023554d05daa7a97098016"
+    }
+  ],
+  "createdAt": "2026-10-04T23:48:04.734Z",
+  "updatedAt": "2026-10-05T00:06:34.677Z",
+  "pendingQuestions": [],
+  "nextEventSeq": 46,
+  "progressSignatures": [],
+  "deferredQuestions": [],
+  "unfinishedBlockIds": [],
+  "error": "拆分证据 ID 内容冲突：evidence-user-input-verified"
+}

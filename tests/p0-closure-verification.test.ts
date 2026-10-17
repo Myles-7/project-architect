@@ -278,7 +278,10 @@ describe('P0 Closure Verification Suite (All 6 P0 Issues Addressed)', () => {
       s0.metadata.stateRevision
     );
 
-    const candidates = updated.decisions.items.filter((d) => d.status === 'candidate');
+    const initialIdea = updated.decisions.items.find((decision) => decision.id === s0.decisions.items[0]!.id);
+    expect(initialIdea?.status).toBe('candidate');
+    expect(initialIdea?.confirmedBy).toBeUndefined();
+    const candidates = updated.decisions.items.filter((d) => d.status === 'candidate' && !s0.decisions.items.some((initial) => initial.id === d.id));
     expect(candidates.length).toBe(3);
 
     // None should be in 'discovery'
@@ -300,7 +303,7 @@ describe('P0 Closure Verification Suite (All 6 P0 Issues Addressed)', () => {
   // ==========================================================================
   // P0-5: Readiness 8-Area Alignment, BasisRevision Invalidation & Zero Bonus for Assumptions
   // ==========================================================================
-  it('P0-5: Enforces 8 canonical areas, resets approval on state changes, and eliminates assumption score bonuses', async () => {
+  it('P0-5: Historical readiness retains 8 areas without score bonuses or retired approvals', async () => {
     const projectPath = join(tempBaseDir, 'p0-readiness');
     const { snapshot: s0 } = await stateEngine.createProject({
       projectPath,
@@ -330,34 +333,13 @@ describe('P0 Closure Verification Suite (All 6 P0 Issues Addressed)', () => {
     // Active assumptions must NEVER raise the readiness score!
     expect(proj1.score).toBeLessThanOrEqual(projNoAsm.score);
 
-    // 3. Stale Approval Invalidation: User approves with acknowledged issues on rev 1
-    const openGaps = s0.gaps.gaps.filter((g) => g.status === 'open');
-    await stateEngine.setUserDisposition(
-      projectPath,
-      'approved-with-known-issues',
-      1,
-      { knownIssues: openGaps.map((g) => `gap:${g.id}`) }
-    );
-    const snapApproved = await stateEngine.getSnapshot(projectPath);
-    expect(snapApproved.readiness.current.userDisposition).toBe('approved-with-known-issues');
-    expect(snapApproved.readiness.current.basisRevision).toBe(1);
+    // Historical readiness cannot become a current authorization through retired writes.
+    await expect(stateEngine.setUserDisposition(projectPath, 'approved-with-known-issues', 1)).rejects.toMatchObject({ code: 'LEGACY_WORKFLOW_RETIRED' });
+    await expect(stateEngine.evaluateReadiness(projectPath, 1)).rejects.toMatchObject({ code: 'LEGACY_WORKFLOW_RETIRED' });
+    const saved = await stateEngine.getSnapshot(projectPath);
+    expect(saved.metadata.stateRevision).toBe(1);
+    expect(saved.readiness.current.userDisposition).toBe('pending');
 
-    // Next, mutate project with a new decision (current revision is 2, becomes 3)
-    const snapMutated = await stateEngine.addDecision(
-      projectPath,
-      'target_user',
-      'Enterprise platform engineers',
-      snapApproved.metadata.stateRevision,
-      'confirmed'
-    );
-    expect(snapMutated.metadata.stateRevision).toBe(3);
-
-    // Re-evaluate readiness on revision 3
-    const reevaluated = await stateEngine.evaluateReadiness(projectPath, 3);
-
-    // The user disposition must be automatically reset to 'pending' because project was mutated after approval!
-    expect(reevaluated.readiness.current.userDisposition).toBe('pending');
-    expect(reevaluated.readiness.current.basisRevision).toBe(3);
   });
 
   // ==========================================================================

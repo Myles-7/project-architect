@@ -121,6 +121,10 @@ describe('Product Hardening Phase 5: Readiness & Document Delivery Trust', () =>
 
       // Add decisions for all 8 core areas
       let snap = await stateEngine.loadProject(projectPath);
+      const initialIdea = snap.decisions.items.find((decision) => decision.statement === 'Full specification for stale test');
+      expect(initialIdea?.status).toBe('candidate');
+      snap = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, snap.metadata.stateRevision);
+      expect(snap.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
       for (const area of CORE_DISCOVERY_AREA_IDS) {
         snap = await stateEngine.addDecision(
           projectPath,
@@ -131,9 +135,12 @@ describe('Product Hardening Phase 5: Readiness & Document Delivery Trust', () =>
         );
       }
 
-      // 2. Run readiness review and approve
-      snap = await stateEngine.evaluateReadiness(projectPath, snap.metadata.stateRevision);
-      snap = await stateEngine.setUserDisposition(projectPath, 'approved', snap.metadata.stateRevision);
+      // Persist a historical fixture directly; retired readiness APIs cannot publish it.
+      snap.metadata.stage = 'approved';
+      snap.readiness.current!.userDisposition = 'approved';
+      snap.readiness.current!.basisRevision = snap.metadata.stateRevision;
+      await stateEngine['commitManager'].commit(projectPath, snap.metadata.stateRevision + 1, { metadata: snap.metadata, readiness: snap.readiness });
+      snap = await stateEngine.getSnapshot(projectPath);
 
       expect(snap.metadata.stage).toBe('approved');
       expect(snap.readiness.current.userDisposition).toBe('approved');
@@ -168,7 +175,7 @@ describe('Product Hardening Phase 5: Readiness & Document Delivery Trust', () =>
       const genRes = await fetch(`${baseUrl}/api/projects/${projId}/documents/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expectedRevision: snap.metadata.stateRevision }),
+        body: JSON.stringify({ expectedRevision: snap.metadata.stateRevision, operationId: 'historical-approval-is-not-planning' }),
       });
       expect(genRes.status).toBe(422);
     });
@@ -252,6 +259,10 @@ describe('Product Hardening Phase 5: Readiness & Document Delivery Trust', () =>
       });
 
       let snap = await stateEngine.loadProject(projectPath);
+      const initialIdea = snap.decisions.items.find((decision) => decision.statement === 'Verified document delivery with exactly 8 core documents');
+      expect(initialIdea?.status).toBe('candidate');
+      snap = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, snap.metadata.stateRevision);
+      expect(snap.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
       for (const area of CORE_DISCOVERY_AREA_IDS) {
         snap = await stateEngine.addDecision(
           projectPath,
@@ -269,12 +280,13 @@ describe('Product Hardening Phase 5: Readiness & Document Delivery Trust', () =>
       expect(coreDocs).toHaveLength(8);
       expect(coreDocs[0].title).toBe('AGENTS.md');
 
-      // Compile documents
-      snap = await stateEngine.evaluateReadiness(projectPath, snap.metadata.stateRevision);
-      snap = await stateEngine.setUserDisposition(projectPath, 'approved', snap.metadata.stateRevision);
+      // Render the historical fixture in memory. Saved-file export remains compatible.
+      snap.metadata.stage = 'approved'; snap.readiness.current!.userDisposition = 'approved'; snap.readiness.current!.basisRevision = snap.metadata.stateRevision;
 
       const compiler = new DocumentCompiler(storage);
-      const compileRes = await compiler.compile(projectPath, snap);
+      const compileRes = await compiler.compile(projectPath, snap, undefined, false);
+      for (const file of compileRes.renderedFiles) await storage.writeText(join(projectPath, file.path), file.content);
+      await storage.writeJson(join(projectPath, 'documents', 'manifest.json'), compileRes.manifest);
 
       expect(compileRes.manifest.documents.length).toBeGreaterThanOrEqual(8);
       expect(compileRes.manifest.sourceCoverage).toBeDefined();

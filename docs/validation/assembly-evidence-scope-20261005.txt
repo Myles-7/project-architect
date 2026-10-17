@@ -1,0 +1,55 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ✓ apps/server/tests/planning-draft-revision.test.ts (30 tests) 16235ms
+   ✓ revises an unapproved first product through HTTP, keeps the source candidate and never approves it  998ms
+   ✓ never unlocks or overwrites a locked formal block while revising a pending feedback source  1440ms
+   ✓ rejects a approved source without saving new feedback  454ms
+   ✓ rejects a rejected source without saving new feedback  359ms
+   ✓ does not ignore unrelated input when retrying an interrupted prepared start  659ms
+   ✓ freezes only pending groups of a partial approval and preserves the approved prefix as Core facts  877ms
+   ✓ atomically carries only the source manual pending lock intent to the same stable block through Core  958ms
+   ✓ continues a cancelled draft revision from its frozen candidate after server restart  875ms
+   ✓ refuses changed frozen source on restart without accepting it or calling a Provider  437ms
+   ✓ refuses missing frozen source on restart without accepting it or calling a Provider  458ms
+   ✓ recovers a start interrupted after feedback commit by replaying its exact operation once  812ms
+   ✓ retains the latest revised candidate and its frozen source across a question answer and server restart  1114ms
+   ✓ exposes no pending proposal before its inherited lock intent and trace commit, including an approval race  614ms
+   ✓ handles EIO before the atomic proposal commit without publishing a lockless draft  464ms
+   ✓ handles EIO after the atomic proposal commit without publishing a lockless draft  501ms
+   ✓ refuses changed-source at the Core revision boundary without writes  401ms
+   ✓ refuses changed-reference at the Core revision boundary without writes  410ms
+   ✓ refuses provider-lock at the Core revision boundary without writes  373ms
+   ✓ refuses a source edited after capture rather than accepting its formerly matching reference  489ms
+   ✓ resumes a failed atomic Runtime proposal without leaving an earlier lockless pending package  996ms
+   ✓ rechecks its frozen source before a transient Provider retry and rejects the altered bytes  533ms
+ ✓ apps/server/tests/planning-assembly-evidence.test.ts (5 tests) 12ms
+ ✓ apps/server/tests/planning-partition.test.ts (30 tests) 24281ms
+   ✓ Registered recovery from actual Provider output limits > splits the failed authoring task, assembles all validated fragments and preserves draft authority  1227ms
+   ✓ Registered recovery from actual Provider output limits > restarts only the failed slice and keeps successful results, receipts and the original failed schema unchanged  1236ms
+   ✓ Registered recovery from actual Provider output limits > resumes a legal old support receipt into a new role-filtered assembly without changing source bytes or hashes  1287ms
+   ✓ Registered recovery from actual Provider output limits > preserves an old unversioned assembly containing legal legacy support groups (missing receipt=false)  1237ms
+   ✓ Registered recovery from actual Provider output limits > preserves an old unversioned assembly containing legal legacy support groups (missing receipt=true)  1199ms
+   ✓ Registered recovery from actual Provider output limits > prevents assembly delivery after cancel while child work is running  683ms
+   ✓ Registered recovery from actual Provider output limits > prevents assembly delivery after basis-change while child work is running  875ms
+   ✓ Registered recovery from actual Provider output limits > offers four valid slice questions in two batches and continues after all answers without discarding any  1536ms
+   ✓ Registered recovery from actual Provider output limits > restores assembly provenance from the receipt after an interrupted run metadata write  920ms
+   ✓ Registered recovery from actual Provider output limits > retains the unfinished registered scope through user answers and automatically repairs an otherwise covered draft that omits it  1265ms
+   ✓ Registered recovery from actual Provider output limits > preserves the pending modify of a formal block through an unanswered slice and carries its legal candidate intent into answer continuation  1356ms
+   ✓ Registered recovery from actual Provider output limits > preserves the pending delete of a formal block through an unanswered slice and carries its legal candidate intent into answer continuation  1357ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds an assembly from source receipts after result writing and before receipt writing (complete orphan)  929ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds an assembly from source receipts after result writing and before receipt writing (truncated orphan)  845ms
+   ✓ Registered recovery from actual Provider output limits > blocks final delivery when a later complete revision drops registered modifications and removals of formal blocks  905ms
+   ✓ Registered recovery from actual Provider output limits > still rejects a Provider result whose receipt is missing instead of treating it as a recoverable assembly  614ms
+   ✓ Registered recovery from actual Provider output limits > shows a deferred fourth question with a valid reopen reason even when its topic has an earlier answer  1464ms
+   ✓ Registered recovery from actual Provider output limits > requires an explicit candidate action for a registered formal-block modify in initial design splitting without a base candidate  979ms
+   ✓ Registered recovery from actual Provider output limits > requires an explicit candidate action for a registered formal-block delete in initial design splitting without a base candidate  904ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (none interruption)  1206ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (after-reference interruption)  1199ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (after-cleanup interruption)  1048ms
+
+ Test Files  3 passed (3)
+      Tests  65 passed (65)
+   Start at  08:12:59
+   Duration  25.95s (transform 767ms, setup 0ms, collect 3.24s, tests 40.53s, environment 0ms, prepare 283ms)
+

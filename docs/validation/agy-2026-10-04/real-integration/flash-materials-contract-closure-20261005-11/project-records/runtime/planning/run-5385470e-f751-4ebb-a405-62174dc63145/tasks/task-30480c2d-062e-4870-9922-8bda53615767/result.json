@@ -1,0 +1,386 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "R4 自动质量验收反馈依据：纠正原生事件重定向无依据保证、补齐伪代码变量定义与组装、落实输入框五类持久属性复制与瞬态重置",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。仅修订 flash-materials-final-20261004-01 的最新已批准 source32 / quality-reviewed-r4；原项目仍未开发。本轮三项阻塞来自真实导出内容的静态/合成复核。保留30个稳定块ID、29条基线历史证据完整对象、其余已正确的300ms输入/即时单按钮清空/手动删空/原文保留/失败恢复/textContent/defer-IIFE/端口8080/安装前提/十文件/全部DAG边和五轮均值<=50ms调度代理指标。只改关联内容及字段，不重新设计无关功能，不运行不可用Docker。\n\nR4-B1：blk-deliv-val-standalone-runtime.task.failureBehavior声称旧原生compositionend若重定向到新节点，generation guard会拒绝，这不成立。对新节点派发时currentTarget、active node、bornGeneration、连接检查全部匹配。删除该保证和“极其罕见”的无依据频率判断，所有投影保持一致。合成隔离保证限于旧节点/旧闭包；原生会话终结、重定向、真实焦点/辅助技术保持unexecuted。开发验证须记录Chrome/Edge/Firefox与Safari适用版本、操作系统、IME、原始事件日志；出现重定向/新会话被结束先修订清空策略及回归，不自造原生token、永久隔离、自动通过或全部浏览器竞态保证。\n\nR4-B2：blk-tech-interface完整JavaScript fence没有FeedbackBanner、displayElement、errorContainer的声明/注入/具体装配，正常timer及catch都会ReferenceError；模块方法列表getInputText/setInputText与实际返回API也不符。请明确实际DOM引用、AppController初始化顺序、FeedbackBanner具体方法签名及呈现/清除错误规则；每个使用的变量均定义或通过显式参数注入。可以采用小的初始化工厂并引用安全textContent renderer；完整伪代码应内部自洽，可以仅用明确浏览器DOM/定时器依赖装配。getInputText/setInputText若不是必要公开能力可从方法列表移除，或真正定义其与accepted draft/generation/定时器的一致性，不能只声明未实现。保留已有正确node闭包、capturedDraft、schedulerEpoch、stale callback拒绝及300ms逻辑。该代码是开发规范，合成核验不能称目标应用真实实现已测试。\n\nR4-B3：replaceInputNode仅复制id/name/class/placeholder/aria-label，但flow/acceptance要求全部持久DOM属性与无障碍配置保留，实际丢aria-describedby/aria-required/tabindex/style/data-test。采用明确安全的持久配置复制/clone策略，覆盖label关联、ARIA、tabindex、style及data属性；单独重置value/trustedDraft、瞬态aria-invalid和错误状态、重绑闭包监听与明确焦点行为。保留原属性保留验收，不能删掉要求迎合旧代码。给出这五类配置前后精确断言；实际布局、屏幕阅读器与原生焦点仍待实测。同步相关flow/page/data/interface/error/task全部字段/validation/acceptance；避免正文属性全保留而伪代码仍白名单。\n\n独立review核对三项与其余正确内容保留，普通细节由AI决定，生成待批准修订包。经公开Core脚本审批/新compiler导出仅自动验收，真人审阅pending。保留旧收据、旧产物与原证据；新证据另登记，不用相同ID覆写旧记录。",
+      "hash": "d6b41906e732983af973864801e3783ec129ff0309ac3bcbdbb839aa03567244",
+      "id": "evidence-17569c8c-1012-4071-8ebe-936b5fe286db",
+      "kind": "user",
+      "location": "input:5cc495c6-96a8-4442-8f77-668749156b46",
+      "obtainedAt": "2026-10-05T00:22:12.095Z",
+      "outcome": "not-applicable",
+      "source": "input:5cc495c6-96a8-4442-8f77-668749156b46"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "提供一键清空与重置功能，帮助用户在完成一轮项目名核对后快速复位界面，通过“清空时替换输入节点＋节点代际闭包隔离＋持久配置安全复制”实现物理级事件解耦、防抖取消与属性保真：\n- 节点替换与代际递增机制：\n  * 用户点击清空按钮时，系统第一优先级调用 DebounceScheduler.cancel() 递增 schedulerEpoch 并销毁排队中的定时器；\n  * 同步递增全局代际 inputGeneration（如由 1 递增至 2）；\n  * 创建全新 input 元素并采用持久配置复制策略，完整保留 5 类持久配置：1. label 关联属性（id, name）；2. ARIA 无障碍属性（aria-label, aria-describedby, aria-required 等全部持久 ARIA 配置）；3. 键盘导航属性（tabindex）；4. 表现样式属性（class 类名与 style 内联样式）；5. 测试与自定义属性（data-* 属性，如 data-test）；\n  * 单独重置瞬态与编辑状态：重置 value = ''、trustedDraft = ''，显式过滤并移除瞬态校验属性 aria-invalid 与错误高亮；\n  * 为新节点闭包绑定全新的 bornGeneration（等于递增后的 inputGeneration）、专属 isComposing=false 与 trustedDraft=''；\n  * 执行 oldNode.replaceWith(newNode) 将旧节点移出当前文档 DOM 树，将 activeInputNode 指向新节点并自动执行 activeInputNode.focus()；\n  * 顶部展示区同步复位为预设占位文字（'【等待输入核对】'），任何正在显示的错误警示被销毁移除。\n- 旧节点迟到事件隔离保护：\n  * 输入法引擎或浏览器事件循环派发迟到的旧 compositionend、beforeinput 或尾随 input 事件时，由于事件目标为脱离文档的 oldNode，且其闭包中 bornGeneration !== inputGeneration 且 node !== activeInputNode，事件直接在闭包入口被拦截返回；\n  * 旧事件完全无法触及 activeInputNode，绝不发生将旧文字写回新输入框、抹除新草稿或误触发空值报错的反例；\n  * 不把强制重写新 DOM value 作为拒绝旧事件手段，旧节点与其私有状态随 GC 自然回收。\n- 新真实输入无障碍流转：\n  * 新节点已就绪并处于 DOM 活跃状态，用户在新输入框中直接敲击物理按键、粘贴文本或启动新的拼音输入法合成，均在新闭包与新代际中正常监听，直接流转 300ms 防抖调度，无需任何额外物理按键解锁；\n  * 清空操作具备绝对抢占优先级与幂等性，连续多次点击清空保持节点同步复位，绝不产生异常或错误提示；实际屏幕阅读器朗读与原生焦点流转待真机实测验证。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-feat-reset",
+          "kind": "feature",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "product",
+          "title": "功能特性：一键即时清空、节点物理替换与持久配置保留契约"
+        },
+        {
+          "content": "1. 用户点击底部橙色圆形清空按钮（resetButton）。\n2. 执行 ResetController.handleReset() 核心复位流程：\n   a. 第一优先级调用 DebounceScheduler.cancel()：清除当前排队的 pendingTimerId，递增 schedulerEpoch 使任何已进入宏任务队列的旧定时器回调彻底失效；\n   b. 递增全局代际计数：inputGeneration++；\n   c. 记录旧节点引用 const oldNode = activeInputNode;；\n   d. 实例化全新输入元素：const newNode = document.createElement('input');；\n   e. 采用持久配置复制策略完整保留配置并重置瞬态状态：遍历 oldNode.attributes，安全复制所有持久属性，覆盖：1. label 关联属性（id, name）；2. ARIA 属性（aria-label, aria-describedby, aria-required 等全部 ARIA 属性）；3. tabindex 键盘导航；4. class 表现类名与 style 内联样式；5. data-* 自定义测试属性；过滤排除 value 属性及瞬态校验属性 aria-invalid；显式设置 newNode.type = 'text'; newNode.value = '';；\n   f. 调用 InputController.bindInputNode(newNode, inputGeneration) 为新节点完成专属闭包事件监听绑定（传入当前代际作为 bornGeneration，初始化私有 isComposing=false 与 trustedDraft=''）；\n   g. 执行 DOM 物理节点替换：oldNode.replaceWith(newNode);；\n   h. 更新全局引用：activeInputNode = newNode;；\n   i. 将顶部展示区复位为灰字占位符：DisplayRenderer.renderPlaceholder(displayElement, '【等待输入核对】');；\n   j. 移除可见的校验错误 DOM 节点并清除边框高亮样式：FeedbackBanner.clearInputError(activeInputNode, errorContainer);；\n   k. 调用 InputController.focusInput()（执行 activeInputNode.focus()）确保键盘输入焦点停留在新输入框内。\n3. 旧节点迟到事件隔离拦截：\n   - 若在重置完成后，输入法或浏览器向 oldNode 派发迟到的 compositionend、beforeinput 或 input 事件；\n   - 事件触发 oldNode 对应的旧闭包函数，守卫执行 if (e.currentTarget !== node || node !== activeInputNode || bornGeneration !== inputGeneration || !document.body.contains(node)) return;；\n   - 由于 node !== activeInputNode（oldNode !== newNode）且 bornGeneration !== inputGeneration，守卫立即直接 return；\n   - 旧事件完全不执行任何逻辑，不修改 activeInputNode.value，不调度防抖，不修改新节点组合状态。\n4. 新输入顺畅恢复：\n   - 用户在 activeInputNode 中键入字符、粘贴或启动新输入法合成，新节点的闭包正常匹配 bornGeneration === inputGeneration，正常流转 300ms 防抖倒计时与结果展示。\n5. 流程结束，界面完全处于干净就绪态。",
+          "dependsOn": [
+            "blk-feat-reset"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-flow-reset",
+          "kind": "flow",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "title": "交互流程：清空重置、DOM节点替换与持久属性复制流转"
+        },
+        {
+          "content": "本地单页面原型核对视图（Single Page View），基于 fixture.png 原生像素结构并在删除确认按钮后映射布局，并规范节点物理替换时的页面保真：\n1. 视觉底色：纯白底色（#FFFFFF）清爽背景，无多余装饰纹理；\n2. 顶部展示区域：映射 fixture.png 上方“Q7M4-8261”视觉层级与相对空间位置，作为核对结果大字展示区（初始显示灰色占位文字，300ms 防抖完成后以高对比黑色大字显示，支持 word-break: break-all 换行防撑破）；\n3. 底部操作区域：依据已批准决策彻底移除原 fixture.png 左下蓝色矩形色块（确认按钮已删除），仅保留映射右下方橙色圆形色块的橙色实心圆形【清空】操作按钮（底色 #FF5500）；\n4. 输入表单区域：在桌面端位于展示区与底部清空按钮区之间居中排布，提供单行文本输入框；在清空触发输入框节点替换（replaceWith）时，采用持久配置复制策略严格保持 5 类配置：1. label 关联（id, name）；2. ARIA 属性（aria-label, aria-describedby, aria-required 等全部 ARIA 属性）；3. tabindex 键盘导航；4. 表现样式（class 类名与 style 内联样式）；5. 自定义测试属性（data-* 属性）完全不变，仅重置 value 与瞬态校验状态 aria-invalid，避免界面发生跳动或焦点迷失，实际布局与辅助技术表现待开发验证真机实测；\n5. 状态覆盖：涵盖就绪初始态（占位灰字）、防抖等待态（草稿输入中/IME选词中）、清空节点替换就绪态（新输入框已就绪回焦，旧节点解耦移出）、正常核对态（大字黑色显示）、错误提示态（红字就地显示）、异常防护态（顶部横幅警示）与纯离线本地加载态。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-page-main-layout",
+          "kind": "page",
+          "requirementIds": [
+            "blk-prod-scope"
+          ],
+          "stage": "product",
+          "title": "页面职责与参考图空间结构映射（节点物理替换与五类持久属性保留）"
+        },
+        {
+          "content": "Scenario 1: 正常即时清空复位、节点替换与回焦\nGiven 顶部展示区正在展示 'Project-Test'，输入框包含 'Project-Test'，界面无错误\nWhen 用户点击底部橙色清空按钮\nThen 页面不弹出任何二次确认框，旧输入框被新 input 节点物理替换（DOM replaceWith），新节点 value 为空字符串 ''，新节点完整继承持久配置（id 为 'project-name-input'，name 为 'projectName'，aria-label 为 '项目名输入'），顶部展示区立即恢复为灰色占位文本 '【等待输入核对】'，输入焦点自动停留在新输入框内。\n\nScenario 2: 防抖倒计时中清空彻底取消异步任务\nGiven 用户刚键入 'New-Test'，当前处于 100 毫秒计时窗口\nWhen 用户点击清空按钮\nThen 调度纪元 schedulerEpoch 递增，输入框被替换复位，定时器被销毁，等待 500 毫秒后查验展示区依然保持 '【等待输入核对】'，无任何旧文字回显。\n\nScenario 3: 清除历史错误提示与瞬态 aria-invalid\nGiven 页面因前次操作正在显示 '项目名不能为空，请输入有效字符' 红色警告，输入框带有 aria-invalid='true'\nWhen 用户点击清空按钮\nThen 红色警告提示立刻从 DOM 移除，新输入框不含有 aria-invalid 属性，输入框错误高亮取消，页面恢复至干净初始态。\n\nScenario 4: 空页面重复点击清空幂等性与节点持续可用\nGiven 页面处于初始空白状态\nWhen 用户连续多次点击清空按钮\nThen 页面无任何异常抛出，节点依次正常替换，展示区保持占位提示，当前活跃输入框持续保持聚焦状态，不产生任何空值错误。\n\nScenario 5: 清空替换后五类持久属性与无障碍配置完整保留精确断言\nGiven 输入框具有完整持久配置：label 关联（id='project-name-input', name='projectName'）、ARIA 属性（aria-label='项目名输入', aria-describedby='project-input-help', aria-required='true'）、键盘导航（tabindex='0'）、样式表现（class='input-control active', style.borderWidth='2px'）、自定义测试属性（data-test='project-input'），且因前次校验失败带有瞬态属性 aria-invalid='true' 与可见错误提示\nWhen 用户点击清空按钮触发 node.replaceWith(newNode) 物理替换\nThen 新 input 节点具有以下 6 项精确断言：\n1. label 关联保持：newNode.id === 'project-name-input' && newNode.name === 'projectName'；\n2. ARIA 配置保持且瞬态重置：newNode.getAttribute('aria-label') === '项目名输入' && newNode.getAttribute('aria-describedby') === 'project-input-help' && newNode.getAttribute('aria-required') === 'true'，而瞬态 newNode.hasAttribute('aria-invalid') 为 false；\n3. 键盘导航保持：newNode.tabIndex === 0 && newNode.getAttribute('tabindex') === '0'；\n4. 样式表现保持：newNode.className === 'input-control active' && newNode.style.borderWidth === '2px'；\n5. data-* 属性保持：newNode.dataset.test === 'project-input' && newNode.getAttribute('data-test') === 'project-input'；\n6. 状态重置与回焦：newNode.value === ''，旧节点闭包隔离失效，document.activeElement === newNode。",
+          "dependsOn": [
+            "blk-flow-reset"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-acc-reset",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "title": "验收标准：清空重置、节点替换与五类持久属性保留精确断言 Given-When-Then"
+        },
+        {
+          "content": "客户端运行时采用单向流动的纯内存数据模型，不使用任何本地持久化存储（如 LocalStorage、IndexedDB），确保单次测试独立且不污染后续测试：\n1. 校验判定结构体（ValidationResult）：\n   - isValid: boolean（是否通过非空规则校验）；\n   - errorMessage: string | null（未通过时提示文案，例如 '项目名不能为空，请输入有效字符'；通过为 null）。\n2. 全局运行时状态模型（AppState）：\n   - activeInputNode: HTMLInputElement | null（当前活跃在 DOM 树中的输入框元素引用，初始为页面加载时的 input 节点）；\n   - inputGeneration: number（单调递增的输入节点代际计数器，初始为 1；每次清空替换节点时自增 1）；\n   - schedulerEpoch: number（单调递增的防抖调度纪元计数器，初始为 0；每次 schedule 替代、cancel、clear 时自增 1）；\n   - pendingTimerId: number | null（当前活跃的 300ms 防抖定时器句柄，无排队任务时为 null）；\n   - projectName: string | null（当前已核对并在顶部大字展示的项目名，初始态为 null）；\n   - validationError: string | null（当前挂载在输入框下方的错误信息，无错误时为 null）；\n   - placeholderText: string（顶部展示区在初始、清空或空值态下的灰字占位符，常量定义为 '【等待输入核对】'）；\n   - persistentAttributesSnapshot: Map<string, string>（节点持久配置映射集合，包含 label 关联 id/name、ARIA、tabindex、style/class 与 data-* 属性；瞬态 aria-invalid 不计入持久属性）。\n3. 节点闭包私有上下文模型（NodeClosureContext）：\n   - node: HTMLInputElement（当前闭包绑定的输入框节点引用）；\n   - bornGeneration: number（当前节点诞生时的代际编号，不可变常量）；\n   - isComposing: boolean（当前节点私有的中文输入法合成状态标记，初始为 false）；\n   - trustedDraft: string（当前节点已接受的受信任草稿文本，初始为空字符串 ''）。\n4. 状态转换路径：\n   - [初始态 就绪]：inputGeneration=1, schedulerEpoch=0, pendingTimerId=null, projectName=null, validationError=null -> 展示区呈现灰字占位符，activeInputNode 聚焦等待；\n   - [普通输入录入]：核验 e.currentTarget === node && node === activeInputNode && bornGeneration === inputGeneration，更新 trustedDraft=node.value，调用 schedule(trustedDraft, node, bornGeneration, ...)，schedulerEpoch++，pendingTimerId 激活 300ms 倒计时；\n   - [IME 合成中]：触发 compositionstart，核验通过后置闭包私有 isComposing=true，调用 cancel()（schedulerEpoch++，pendingTimerId=null）挂起防抖定时器；\n   - [IME 选词上屏]：触发 compositionend，核验通过后置闭包私有 isComposing=false，更新 trustedDraft=node.value，调用 schedule(trustedDraft, node, bornGeneration, ...) 重新启动 300ms 倒计时；\n   - [清空重置触发]：用户点击清空 -> 立即调用 clearTimeout(pendingTimerId), pendingTimerId=null, schedulerEpoch++, inputGeneration++, 创建新节点 newNode（安全复制 5 类持久属性，重置 value='', trustedDraft='', 移除瞬态 aria-invalid）, oldNode.replaceWith(newNode), activeInputNode=newNode, projectName=null, validationError=null -> 展示区恢复灰字占位符，光标自动回焦 newNode；\n   - [旧节点迟到事件到达]：派发至 oldNode，其闭包核查 bornGeneration !== inputGeneration 或 node !== activeInputNode，立即 return 丢弃，完全无法接触 activeInputNode，不制造空值错误；\n   - [300ms 到期且非空]：定时器唤醒核查 thisEpoch === schedulerEpoch && targetGeneration === inputGeneration，ValidatorModule 对草稿快照 draftSnapshot 校验通过 -> projectName=draftSnapshot, validationError=null, pendingTimerId=null -> 展示区呈现黑色大字，输入框内容完好保留；\n   - [300ms 到期且空值]：对草稿快照 draftSnapshot 校验未通过 -> validationError='项目名不能为空，请输入有效字符', projectName=null, pendingTimerId=null -> 展示区恢复灰字占位符（彻底清除旧项目名结果），输入框原样保留既有输入（含空格）。",
+          "dependsOn": [
+            "blk-tech-module"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-tech-data-model",
+          "kind": "data_model",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "客户端运行时数据模型与状态结构规范（节点代际、调度纪元与持久配置模型）"
+        },
+        {
+          "content": "建立全面的客户端异常捕获与容错恢复机制，重点落实“失败时保留输入”决策、旧结果清除与节点物理替换闭包代际隔离策略：\n1. E01 防抖校验拦截（空值或纯空白字符输入）：\n   - 场景：用户键入若干空格，或将已有文字全部删空，且 300ms 防抖倒计时结束；\n   - 拦截行为：ValidatorModule 判定 draftSnapshot 校验未通过（isValid 为 false）；\n   - 旧结果清除行为：展示区已显示的旧项目名立即被清除，复位显示为初始灰色占位符“【等待输入核对】”，杜绝旧结果在空值状态下残留回显；\n   - 呈现行为：调用 FeedbackBanner.showInputError 在输入框正下方挂载可见红色警示“项目名不能为空，请输入有效字符”，输入框设置 aria-invalid=\"true\" 边框变红并保持高亮；\n   - 保留与恢复：输入框内的既有字符（如输入的纯空格）严格原样保留，光标保持在输入框内部，绝不执行清空操作；用户补充输入有效字符后重新触发 300ms 防抖自动移除报错、清除 aria-invalid 并更新展示；\n2. E02 异步竞态与幽灵渲染防护（Ghost Render Prevention）：\n   - 场景：用户键入过程中立即点击清空按钮，或在 300ms 倒计时未结束前连续键入新字符；\n   - 防护行为：必须调用 DebounceScheduler.cancel() 执行 clearTimeout(pendingTimerId) 并自增 schedulerEpoch，确保排队中的老回调不仅定时器被清除，即便已出队进入事件循环也会在唤醒守卫处因 thisEpoch !== schedulerEpoch 被作废丢弃；\n3. E03 输入法合成态与清空后旧节点迟到事件隔离防护（IME & Trailing Event Node Replacement Guard）：\n   - 场景：反例 A（旧 compositionstart -> reset -> 新输入 'Brand-New' -> 旧 compositionend 迟到到达）与反例 B（旧会话 reset 后新合成启动 -> 旧 compositionend 迟到到达）；\n   - 防护行为：清空操作递增 inputGeneration，创建全新 input 节点采用持久配置复制策略替换旧节点（oldNode.replaceWith(newNode)），完整保留 label 关联、ARIA 属性、tabindex、style/class 与 data-* 属性，单独重置 value=''、trustedDraft='' 并移除瞬态 aria-invalid；在新节点闭包中初始化私有的 isComposing=false 与 trustedDraft=''；\n   - 迟到事件处理：发往旧节点的迟到 compositionend、beforeinput 或尾随 input 事件，在进入旧闭包时因 node !== activeInputNode 以及 bornGeneration !== inputGeneration 第一时间被拦截直接 return，完全无法触碰 activeInputNode，绝不重写新节点的 value、绝不修改新节点的 isComposing 状态、绝不取消新定时器、绝不制造空值错误；新节点输入流程保持 100% 独立与顺畅；\n   - 待验证边界与实测要求：合成隔离保证严格限于旧节点/旧闭包拦截；不同桌面操作系统及浏览器原生 IME 对脱离 DOM 的输入框派发事件细节、会话终结行为及是否存在原生重定向属于开发阶段真机实测用例，在当前规划环境无法做全量真机实测，标为 unexecuted 待开发验证任务；若实测中发现浏览器将原生事件重定向至新节点，根据实测日志修订清空策略（如 replaceWith 前显式 blur() 终结原生会话），不自造原生 token、不宣称永久隔离、不作彻底杜绝所有浏览器原生未定义行为的无依据绝对承诺；\n4. E04 后台标签页节流与唤醒竞态防护（Background Tab Throttle Guard）：\n   - 场景：页面置于后台标签页时浏览器对 setTimeout 产生 ≥1s 的节流延迟；\n   - 防护行为：明确前台测量前提；当标签页唤醒或定时器到期时，schedulerEpoch 调度纪元与 inputGeneration 代际双重核验，确保只有未经取消且代际匹配的草稿快照才可更新界面，清空与新键入具有无条件前置失效能力；\n5. E05 意外 DOM 异常与脚本运行时错误（Runtime Exception）：\n   - 场景：DOM 节点获取失败或回调执行抛出未捕获 Error；\n   - 拦截行为：在防抖回调、handleReset 与顶层 window.onerror 外层封装严格的 try...catch 与 FeedbackBanner 呈现；\n   - 呈现行为：展示轻量警示条，并在控制台输出完整堆栈；\n   - 保留与恢复：绝不重载页面，不抹除 activeInputNode.value 中的任何既有文本，输入框保持可编辑状态供用户修改重试；\n6. E06 极端超长文本防撑破：展示区与输入框设置 overflow-wrap: anywhere; word-break: break-all; max-width: 100%；\n7. E07 清空操作幂等性：连续多次点击清空保持节点同步物理替换与状态复位，无异步排队，不抛出异常。",
+          "dependsOn": [
+            "blk-tech-interface"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+            "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-tech-error",
+          "kind": "error",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-prod-outcomes"
+          ],
+          "stage": "technical",
+          "title": "错误分类、旧结果清除机制与节点替换代际隔离容错策略"
+        },
+        {
+          "content": "落实底部橙色圆形清空按钮的即时复位逻辑，第一优先级调用 DebounceScheduler.cancel() 废弃排队防抖任务，递增 inputGeneration，创建采用持久配置复制策略的全新 input 节点替换旧节点（oldNode.replaceWith(newNode)），复位展示区为占位符并移除错误与瞬态 aria-invalid，光标自动回焦新输入框，无二次确认阻断。",
+          "dependsOn": [
+            "blk-deliv-task-layout-styling",
+            "blk-tech-module",
+            "blk-tech-interface"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-deliv-task-reset-workflow",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-reset",
+            "blk-tech-module",
+            "blk-tech-interface"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "用户接受误触清空需重新输入的代价（已在决策中确认）",
+              "纯客户端内存单向流转，浏览器支持标准 Element.replaceWith 与 Element.attributes DOM API"
+            ],
+            "completionCriteria": [
+              "严格遵守 dec-clear-interaction-mode，即时直接清空，无二次确认阻断",
+              "同步复位输入框、展示区与错误提示，并销毁排队中的防抖任务，递增 schedulerEpoch 使旧回调失效",
+              "通过 replaceWith 物理替换 input 节点，采用持久配置复制策略完整保留 5 类配置：label 关联 (id, name)、ARIA 属性 (aria-label, aria-describedby, aria-required 等全部 ARIA 属性)、tabindex 键盘导航、style/class 样式表现与 data-* 自定义属性，单独重置 value=''、trustedDraft='' 与瞬态 aria-invalid",
+              "为新节点绑定独立闭包（bornGeneration=inputGeneration），使旧节点尾随事件完全解耦并被守卫拦截，不制造空值错误",
+              "光标准确自动回焦至新输入框，后续新输入顺畅恢复正常防抖调度"
+            ],
+            "exclusions": "不弹出 window.confirm 或任何阻塞式模态弹窗，不设置撤销等待定时器，不刷新浏览器页面，不把强制清新 DOM 作为拒绝旧事件手段，不采用仅复制部分属性的白名单硬编码",
+            "failureBehavior": "若执行重置逻辑捕获到异常，保留当前页面状态，在控制台打印排查日志并在界面呈现温和提示，页面不崩溃不跳转，用户可手动清空或重试",
+            "goal": "落实底部橙色圆形清空按钮的即时复位逻辑，取消待展示防抖任务，递增代际并通过持久配置复制策略与 replaceWith 物理替换输入框节点，解耦旧节点迟到事件，完整保留五类持久配置并重置瞬态状态，复位展示区，光标自动回焦新输入框，无二次确认阻断",
+            "modules": [
+              "ResetController",
+              "DebounceScheduler",
+              "InputController",
+              "DisplayRenderer",
+              "FeedbackBanner"
+            ],
+            "normalBehavior": "用户点击橙色圆形清空按钮，系统立即调用 DebounceScheduler.cancel() 销毁待展示任务并递增 schedulerEpoch，递增 inputGeneration，创建新 input 元素并通过持久配置复制策略安全复制旧节点全部持久配置（包含 label 关联 id/name、全部 ARIA 属性、tabindex、class/style 与 data-* 属性），单独重置 value=''、trustedDraft='' 并移除瞬态 aria-invalid，为新节点绑定新闭包并执行 oldNode.replaceWith(newNode)，将 activeInputNode 指向新节点，将顶部展示区重置为灰字占位符 '【等待输入核对】'，移除错误高亮和提示节点，并立即执行 activeInputNode.focus() 回焦输入框；旧节点迟到事件只能到达旧闭包并被直接拒绝丢弃，新节点键入、粘贴与新合成直接可用",
+            "scope": "ResetController 编码实现，DebounceScheduler.cancel() 调用、inputGeneration 单调递增、全新 input 节点五类持久配置复制（label 关联、ARIA 属性、tabindex、style/class、data-*）与 replaceWith DOM 物理替换、瞬态 aria-invalid 过滤移除、新节点闭包事件绑定、展示区恢复占位文本、历史错误清除与 activeInputNode.focus() 调用",
+            "verification": [
+              "在已有输入内容和展示结果的状态下点击清空，验证无阻断弹窗，DOM 中 input 节点成功替换，新节点继承 5 类持久属性且 value 为空、aria-invalid 已移除，页面各区域瞬间恢复初始待命态",
+              "验证清空替换后新 input 节点对五类持久配置（label 关联、ARIA 属性、tabindex、style/class、data-*）完整保留的精确断言（newNode.id === 'project-name-input' && newNode.name === 'projectName' && newNode.getAttribute('aria-describedby') === 'project-input-help' && newNode.tabIndex === 0 && newNode.dataset.test === 'project-input'），且瞬态 aria-invalid 属性不存在",
+              "在键入字符后 150ms 立即点击清空按钮，验证待展示任务被完全取消，后续展示区无文字幽灵回显",
+              "在输入法拼音输入过程中点击清空按钮，验证当前输入框被替换，此后旧节点派发的迟到 compositionend 及尾随 input 事件不产生任何回填或报错",
+              "验证点击清空后，键盘光标自动回焦至新输入框内，敲击新按键或启动新输入法合成可直接继续正常防抖录入",
+              "验证清空前后输入框在页面中的几何布局不发生任何视觉跳动，label 与 ARIA 属性正常可访问"
+            ]
+          },
+          "title": "交付任务：一键即时清空、输入节点五类持久属性复制与焦点恢复交付"
+        },
+        {
+          "content": "Scenario 1: 标准项目名输入 300ms 实时核对全流程\nGiven 页面处于初始待命状态，展示区显示灰色占位文字 '【等待输入核对】'，界面无确认按钮\nWhen 用户在输入框键入 'Project-Beta-2026' 并停止输入满 300 毫秒\nThen 页面顶部展示区自动大字呈现 'Project-Beta-2026'，字体为加粗高对比度样式，输入框内完好保留 'Project-Beta-2026'，页面无任何错误警示，无需点击确认按钮。\n\nScenario 2: 中文输入法（IME）拼音输入与防抖展示\nGiven 开发者在输入框中通过拼音输入法键入中文\nWhen 拼音字母输入期间未选字上屏\nThen 展示区保持原内容或占位符，不展示中间拼音字母；当选词完成（'测试项目'）且输入停止满 300 毫秒后，展示区更新呈现 '测试项目'。\n\nScenario 3: 删空文本防抖拦截与旧项目名清除\nGiven 页面顶部展示区正呈现此前核对成功的项目名 'Project-Beta-2026'，输入框包含对应文字\nWhen 开发者使用 Backspace/Delete 键将输入框文字全部删除并停止输入满 300 毫秒\nThen 顶部展示区原旧项目名 'Project-Beta-2026' 立即被清除，恢复为初始灰色占位文字 '【等待输入核对】'，输入框下方即时呈现红色警示文字 '项目名不能为空，请输入有效字符'，输入框边框变红并带有 aria-invalid='true'，输入框保持空值可编辑状态，光标保持在输入框内。\n\nScenario 4: 纯空格防抖拦截、旧结果清除与原始空格保留\nGiven 页面顶部展示区正呈现项目名\nWhen 开发者在输入框中输入三个半角空格 '   ' 并停止输入满 300 毫秒\nThen 顶部展示区原项目名被清除并恢复为占位提示，输入框下方呈现红色警示，且输入框内的三个半角空格完好保留，光标保持在输入框内。\n\nScenario 5: 补充有效输入后错误自动恢复\nGiven 界面正处于 Scenario 3 或 4 的错误提示状态\nWhen 开发者在输入框中补充键入有效字符 'Valid-Name' 并停止满 300 毫秒\nThen 错误提示自动销毁，aria-invalid 属性被移除，输入框边框恢复正常，顶部展示区大字正常呈现 'Valid-Name'。\n\nScenario 6: 清空后旧节点迟到 compositionend 与尾随 input 不得重显或造错（反例 A 合成守卫验证）\nGiven 用户在旧输入框 node_1（bornGeneration=1）中启动拼音输入法合成，尚未完成选词\nWhen 用户直接点击底部橙色圆形清空按钮（触发 node_1.replaceWith(node_2)，inputGeneration 递增为 2），且随后向已脱离 DOM 的 node_1 派发迟到的旧 compositionend 事件与尾随 input 事件\nThen node_1 闭包检测到 node_1 !== activeInputNode 且 1 !== 2 立即直接返回，新输入框 node_2 的 value 保持为空字符串 ''，顶部展示区保持占位提示 '【等待输入核对】'；等待 350 毫秒后复查，展示区始终显示 '【等待输入核对】'，页面绝不出现空值错误提示，控制台 0 报错；该项验证合成隔离对旧节点/旧闭包的有效性，原生输入法会话终结及真实表现待真机实测。\n\nScenario 7: 新节点输入后旧节点 compositionend 不得抹除新草稿或取消新定时器\nGiven 用户在 node_1 键入拼音后点击清空，系统生成新节点 node_2（bornGeneration=2, inputGeneration=2）\nWhen 用户立即在 node_2 中键入 'Brand-New-2026' 并启动 300ms 防抖，随后向 node_1 派发迟到的旧 compositionend 事件\nThen node_1 闭包拒绝执行并不操作 activeInputNode，node_2 的 300ms 防抖定时器未被取消，node_2 的 value 完好保持为 'Brand-New-2026'；满 300 毫秒后顶部展示区大字呈现 'Brand-New-2026'。\n\nScenario 8: 新节点启动新合成后旧节点 compositionend 不得提前结束新合成（反例 B 合成守卫验证）\nGiven 用户在 node_1 键入后点击清空生成 node_2，随后用户在 node_2 中启动新的中文输入法拼音输入（node_2 闭包 isComposing 变为 true）\nWhen 向 node_1 派发迟到的旧 compositionend 事件\nThen node_1 闭包被守卫拦截直接返回，node_2 闭包中的 isComposing 保持为 true，新拼音草稿不被提前校验，等待新选词上屏后满 300 毫秒正常呈现最终中文项目名。\n\nScenario 9: 旧定时器已出队后被清空或新输入抢占，旧回调执行作废无效\nGiven 用户在输入框中键入 'Temporary-Draft'，300ms 定时器即将到期并已出队进入宏任务队列\nWhen 用户在定时器回调执行前瞬间点击清空按钮（触发 schedulerEpoch 递增并清空），或录入新字符\nThen 定时器回调执行时检测到 thisEpoch !== schedulerEpoch（或 targetGeneration !== inputGeneration），立即退出返回，不调用 ValidatorModule，不更新 DOM 展示区，展示区保持为 '【等待输入核对】'。\n\nScenario 10: 极端恶意脚本标签纯文本安全回显（DOM 纯 TextNode 验证）\nGiven 开发者在输入框中录入包含 XSS 攻击向量的恶意代码 `<script>window.__xss_flag = true; alert('XSS');</script><svg onload=alert(1)>`\nWhen 停止输入满 300 毫秒防抖触发\nThen 顶部展示区将上述字符完整作为纯文本安全显示，控制台 window.__xss_flag 值为 undefined，页面不弹出任何系统警报框，DOM 树中展示区子节点仅包含纯 Text 节点，无 HTML 元素被创建。\n\nScenario 11: 节点物理替换后五类持久属性、可访问性（ARIA）与焦点保留精确验证\nGiven 输入框具有完整持久配置：label 关联（id='project-name-input', name='projectName'）、ARIA 属性（aria-label='项目名输入', aria-describedby='project-input-help', aria-required='true'）、键盘导航（tabindex='0'）、样式表现（class='input-control active', style.borderWidth='2px'）、自定义测试属性（data-test='project-input'），且带有瞬态属性 aria-invalid='true'\nWhen 用户点击清空按钮触发 node.replaceWith(newNode)\nThen 新 input 节点满足以下 6 项断言：\n1. label 关联保持：newNode.id === 'project-name-input' && newNode.name === 'projectName'；\n2. ARIA 配置保持且瞬态重置：newNode.getAttribute('aria-label') === '项目名输入' && newNode.getAttribute('aria-describedby') === 'project-input-help' && newNode.getAttribute('aria-required') === 'true'，而瞬态 newNode.hasAttribute('aria-invalid') 为 false；\n3. 键盘导航保持：newNode.tabIndex === 0 && newNode.getAttribute('tabindex') === '0'；\n4. 样式表现保持：newNode.className === 'input-control active' && newNode.style.borderWidth === '2px'；\n5. data-* 属性保持：newNode.dataset.test === 'project-input' && newNode.getAttribute('data-test') === 'project-input'；\n6. 状态重置与回焦：newNode.value === ''，旧节点闭包隔离失效，document.activeElement === newNode。\n\nScenario 12: 双模式本地加载自包含性验证（file:// 与 localhost:8080）\nGiven 开发者将交付产物 index.html, styles.css, app.js, README.md 置于本地同一目录\nWhen 分别通过文件双击（file://）与本地服务（python -m http.server 8080 / npx serve . --listen 8080 访问 http://localhost:8080）打开\nThen 两种模式下界面呈现完全一致，无确认按钮，实时防抖核对、清空复位与错误提示逻辑均零网络依赖正常运行，控制台无报错。",
+          "dependsOn": [
+            "blk-deliv-task-package"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+            "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+            "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-deliv-acc-full-e2e",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-feat-reset",
+            "blk-deliv-spec-deployment"
+          ],
+          "stage": "delivery",
+          "title": "端到端集成验收规范：防抖实时核对、持久属性保留与精确测试用例 Given-When-Then"
+        }
+      ],
+      "decisions": [
+        {
+          "area": "project_overview",
+          "decisionKey": "dec-clear-interaction-mode",
+          "evidenceIds": [
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+            "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "rationale": "依据最新质量验收反馈 R4-B1 与 R4-B3，明确节点替换采用持久配置复制策略覆盖五类配置并重置瞬态属性，同时纠正原生事件重定向的无依据保证，将合成隔离边界严格限定于旧节点/旧闭包，原生真实表现留待开发验证实测。",
+          "replaces": [
+            "dec-4a461c2d-0f30-46a2-b396-d5e2fcd05886"
+          ],
+          "statement": "在点击清空按钮时，采用即时直接清空与清空时替换输入节点＋节点代际闭包隔离机制：用户点击清空按钮后立即调用 DebounceScheduler.cancel() 取消防抖任务并递增调度纪元（schedulerEpoch），单调递增全局节点代际计数（inputGeneration）；创建全新 <input> 元素采用持久配置复制策略完整保留 label 关联（id/name）、ARIA 属性（如 aria-label, aria-describedby, aria-required）、tabindex 键盘导航、内联样式与类名及 data-* 属性，单独重置 value=''、trustedDraft=''、瞬态 aria-invalid 与错误状态；为新节点绑定独立事件监听闭包（捕获当前代际作为 bornGeneration 与私有 isComposing=false、trustedDraft=''），通过 Element.replaceWith() 物理替换旧节点移出 DOM 树；将活跃输入节点 activeInputNode 指向新节点，同步复位展示区为灰色占位符并清除错误，光标自动回焦新输入框；旧节点迟到的任何 compositionend、beforeinput 或尾随 input 事件因 node !== activeInputNode 且 bornGeneration !== inputGeneration 被旧闭包入口守卫直接拦截丢弃，不操作新节点、不修改新会话状态、不取消新定时器；新节点直接支持物理键入、粘贴与新中文合成流转 300ms 防抖，无需额外按键解除隔离；防抖调度器采用草稿快照与单调纪元校验，杜绝到期读取被篡改 DOM 的竞态；合成隔离保证仅限于旧节点/旧闭包，原生会话终结、重定向行为与辅助技术在当前规划环境未做真机实测，标为待验证开发任务，不作彻底杜绝所有浏览器未定义行为的无依据绝对保证。"
+        }
+      ],
+      "dependsOn": [],
+      "id": "grp-reset-persistent-attributes",
+      "impact": "彻底闭合 R4-B3 输入框五类持久属性与无障碍配置在清空物理替换节点时丢失的问题，给出前后精确断言与状态恢复流转。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "清空重置输入框五类持久配置复制与瞬态重置（产品交互、数据模型与交付任务/验收）"
+    },
+    {
+      "blocks": [
+        {
+          "content": "前端采用低耦合、高内聚的模块化架构，划分为核心应用协调器与 6 个专用功能模块，建立节点物理替换、闭包代际隔离、持久属性安全复制与草稿快照调度体系：\n1. AppController（核心应用协调器）：入口装配中心，监听 DOMContentLoaded 事件，显式获取 displayElement、errorContainer、globalBannerElement、initialInput 与 resetButton 等 DOM 引用，完成模块间参数注入；初始化调用 InputController.init(initialInput) 绑定首个代际闭包（generation = 1），挂载全局 window.addEventListener('error') 兜底，协调组件间流转；\n2. InputController（输入节点生命周期与事件闭包监听控制器）：\n   - 管理当前活跃输入框节点 activeInputNode 与单调递增的代际计数 inputGeneration；\n   - 提供 init(initialNode) 方法：初始化首个输入节点并绑定代际 1 闭包；\n   - 提供 bindInputNode(node, bornGeneration) 方法：为指定 input 节点闭包绑定 input、beforeinput、compositionstart、compositionend、keydown、paste 事件，并在闭包内维护该节点专有的 isComposing 与 trustedDraft；\n   - 事件处理前置严密核验四重守卫：event.currentTarget === node && node === activeInputNode && bornGeneration === inputGeneration && document.body.contains(node)；\n   - 提供 replaceInputNode() 方法：递增 inputGeneration，创建采用持久配置复制策略的新 input 节点（安全复制 label 关联、ARIA、tabindex、style/class、data-* 属性，单独重置 value、trustedDraft 与瞬态 aria-invalid），绑定新闭包并调用 oldNode.replaceWith(newNode)，更新 activeInputNode 并执行 focus()；\n   - 提供 getActiveInputNode()、focusInput() 接口；移除未实现的 getInputText/setInputText，保持接口契约与实际导出 API 严格一致；\n3. DebounceScheduler（快照防抖调度器）：\n   - 维护单调递增的调度纪元 schedulerEpoch 与活跃定时器句柄 pendingTimerId；\n   - schedule(draftSnapshot, targetNode, targetGeneration, callback, delayMs = 300)：先调用 cancel() 递增 schedulerEpoch 使旧任务失效，记录当前 thisEpoch = schedulerEpoch，启动 setTimeout；到期执行时校验 thisEpoch === schedulerEpoch && targetGeneration === inputGeneration && targetNode === activeInputNode && document.body.contains(targetNode)，通过后执行 callback(draftSnapshot)；\n   - cancel()：若存在 pendingTimerId 则 clearTimeout 并置 null，单调递增 schedulerEpoch 使已排队的宏任务回调失效；\n   - isPending()、getEpoch() 状态查询接口；\n4. ValidatorModule（规则校验器）：无状态纯函数校验模块，接收 draft 字符串，执行 trim() 校验，返回 { isValid: boolean, errorMessage: string | null }；\n5. DisplayRenderer（安全大字展示渲染器）：负责顶部展示区视图更新，强制使用 Node.textContent 纯文本赋值，提供 renderProjectName(targetElement, text) 与 renderPlaceholder(targetElement, placeholder) 接口，空值或清空时将展示区复位为占位符；\n6. ResetController（清空复位控制器）：响应清空按钮点击，第一优先级调用 DebounceScheduler.cancel() 废弃待展示任务，调用 InputController.replaceInputNode() 替换输入节点并进入新代际，复位展示区为占位符、移除错误提示与瞬态 aria-invalid 并回焦新节点；\n7. FeedbackBanner（错误提示与容错横幅组件）：管理输入框下方就地红色错误提示节点（showInputError(inputNode, container, message)、clearInputError(inputNode, container)）与全局异常横幅（showGlobalError(message)、clearGlobalError()）；错误挂载时为 input 节点设置 aria-invalid=\"true\"，错误清除时移除该瞬态属性，文本均通过 textContent 安全输出。",
+          "dependsOn": [
+            "blk-tech-stack",
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-document-queryselector",
+            "evidence-mdn-htmlinputelement",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+            "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-tech-module",
+          "kind": "module",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "前端系统架构与核心功能模块划分（输入节点闭包绑定与快照调度器）"
+        },
+        {
+          "content": "各模块间通过明确的函数签名、显式参数装配与原生事件契约进行交互解耦，提供变量全定义、无 ReferenceError 风险、内部自洽且可直接指导编码实现的完整开发接口契约与伪代码实现：\n\n```javascript\n// 全局状态管理\nlet activeInputNode = null;\nlet inputGeneration = 1;\n\n// DOM 元素引用（由 AppController 初始化显式获取并管理）\nlet displayElement = null;\nlet errorContainer = null;\nlet globalBannerElement = null;\n\n// 1. DebounceScheduler 模块接口契约\nconst DebounceScheduler = (() => {\n  let pendingTimerId = null;\n  let schedulerEpoch = 0;\n\n  function schedule(draftSnapshot, targetNode, targetGeneration, callback, delayMs = 300) {\n    cancel(); // 清除排队任务并递增 schedulerEpoch 使旧回调失效\n    const thisEpoch = ++schedulerEpoch;\n    pendingTimerId = window.setTimeout(() => {\n      // 唤醒守卫：即便回调已出队进入宏任务，若纪元、代际或节点不匹配，立即作废返回\n      if (thisEpoch !== schedulerEpoch) return;\n      if (targetGeneration !== inputGeneration) return;\n      if (targetNode !== activeInputNode) return;\n      if (!document.body.contains(targetNode)) return;\n\n      pendingTimerId = null;\n      // 严格使用捕获的草稿快照进行校验与输出，绝不重读可能已被篡改的 DOM value\n      callback(draftSnapshot);\n    }, delayMs);\n  }\n\n  function cancel() {\n    if (pendingTimerId !== null) {\n      window.clearTimeout(pendingTimerId);\n      pendingTimerId = null;\n    }\n    schedulerEpoch++; // 递增纪元使任何待执行或已出队的旧定时器失效\n  }\n\n  function isPending() {\n    return pendingTimerId !== null;\n  }\n\n  function getEpoch() {\n    return schedulerEpoch;\n  }\n\n  return { schedule, cancel, isPending, getEpoch };\n})();\n\n// 2. FeedbackBanner 模块接口契约（错误提示与容错横幅管理）\nconst FeedbackBanner = (() => {\n  function showInputError(inputNode, container, message) {\n    if (inputNode) {\n      inputNode.setAttribute('aria-invalid', 'true');\n      inputNode.classList.add('input-error');\n    }\n    if (container) {\n      container.textContent = message;\n      container.classList.remove('hidden');\n    }\n  }\n\n  function clearInputError(inputNode, container) {\n    if (inputNode) {\n      inputNode.removeAttribute('aria-invalid');\n      inputNode.classList.remove('input-error');\n    }\n    if (container) {\n      container.textContent = '';\n      container.classList.add('hidden');\n    }\n  }\n\n  function showGlobalError(message) {\n    if (globalBannerElement) {\n      globalBannerElement.textContent = message;\n      globalBannerElement.classList.remove('hidden');\n    } else {\n      console.warn('Global banner:', message);\n    }\n  }\n\n  function clearGlobalError() {\n    if (globalBannerElement) {\n      globalBannerElement.textContent = '';\n      globalBannerElement.classList.add('hidden');\n    }\n  }\n\n  return { showInputError, clearInputError, showGlobalError, clearGlobalError };\n})();\n\n// 3. DisplayRenderer 模块接口契约（纯文本安全渲染器）\nconst DisplayRenderer = (() => {\n  function renderProjectName(targetElement, text) {\n    if (!targetElement) return;\n    targetElement.textContent = text;\n    targetElement.classList.remove('placeholder');\n    targetElement.classList.add('active-result');\n  }\n\n  function renderPlaceholder(targetElement, placeholder = '【等待输入核对】') {\n    if (!targetElement) return;\n    targetElement.textContent = placeholder;\n    targetElement.classList.remove('active-result');\n    targetElement.classList.add('placeholder');\n  }\n\n  return { renderProjectName, renderPlaceholder };\n})();\n\n// 4. ValidatorModule 模块接口契约（无状态规则校验器）\nconst ValidatorModule = (() => {\n  function validate(rawInput) {\n    if (typeof rawInput !== 'string') {\n      return { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' };\n    }\n    const trimmed = rawInput.trim();\n    if (trimmed.length === 0) {\n      return { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' };\n    }\n    return { isValid: true, errorMessage: null };\n  }\n\n  return { validate };\n})();\n\n// 5. handleDebouncedValidateAndDisplay 防抖执行契约\nfunction handleDebouncedValidateAndDisplay(draftSnapshot) {\n  try {\n    const validation = ValidatorModule.validate(draftSnapshot);\n    if (!validation.isValid) {\n      // 空值或纯空格：彻底清除旧项目名展示并恢复占位符，挂载错误提示，输入框草稿完好保留\n      DisplayRenderer.renderPlaceholder(displayElement, '【等待输入核对】');\n      FeedbackBanner.showInputError(InputController.getActiveInputNode(), errorContainer, validation.errorMessage);\n    } else {\n      // 有效非空字符：移除错误提示，通过 textContent 安全输出草稿快照\n      FeedbackBanner.clearInputError(InputController.getActiveInputNode(), errorContainer);\n      DisplayRenderer.renderProjectName(displayElement, draftSnapshot);\n    }\n  } catch (err) {\n    FeedbackBanner.showGlobalError('处理输入时遇到异常，已为您保留当前输入');\n    console.error('防抖回调异常:', err);\n  }\n}\n\n// 6. InputController 模块接口契约（节点生命周期与事件闭包隔离）\nconst InputController = (() => {\n  function isNodeActiveAndCurrent(e, node, bornGeneration) {\n    return e.currentTarget === node &&\n           node === activeInputNode &&\n           bornGeneration === inputGeneration &&\n           document.body.contains(node);\n  }\n\n  function bindInputNode(node, bornGeneration) {\n    // 节点闭包私有变量\n    let isComposing = false;\n    let trustedDraft = '';\n\n    node.addEventListener('compositionstart', (e) => {\n      if (!isNodeActiveAndCurrent(e, node, bornGeneration)) return;\n      isComposing = true;\n      DebounceScheduler.cancel(); // 挂起防抖并使旧纪元失效\n    });\n\n    node.addEventListener('compositionend', (e) => {\n      if (!isNodeActiveAndCurrent(e, node, bornGeneration)) return;\n      isComposing = false;\n      trustedDraft = node.value;\n      DebounceScheduler.schedule(trustedDraft, node, bornGeneration, handleDebouncedValidateAndDisplay, 300);\n    });\n\n    node.addEventListener('input', (e) => {\n      if (!isNodeActiveAndCurrent(e, node, bornGeneration)) return;\n      if (!isComposing && !e.isComposing) {\n        trustedDraft = node.value;\n        DebounceScheduler.schedule(trustedDraft, node, bornGeneration, handleDebouncedValidateAndDisplay, 300);\n      }\n    });\n\n    node.addEventListener('beforeinput', (e) => {\n      if (!isNodeActiveAndCurrent(e, node, bornGeneration)) return;\n    });\n\n    node.addEventListener('keydown', (e) => {\n      if (!isNodeActiveAndCurrent(e, node, bornGeneration)) return;\n    });\n\n    node.addEventListener('paste', (e) => {\n      if (!isNodeActiveAndCurrent(e, node, bornGeneration)) return;\n    });\n  }\n\n  function replaceInputNode() {\n    const oldNode = activeInputNode;\n    inputGeneration++;\n    const nextGen = inputGeneration;\n\n    const newNode = document.createElement('input');\n\n    // 1. 持久配置复制策略：安全遍历并复制旧节点全部持久 DOM 属性与无障碍配置\n    // 覆盖：label 关联 (id, name)、ARIA 属性 (aria-label, aria-describedby, aria-required 等)、\n    // 键盘导航 (tabindex)、表现样式 (class, style)、测试与自定义属性 (data-*)\n    if (oldNode && oldNode.attributes) {\n      for (let i = 0; i < oldNode.attributes.length; i++) {\n        const attr = oldNode.attributes[i];\n        // 过滤瞬态属性与需单独重置的状态：value 属性及瞬态校验属性 aria-invalid\n        if (attr.name === 'value' || attr.name === 'aria-invalid') {\n          continue;\n        }\n        newNode.setAttribute(attr.name, attr.value);\n      }\n    }\n\n    // 2. 状态重置与规范保障：确保基础输入类型为 text，重置 value 为空字符串\n    newNode.type = 'text';\n    newNode.value = '';\n\n    // 3. 闭包监听绑定：为新节点绑定独立事件监听闭包（注入全新代际 nextGen，重置私有 isComposing 与 trustedDraft）\n    bindInputNode(newNode, nextGen);\n\n    // 4. 物理节点替换与活跃指针更新\n    if (oldNode && oldNode.parentNode) {\n      oldNode.replaceWith(newNode);\n    }\n    activeInputNode = newNode;\n\n    return activeInputNode;\n  }\n\n  function init(initialNode) {\n    activeInputNode = initialNode;\n    bindInputNode(activeInputNode, inputGeneration);\n  }\n\n  function getActiveInputNode() {\n    return activeInputNode;\n  }\n\n  function focusInput() {\n    if (activeInputNode) activeInputNode.focus();\n  }\n\n  return { init, bindInputNode, replaceInputNode, getActiveInputNode, focusInput };\n})();\n\n// 7. ResetController 模块接口契约（清空复位控制器）\nconst ResetController = (() => {\n  function handleReset() {\n    try {\n      // 1. 立即取消待展示防抖任务并废弃调度纪元\n      DebounceScheduler.cancel();\n      // 2. 递增代际，创建保留五类持久配置的新输入节点物理替换旧节点，绑定新闭包\n      const newInputNode = InputController.replaceInputNode();\n      // 3. 顶部展示区恢复为占位符\n      DisplayRenderer.renderPlaceholder(displayElement, '【等待输入核对】');\n      // 4. 清除输入错误提示与瞬态 aria-invalid\n      FeedbackBanner.clearInputError(newInputNode, errorContainer);\n      // 5. 焦点自动回焦到新输入节点\n      InputController.focusInput();\n    } catch (err) {\n      FeedbackBanner.showGlobalError('重置时遇到异常，界面保持可编辑');\n      console.error('清空重置异常:', err);\n    }\n  }\n\n  return { handleReset };\n})();\n\n// 8. AppController 核心应用协调器（装配与初始化）\nconst AppController = (() => {\n  function init() {\n    // 显式获取 DOM 引用并初始化模块变量\n    displayElement = document.getElementById('project-display');\n    errorContainer = document.getElementById('error-container');\n    globalBannerElement = document.getElementById('global-banner');\n    const initialInput = document.getElementById('project-name-input');\n    const resetButton = document.getElementById('btn-reset');\n\n    // 初始化输入控制器（绑定代际 1）\n    if (initialInput) {\n      InputController.init(initialInput);\n    }\n\n    // 绑定清空按钮事件\n    if (resetButton) {\n      resetButton.addEventListener('click', ResetController.handleReset);\n    }\n\n    // 全局未捕获异常兜底防护\n    window.addEventListener('error', (event) => {\n      FeedbackBanner.showGlobalError('系统遇到异常，已为您保留当前输入');\n      console.error('全局未捕获异常:', event.error || event.message);\n    });\n  }\n\n  return { init };\n})();\n\n// 页面加载就绪时启动\ndocument.addEventListener('DOMContentLoaded', AppController.init);\n```\n\n9. 规范声明与待验证状态说明：\n   - 以上代码为规范实现参考，合成核验仅验证事件契约与静态语法自洽性，不能称为目标应用真实实现已完成测试；\n   - 防抖调度延迟测量以前台可见状态（document.visibilityState === 'visible'）为基准；后台标签页唤醒时受调度纪元 thisEpoch 与代际 targetGeneration 严格核验约束，旧任务安全作废；\n   - 原生输入法在不同桌面浏览器环境下的事件派发细节与真实重定向行为，留待真机开发验证阶段实测。",
+          "dependsOn": [
+            "blk-tech-data-model"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-mdn-htmlinputelement",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+            "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+            "evidence-mdn-ime-compositionstart-session",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+            "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+            "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-tech-interface",
+          "kind": "interface",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "组件事件契约与模块调用接口规范（显式依赖装配、五类持久属性复制与内部自洽伪代码）"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "grp-reset-persistent-attributes"
+      ],
+      "id": "grp-interface-pseudo-code-assembly",
+      "impact": "彻底闭合 R4-B2 伪代码缺少变量声明/注入与 ReferenceError 风险，移除未实现方法声明，建立自洽可执行的代码规范。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "接口模块伪代码显式依赖装配与自洽性规范（技术接口与架构）"
+    },
+    {
+      "blocks": [
+        {
+          "content": "在现代主流桌面浏览器（Google Chrome、Microsoft Edge、Mozilla Firefox 及 Apple Safari）中，实测验证交付产物在 file:// 本地双击与 http://localhost:8080 托管下的运行一致性，并重点实测各平台操作系统原生中文输入法（IME）在清空替换节点时的真实事件派发、会话终结行为及焦点/无障碍表现；明确合成隔离保证仅限于旧节点/旧闭包，原生真实表现与重定向行为在当前规划环境未做真机实测，标为 unexecuted 待验证状态。",
+          "dependsOn": [
+            "blk-deliv-task-package"
+          ],
+          "evidenceIds": [
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0",
+            "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+            "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+            "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db"
+          ],
+          "id": "blk-deliv-val-standalone-runtime",
+          "kind": "validation",
+          "requirementIds": [
+            "blk-tech-deployment",
+            "blk-tech-interface"
+          ],
+          "stage": "delivery",
+          "title": "交付前置验证任务：本地双击直接运行与多浏览器兼容性实测（原生IME节点替换事件派发）"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "grp-interface-pseudo-code-assembly"
+      ],
+      "id": "grp-native-ime-runtime-validation",
+      "impact": "彻底闭合 R4-B1 中关于原生 compositionend 重定向无依据保证与极其罕见频率判断的问题，保持合成与真实真机边界清晰。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "原生 IME 节点替换多浏览器真机验证边界纠正（交付前置验证）"
+    }
+  ],
+  "questions": [],
+  "summary": "根据最新自动质量验收反馈 R4 进行针对性修订，彻底解决 R4-B1、R4-B2、R4-B3 三项阻塞：\n1. R4-B1：纠正 blk-deliv-val-standalone-runtime 中关于原生 compositionend 重定向到新节点的无依据 generation guard 拒绝保证及“极其罕见”主观频率判断；明确合成隔离保证严格限于旧节点/旧闭包守卫，原生会话终结、重定向行为与辅助技术在当前规划环境未做真机实测，如实标为 unexecuted 待开发验证阶段执行，并给出 Chrome/Edge/Firefox/Safari 详细实测记录与失败回退修复策略；\n2. R4-B2：重构 blk-tech-interface 完整 JavaScript 伪代码，补齐 displayElement、errorContainer、globalBannerElement 变量声明及 FeedbackBanner、DisplayRenderer、ValidatorModule、InputController、ResetController、AppController 的具体方法实现与 DOM 依赖注入装配，杜绝 ReferenceError 风险；在 blk-tech-module 中移除未实现的 getInputText/setInputText 方法描述，保持模块接口契约与代码导出完全自洽；\n3. R4-B3：在 replaceInputNode 中落实安全的持久配置复制策略，全面覆盖 5 类持久配置：label 关联 (id, name)、ARIA 属性 (aria-label, aria-describedby, aria-required 等)、tabindex 键盘导航、style/class 样式表现及 data-* 自定义测试属性；显式过滤排除 value 与瞬态 aria-invalid，并在 blk-acc-reset（Scenario 5）与 blk-deliv-acc-full-e2e（Scenario 11）中给出 6 项精确断言，同步修订 flow、page、data_model、error 与 delivery task 全部关联字段；\n4. 保持项目 30 个块稳定 ID、29 条基线历史证据及 DAG 依赖不变，普通实现细节由 AI 自行拟定自洽，不新增用户选择题。",
+  "workItems": []
+}

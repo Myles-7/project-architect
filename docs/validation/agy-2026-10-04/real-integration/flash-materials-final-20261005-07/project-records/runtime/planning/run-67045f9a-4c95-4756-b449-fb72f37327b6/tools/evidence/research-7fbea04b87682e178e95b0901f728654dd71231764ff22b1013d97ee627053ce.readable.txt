@@ -1,0 +1,684 @@
+Element：input 事件 - Web API | MDN 
+
+ 跳转到主要内容 
+
+ 跳转到搜索 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ 切换侧边栏
+
+ 面向开发者的 Web 技术 
+
+ Web API 
+
+ Element 
+
+ Element：input 事件 
+
+ 主题 
+
+ 跟随系统
+
+ 浅色
+
+ 深色
+
+ 中文 (简体) 
+
+ 记住语言 
+
+ 了解更多 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ 此页面由社区从英文翻译而来。 了解更多并加入 MDN Web Docs 社区。 
+
+ View in English 
+
+ Always switch to English 
+
+ Element：input 事件
+
+ 基线
+
+ 广泛可用
+
+ 自 2020年1月 起，此特性已在主流浏览器中得到支持，可在大多数设备和浏览器版本中正常使用。
+
+ 查看完整兼容性
+
+ 了解更多
+
+ 当一个 <input> 、 <select> 或 <textarea> 元素的 value 被修改时，会触发 input 事件。
+
+ Bubbles 
+ Yes 
+
+ Cancelable 
+ No 
+
+ Interface 
+ InputEvent 
+
+ Event handler property 
+ GlobalEventHandlers.oninput 
+
+ input 事件也适用于启用了 contenteditable 的元素，以及开启了 designMode 的任意元素。在 contenteditable 和 designMode 的情况下，事件的 target 为当前正在编辑的宿主。如果这些属性应用于多个元素上，当前正在编辑的宿主为最近的父节点不可编辑的祖先元素。
+
+ 对于 type=checkbox 或 type=radio 的 input 元素，每当用户切换控件（通过触摸、鼠标或键盘）时（ HTML5 规范 ）， input 事件都应该触发。然而，历史事实并非如此。请检查兼容性，或使用 change 事件代替这些类型的元素。
+
+ 备注： 每当元素的 value 改变， input 事件都会被触发。这与 change 事件不同。change 事件仅当 value 被提交时触发，如按回车键，从一个 options 列表中选择一个值等。
+
+ 本文内容
+
+ 示例 
+
+ 属性 
+
+ 规范 
+
+ 浏览器兼容性 
+
+ 参见 
+
+ 示例 
+
+ 每当用户修改 <input> 元素的 value 时，这个示例会记录 value。
+
+ HTML 
+
+ html 
+ <input placeholder="输入一些文本" name="name" />
+<p id="values"></p>
+
+ JavaScript 
+
+ js 
+ const input = document.querySelector("input");
+const log = document.getElementById("values");
+
+input.addEventListener("input", updateValue);
+
+function updateValue(e) {
+ log.textContent = e.target.value;
+}
+
+ 结果 
+
+ 属性 
+
+ Property 
+ Type 
+ Description 
+
+ target 只读 
+ EventTarget 
+ The event target (the topmost target in the DOM tree). 
+
+ type 只读 
+ String 
+ The type of event. 
+
+ bubbles 只读 
+ Boolean 
+ Whether the event normally bubbles or not. 
+
+ cancelable 只读 
+ Boolean 
+ Whether the event is cancellable or not. 
+
+ 规范 
+
+ 规范
+
+ UI Events 
+# event-type-input 
+
+ HTML 
+# handler-oninput 
+
+ 浏览器兼容性 
+
+ 启用 JavaScript 以查看此浏览器兼容性表。 
+
+ 参见 
+
+ 相关事件
+
+ beforeinput 
+
+ change 
+
+ invalid 
+
+ 帮助改进 MDN
+
+ 此页面对您有帮助吗？
+
+ 是
+
+ 否
+
+ 了解如何参与贡献 
+ 此页面最后更新于 2026年5月22日 ，由 MDN 贡献者 更新。
+
+ 在 GitHub 上查看此页面 • 报告此内容的问题 
+
+ 筛选侧边栏 
+
+ 清除筛选输入 
+
+ Element 
+ 实例属性 activeViewTransition 
+ ariaActiveDescendantElement 
+ ariaAtomic 
+ ariaAutoComplete 
+ ariaBrailleLabel 
+ ariaBrailleRoleDescription 
+ ariaBusy 
+ ariaChecked 
+ ariaColCount 
+ ariaColIndex 
+ ariaColIndexText 
+ ariaColSpan 
+ ariaControlsElements 
+ ariaCurrent 
+ ariaDescribedByElements 
+ ariaDescription 
+ ariaDetailsElements 
+ ariaDisabled 
+ ariaErrorMessageElements 
+ ariaExpanded 
+ ariaFlowToElements 
+ ariaHasPopup 
+ ariaHidden 
+ ariaInvalid 
+ ariaKeyShortcuts 
+ ariaLabel 
+ ariaLabelledByElements 
+ ariaLevel 
+ ariaLive 
+ ariaModal 
+ ariaMultiLine 
+ ariaMultiSelectable 
+ ariaOrientation 
+ ariaOwnsElements 
+ ariaPlaceholder 
+ ariaPosInSet 
+ ariaPressed 
+ ariaReadOnly 
+ ariaRelevant 
+ ariaRequired 
+ ariaRoleDescription 
+ ariaRowCount 
+ ariaRowIndex 
+ ariaRowIndexText 
+ ariaRowSpan 
+ ariaSelected 
+ ariaSetSize 
+ ariaSort 
+ ariaValueMax 
+ ariaValueMin 
+ ariaValueNow 
+ ariaValueText 
+ assignedSlot 
+ attributes 
+ childElementCount 
+ children 
+ classList 
+ className 
+ clientHeight 
+ clientLeft 
+ clientTop 
+ clientWidth 
+ currentCSSZoom 
+ customElementRegistry 
+ elementTiming 
+ firstElementChild 
+ id 
+ innerHTML 
+ lastElementChild 
+ localName 
+ namespaceURI 
+ nextElementSibling 
+ outerHTML 
+ part 
+ prefix 
+ previousElementSibling 
+ role 
+ scrollHeight 
+ scrollLeft 
+ scrollLeftMax 
+ scrollTop 
+ scrollTopMax 
+ scrollWidth 
+ shadowRoot 
+ slot 
+ tagName 
+
+ 实例方法 after() 
+ animate() 
+ append() 
+ ariaNotify() 
+ attachShadow() 
+ before() 
+ checkVisibility() 
+ closest() 
+ computedStyleMap() 
+ getAnimations() 
+ getAttribute() 
+ getAttributeNames() 
+ getAttributeNode() 
+ getAttributeNodeNS() 
+ getAttributeNS() 
+ getBoundingClientRect() 
+ getClientRects() 
+ getElementsByClassName() 
+ getElementsByTagName() 
+ getElementsByTagNameNS() 
+ getHTML() 
+ hasAttribute() 
+ hasAttributeNS() 
+ hasAttributes() 
+ hasPointerCapture() 
+ insertAdjacentElement() 
+ insertAdjacentHTML() 
+ insertAdjacentText() 
+ matches() 
+ moveBefore() 
+ prepend() 
+ pseudo() 
+ querySelector() 
+ querySelectorAll() 
+ releasePointerCapture() 
+ remove() 
+ removeAttribute() 
+ removeAttributeNode() 
+ removeAttributeNS() 
+ replaceChildren() 
+ replaceWith() 
+ requestFullscreen() 
+ requestPointerLock() 
+ scroll() 
+ scrollBy() 
+ scrollIntoView() 
+ scrollIntoViewIfNeeded() 
+ scrollTo() 
+ setAttribute() 
+ setAttributeNode() 
+ setAttributeNodeNS() 
+ setAttributeNS() 
+ setCapture() 
+ setHTML() 
+ setHTMLUnsafe() 
+ setPointerCapture() 
+ startViewTransition() 
+ toggleAttribute() 
+
+ 事件 afterscriptexecute 
+ animationcancel 
+ animationend 
+ animationiteration 
+ animationstart 
+ auxclick 
+ beforeinput 
+ beforematch 
+ beforescriptexecute 
+ beforexrselect 
+ blur 
+ click 
+ compositionend 
+ compositionstart 
+ compositionupdate 
+ contentvisibilityautostatechange 
+ contextmenu 
+ copy 
+ cut 
+ dblclick 
+ DOMActivate 
+ DOMMouseScroll 
+ focus 
+ focusin 
+ focusout 
+ fullscreenchange 
+ fullscreenerror 
+ gesturechange 
+ gestureend 
+ gesturestart 
+ gotpointercapture 
+ input 
+ keydown 
+ keypress 
+ keyup 
+ lostpointercapture 
+ mousedown 
+ mouseenter 
+ mouseleave 
+ mousemove 
+ mouseout 
+ mouseover 
+ mouseup 
+ mousewheel 
+ MozMousePixelScroll 
+ paste 
+ pointercancel 
+ pointerdown 
+ pointerenter 
+ pointerleave 
+ pointermove 
+ pointerout 
+ pointerover 
+ pointerrawupdate 
+ pointerup 
+ scroll 
+ scrollend 
+ scrollsnapchange 
+ scrollsnapchanging 
+ securitypolicyviolation 
+ touchcancel 
+ touchend 
+ touchmove 
+ touchstart 
+ transitioncancel 
+ transitionend 
+ transitionrun 
+ transitionstart 
+ webkitmouseforcechanged 
+ webkitmouseforcedown 
+ webkitmouseforceup 
+ webkitmouseforcewillbegin 
+ wheel 
+
+ 继承 Node 
+ EventTarget 
+
+ 构建更美好互联网的蓝图。
+
+ MDN 
+
+ 关于
+
+ 博客
+
+ Mozilla 招聘
+
+ 与我们合作投放广告
+
+ MDN Plus
+
+ 产品帮助
+
+ 参与贡献 
+
+ MDN 社区
+
+ 社区资源
+
+ 写作指南
+
+ MDN Discord
+
+ MDN GitHub 主页
+
+ 开发者 
+
+ Web 技术
+
+ 学习 Web 开发
+
+ 指南
+
+ 教程
+
+ 术语表
+
+ Hacks 博客
+
+ 网站隐私声明 
+
+ 遥测设置 
+
+ 法律声明 
+
+ 社区参与准则 
+
+ 本内容的部分版权归 mozilla.org 贡献者所有，©1998–2026。内容依据 知识共享许可协议 提供。

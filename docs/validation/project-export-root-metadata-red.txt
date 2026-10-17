@@ -1,0 +1,32 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/ProjectExportImportService.test.ts (5 tests | 1 failed) 1135ms
+   ✓ ProjectExportImportService Unit Tests > exports one Core snapshot while a concurrent formal commit waits for archive reading 293ms
+   ✓ ProjectExportImportService Unit Tests > rejects a project link before reading files outside the archive tree 57ms
+   × ProjectExportImportService Unit Tests > round-trips nested project.json and same-named historical commit records without treating them as the root 73ms
+     → Invalid project bundle: exactly one project.json is required.
+   ✓ ProjectExportImportService Unit Tests > exports and imports a full project archive accurately without loss 299ms
+   ✓ ProjectExportImportService Unit Tests > P0-5: detects collision and renames imported project safely with timestamp suffix when same project exists  412ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/core/tests/ProjectExportImportService.test.ts > ProjectExportImportService Unit Tests > round-trips nested project.json and same-named historical commit records without treating them as the root
+Error: Invalid project bundle: exactly one project.json is required.
+ ❯ ProjectExportImportService.importProject packages/core/src/projects/ProjectExportImportService.ts:140:21
+    138|     const metadataEntries = extractedFiles.filter(file => file.path ==…
+    139|     if (metadataEntries.length !== 1) {
+    140|       const error = new Error('Invalid project bundle: exactly one pro…
+       |                     ^
+    141|       error.code = ErrorCode.STATE_VALIDATION_FAILED;
+    142|       throw error;
+ ❯ packages/core/tests/ProjectExportImportService.test.ts:83:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  07:15:42
+   Duration  1.85s (transform 237ms, setup 0ms, collect 383ms, tests 1.13s, environment 0ms, prepare 104ms)
+

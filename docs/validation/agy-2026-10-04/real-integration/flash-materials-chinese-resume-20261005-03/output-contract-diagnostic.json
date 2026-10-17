@@ -1,0 +1,1477 @@
+{
+  "label": "flash-materials-chinese-resume-20261005-03",
+  "checkedAt": "2026-10-04T19:09:01.465Z",
+  "frozenManifestSha256": "e2c033aeee1594a35d029218bf85526c9c0b2cf62c69dfbaa4be8a354725f63a",
+  "frozenManifestUnchanged": true,
+  "scope": "Read-only frozen real calls. Schema/goal/output bytes come from persisted call artifacts. Context sections are reported only when reconstructed bytes and SHA-256 exactly match observations recorded before the actual call. Provider token counters can span tool/model turns; output-token-limit ERROR is not an accepted result.",
+  "runtimeArtifacts": [
+    {
+      "source": "D:\\桌面\\项目构思\\apps\\server\\dist\\planning\\PlanningRuntime.js",
+      "copy": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\output-contract-runtime\\PlanningRuntime.js",
+      "sha256": "e94b8156d499187749b919bbbc500291237ef3a1f917db19bd884d472a8f25dc",
+      "matchedFrozenStartupHash": true
+    },
+    {
+      "source": "D:\\桌面\\项目构思\\apps\\server\\dist\\planning\\PlanningContext.js",
+      "copy": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\output-contract-runtime\\PlanningContext.js",
+      "sha256": "beb3e0af9b62f3f79d415563a5ef5e43311a24723acf858b29c29cdc72393052",
+      "matchedFrozenStartupHash": true
+    },
+    {
+      "source": "D:\\桌面\\项目构思\\apps\\server\\dist\\planning\\PlanningPrompt.js",
+      "copy": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\output-contract-runtime\\PlanningPrompt.js",
+      "sha256": "b6ce8d5ae752029c72254b160740c7ffa938fb00b79cf4ab9a7889b9f8cef0f2",
+      "matchedFrozenStartupHash": true
+    },
+    {
+      "source": "D:\\桌面\\项目构思\\apps\\server\\dist\\planning\\PlanningAnswerContext.js",
+      "copy": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\output-contract-runtime\\PlanningAnswerContext.js",
+      "sha256": "7ba47de6473be8233b19d24c92c4d4cd79b39668d0c2aef465d08616fa7c3e2a",
+      "matchedFrozenStartupHash": null
+    }
+  ],
+  "calls": [
+    {
+      "requestId": "task-24023a31-f3ad-47a6-81d3-8780c0a76a58-4",
+      "kind": "revision",
+      "goal": "修订最新草案，解决这些确定性或评审问题：【验收规范遗留双按钮断言冲突】交付阶段验收标准块 blk-deliv-acc-package（验收标准：交付包自包含性与本地启动模式 Given-When-Then）未被纳入 feedback 阶段变更组，其 Scenario 1 断言仍包含“页面呈现白底背景、顶部灰字占位提示、输入框及底部蓝橙双按钮”。根据用户反馈（input:b33f1cd7-dee5-49e5-ab04-da05e30564c5）“删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收”，确认按钮（蓝色矩形）已被彻底移除，界面仅保留单个橙色圆形清空按钮。blk-deliv-acc-package 处于已修改任务 blk-deliv-task-package 的直接依赖闭包中，未同步修改将导致交付验收断言与实际界面冲突并必然失败。；【验收规范遗留点击确认交互步骤冲突】交付阶段验收标准块 blk-deliv-acc-security-edge（端到端安全防范与极端边界验收规范 Given-When-Then）未被纳入 feedback 阶段变更组，其 Scenario 1 规定“When 用户输入 <script>... 并点击确认”、Scenario 2 规定“When 点击确认提交”、Scenario 3 规定“When 点击确认提交”。在确认按钮与表单提交事件已被彻底删除（blk-deliv-task-input-workflow、blk-page-main-layout、blk-tech-stack）的前提下，该验收标准中的操作步骤在物理上已无法执行，与 300ms 防抖自动展示机制直接冲突。该块直接依赖已修改的 blk-deliv-task-input-workflow 与 blk-deliv-task-error-handling，必须纳入变更组更新为停止输入满 300ms 防抖自动安全渲染的 Given-When-Then 验收规范。；【验证任务操作步骤与验证标准不可执行】交付阶段验证任务块 blk-deliv-val-security-xss-audit（交付前置验证任务：XSS 安全审计与纯原生代码静态规范性检查）未被纳入 feedback 阶段变更组，其 task.steps 步骤 4 明确要求“4. 逐一录入并点击确认，检查 DOM 检查器中展示区节点的 children.length 是否始终为 0...”，task.verification 验证项要求“分别将 <script>alert(1)</script>... 填入输入框确认，验证无弹窗且展示区为纯文本”。因确认按钮已在 DOM 骨架和脚本中完全移除，测试人员无法执行“点击确认”，该前置验证任务无法闭环。该块直接依赖 blk-deliv-task-input-workflow，必须同步更新验证步骤与通过标准为防抖自动渲染路径。。保留完整产物和真实证据。",
+      "dependsOn": [],
+      "startedAt": "2026-10-04T18:52:07.880Z",
+      "completedAt": "2026-10-04T18:54:33.817Z",
+      "status": "success",
+      "actualInputObservation": {
+        "runtimeContextUtf8Bytes": 314683,
+        "runtimeContextUtf16CodeUnits": 212317,
+        "runtimeContextSha256": "1953eb626c276ebebe69f5357b36b8c67159a8073047a76d370f7f5325cb552a",
+        "rolePromptUtf8Bytes": 11242,
+        "rolePromptSha256": "64a956726382c213fc5d23b77fa22724450be61246a0614fbe7ab99f01168aaf",
+        "scope": "Exact registered request context and role prompt; excludes Provider-added image/tool/schema instructions and hidden service context"
+      },
+      "schema": {
+        "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-24023a31-f3ad-47a6-81d3-8780c0a76a58\\result.schema.json",
+        "utf8Bytes": 5328,
+        "sha256": "5788d1b9001b399140f5f724be232893b42f746f52952d5f0b88ba09e15788bd",
+        "required": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "topLevelFields": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "serializedTopLevelPropertyBytes": {
+          "summary": 17,
+          "groups": 2470,
+          "questions": 1357,
+          "evidence": 556,
+          "blockers": 42,
+          "followUp": 196,
+          "clarification": 363
+        }
+      },
+      "contextReconstruction": {
+        "status": "exact-byte-size-and-sha256-match-to-actual-observation",
+        "utf8Bytes": 314683,
+        "sha256": "1953eb626c276ebebe69f5357b36b8c67159a8073047a76d370f7f5325cb552a",
+        "matchesObservedContext": true,
+        "matchesObservedRole": true,
+        "sections": {
+          "projectName": {
+            "utf8Bytes": 54
+          },
+          "stage": {
+            "utf8Bytes": 8
+          },
+          "basis": {
+            "utf8Bytes": 89
+          },
+          "approvedDecisions": {
+            "utf8Bytes": 8764,
+            "entries": 9
+          },
+          "blueprint": {
+            "utf8Bytes": 72864
+          },
+          "decisionTopics": {
+            "utf8Bytes": 1664,
+            "entries": 9
+          },
+          "rawInputs": {
+            "utf8Bytes": 1133,
+            "entries": 2
+          },
+          "answers": {
+            "utf8Bytes": 2641,
+            "entries": 1
+          },
+          "materialIndex": {
+            "utf8Bytes": 899,
+            "entries": 2
+          },
+          "workerResults": {
+            "utf8Bytes": 72190
+          },
+          "currentDraft": {
+            "utf8Bytes": 68199
+          },
+          "taskHistory": {
+            "utf8Bytes": 3942,
+            "entries": 4
+          },
+          "historicalReviewFindings": {
+            "utf8Bytes": 2458,
+            "entries": 3
+          },
+          "approvedEvidence": {
+            "utf8Bytes": 10692,
+            "entries": 13
+          },
+          "knownEvidence": {
+            "utf8Bytes": 19621,
+            "entries": 19
+          },
+          "evidenceConflicts": {
+            "utf8Bytes": 2,
+            "entries": 0
+          }
+        },
+        "currentDraft": {
+          "utf8Bytes": 68199
+        },
+        "workerResults": {
+          "task-bbdcd90e-394d-4a5f-9af2-8bbe96a3d927": {
+            "utf8Bytes": 72144
+          }
+        }
+      },
+      "stream": {
+        "frozenLogPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-24023a31-f3ad-47a6-81d3-8780c0a76a58\\call-4.ndjson",
+        "sha256": "edf80619e1c9d764d114502d4ef15203e6eafc019ebef2d293a62a169af70998",
+        "logUtf8Bytes": 350258,
+        "stdoutUtf8Bytes": 328602,
+        "eventTypes": {
+          "init": 1,
+          "step_update": 19,
+          "result": 1
+        }
+      },
+      "terminalMetrics": [
+        {
+          "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\task-24023a31-f3ad-47a6-81d3-8780c0a76a58-4-terminal-1.json",
+          "status": "SUCCESS",
+          "exactSerializedUtf8Bytes": 163613,
+          "fields": {
+            "conversation_id": {
+              "utf8Bytes": 36
+            },
+            "status": {
+              "utf8Bytes": 7
+            },
+            "response": {
+              "utf8Bytes": 77924
+            },
+            "duration_seconds": {
+              "utf8Bytes": 11
+            },
+            "num_turns": {
+              "utf8Bytes": 1
+            },
+            "structured_output": {
+              "utf8Bytes": 77524
+            },
+            "json_schema": {
+              "utf8Bytes": 5328
+            },
+            "usage": {
+              "utf8Bytes": 117
+            }
+          },
+          "structuredOutput": {
+            "serializedUtf8Bytes": 77524,
+            "topLevelFields": {
+              "blockers": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "clarification": {
+                "utf8Bytes": 4
+              },
+              "evidence": {
+                "utf8Bytes": 1894,
+                "entries": 2
+              },
+              "followUp": {
+                "utf8Bytes": 385,
+                "entries": 2
+              },
+              "groups": {
+                "utf8Bytes": 73491,
+                "entries": 1
+              },
+              "questions": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "summary": {
+                "utf8Bytes": 1652
+              }
+            },
+            "groups": [
+              {
+                "id": "grp-feedback-realtime-debounce-and-clean",
+                "bytes": 73489,
+                "blockCount": 30,
+                "removed": []
+              }
+            ],
+            "blockCount": 30,
+            "blocks": [
+              {
+                "id": "blk-deliv-val-perf-benchmark",
+                "kind": "validation",
+                "title": "交付前置验证任务：首屏冷启动与实时输入防抖响应性能基准实测",
+                "serializedUtf8Bytes": 4176,
+                "contentUtf8Bytes": 133,
+                "taskUtf8Bytes": 3594
+              },
+              {
+                "id": "blk-deliv-val-security-xss-audit",
+                "kind": "validation",
+                "title": "交付前置验证任务：XSS 安全审计与纯原生代码静态规范性检查（防抖自动渲染路径）",
+                "serializedUtf8Bytes": 3828,
+                "contentUtf8Bytes": 204,
+                "taskUtf8Bytes": 3115
+              },
+              {
+                "id": "blk-tech-val-performance",
+                "kind": "validation",
+                "title": "技术验证任务：防抖实时反馈响应延迟与冷启动性能实测验证",
+                "serializedUtf8Bytes": 3780,
+                "contentUtf8Bytes": 132,
+                "taskUtf8Bytes": 3276
+              },
+              {
+                "id": "blk-deliv-val-standalone-runtime",
+                "kind": "validation",
+                "title": "交付前置验证任务：无确认按钮单页面本地双击直接运行与多浏览器实测",
+                "serializedUtf8Bytes": 3625,
+                "contentUtf8Bytes": 155,
+                "taskUtf8Bytes": 2966
+              },
+              {
+                "id": "blk-task-input-display",
+                "kind": "task",
+                "title": "开发任务：输入框 300ms 防抖实时反馈与安全展示区联动实现",
+                "serializedUtf8Bytes": 3618,
+                "contentUtf8Bytes": 223,
+                "taskUtf8Bytes": 2988
+              },
+              {
+                "id": "blk-tech-task-impl",
+                "kind": "task",
+                "title": "技术开发任务：防抖实时反馈架构、移除确认按钮与容错实现",
+                "serializedUtf8Bytes": 3588,
+                "contentUtf8Bytes": 219,
+                "taskUtf8Bytes": 2889
+              },
+              {
+                "id": "blk-deliv-acc-full-e2e",
+                "kind": "acceptance",
+                "title": "端到端集成验收规范：防抖实时核对与输入保留 Given-When-Then",
+                "serializedUtf8Bytes": 2842,
+                "contentUtf8Bytes": 2293,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-deliv-task-input-workflow",
+                "kind": "task",
+                "title": "交付任务：300ms 防抖实时反馈监听、安全渲染与输入保留交付",
+                "serializedUtf8Bytes": 2614,
+                "contentUtf8Bytes": 186,
+                "taskUtf8Bytes": 1926
+              },
+              {
+                "id": "blk-deliv-task-error-handling",
+                "kind": "task",
+                "title": "交付任务：防抖校验拦截、就地提示与异常保留输入容错交付",
+                "serializedUtf8Bytes": 2592,
+                "contentUtf8Bytes": 154,
+                "taskUtf8Bytes": 2022
+              },
+              {
+                "id": "blk-deliv-task-reset-workflow",
+                "kind": "task",
+                "title": "交付任务：一键即时清空、防抖任务销毁与焦点自动恢复交付",
+                "serializedUtf8Bytes": 2484,
+                "contentUtf8Bytes": 168,
+                "taskUtf8Bytes": 1812
+              },
+              {
+                "id": "blk-tech-data-model",
+                "kind": "data_model",
+                "title": "客户端运行时数据模型与状态结构规范（增加防抖定时器句柄）",
+                "serializedUtf8Bytes": 2471,
+                "contentUtf8Bytes": 2057,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-tech-error",
+                "kind": "error",
+                "title": "错误分类、防抖拦截机制与异步竞态容错策略",
+                "serializedUtf8Bytes": 2345,
+                "contentUtf8Bytes": 1939,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-deliv-task-layout-styling",
+                "kind": "task",
+                "title": "交付任务：单按钮精简视觉布局实现与确认按钮样式剔除",
+                "serializedUtf8Bytes": 2300,
+                "contentUtf8Bytes": 219,
+                "taskUtf8Bytes": 1630
+              },
+              {
+                "id": "blk-tech-interface",
+                "kind": "interface",
+                "title": "组件事件契约与模块调用接口规范（防抖调度契约）",
+                "serializedUtf8Bytes": 2249,
+                "contentUtf8Bytes": 1834,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-deliv-task-package",
+                "kind": "task",
+                "title": "交付任务：静态产物装配与防抖实时反馈交付包就绪",
+                "serializedUtf8Bytes": 2224,
+                "contentUtf8Bytes": 187,
+                "taskUtf8Bytes": 1623
+              },
+              {
+                "id": "blk-acc-input-display",
+                "kind": "acceptance",
+                "title": "验收标准：300ms 防抖实时反馈、清空取消与输入保留 Given-When-Then",
+                "serializedUtf8Bytes": 2223,
+                "contentUtf8Bytes": 1790,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-task-reset",
+                "kind": "task",
+                "title": "开发任务：一键清空、防抖任务取消与组件回焦控制",
+                "serializedUtf8Bytes": 2212,
+                "contentUtf8Bytes": 111,
+                "taskUtf8Bytes": 1718
+              },
+              {
+                "id": "blk-deliv-acc-security-edge",
+                "kind": "acceptance",
+                "title": "端到端安全防范与极端边界验收规范 Given-When-Then（防抖自动渲染路径）",
+                "serializedUtf8Bytes": 2207,
+                "contentUtf8Bytes": 1683,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-tech-module",
+                "kind": "module",
+                "title": "前端系统架构与核心功能模块划分（引入 DebounceScheduler）",
+                "serializedUtf8Bytes": 2078,
+                "contentUtf8Bytes": 1534,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-feat-input-display",
+                "kind": "feature",
+                "title": "功能特性：输入 300ms 防抖实时反馈、安全展示与失败保留输入",
+                "serializedUtf8Bytes": 1942,
+                "contentUtf8Bytes": 1527,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-flow-input-display",
+                "kind": "flow",
+                "title": "交互流程：实时输入防抖调度、自动展示与清空取消流转",
+                "serializedUtf8Bytes": 1851,
+                "contentUtf8Bytes": 1445,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-prod-outcomes",
+                "kind": "outcomes",
+                "title": "预期产品成效与衡量目标",
+                "serializedUtf8Bytes": 1850,
+                "contentUtf8Bytes": 1524,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-tech-stack",
+                "kind": "technology",
+                "title": "技术栈选型与运行规范（防抖调度与确认按钮解耦）",
+                "serializedUtf8Bytes": 1728,
+                "contentUtf8Bytes": 1228,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-deliv-spec-deployment",
+                "kind": "deployment",
+                "title": "交付产物文件组织与双启动模式规范（剔除确认按钮代码）",
+                "serializedUtf8Bytes": 1658,
+                "contentUtf8Bytes": 1223,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-acc-reset",
+                "kind": "acceptance",
+                "title": "验收标准：清空重置与任务销毁 Given-When-Then",
+                "serializedUtf8Bytes": 1585,
+                "contentUtf8Bytes": 1198,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-feat-reset",
+                "kind": "feature",
+                "title": "功能特性：一键清空、取消待展示任务与状态复位",
+                "serializedUtf8Bytes": 1562,
+                "contentUtf8Bytes": 1163,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-page-main-layout",
+                "kind": "page",
+                "title": "页面职责与参考图空间结构映射（移除确认按钮）",
+                "serializedUtf8Bytes": 1535,
+                "contentUtf8Bytes": 1152,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-deliv-acc-package",
+                "kind": "acceptance",
+                "title": "验收标准：交付包自包含性与本地启动模式 Given-When-Then",
+                "serializedUtf8Bytes": 1533,
+                "contentUtf8Bytes": 1108,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-prod-scope",
+                "kind": "scope",
+                "title": "产品功能与边界范围",
+                "serializedUtf8Bytes": 1159,
+                "contentUtf8Bytes": 832,
+                "taskUtf8Bytes": 0
+              },
+              {
+                "id": "blk-flow-reset",
+                "kind": "flow",
+                "title": "交互流程：清空重置与任务销毁操作流转",
+                "serializedUtf8Bytes": 1141,
+                "contentUtf8Bytes": 774,
+                "taskUtf8Bytes": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requestId": "task-c3b0b05b-fa71-48f1-a339-097c8c0ae250-1",
+      "kind": "review",
+      "goal": "独立检查最新草案与证据，返回具体阻塞；只有全部满足时 blockers=[]。",
+      "dependsOn": [],
+      "startedAt": "2026-10-04T18:54:33.920Z",
+      "completedAt": "2026-10-04T18:56:32.065Z",
+      "status": "success",
+      "actualInputObservation": {
+        "runtimeContextUtf8Bytes": 221527,
+        "runtimeContextUtf16CodeUnits": 150303,
+        "runtimeContextSha256": "cec36ab3ab480dcf4dd0d4ebfa99931995672ef95e6b873b504052e57ba91804",
+        "rolePromptUtf8Bytes": 9286,
+        "rolePromptSha256": "0e79283f49ab38bec0158175d3728eb20b014fbed47ff70b47641dbc0a15fecf",
+        "scope": "Exact registered request context and role prompt; excludes Provider-added image/tool/schema instructions and hidden service context"
+      },
+      "schema": {
+        "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-c3b0b05b-fa71-48f1-a339-097c8c0ae250\\result.schema.json",
+        "utf8Bytes": 5328,
+        "sha256": "5788d1b9001b399140f5f724be232893b42f746f52952d5f0b88ba09e15788bd",
+        "required": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "topLevelFields": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "serializedTopLevelPropertyBytes": {
+          "summary": 17,
+          "groups": 2470,
+          "questions": 1357,
+          "evidence": 556,
+          "blockers": 42,
+          "followUp": 196,
+          "clarification": 363
+        }
+      },
+      "contextReconstruction": {
+        "status": "exact-byte-size-and-sha256-match-to-actual-observation",
+        "utf8Bytes": 221527,
+        "sha256": "cec36ab3ab480dcf4dd0d4ebfa99931995672ef95e6b873b504052e57ba91804",
+        "matchesObservedContext": true,
+        "matchesObservedRole": true,
+        "sections": {
+          "projectName": {
+            "utf8Bytes": 54
+          },
+          "stage": {
+            "utf8Bytes": 8
+          },
+          "basis": {
+            "utf8Bytes": 89
+          },
+          "approvedDecisions": {
+            "utf8Bytes": 8764,
+            "entries": 9
+          },
+          "blueprint": {
+            "utf8Bytes": 72864
+          },
+          "decisionTopics": {
+            "utf8Bytes": 1664,
+            "entries": 9
+          },
+          "rawInputs": {
+            "utf8Bytes": 1133,
+            "entries": 2
+          },
+          "answers": {
+            "utf8Bytes": 2641,
+            "entries": 1
+          },
+          "materialIndex": {
+            "utf8Bytes": 899,
+            "entries": 2
+          },
+          "workerResults": {
+            "utf8Bytes": 77534
+          },
+          "approvedEvidence": {
+            "utf8Bytes": 10692,
+            "entries": 13
+          },
+          "knownEvidence": {
+            "utf8Bytes": 10598,
+            "entries": 10
+          },
+          "evidenceConflicts": {
+            "utf8Bytes": 2,
+            "entries": 0
+          }
+        },
+        "currentDraft": null,
+        "workerResults": {
+          "draft": {
+            "utf8Bytes": 77524
+          }
+        }
+      },
+      "stream": {
+        "frozenLogPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-c3b0b05b-fa71-48f1-a339-097c8c0ae250\\call-1.ndjson",
+        "sha256": "c6d5642492b87d15569210b888db8f70f18f761a39077d6c0f3672ff09591bca",
+        "logUtf8Bytes": 61425,
+        "stdoutUtf8Bytes": 52507,
+        "eventTypes": {
+          "init": 1,
+          "step_update": 25,
+          "result": 1
+        }
+      },
+      "terminalMetrics": [
+        {
+          "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\task-c3b0b05b-fa71-48f1-a339-097c8c0ae250-1-terminal-1.json",
+          "status": "SUCCESS",
+          "exactSerializedUtf8Bytes": 17790,
+          "fields": {
+            "conversation_id": {
+              "utf8Bytes": 36
+            },
+            "status": {
+              "utf8Bytes": 7
+            },
+            "response": {
+              "utf8Bytes": 7916
+            },
+            "duration_seconds": {
+              "utf8Bytes": 10
+            },
+            "num_turns": {
+              "utf8Bytes": 1
+            },
+            "structured_output": {
+              "utf8Bytes": 3868
+            },
+            "json_schema": {
+              "utf8Bytes": 5328
+            },
+            "usage": {
+              "utf8Bytes": 118
+            }
+          },
+          "structuredOutput": {
+            "serializedUtf8Bytes": 3868,
+            "topLevelFields": {
+              "blockers": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "clarification": {
+                "utf8Bytes": 4
+              },
+              "evidence": {
+                "utf8Bytes": 1894,
+                "entries": 2
+              },
+              "followUp": {
+                "utf8Bytes": 187,
+                "entries": 1
+              },
+              "groups": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "questions": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "summary": {
+                "utf8Bytes": 1682
+              }
+            },
+            "groups": [],
+            "blockCount": 0,
+            "blocks": []
+          }
+        }
+      ]
+    },
+    {
+      "requestId": "task-b592217b-b1a3-443e-acf4-a7bfaefd41d2-1",
+      "kind": "validation",
+      "goal": "在后续开发与交付阶段，在本地现代主流桌面浏览器真实环境中实测 300ms 防抖响应延迟与清除定时器防幽灵渲染逻辑",
+      "dependsOn": [],
+      "startedAt": "2026-10-04T18:56:32.116Z",
+      "completedAt": "2026-10-04T19:01:02.359Z",
+      "status": "failed",
+      "actualInputObservation": {
+        "runtimeContextUtf8Bytes": 137671,
+        "runtimeContextUtf16CodeUnits": 97717,
+        "runtimeContextSha256": "ca14341652cebdc47d70ea94810aa2c6988b744ce799a180b3eb6877eab414d5",
+        "rolePromptUtf8Bytes": 8315,
+        "rolePromptSha256": "2f834b186a1dcf84affedf5b29f588b3e5c47872bc13c425aa9cc5cb82871ad0",
+        "scope": "Exact registered request context and role prompt; excludes Provider-added image/tool/schema instructions and hidden service context"
+      },
+      "schema": {
+        "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-b592217b-b1a3-443e-acf4-a7bfaefd41d2\\result.schema.json",
+        "utf8Bytes": 5328,
+        "sha256": "5788d1b9001b399140f5f724be232893b42f746f52952d5f0b88ba09e15788bd",
+        "required": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "topLevelFields": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "serializedTopLevelPropertyBytes": {
+          "summary": 17,
+          "groups": 2470,
+          "questions": 1357,
+          "evidence": 556,
+          "blockers": 42,
+          "followUp": 196,
+          "clarification": 363
+        }
+      },
+      "contextReconstruction": {
+        "status": "exact-byte-size-and-sha256-match-to-actual-observation",
+        "utf8Bytes": 137671,
+        "sha256": "ca14341652cebdc47d70ea94810aa2c6988b744ce799a180b3eb6877eab414d5",
+        "matchesObservedContext": true,
+        "matchesObservedRole": true,
+        "sections": {
+          "projectName": {
+            "utf8Bytes": 54
+          },
+          "stage": {
+            "utf8Bytes": 8
+          },
+          "basis": {
+            "utf8Bytes": 89
+          },
+          "approvedDecisions": {
+            "utf8Bytes": 8764,
+            "entries": 9
+          },
+          "blueprint": {
+            "utf8Bytes": 72864
+          },
+          "decisionTopics": {
+            "utf8Bytes": 1664,
+            "entries": 9
+          },
+          "rawInputs": {
+            "utf8Bytes": 1133,
+            "entries": 2
+          },
+          "answers": {
+            "utf8Bytes": 2641,
+            "entries": 1
+          },
+          "materialIndex": {
+            "utf8Bytes": 899,
+            "entries": 2
+          },
+          "workerResults": {
+            "utf8Bytes": 2
+          },
+          "approvedEvidence": {
+            "utf8Bytes": 10692,
+            "entries": 13
+          },
+          "knownEvidence": {
+            "utf8Bytes": 19925,
+            "entries": 19
+          },
+          "evidenceConflicts": {
+            "utf8Bytes": 2,
+            "entries": 0
+          }
+        },
+        "currentDraft": null,
+        "workerResults": {}
+      },
+      "stream": {
+        "frozenLogPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-b592217b-b1a3-443e-acf4-a7bfaefd41d2\\call-1.ndjson",
+        "sha256": "0ec9f305a64e57ca89d8c0d82405c40deb48cb924721e7fe23b00bcbf1b6af33",
+        "logUtf8Bytes": 121382,
+        "stdoutUtf8Bytes": 110106,
+        "eventTypes": {
+          "init": 1,
+          "step_update": 21,
+          "result": 1
+        }
+      },
+      "terminalMetrics": [
+        {
+          "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\task-b592217b-b1a3-443e-acf4-a7bfaefd41d2-1-terminal-1.json",
+          "status": "ERROR",
+          "error": "Your previous response was cut off because it exceeded the output token limit\nPlease continue from where you left off, keeping your response shorter\nRetries remaining: 3",
+          "exactSerializedUtf8Bytes": 50125,
+          "fields": {
+            "conversation_id": {
+              "utf8Bytes": 36
+            },
+            "status": {
+              "utf8Bytes": 5
+            },
+            "response": {
+              "utf8Bytes": 21803
+            },
+            "error": {
+              "utf8Bytes": 169
+            },
+            "duration_seconds": {
+              "utf8Bytes": 11
+            },
+            "num_turns": {
+              "utf8Bytes": 1
+            },
+            "structured_output": {
+              "utf8Bytes": 21688
+            },
+            "json_schema": {
+              "utf8Bytes": 5328
+            },
+            "usage": {
+              "utf8Bytes": 118
+            }
+          },
+          "structuredOutput": {
+            "serializedUtf8Bytes": 21688,
+            "topLevelFields": {
+              "blockers": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "clarification": {
+                "utf8Bytes": 1069
+              },
+              "evidence": {
+                "utf8Bytes": 4686,
+                "entries": 5
+              },
+              "followUp": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "groups": {
+                "utf8Bytes": 15254,
+                "entries": 1
+              },
+              "questions": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "summary": {
+                "utf8Bytes": 583
+              }
+            },
+            "groups": [
+              {
+                "id": "grp-feedback-debounce-perf-benchmark",
+                "bytes": 15252,
+                "blockCount": 3,
+                "removed": []
+              }
+            ],
+            "blockCount": 3,
+            "blocks": [
+              {
+                "id": "blk-tech-val-performance",
+                "kind": "validation",
+                "title": "技术验证任务：本地冷启动与 300ms 防抖及清空实测基准验证",
+                "serializedUtf8Bytes": 6152,
+                "contentUtf8Bytes": 337,
+                "taskUtf8Bytes": 5253
+              },
+              {
+                "id": "blk-deliv-val-perf-benchmark",
+                "kind": "validation",
+                "title": "交付前置验证任务：首屏冷启动、300ms防抖响应与清除定时器防幽灵渲染性能实测",
+                "serializedUtf8Bytes": 5785,
+                "contentUtf8Bytes": 353,
+                "taskUtf8Bytes": 4783
+              },
+              {
+                "id": "blk-prod-outcomes",
+                "kind": "outcomes",
+                "title": "预期产品成效与衡量目标",
+                "serializedUtf8Bytes": 1829,
+                "contentUtf8Bytes": 1359,
+                "taskUtf8Bytes": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "requestId": "task-7697ba53-eda8-416f-ba20-7cf34555e831-1",
+      "kind": "research",
+      "goal": "在具备外网访问权限的环境下，进一步查阅 WHATWG/W3C 关于 InputEvent.isComposing 与 CompositionEvent 在不同操作系统输入法下的规范说明",
+      "dependsOn": [],
+      "startedAt": "2026-10-04T18:56:32.176Z",
+      "completedAt": "2026-10-04T18:59:34.755Z",
+      "status": "success",
+      "actualInputObservation": {
+        "runtimeContextUtf8Bytes": 137671,
+        "runtimeContextUtf16CodeUnits": 97717,
+        "runtimeContextSha256": "ca14341652cebdc47d70ea94810aa2c6988b744ce799a180b3eb6877eab414d5",
+        "rolePromptUtf8Bytes": 8707,
+        "rolePromptSha256": "6639861001756680ab03c8338360660f80b5750ff0e14dd4f5901b5ae19b043e",
+        "scope": "Exact registered request context and role prompt; excludes Provider-added image/tool/schema instructions and hidden service context"
+      },
+      "schema": {
+        "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-7697ba53-eda8-416f-ba20-7cf34555e831\\result.schema.json",
+        "utf8Bytes": 5328,
+        "sha256": "5788d1b9001b399140f5f724be232893b42f746f52952d5f0b88ba09e15788bd",
+        "required": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "topLevelFields": [
+          "summary",
+          "groups",
+          "questions",
+          "evidence",
+          "blockers",
+          "followUp",
+          "clarification"
+        ],
+        "serializedTopLevelPropertyBytes": {
+          "summary": 17,
+          "groups": 2470,
+          "questions": 1357,
+          "evidence": 556,
+          "blockers": 42,
+          "followUp": 196,
+          "clarification": 363
+        }
+      },
+      "contextReconstruction": {
+        "status": "exact-byte-size-and-sha256-match-to-actual-observation",
+        "utf8Bytes": 137671,
+        "sha256": "ca14341652cebdc47d70ea94810aa2c6988b744ce799a180b3eb6877eab414d5",
+        "matchesObservedContext": true,
+        "matchesObservedRole": true,
+        "sections": {
+          "projectName": {
+            "utf8Bytes": 54
+          },
+          "stage": {
+            "utf8Bytes": 8
+          },
+          "basis": {
+            "utf8Bytes": 89
+          },
+          "approvedDecisions": {
+            "utf8Bytes": 8764,
+            "entries": 9
+          },
+          "blueprint": {
+            "utf8Bytes": 72864
+          },
+          "decisionTopics": {
+            "utf8Bytes": 1664,
+            "entries": 9
+          },
+          "rawInputs": {
+            "utf8Bytes": 1133,
+            "entries": 2
+          },
+          "answers": {
+            "utf8Bytes": 2641,
+            "entries": 1
+          },
+          "materialIndex": {
+            "utf8Bytes": 899,
+            "entries": 2
+          },
+          "workerResults": {
+            "utf8Bytes": 2
+          },
+          "approvedEvidence": {
+            "utf8Bytes": 10692,
+            "entries": 13
+          },
+          "knownEvidence": {
+            "utf8Bytes": 19925,
+            "entries": 19
+          },
+          "evidenceConflicts": {
+            "utf8Bytes": 2,
+            "entries": 0
+          }
+        },
+        "currentDraft": null,
+        "workerResults": {}
+      },
+      "stream": {
+        "frozenLogPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-7697ba53-eda8-416f-ba20-7cf34555e831\\call-1.ndjson",
+        "sha256": "57167d4fc3848df434713e0f95e61a81559aea7fab4b92be9cc54794ff1a29c0",
+        "logUtf8Bytes": 214771,
+        "stdoutUtf8Bytes": 182920,
+        "eventTypes": {
+          "init": 1,
+          "step_update": 121,
+          "result": 1
+        }
+      },
+      "terminalMetrics": [
+        {
+          "path": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\task-7697ba53-eda8-416f-ba20-7cf34555e831-1-terminal-1.json",
+          "status": "SUCCESS",
+          "exactSerializedUtf8Bytes": 15627,
+          "fields": {
+            "conversation_id": {
+              "utf8Bytes": 36
+            },
+            "status": {
+              "utf8Bytes": 7
+            },
+            "response": {
+              "utf8Bytes": 4964
+            },
+            "duration_seconds": {
+              "utf8Bytes": 11
+            },
+            "num_turns": {
+              "utf8Bytes": 1
+            },
+            "structured_output": {
+              "utf8Bytes": 4858
+            },
+            "json_schema": {
+              "utf8Bytes": 5328
+            },
+            "usage": {
+              "utf8Bytes": 119
+            }
+          },
+          "structuredOutput": {
+            "serializedUtf8Bytes": 4858,
+            "topLevelFields": {
+              "blockers": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "clarification": {
+                "utf8Bytes": 4
+              },
+              "evidence": {
+                "utf8Bytes": 3946,
+                "entries": 4
+              },
+              "followUp": {
+                "utf8Bytes": 223,
+                "entries": 1
+              },
+              "groups": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "questions": {
+                "utf8Bytes": 2,
+                "entries": 0
+              },
+              "summary": {
+                "utf8Bytes": 589
+              }
+            },
+            "groups": [],
+            "blockCount": 0,
+            "blocks": []
+          }
+        }
+      ]
+    }
+  ],
+  "successfulReceiptInventory": {
+    "count": 23,
+    "completedInThisControl": 3,
+    "receipts": [
+      {
+        "runId": "run-d946e41f-f6c5-418f-9ea2-e3b394b7330e",
+        "stage": "clarify",
+        "taskId": "task-b8f92294-f3c2-4282-a905-72e046e8df16",
+        "kind": "clarification",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:07:32.007Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-d946e41f-f6c5-418f-9ea2-e3b394b7330e\\tasks\\task-b8f92294-f3c2-4282-a905-72e046e8df16\\result.json",
+        "resultSha256": "e6c8a9e69470c10c3d4ab2f4a10363f5842ad734ecb064c060f96d755b64352a",
+        "resultUtf8Bytes": 4521,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-d946e41f-f6c5-418f-9ea2-e3b394b7330e\\tasks\\task-b8f92294-f3c2-4282-a905-72e046e8df16\\result-receipt.json",
+        "receiptSha256": "8a59711a860c42a63f4682597f2b4a8ae8c78d3e60e9518ad0d8f5ea0f9d1df6",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "f3f92beadc5d787a9bd04778dffc600e2d90041bdb0509ee3820fd8533e01468",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-ac565ee1-277a-4c40-90a6-baa56d82b8c9",
+        "kind": "design",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:09:20.910Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-ac565ee1-277a-4c40-90a6-baa56d82b8c9\\result.json",
+        "resultSha256": "fc0853d9e3c6293b47ea273e6bb55403011c4a4fd0d128696e52140076808725",
+        "resultUtf8Bytes": 26889,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-ac565ee1-277a-4c40-90a6-baa56d82b8c9\\result-receipt.json",
+        "receiptSha256": "727b83bccd60926ffb169233991810c74954590ddd814f47a0eedc3350123cc5",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "6791d9ac47574508c3270e3ff3b4768e157688fcb5a14c3cc270f170f44120ab",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-39b26e11-58b4-4565-ae78-82602c2a9267",
+        "kind": "research",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:09:27.690Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-39b26e11-58b4-4565-ae78-82602c2a9267\\result.json",
+        "resultSha256": "1e7f6d53b44213c7193cf1e3ee39990afef04c872844ff3cd21a84a9e7efaa20",
+        "resultUtf8Bytes": 12919,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-39b26e11-58b4-4565-ae78-82602c2a9267\\result-receipt.json",
+        "receiptSha256": "986390e82a666db567d310d1230efe579efd58a451a1d7bb427be07a438eb4cd",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "dd77d5c0aae03fa9380e1bcdae9bb4f032d3dbb275f5df75311aa105c32bfe64",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-e93f2ba9-c786-40e2-9126-d50fc788dc9f",
+        "kind": "integration",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:11:24.514Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-e93f2ba9-c786-40e2-9126-d50fc788dc9f\\result.json",
+        "resultSha256": "8717dd659266fec50320ba1e661baf945222e5ac96f3e131f986e6de5f88f41f",
+        "resultUtf8Bytes": 36023,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-e93f2ba9-c786-40e2-9126-d50fc788dc9f\\result-receipt.json",
+        "receiptSha256": "3c4b1495d34e76037cd97ebf5edf0ce9041e4f8fe923c073cdcf8bd48382ee1e",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "f1bb5e856f12872f229c4e4d9ded944216857a29f7163dad10872a73a0b1e529",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-1da85583-2553-422e-87d2-41aa0b2333c3",
+        "kind": "revision",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:12:46.137Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-1da85583-2553-422e-87d2-41aa0b2333c3\\result.json",
+        "resultSha256": "b6139e2b6ef7c67fab3c41da35f7bbb776afb0492d44a6c67665a4270242299d",
+        "resultUtf8Bytes": 35687,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-1da85583-2553-422e-87d2-41aa0b2333c3\\result-receipt.json",
+        "receiptSha256": "d401224feabed2337d312b65534ec8f894568824773f64d1f40573669d62648a",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "e3ee646cd733e24dd8a50e86c6226c217ab5869cbc4fcaafbe14ddf6714687b5",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-32f6f9dc-6865-4224-b4d9-a2afb692d074",
+        "kind": "revision",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:13:59.602Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-32f6f9dc-6865-4224-b4d9-a2afb692d074\\result.json",
+        "resultSha256": "345e1c53948d6461dacf347c3b68038c0c671e5de73ca3d0a63f15d0f300e823",
+        "resultUtf8Bytes": 33027,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-32f6f9dc-6865-4224-b4d9-a2afb692d074\\result-receipt.json",
+        "receiptSha256": "df1ef316047eea7852969405f2b033d68e2cb576b51f5f3d290869e6190cc2ff",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "ac23fa564804fbbc647ae2ae4f340c138c507f382c09a45c10830688f75ec238",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-ddb296ba-bbc8-45e8-bc70-15ec88e02384",
+        "kind": "revision",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:15:18.306Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-ddb296ba-bbc8-45e8-bc70-15ec88e02384\\result.json",
+        "resultSha256": "3fa4e3d24214e32c8b6aa3fffb95a7dc6a08a3956069fb705417fe72656d68f2",
+        "resultUtf8Bytes": 32871,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-ddb296ba-bbc8-45e8-bc70-15ec88e02384\\result-receipt.json",
+        "receiptSha256": "d1b8dd700ba604b23c7e3fe63775122b614e867eeca1bab79badc964788986a9",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "71d5813e882351ec7997936cd39ae7b5b15a16367c66a154186755e058d5ef67",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f",
+        "stage": "product",
+        "taskId": "task-d247a8ff-48e1-4fc4-95d9-929093056a58",
+        "kind": "review",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:16:24.906Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-d247a8ff-48e1-4fc4-95d9-929093056a58\\result.json",
+        "resultSha256": "48290fadbceaf2a0ae6f5015dc60240723753390ce68d91f084449a5f12a23ce",
+        "resultUtf8Bytes": 8064,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tasks\\task-d247a8ff-48e1-4fc4-95d9-929093056a58\\result-receipt.json",
+        "receiptSha256": "96ff8983fd45aa7d40dfff638d52de07cc138565c2a126e6ae6a8e025b35487a",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "074945f48bfea8c66141ca4ab439d1532e372f6b9bfeb1a2c2f8b1c48d8d37cb",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-61512c88-a371-461b-be4a-0a18237f2b2e",
+        "stage": "technical",
+        "taskId": "task-19cbf783-e01f-4c05-886a-a982f6b4d725",
+        "kind": "design",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:19:37.037Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-19cbf783-e01f-4c05-886a-a982f6b4d725\\result.json",
+        "resultSha256": "8538526c500a30ea5ff79f6af1f84920dbfb293023fc4d022b6801fabe46d96e",
+        "resultUtf8Bytes": 29990,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-19cbf783-e01f-4c05-886a-a982f6b4d725\\result-receipt.json",
+        "receiptSha256": "f4da3a420a2f55052045cf2800bee921beb6ac35b59ce560408727b16c1dbd83",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "2a551163a8694938aab9388ca49a1c2a2b32b82b085cfcb89a6c3f4a50f54142",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-61512c88-a371-461b-be4a-0a18237f2b2e",
+        "stage": "technical",
+        "taskId": "task-950d1e71-3df2-4504-9d63-bbe334fe095e",
+        "kind": "research",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:18:22.278Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-950d1e71-3df2-4504-9d63-bbe334fe095e\\result.json",
+        "resultSha256": "0bb900f53efa159998ca094edef2df470a45a7b8800823dfdc8cb5fa01a007a9",
+        "resultUtf8Bytes": 19528,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-950d1e71-3df2-4504-9d63-bbe334fe095e\\result-receipt.json",
+        "receiptSha256": "9a53af3b77d9cda20fe7adbb2e7a8fb9e9352976f863168b2e4d76c12d2fa6cd",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "2a8b0280b15007b2da2a8a7c878a4d41b8fda6ab0586b1057bc5e95c74b2c2d8",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-61512c88-a371-461b-be4a-0a18237f2b2e",
+        "stage": "technical",
+        "taskId": "task-524b0dc6-12d6-45e7-acf9-d149f7169df5",
+        "kind": "integration",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:21:45.671Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-524b0dc6-12d6-45e7-acf9-d149f7169df5\\result.json",
+        "resultSha256": "8d08f238548d6f37318bb50bd7ddc8ebb917aad427f5f5a7790fe8e887ce2a1c",
+        "resultUtf8Bytes": 32778,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-524b0dc6-12d6-45e7-acf9-d149f7169df5\\result-receipt.json",
+        "receiptSha256": "7aa10671f8f51fb733ff94569a70c8fe91151fcc7c2bc0fb9bcb830983c975f8",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "1cf527e8c82f9f432d8d02d3fd5451ed2d0bb7643e5562fcfefcd05b1bca7c3b",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-61512c88-a371-461b-be4a-0a18237f2b2e",
+        "stage": "technical",
+        "taskId": "task-13777bd3-0a7c-4bf6-b5d9-b2267890df12",
+        "kind": "review",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:22:58.689Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-13777bd3-0a7c-4bf6-b5d9-b2267890df12\\result.json",
+        "resultSha256": "3a187d596824748ca6da7d048890fe23c9d5d2d63e55299bdf6f90fd1e87bd3c",
+        "resultUtf8Bytes": 2211,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-61512c88-a371-461b-be4a-0a18237f2b2e\\tasks\\task-13777bd3-0a7c-4bf6-b5d9-b2267890df12\\result-receipt.json",
+        "receiptSha256": "8584c5f8d8ecd44a217f9cbaf9c8d68739fe2c2cefde7ae338678d23f9335c65",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "fbc50d7a9ff307eec6994aa131994a14d1a2503d7d4537c1c310dfcab17afcc9",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-98e4cedc-717d-4d2b-8532-d9919924590f",
+        "stage": "delivery",
+        "taskId": "task-9a469a08-fab6-442a-9b79-314764a7908b",
+        "kind": "design",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:25:50.210Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-9a469a08-fab6-442a-9b79-314764a7908b\\result.json",
+        "resultSha256": "59f3d1ae16ad0f0ad26c0a231c549eba9565a6e2dedaa91b351e67a372f30a18",
+        "resultUtf8Bytes": 45455,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-9a469a08-fab6-442a-9b79-314764a7908b\\result-receipt.json",
+        "receiptSha256": "d62ea5ea76a379aaec24758a7a4172a03dda3b6c547ac8dfd75fb11b7d627571",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "8821da70b7d54da197bef9b0504c6dd93016ed0ef495c091bc6ce6ec0d64afe8",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-98e4cedc-717d-4d2b-8532-d9919924590f",
+        "stage": "delivery",
+        "taskId": "task-25825306-0df1-4bf7-ba51-b25ddfb47603",
+        "kind": "research",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:24:26.967Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-25825306-0df1-4bf7-ba51-b25ddfb47603\\result.json",
+        "resultSha256": "efbeb1d856df52c11850d8feeee646396a84137629ed123792a6c562e2ef0910",
+        "resultUtf8Bytes": 4595,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-25825306-0df1-4bf7-ba51-b25ddfb47603\\result-receipt.json",
+        "receiptSha256": "0018ed0cdbb31b36c18b04143100bb27e06c91e5cf70b089724c654f096f7258",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "6feec11959fff91835b82cf32153198a93ef9aa757845a9e006f11cc1fa7e2cd",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-98e4cedc-717d-4d2b-8532-d9919924590f",
+        "stage": "delivery",
+        "taskId": "task-69a76e8d-6854-4c19-a074-06ec08aefe0f",
+        "kind": "integration",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:27:02.646Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-69a76e8d-6854-4c19-a074-06ec08aefe0f\\result.json",
+        "resultSha256": "a9454756efd1df8f9032f4b0fa9896618508a2e0687574d276c02b91012b5376",
+        "resultUtf8Bytes": 45917,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-69a76e8d-6854-4c19-a074-06ec08aefe0f\\result-receipt.json",
+        "receiptSha256": "5ca020198019603e27eda527c2f77b055215385665e483b912de19c01f3a061c",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "3eb89c6f94f275d9012b6113567612b8c6a2e403e153c8faf8d8a092a5ba7b1a",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-98e4cedc-717d-4d2b-8532-d9919924590f",
+        "stage": "delivery",
+        "taskId": "task-e7dc4bc9-b65c-4409-aa66-bdd1538c6c20",
+        "kind": "review",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:28:06.318Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-e7dc4bc9-b65c-4409-aa66-bdd1538c6c20\\result.json",
+        "resultSha256": "365f894296baf7b17e410f7c39e11cab4aceb9384254e2a4f38c3e113ac2d3e6",
+        "resultUtf8Bytes": 7877,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tasks\\task-e7dc4bc9-b65c-4409-aa66-bdd1538c6c20\\result-receipt.json",
+        "receiptSha256": "edddfd21196ce71e45d9ddd62712b2dc864b55563e484829a05c22370b674ecb",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "a84e931f21ab16673a86c955009eebf2ce6bf70ead9fa43492481470e1b66aef",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-f738b6ac-025f-4023-92ee-409e0f480369",
+        "kind": "design",
+        "attempts": 2,
+        "completedAt": "2026-10-04T16:40:44.871Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-f738b6ac-025f-4023-92ee-409e0f480369\\result.json",
+        "resultSha256": "f67fbd1c7782141136dda9761371dfe057f6f0c67f767db560709e6496b20de5",
+        "resultUtf8Bytes": 95813,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-f738b6ac-025f-4023-92ee-409e0f480369\\result-receipt.json",
+        "receiptSha256": "13b6e47f4af93712c8985d6f409fe5f0a57658ea83de8100729f4a0b5b897ebf",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "3736b9561adc0e881a95f0b874c8704db4ed75bebe18b6eb5fb78b14d252d610",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-bbdcd90e-394d-4a5f-9af2-8bbe96a3d927",
+        "kind": "research",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:31:45.710Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-bbdcd90e-394d-4a5f-9af2-8bbe96a3d927\\result.json",
+        "resultSha256": "5916143232373469e542818ae035ed7d4ad761054296ccc43bea9dc771e35050",
+        "resultUtf8Bytes": 84586,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-bbdcd90e-394d-4a5f-9af2-8bbe96a3d927\\result-receipt.json",
+        "receiptSha256": "038a2bb50f177f88a7bce0053264d02c252c810abd5c72fb3f50513214c29ce7",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "35fe3c89c2ea66e930f08bb1959c23693730b7d920ad01bb45b4f89f72911af1",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-9dcd7940-4a8b-432c-9a2d-96ec39a4538b",
+        "kind": "integration",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:44:47.842Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-9dcd7940-4a8b-432c-9a2d-96ec39a4538b\\result.json",
+        "resultSha256": "e19582a672f3ff3c4f836052d6eb97c7f6e1e140f50de56be730275cbed4c82a",
+        "resultUtf8Bytes": 79955,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-9dcd7940-4a8b-432c-9a2d-96ec39a4538b\\result-receipt.json",
+        "receiptSha256": "e309c17caf1ae6878939cf13a0c1eed6de36f8f23403508326961b8a2d9a0248",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "a0702e94789e3ce5642871c8ac150e16b2885f7d4a4cff8ef8e57188af91b705",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-5d4faf12-2263-41c6-ad2f-1a7dbeaf9c7c",
+        "kind": "review",
+        "attempts": 1,
+        "completedAt": "2026-10-04T16:46:56.273Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-5d4faf12-2263-41c6-ad2f-1a7dbeaf9c7c\\result.json",
+        "resultSha256": "4d7cc5a45745f1b969f9424cf8fbe10746c77d78f98fd453bb6f2f6d600e61c6",
+        "resultUtf8Bytes": 5448,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-5d4faf12-2263-41c6-ad2f-1a7dbeaf9c7c\\result-receipt.json",
+        "receiptSha256": "15b246ea2b1bc01f84efc3b90b7c24c3a755d6dad6450d1fe537b48261b44478",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "976076ba458f6c4973d0367e503cefcffdb53dca1c6de1e749ffc514b98d770a",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": false
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-24023a31-f3ad-47a6-81d3-8780c0a76a58",
+        "kind": "revision",
+        "attempts": 4,
+        "completedAt": "2026-10-04T18:54:33.823Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-24023a31-f3ad-47a6-81d3-8780c0a76a58\\result.json",
+        "resultSha256": "e783c1784160f62138ff0c1235eda6e835771548dd24b59cdca042c9eb149ee6",
+        "resultUtf8Bytes": 90611,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-24023a31-f3ad-47a6-81d3-8780c0a76a58\\result-receipt.json",
+        "receiptSha256": "c88b8b8cbbfb4a1a9b1912b8559efe3318856e4acc594bda4a561b80fbef7d5c",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "66696795c9cfce2280a7393a6eba644c899aef10e26b2a3311a44aad13349dd4",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": true
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-c3b0b05b-fa71-48f1-a339-097c8c0ae250",
+        "kind": "review",
+        "attempts": 1,
+        "completedAt": "2026-10-04T18:56:32.069Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-c3b0b05b-fa71-48f1-a339-097c8c0ae250\\result.json",
+        "resultSha256": "398e464f66d9d92762855e6dc36ef9e1b317c1a8898f69c1ba7fbabf172bceb4",
+        "resultUtf8Bytes": 4094,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-c3b0b05b-fa71-48f1-a339-097c8c0ae250\\result-receipt.json",
+        "receiptSha256": "69e04324c0c5ab48b1946b182a46b67dd3d6a1fd8919b4dc94885b7433bd02ea",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "ccf160e161bdc0470d97bd179cbf04b3d8fb1c5bd7e7ea5ec7d5e72697bb2412",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": true
+      },
+      {
+        "runId": "run-67045f9a-4c95-4756-b449-fb72f37327b6",
+        "stage": "feedback",
+        "taskId": "task-7697ba53-eda8-416f-ba20-7cf34555e831",
+        "kind": "research",
+        "attempts": 1,
+        "completedAt": "2026-10-04T18:59:34.762Z",
+        "resultPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-7697ba53-eda8-416f-ba20-7cf34555e831\\result.json",
+        "resultSha256": "1eea9b220f7ccd27d2551788b3f60e9e0f1b85477f06eb626374d5f68c0adc82",
+        "resultUtf8Bytes": 5248,
+        "receiptPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-03\\project-records\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tasks\\task-7697ba53-eda8-416f-ba20-7cf34555e831\\result-receipt.json",
+        "receiptSha256": "a0d808496301a6d97d0b2fa47242b800d2eed2dfcb8a0d2df1827d34269ccd93",
+        "receiptUtf8Bytes": 221,
+        "registeredOutputHash": "5420f11365c842435e72ea117565eaf840d50a1e9fbe15f2ae16251b292670a8",
+        "receiptAndOutputHashMatch": true,
+        "completedInThisControl": true
+      }
+    ]
+  }
+}

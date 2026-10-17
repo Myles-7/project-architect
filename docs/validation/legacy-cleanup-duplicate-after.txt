@@ -1,0 +1,26 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ✓ packages/core/tests/PlanningMigration.test.ts (5 tests) 1672ms
+   ✓ Old-format project migration on copies > persists the new files only at a normal commit and retains the recoverable old revision  305ms
+   ✓ Old-format project migration on copies > requires explicit cleanup approval and unlock, preserving all original records as history  428ms
+   ✓ Old-format project migration on copies > does not duplicate the remaining cleanup groups after a partial approval  302ms
+   ✓ Old-format project migration on copies > honors rejected cleanup for the same record text across unrelated input, but reviews changed text again  420ms
+ ✓ packages/core/tests/PlanningService.test.ts (9 tests) 2913ms
+   ✓ Planning approval safety > draft never confirms; approval is atomic and idempotent and preserves provenance  356ms
+   ✓ Planning approval safety > refuses stale proposals and locked replacement without partial writes  635ms
+   ✓ Planning approval safety > free text and delegation preserve raw input without confirmed decisions  428ms
+ ✓ packages/core/tests/PlanningBoundaries.test.ts (17 tests) 6042ms
+   ✓ Planning state boundaries on real files > keeps untouched downstream design pending when feedback combines a decision change with product-only revision  1060ms
+   ✓ Planning state boundaries on real files > keeps complete three-stage feedback approved when it also changes a decision  939ms
+   ✓ Planning state boundaries on real files > keeps all three stages approved when one feedback package explicitly revises every affected stage  960ms
+   ✓ Planning state boundaries on real files > allows separate answers to an approved project batch while invalidating affected design  512ms
+   ✓ Planning state boundaries on real files > refuses newly colliding aliases and overlapping blocks before any commit  335ms
+   ✓ Planning state boundaries on real files > finishes a partial package after rejecting its optional group, without reviving stale readiness  341ms
+   ✓ Planning state boundaries on real files > makes decision-only feedback require redesign while preserving history  334ms
+
+ Test Files  3 passed (3)
+      Tests  31 passed (31)
+   Start at  01:44:56
+   Duration  6.98s (transform 370ms, setup 0ms, collect 1.44s, tests 10.63s, environment 0ms, prepare 248ms)
+

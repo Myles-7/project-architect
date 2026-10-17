@@ -1,0 +1,568 @@
+{
+  "schemaVersion": 1,
+  "blocks": [
+    {
+      "content": "面向个人开发者本地独立开发与核对测试场景。用户需要在桌面浏览器中快速核对原型项目名的输入与即时视觉反馈，桌面优先，单人单机使用，无需跨设备同步、无多用户协作与无身份认证。",
+      "dependsOn": [],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "id": "blk-prod-target",
+      "kind": "target",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "目标用户与使用场景",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "解决个人开发者在本地进行轻量原型验证时缺乏即时、低干扰核对界面的问题。痛点包括：常规测试页面常依赖网络请求或复杂脚手架，难以进行秒级纯客户端反馈；在空值或异常提交时若缺乏提示或粗暴清空用户输入，会导致重复录入测试数据，严重降低核对效率。",
+      "dependsOn": [
+        "blk-prod-target"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "id": "blk-prod-problem",
+      "kind": "problem",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "核心问题与痛点分析",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "1. 实时核对成效：输入任意非空项目名点击确认后，顶部展示区即时高对比呈现该名称。\n2. 健壮防错与空值反馈：空值提交时产生明确就地错误警示，不破坏界面状态，异常或提交失败时严格保留已有输入文本。\n3. 安全渲染成效：任意包含 HTML 或特殊字符的项目名均作为纯文本安全回显，无脚本注入与执行风险。\n4. 性能目标（待技术阶段验证）：在桌面现代主流浏览器（Chrome/Edge/Firefox 最新版）、1 条项目名文本（1~200 字符）条件下，本地页面冷启动渲染时间目标≤300ms，输入与按钮点击响应延迟目标≤50ms（测量起止：从 click/keyup 事件触发至 DOM 更新并完成重绘，包含微任务排队与渲染耗时，验证方法：在开发与交付阶段通过浏览器 Performance API / DevTools 实测）。",
+      "dependsOn": [
+        "blk-prod-problem"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-textcontent-xss-safety"
+      ],
+      "id": "blk-prod-outcomes",
+      "kind": "outcomes",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "预期产品成效与衡量目标",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "本产品严格限定为纯前端单页面应用。包含：\n1. 单个文本输入框（用于输入项目名，支持键盘 Enter 快捷提交）；\n2. 确认提交按钮（触发非空校验、XSS安全过滤与大字展示）；\n3. 顶部高对比项目名展示区域（支持纯文本安全渲染与超长文本自动换行）；\n4. 清空重置按钮（一键复位界面状态与自动回焦）；\n5. 就地错误警示展示与异常保留输入机制；\n6. 基于 fixture.png 的白底与控件空间排布映射。",
+      "dependsOn": [
+        "blk-prod-outcomes"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+        "evidence-mdn-textcontent-xss-safety"
+      ],
+      "id": "blk-prod-scope",
+      "kind": "scope",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "产品功能与边界范围",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "明确排除以下所有能力扩张：\n1. 服务端支持：不引入任何后端 API、Node.js 服务端运行时或网络请求；\n2. 数据库与持久化：不依赖 IndexedDB/LocalStorage/远程数据库作为长期数据仓库；\n3. 用户鉴权与权限：无登录、注册、Token 管理或鉴权逻辑；\n4. 协同与支付：无多人协作、链接分享或商业化计费体系；\n5. 不将 fixture.png 中的示例文字“Q7M4-8261”转为业务需求或固定业务约束。",
+      "dependsOn": [
+        "blk-prod-scope"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+      ],
+      "id": "blk-prod-non-goals",
+      "kind": "non_goals",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "非目标与排除能力",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "支持在桌面端输入框中录入项目名文本，点击确认按钮（或按 Enter 键）后触发核对流程。\n- 正常状态：输入有效非空字符串时，顶部展示区即时切换为该文本（通过 Node.textContent 安全渲染），去除先前任何错误标记，输入框保留当前文字便于微调。\n- 空值状态：输入为空或全空白字符时，阻断展示区更新，输入框高亮错误边框并在其下方显示‘项目名不能为空，请输入有效字符’，且不抹除用户已输入的空格等字符。\n- 异常保护状态：若执行过程发生未知运行时错误，立即捕获异常并显示轻量错误提示条，严格保护输入框现有文本，不重置页面，允许用户修复或重试。\n- 初始/离线状态：首次打开展示区显示灰色占位文字‘【等待输入核对】’，完全支持纯离线本地加载运行。",
+      "dependsOn": [
+        "blk-prod-scope"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-event-prevent-default"
+      ],
+      "id": "blk-feat-input-display",
+      "kind": "feature",
+      "requirementIds": [
+        "blk-prod-scope",
+        "blk-prod-outcomes"
+      ],
+      "stage": "product",
+      "title": "功能特性：项目名输入、安全展示与失败保留输入",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "1. 用户光标聚焦在文本输入框并输入字符。\n2. 用户点击确认按钮或在输入框内按下 Enter 键。\n3. 系统调用 event.preventDefault() 拦截默认页面刷新行为。\n4. 系统获取输入文本并去除首尾空白字符（trim()）进行合法性判断：\n   - 分支 A（空值或纯空白字符）：在输入框正下方挂载红色错误提示节点 '项目名不能为空，请输入有效字符'，输入框边框变红并保持焦点，展示区保持原有内容，用户已输入内容完全保留，流程终止；\n   - 分支 B（有效非空字符）：移除可能存在的旧错误提示节点与高亮，通过 Node.textContent 将内容赋值至顶部大字展示区，输入框保持原文本便于用户微调。\n5. 异常防护：若 DOM 渲染或执行抛出异常，捕获该异常并在界面顶部以警示条显示，输入框文本完好保留供用户恢复。",
+      "dependsOn": [
+        "blk-feat-input-display"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-event-prevent-default"
+      ],
+      "id": "blk-flow-input-display",
+      "kind": "flow",
+      "requirementIds": [
+        "blk-feat-input-display"
+      ],
+      "stage": "product",
+      "title": "交互流程：输入核对、校验拦截与安全展示流转",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "实现单页面内的项目名输入控件、客户端非空校验逻辑、基于 Node.textContent 的安全大字渲染以及提交异常保留输入机制。",
+      "dependsOn": [
+        "blk-flow-input-display"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-event-prevent-default"
+      ],
+      "id": "blk-task-input-display",
+      "kind": "task",
+      "requirementIds": [
+        "blk-feat-input-display"
+      ],
+      "stage": "product",
+      "task": {
+        "assumptions": [
+          "运行于现代桌面浏览器（支持 ES6+、标准 DOM API 与 CSS 标准）",
+          "用户使用标准键盘与鼠标进行单人本地交互，页面通过 file:// 或本地轻量静态服务器加载"
+        ],
+        "completionCriteria": [
+          "非空有效输入提交后展示区文本与输入内容一致，字体醒目高对比",
+          "空值提交就地显示红色警示，展示区不刷新，且输入框字符不被强制清空",
+          "任意 HTML/特殊字符作为纯文本安全渲染，无脚本执行与 DOM 注入风险",
+          "运行时异常发生时页面不白屏不跳出，输入框文本完好保留供用户恢复重试"
+        ],
+        "exclusions": "不连接任何后端 API，不进行远程唯一性校验，不引入大型重型表单校验框架，不重载页面",
+        "failureBehavior": "输入空值或全空白字符时，拦截展示区更新，在输入框下方挂载可见红色提示 '项目名不能为空，请输入有效字符'，焦点保留在输入框内，不抹除已有输入；若 DOM 渲染或交互脚本发生意外异常，捕获错误并在界面展示轻量警报条，输入框文本原样保留，页面不崩溃不跳转，用户可修正后重试",
+        "goal": "完成单页面内项目名输入框、校验器与顶部大字展示区的双向联动与状态保护，落实空值校验提示、XSS 防护及提交失败保留输入机制",
+        "modules": [
+          "InputComponent",
+          "DisplayComponent",
+          "Validator"
+        ],
+        "normalBehavior": "输入非空有效项目名并点击确认（或按 Enter 提交）后，调用 event.preventDefault() 拦截默认刷新，通过 Node.textContent 安全更新顶部展示区大字文本，隐藏旧有错误提示，输入框保持当前文本以便后续微调",
+        "scope": "纯客户端 DOM 状态管理、输入文本去空格校验、Node.textContent 安全回显、错误提示挂载与提交异常保护",
+        "verification": [
+          "在现代桌面浏览器（Chrome/Edge/Firefox）直接加载单页面，输入正常项目名（如 'AiRDUO-Project-01'），验证顶部展示区文本一致且字体高对比醒目",
+          "输入包含 HTML 标签或特殊字符（如 '<script>alert(1)</script>'、'<div>Test&</div>'），验证展示区通过 Node.textContent 忠实作为纯文本回显，无弹窗且无 DOM 注入风险",
+          "输入空值或连续半角/全角空格点击确认，验证展示区不更新，输入框下方出现红色明确警示，且输入框内已有空格完好保留",
+          "模拟 DOM 挂载或运行时抛错，验证错误提示条出现，输入框内的所有字符原样保留且可继续编辑"
+        ]
+      },
+      "title": "开发任务：输入框、校验器与安全展示区联动实现",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "Scenario 1: 正常项目名核对展示\nGiven 页面已在本地桌面浏览器正常加载且处于待命状态\nWhen 用户在输入框中输入 'AiRDUO-Project-01' 并点击确认按钮（或按 Enter 键）\nThen 页面顶部展示区立即显示 'AiRDUO-Project-01'，字体醒目大字高对比，输入框保留 'AiRDUO-Project-01'，页面无错误提示。\n\nScenario 2: 特殊字符安全渲染防 XSS\nGiven 页面处于就绪状态\nWhen 用户在输入框输入 '<script>alert(\"XSS\")</script>' 并点击确认\nThen 顶部展示区将其原样作为纯文本渲染回显，不弹出任何警告框，无脚本执行。\n\nScenario 3: 空值与纯空格输入阻断校验\nGiven 用户在输入框中未输入任何字符或仅输入若干连续空格\nWhen 用户点击确认按钮\nThen 顶部展示区保持当前状态不更新，输入框下方出现红色可见提示 '项目名不能为空，请输入有效字符'，输入框原有空格或空状态完好保留，光标保持在输入框内。\n\nScenario 4: 运行时异常保留输入\nGiven 用户在输入框中输入了测试项目名\nWhen 点击确认提交触发未知运行时错误\nThen 页面顶部显示友好错误横幅，输入框内的所有字符完好保留，页面不重载，允许用户修改或重试。",
+      "dependsOn": [
+        "blk-task-input-display"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-textcontent-xss-safety"
+      ],
+      "id": "blk-acc-input-display",
+      "kind": "acceptance",
+      "requirementIds": [
+        "blk-feat-input-display"
+      ],
+      "stage": "product",
+      "title": "验收标准：输入、展示与输入保留 Given-When-Then",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "本地单页面原型核对视图（Single Page View），基于 fixture.png 原生像素信息进行视觉与空间布局映射：\n1. 视觉底色：纯白底色（#FFFFFF）清爽背景，无多余装饰纹理；\n2. 顶部展示区域：映射 fixture.png 上方“Q7M4-8261”视觉层级与相对空间位置，作为核对结果大字展示区（初始显示灰色占位文字，确认后以高对比黑色大字显示，支持 break-word 换行防撑破）；\n3. 底部主操作控件：映射 fixture.png 下方左侧蓝色矩形色块，呈现为蓝色实心矩形外观的【确认】主操作按钮；\n4. 底部辅助操作控件：映射 fixture.png 下方右侧橙色圆形色块，呈现为橙色实心圆形外观的【清空】辅助操作按钮；\n5. 输入表单区域：在桌面端位于展示区与底部按钮区之间居中排布，提供单行文本输入框，保持操作动线自上而下流畅连贯；\n6. 状态覆盖：涵盖就绪初始态（占位灰字）、正常核对态（大字黑色显示）、错误提示态（红字就地显示）、异常防护态（顶部横幅警示）与纯离线本地加载态。",
+      "dependsOn": [
+        "blk-prod-scope"
+      ],
+      "evidenceIds": [
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "id": "blk-page-main-layout",
+      "kind": "page",
+      "requirementIds": [
+        "blk-prod-scope"
+      ],
+      "stage": "product",
+      "title": "页面职责与参考图空间结构映射",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "提供一键清空与重置功能，帮助用户在完成一轮项目名核对后快速复位界面。\n- 正常交互：依据用户已确认决策（即时直接清空），用户点击清空按钮后系统立即执行复位，不弹出阻断式确认弹窗。顶部展示区复位为初始占位提示（如‘【等待输入核对】’），输入框内容清空，任何正在显示的校验报错信息被移除，光标自动重新聚焦在输入框内（.focus()），方便立即开始新一轮输入。误触代价说明：误触将立即清空当前内容，需重新输入。\n- 容错与恢复：清空操作不依赖外部环境，纯客户端内存重置；若清空过程抛出异常，捕获错误并保留现有视图，控制台输出日志并提示用户手动刷新，不发生页面白屏。\n- 幂等性：在空页面状态下重复点击清空不会产生任何副作用或错误。",
+      "dependsOn": [
+        "blk-prod-scope"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+      ],
+      "id": "blk-feat-reset",
+      "kind": "feature",
+      "requirementIds": [
+        "blk-prod-scope",
+        "blk-prod-outcomes"
+      ],
+      "stage": "product",
+      "title": "功能特性：一键清空与状态复位",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "1. 用户点击底部右侧橙色圆形清空按钮（对应 fixture.png 下方右侧橙色圆形色块位置）。\n2. 系统执行即时直接复位（不弹出阻断确认框）：\n   a. 将当前输入框 value 设为空字符串；\n   b. 将顶部展示区 textContent 重置为预设占位文字（如 '【等待输入核对】'）；\n   c. 隐藏或移除所有可见的校验错误 DOM 节点，重置边框高亮样式；\n   d. 触发 inputElement.focus() 将焦点重置到输入框，等待新一轮输入。\n3. 流程结束，界面完全恢复初始就绪态。",
+      "dependsOn": [
+        "blk-feat-reset"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+      ],
+      "id": "blk-flow-reset",
+      "kind": "flow",
+      "requirementIds": [
+        "blk-feat-reset"
+      ],
+      "stage": "product",
+      "title": "交互流程：清空重置操作流转",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "实现清空按钮的事件绑定、各组件状态统一重置以及光标自动回焦机制。",
+      "dependsOn": [
+        "blk-flow-reset"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+      ],
+      "id": "blk-task-reset",
+      "kind": "task",
+      "requirementIds": [
+        "blk-feat-reset"
+      ],
+      "stage": "product",
+      "task": {
+        "assumptions": [
+          "所有组件状态均为纯客户端内存受控状态，无异步数据竞争"
+        ],
+        "completionCriteria": [
+          "点击清空后展示区重置为初始占位符，输入框完全清空且处于聚焦状态",
+          "前次操作遗留的错误警示彻底清除，页面恢复初始干净就绪态",
+          "重置逻辑具备异常捕获保护，异常时不发生页面崩溃"
+        ],
+        "exclusions": "不重载网页，不清除控制台调试日志，不重置浏览器配置",
+        "failureBehavior": "若清空或回焦逻辑抛出未捕获异常，捕获该错误并保留当前视图，向控制台输出错误日志并弹出友好错误提示 '重置失败，请重试'，绝不导致页面崩溃或白屏，用户可手动清空输入框或刷新页面",
+        "goal": "实现全局视图状态一键复位与输入框自动回焦控制",
+        "modules": [
+          "ResetController",
+          "StateManager"
+        ],
+        "normalBehavior": "点击底部右侧橙色清空按钮后，无需阻断式二次确认弹窗，立即将输入框 value 设为空字符串，顶部展示区恢复为灰色占位文本 '【等待输入核对】'，隐藏并移除所有现存的校验错误提示，同时调用 inputElement.focus() 自动将光标聚焦回输入框",
+        "scope": "清空按钮事件监听、输入框与展示区复位逻辑、错误状态清理与回焦机制",
+        "verification": [
+          "在已展示有效项目名且有遗留空值警告的状态下点击清空按钮，验证无弹窗阻断、展示区即时恢复占位文字且警告提示彻底消除",
+          "验证点击清空后输入框内容为空，且键盘光标自动聚焦在输入框内可直接键入",
+          "验证连续多次点击清空按钮表现稳定，无运行时报错或无预期状态残留"
+        ]
+      },
+      "title": "开发任务：一键清空与组件回焦控制",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "Scenario 1: 正常即时清空复位与回焦\nGiven 顶部展示区正在展示 'Project-Test'，输入框包含 'Project-Test'，界面无错误\nWhen 用户点击底部右侧橙色清空按钮\nThen 页面不弹出任何二次确认框，顶部展示区立即恢复为灰色占位文本 '【等待输入核对】'，输入框文本变为空字符串，输入光标自动聚焦在输入框内。\n\nScenario 2: 清除历史错误提示\nGiven 页面因前次操作正在显示 '项目名不能为空，请输入有效字符' 红色警告\nWhen 用户点击清空按钮\nThen 红色警告提示立刻从 DOM 移除，输入框错误高亮取消，页面恢复至干净初始态。\n\nScenario 3: 空页面重复点击清空幂等性\nGiven 页面处于初始空白状态\nWhen 用户连续多次点击清空按钮\nThen 页面无任何异常抛出，展示区保持占位提示，输入框保持聚焦。",
+      "dependsOn": [
+        "blk-task-reset"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07"
+      ],
+      "id": "blk-acc-reset",
+      "kind": "acceptance",
+      "requirementIds": [
+        "blk-feat-reset"
+      ],
+      "stage": "product",
+      "title": "验收标准：清空重置 Given-When-Then",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "approvedAt": "2026-10-04T16:16:26.124Z"
+    },
+    {
+      "content": "技术栈选型严格遵守已批准的纯前端单页面边界约束，采用纯原生 HTML5、CSS3 与现代原生 JavaScript（ES2022+ 标准）：\n1. 标记层（HTML5）：采用标准语义化标签（<main>, <section>, <form>, <input>, <button>），通过 WAI-ARIA 属性（如 aria-live=\"polite\"）辅助就地错误提示展示，不依赖任何第三方 UI 库；\n2. 表现层（CSS3）：采用 CSS Flexbox 弹性布局规范，通过现代 CSS 自定义属性管理主题色（如确认按钮底色 #2F65F6、清空按钮底色 #FF5500），配置全局盒模型 box-sizing: border-box 与文本折行规则 word-break: break-all，实现忠实还原 fixture.png 的白底与高对比度排布；\n3. 交互与控制层（ES2022+）：采用纯原生现代 JavaScript（ESM 模块化），使用原生 DOM API（Document.querySelector, Node.textContent, HTMLElement.focus）与原生事件模型（addEventListener, Event.preventDefault），零外部 npm 运行时依赖，完全支持离线本地直接运行；\n4. DOM 安全输出：全面采用 W3C/WHATWG 标准 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML，从根本上杜绝 DOM 型 XSS 漏洞；\n5. 运行环境兼容：兼容主流现代桌面浏览器（Chrome ≥ 100, Edge ≥ 100, Firefox ≥ 100, Safari ≥ 15），零需转译即可原生执行。",
+      "dependsOn": [
+        "blk-prod-scope"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-htmlinputelement",
+        "evidence-mdn-document-queryselector",
+        "evidence-mdn-css-flexbox",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "id": "blk-tech-stack",
+      "kind": "technology",
+      "requirementIds": [
+        "blk-prod-scope",
+        "blk-prod-outcomes"
+      ],
+      "stage": "technical",
+      "title": "技术栈选型与运行规范",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "前端采用低耦合、高内聚的模块化架构，划分为核心协调控制器与 5 个专用功能模块：\n1. AppController（核心应用协调器）：应用生命周期管理入口，负责 DOM 树加载就绪检查（DOMContentLoaded）、模块装配与挂载、全局未捕获异常监听（window.addEventListener('error')），协调跨组件状态流转；\n2. InputController（输入与键盘监听控制器）：封装 <input type=\"text\"> 的交互监听，处理 input 输入事件与 keydown 按键事件（匹配 event.key === 'Enter' 时代理触发确认流程），提供 getInputText()、setInputText(val) 与 focusInput() 接口；\n3. ValidatorModule（规则校验器）：无状态纯函数校验模块，提取输入字符串并执行 trim() 去除首尾空白字符，返回结构化校验判定对象 { isValid: boolean, errorMessage: string | null }；\n4. DisplayRenderer（安全大字展示渲染器）：负责顶部结果展示区的视图更新，严格强制使用 Node.textContent 进行文本注入，绝不使用 innerHTML，彻底阻断任何 HTML/Script 脚本注入，并处理初始占位状态与换行防撑破样式；\n5. ResetController（清空复位与回焦控制器）：响应底部右侧清空按钮点击，协调调用 InputController 清空文本、DisplayRenderer 复位为占位符、FeedbackBanner 移除错误节点，并调用 input.focus() 自动恢复焦点；\n6. FeedbackBanner（错误提示与容错横幅组件）：管理输入框下方就地红色错误提示节点（aria-live=\"polite\"）以及全局意外异常警告横幅的挂载、呈现与清理。",
+      "dependsOn": [
+        "blk-tech-stack",
+        "blk-feat-input-display",
+        "blk-feat-reset"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-document-queryselector",
+        "evidence-mdn-htmlinputelement",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "id": "blk-tech-module",
+      "kind": "module",
+      "requirementIds": [
+        "blk-prod-scope",
+        "blk-feat-input-display",
+        "blk-feat-reset"
+      ],
+      "stage": "technical",
+      "title": "前端系统架构与核心功能模块划分",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "客户端运行时采用单向流动的纯内存数据模型，不使用任何本地持久化存储（如 LocalStorage、IndexedDB），确保单次测试独立且不污染后续测试：\n1. 校验判定结构体（ValidationResult）：\n   - isValid: boolean（是否通过非空规则校验）；\n   - errorMessage: string | null（校验未通过时的就地展示提示文案，例如 '项目名不能为空，请输入有效字符'；校验通过为 null）。\n2. 全局运行时状态模型（AppState）：\n   - projectName: string | null（当前已确认并在顶部大字展示的项目名，初始态为 null）；\n   - inputDraft: string（输入框当前正在键入的草稿文本，初始态为空字符串 ''）；\n   - status: 'idle' | 'validating' | 'displayed' | 'error'（界面所处交互生命周期状态）；\n   - validationError: string | null（当前挂载在输入框下方的错误信息，无错误时为 null）；\n   - placeholderText: string（顶部展示区在初始或清空态下的灰字占位符，常量定义为 '【等待输入核对】'）。\n3. 状态转换路径：\n   - [初始态 idle]：projectName=null, inputDraft='', validationError=null -> 展示区呈现灰字占位符；\n   - [输入录入]：用户键入更新 inputDraft，其他状态保持；\n   - [有效提交]：ValidatorModule 校验通过 -> status='displayed', projectName=inputDraft, validationError=null -> 展示区高亮呈现黑色大字，inputDraft 保留；\n   - [空值提交]：ValidatorModule 校验失败 -> status='error', validationError='项目名不能为空，请输入有效字符', projectName 与 inputDraft 保持原样，展示区不更新；\n   - [一键清空]：触发重置 -> 复位至 [初始态 idle]，所有字段归位，焦点重新绑定至 inputDraft。",
+      "dependsOn": [
+        "blk-tech-module"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+      ],
+      "id": "blk-tech-data-model",
+      "kind": "data_model",
+      "requirementIds": [
+        "blk-prod-scope",
+        "blk-feat-input-display",
+        "blk-feat-reset"
+      ],
+      "stage": "technical",
+      "title": "客户端运行时数据模型与状态结构规范",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "各模块间通过明确的函数签名与原生事件契约进行交互解耦：\n1. ValidatorModule 接口契约：\n   - validate(rawInput: string): { isValid: boolean, errorMessage: string | null }\n     入参：用户当前在输入框键入的原始文本；\n     处理：执行 rawInput.trim()，若长度为 0 则返回 { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' }，否则返回 { isValid: true, errorMessage: null }。\n2. DisplayRenderer 接口契约：\n   - renderProjectName(targetElement: HTMLElement, text: string): void\n     处理：调用 targetElement.textContent = text，移除占位灰字样式，应用黑色加粗高对比度展示样式；\n   - renderPlaceholder(targetElement: HTMLElement, placeholder: string): void\n     处理：调用 targetElement.textContent = placeholder，应用灰色占位展示样式。\n3. FeedbackBanner 接口契约：\n   - showInputError(inputElement: HTMLElement, containerElement: HTMLElement, errorMsg: string): void\n     处理：为 inputElement 增加错误边框样式（如 border-color: #E53E3E），在 containerElement 内挂载 <div class=\"error-tip\" aria-live=\"polite\"> 节点并赋值 errorMsg；\n   - clearInputError(inputElement: HTMLElement, containerElement: HTMLElement): void\n     处理：移除 inputElement 错误边框高亮，查找并销毁现存的 .error-tip 节点；\n   - showRuntimeAlert(alertMsg: string): void\n     处理：在页面顶部挂载轻量告警横幅，输出友好排查信息。\n4. 事件流契约：\n   - 确认按钮点击事件（confirmButton.addEventListener('click', handleConfirm)）与输入框回车事件（inputElement.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(e); })）统一派发至 handleConfirm；\n   - 清空按钮点击事件（resetButton.addEventListener('click', handleReset)）派发至 handleReset，按已批准决策直接清空，无阻断弹窗。",
+      "dependsOn": [
+        "blk-tech-data-model"
+      ],
+      "evidenceIds": [
+        "evidence-mdn-htmlinputelement",
+        "evidence-mdn-keyboardevent-key",
+        "evidence-mdn-event-prevent-default",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "id": "blk-tech-interface",
+      "kind": "interface",
+      "requirementIds": [
+        "blk-feat-input-display",
+        "blk-feat-reset"
+      ],
+      "stage": "technical",
+      "title": "组件事件契约与模块调用接口规范",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "建立全面的客户端异常捕获与容错恢复机制，重点落实“失败时保留输入”决策：\n1. E01 校验失败（空值或纯空白字符提交）：\n   - 场景：用户未键入字符或仅键入多个空格即点击确认或按 Enter；\n   - 拦截行为：ValidatorModule 判定 isValid 为 false，调用 event.preventDefault() 拦截默认动作，展示区内容完全冻结不刷新；\n   - 呈现行为：调用 FeedbackBanner.showInputError 在输入框正下方挂载可见的红色警示文本“项目名不能为空，请输入有效字符”，输入框边框变红并保持高亮；\n   - 保留与恢复：输入框内的既有字符（包括用户已输入的空格等文本）严格原样保留，光标保持在输入框内部，绝不执行 inputElement.value = '' 清空操作；用户补充输入有效字符后再次提交，自动移除错误提示；\n2. E02 意外 DOM 异常与脚本运行时错误（Runtime Exception）：\n   - 场景：浏览器极端环境、DOM 节点获取失败或渲染过程抛出未捕获 Error；\n   - 拦截行为：在 handleConfirm 与 handleReset 外层封装严格的 try...catch (err) 异常保护；\n   - 呈现行为：捕获异常并在页面顶部通过 FeedbackBanner.showRuntimeAlert 展示轻量警示条“操作执行遇到意外异常，已为您保留当前输入内容”，同时在控制台通过 console.error 输出完整堆栈；\n   - 保留与恢复：发生任何异常时，绝不重载或重定向页面，不抹除 inputElement.value 中的任何既有文本，输入框保持可编辑状态供用户修改或重新点击提交；\n3. E03 极端超长文本输入防撑破（Overflow Protection）：\n   - 场景：输入数千至上万字符的超长字符串；\n   - 防护行为：展示区与输入框统一样式设置 overflow-wrap: anywhere; word-break: break-all; max-width: 100%，确保长字符串在容器内自动换行折行，杜绝撑破页面布局或横向滚动条失控；\n4. E04 清空操作防死锁与幂等性：\n   - 场景：连续多次快速点击清空按钮或在初始空状态下点击清空；\n   - 行为：清空逻辑为纯状态复位，无异步排队，多次触发保持幂等，不抛出异常。",
+      "dependsOn": [
+        "blk-tech-interface"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-textcontent-xss-safety",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "id": "blk-tech-error",
+      "kind": "error",
+      "requirementIds": [
+        "blk-feat-input-display",
+        "blk-prod-outcomes"
+      ],
+      "stage": "technical",
+      "title": "错误分类、校验拦截机制与输入保留恢复策略",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "部署与运行方案面向个人开发者的本地无门槛极简运行场景设计：\n1. 目标运行环境版本要求：\n   - 操作系统：Windows 10/11、macOS 12+ 或主流 Linux 桌面环境；\n   - 目标浏览器：现代主流桌面浏览器最新稳定版（Google Chrome ≥ 100, Microsoft Edge ≥ 100, Mozilla Firefox ≥ 100, Apple Safari ≥ 15）；\n   - 硬件要求：标准桌面设备，支持 1024×768 及以上分辨率显示器、鼠标与键盘；\n2. 静态部署与启动模式：\n   - 模式 A（零安装直接双击运行）：直接通过文件资源管理器双击 index.html（file:// 协议加载），无须启动任何 HTTP 服务；\n   - 模式 B（轻量本地服务器托管）：通过本地已有轻量静态服务运行，例如在项目根目录执行 npx serve . 或 python -m http.server 8080，访问 http://localhost:8080；\n3. 静态产物组织结构：\n   ```\n   ├── index.html        # 单页面主入口，包含语义化 DOM 骨架与无障碍标记\n   ├── styles.css        # 视觉样式表，实现基于 fixture.png 的白底与控件空间排布映射\n   ├── app.js            # 模块化纯原生 JavaScript 脚本（AppController 与各子模块实现）\n   └── README.md         # 本地启动、操作说明与验证测试指南\n   ```\n4. 无后端/无云服务声明：\n   本产品不包含任何服务端后端程序、不调用任何云端 API、不进行任何跨域网络请求，完全自主运行在用户本地浏览器沙箱中。",
+      "dependsOn": [
+        "blk-tech-stack"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-mdn-htmlinputelement"
+      ],
+      "id": "blk-tech-deployment",
+      "kind": "deployment",
+      "requirementIds": [
+        "blk-prod-target",
+        "blk-prod-scope"
+      ],
+      "stage": "technical",
+      "title": "运行环境版本要求与本地静态部署规范",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "全面实现纯前端单页面的 DOM 构建、事件绑定、非空校验拦截、Node.textContent 安全展示、清空复位与异常输入保留容错机制。",
+      "dependsOn": [
+        "blk-tech-module",
+        "blk-tech-interface",
+        "blk-tech-error"
+      ],
+      "evidenceIds": [
+        "evidence-mdn-htmlinputelement",
+        "evidence-mdn-keyboardevent-key",
+        "evidence-mdn-document-queryselector",
+        "evidence-mdn-node-textcontent-official"
+      ],
+      "id": "blk-tech-task-impl",
+      "kind": "task",
+      "requirementIds": [
+        "blk-task-input-display",
+        "blk-task-reset"
+      ],
+      "stage": "technical",
+      "task": {
+        "assumptions": [
+          "页面运行于现代桌面浏览器，完全支持 ES6+、标准 DOM API 与 CSS Flexbox 规范",
+          "用户单人单机操作，使用标准桌面键盘与鼠标进行本地原型核对交互"
+        ],
+        "completionCriteria": [
+          "index.html、styles.css、app.js 静态文件构建完成，在桌面现代浏览器中双击直接可用",
+          "输入有效项目名后点击确认或按 Enter，顶部展示区即时切换大字文本且输入框保持当前文本",
+          "输入包含 HTML 标签或脚本字符时，作为纯文本安全回显，无弹窗且杜绝 XSS 执行风险",
+          "空值或纯空白字符提交时，展示区不刷新，输入框就地出现红色错误提示，已有字符完整保留不被清空",
+          "点击清空按钮无需确认弹窗，展示区立即恢复占位文本，输入框清空且光标自动回焦输入框"
+        ],
+        "exclusions": "不引入 React/Vue/Angular 等前端重型框架，不引入打包构建器（如 Webpack/Vite）强制编译步骤，不引入任何后端 API 与 LocalStorage 存储",
+        "failureBehavior": "若输入空值或空白字符，拦截展示更新并在输入框下方就地挂载红色警报提示，严格保留输入框现有文本与焦点；若交互或渲染过程发生未知运行时异常，顶层 try-catch 捕获错误并于界面顶部弹出告警横幅，严格保护输入框内的草稿文本不丢失，页面不白屏不跳出，用户可微调后重试",
+        "goal": "完成纯原生单页面本地原型核对界面的完整编码实现，建立高内聚模块与健壮的输入保留容错机制",
+        "modules": [
+          "AppController",
+          "InputController",
+          "ValidatorModule",
+          "DisplayRenderer",
+          "ResetController",
+          "FeedbackBanner"
+        ],
+        "normalBehavior": "用户输入非空有效字符串并点击确认（或在输入框内按 Enter 键），系统调用 event.preventDefault() 拦截默认提交行为，调用 ValidatorModule.validate() 通过后，使用 Node.textContent 将内容赋值至顶部大字展示区，清除旧有错误提示，输入框保持原内容供后续微调；用户点击清空按钮后，直接重置展示区为预设占位符，清空输入框并自动触发 inputElement.focus() 回焦光标",
+        "scope": "单页面静态 HTML/CSS/JS 编写，包含输入表单、展示大字容器、确认与清空按钮的布局绘制、事件监听、DOM 纯文本渲染、校验拦截与异常捕获防护",
+        "verification": [
+          "在主流桌面现代浏览器（Chrome/Edge/Firefox）直接加载 index.html，输入正常字符串并确认，校验顶部大字渲染且输入框文本完好保留",
+          "输入 '<script>alert(1)</script>' 与 '<div>Safe&Test</div>' 并确认，验证展示区原样纯文本回显，无弹窗且无 DOM 节点注入",
+          "输入全空格点击确认，验证展示区不刷新，出现明确红色警示，输入框空格完好保留且光标留在输入框内",
+          "点击清空按钮，验证无二次弹窗，展示区即时恢复灰色占位文字，错误提示消除，输入框清空且光标重新聚焦输入框"
+        ]
+      },
+      "title": "技术开发任务：纯前端原型核对架构与健壮容错实现",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    },
+    {
+      "content": "建立本地运行性能与交互体验基准的实测验证流程，实测冷启动时间与用户交互响应延迟指标。",
+      "dependsOn": [
+        "blk-tech-task-impl"
+      ],
+      "evidenceIds": [
+        "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+        "evidence-exp-docker-env-unavailable"
+      ],
+      "id": "blk-tech-val-performance",
+      "kind": "validation",
+      "requirementIds": [
+        "blk-prod-outcomes"
+      ],
+      "stage": "technical",
+      "task": {
+        "assumptions": [
+          "测试环境为标准现代桌面 PC，运行现代主流浏览器最新稳定版本",
+          "测试数据规模为 1~200 字符的典型项目名测试文本"
+        ],
+        "completionCriteria": [
+          "完成本地冷启动耗时与交互响应延迟的实测验证并记录基准数据",
+          "冷启动时间与交互响应时间均达到或优于设计衡量指标"
+        ],
+        "environment": "主流桌面现代浏览器（Chrome 100+ / Edge 100+ / Firefox 100+），本地文件系统或轻量静态 HTTP 服务器托管环境",
+        "evidenceRequired": [
+          "浏览器控制台输出的 Performance API 耗时日志及 DevTools Performance 面板 Trace 记录"
+        ],
+        "exclusions": "不进行分布式网络高并发压测，不进行跨洲际网络延迟模拟",
+        "failureBehavior": "若实测性能超出目标阈值，在日志中记录长任务瓶颈阶段与 CSS 重排重绘耗时，分析 DOM 节点结构并定位阻塞点，提供精简优化方案后复测",
+        "goal": "验证纯原生轻量单页面的本地冷启动渲染时间（目标≤300ms）及用户交互点击/按键响应延迟（目标≤50ms）",
+        "modules": [
+          "AppController",
+          "DisplayRenderer",
+          "InputController"
+        ],
+        "normalBehavior": "在本地浏览器加载 index.html，从页面导航加载至 DOM 完全就绪并完成首屏大字展示区渲染，总耗时控制在 300ms 以内；用户输入字符后点击确认或清空按钮，从事件分发到 DOM 更新并完成首帧重绘，总耗时控制在 50ms 以内",
+        "onFailure": "若性能未达标，排查冗余的 DOM querySelector 遍历、高频无效样式计算或未解绑事件，重构关键渲染路径并重新测试直到满足指标",
+        "passCriteria": [
+          "冷启动耗时（从 navigationStart 到 domContentLoadedEventEnd）实测目标 ≤ 300ms",
+          "交互响应耗时（从 click/keydown 事件触发至 textContent 赋值与 requestAnimationFrame 重绘完成）实测目标 ≤ 50ms",
+          "无阻塞主线程的长任务（Long Task > 50ms）产生"
+        ],
+        "scope": "使用浏览器原生 Performance Navigation Timing 与 Performance.now() API 对首屏加载冷启动及确认/清空交互耗时进行精确打点测量",
+        "steps": [
+          "1. 打开桌面 Chrome/Edge 浏览器无痕窗口，加载 index.html；",
+          "2. 通过 performance.getEntriesByType('navigation')[0] 读取 domContentLoadedEventEnd - startTime 作为首屏冷启动渲染耗时；",
+          "3. 在输入框键入 50 字符的项目名，通过 performance.now() 在 click/keydown 事件起始处打点，并在 requestAnimationFrame 回调中打点，计算两者差值作为交互响应耗时；",
+          "4. 连续执行 5 次测量，计算平均耗时与最大延迟并记录到验证日志。"
+        ],
+        "verification": [
+          "查验 Performance 面板导出的 JSON 记录，核验 DOMContentLoaded 耗时是否 ≤ 300ms",
+          "查验控制台输出的 5 次交互测量耗时，核验平均值与峰值是否 ≤ 50ms"
+        ]
+      },
+      "title": "技术验证任务：本地冷启动与交互延迟实测基准验证",
+      "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "approvedAt": "2026-10-04T16:23:00.364Z"
+    }
+  ],
+  "stages": {
+    "product": "approved",
+    "technical": "approved",
+    "delivery": "not-designed"
+  },
+  "decisionBasisHash": "0cf96e2dd817a30489fdd5cc93ccc62c60721a22207ae02f23766aa62b5ea0cf",
+  "approvedInputHash": "baa08d353fdebbfdd4494572f82f9fa5f57ca7f4ff14a56d164a08b4fdb4e129"
+}

@@ -1,0 +1,91 @@
+{
+  "blockers": [
+    "[blk-tech-module / blk-tech-interface] 模块 API 与正式事务顺序冲突：blk-tech-module 仍定义 handleReset 先递增 inputGeneration 再执行 cancel 与 replaceWith，与 blk-tech-interface 及 flow/data/task 规定的“先捕获快照、预制新节点并复制属性、取消旧定时器、执行替换，全部成功后原子提交才递增 inputGeneration”冲突；在替换前或 replaceWith 抛错时会导致代际提前递增使原节点闭包失效，破坏失败保留输入契约，需由整合任务对 blk-tech-module 进行同步。",
+    "[blk-tech-interface / blk-tech-module] 初始化装配接口与公共方法契约不完备：blk-tech-interface 在精简内部实现示意时未完整保留 AppController.init 显式依赖注入参数（displayElement, initialInputNode, errorContainer, resetButton）及只读草稿容器 showSevereFallbackDraft 的装配契约；同时缺失 11 个原已批准公共方法（bindInputNode, focusInput, schedule, cancel, hasPending, handleReset, captureSnapshot, rollback, renderProjectName, renderPlaceholder, showInputError, clearInputError, showGlobalError, showSevereFallbackDraft, validate）的完整参数与后置条件说明，需由整合任务补齐。",
+    "[blk-deliv-val-standalone-runtime / blk-deliv-val-perf-benchmark] 真实浏览器与 IME 交互、性能代理指标在当前规划环境不可执行：宿主机未启动 Docker Desktop 守护进程（environment_prepare 返回 unavailable），受控自动化实验无法在规划期执行；原生 IME 重定向、真实焦点/辅助技术与微秒级绘制前延迟指标必须保持 unexecuted 状态，留待开发阶段在具备宿主浏览器环境中实际验证，不能将静态/合成规范分析冒充为真机实测通过。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "查证 Node.insertBefore 标准规范，证实其在现代浏览器全平台普遍支持（Baseline: Widely available since 2015），支持在清空回滚或 DOM 异常恢复时，将原输入节点准确插回原父节点及 nextSibling 位置，保障唯一输入框与 DOM 拓扑原子恢复。",
+      "content": "Node: insertBefore() method - Web APIs | MDN: The insertBefore() method of the Node interface inserts a node before a reference node as a child of a specified parent node. If referenceNode is null, newNode is inserted at the end of node's child nodes. If the given node already exists in the document, it is moved from its current position. Baseline: Widely available (since July 2015).",
+      "hash": "40443693726f17fc6165ec49ebfcad45f9f8f4566d5df1e54bf20505b0e3b03c",
+      "id": "evidence-7302929b-2e70-4bf1-874e-8bd1e3a3dd54",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore",
+      "obtainedAt": "2026-10-05T07:20:03.955Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore"
+    },
+    {
+      "applicability": "查证 HTMLTextAreaElement.readOnly 属性规范，证实其支持在用户不可修改的同时仍可点击和选中（unlike disabled），支撑在严重回插失败等极端回滚异常时，采用只读 textarea 呈现已捕获的用户草稿全文，允许用户点击并手动选中复制，且纯文本 value 赋值杜绝 HTML 注入，无需剪贴板权限或外部存储。",
+      "content": "HTMLTextAreaElement: readOnly property - Web APIs | MDN: The readOnly property of the HTMLTextAreaElement interface indicates that the user cannot modify the value of the control. Unlike the disabled attribute, the readonly attribute does not prevent the user from clicking or selecting in the control. Baseline: Widely available (since July 2015).",
+      "hash": "5bf8e5f908da5de79a5cdbfd201716d7b658fc6cb055df51e0ef3b8d57805616",
+      "id": "evidence-8d52b774-8940-4f2b-892a-fa5b471b2b5e",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement/readOnly",
+      "obtainedAt": "2026-10-05T07:20:18.343Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement/readOnly"
+    },
+    {
+      "applicability": "查证 Element.compositionend 标准事件规范，证实其在输入法会话完成或取消时触发（如中文拼音输入），并提供 generated characters（event.data）。在清空重置时需结合节点闭包与代际隔离，防止旧会话的迟到 compositionend 污染新输入或触发伪空值校验。",
+      "content": "Element: compositionend event - Web APIs | MDN: The compositionend event is fired when a text composition system such as an input method editor completes or cancels the current composition session (e.g., after entering a Chinese character via Pinyin IME). Baseline: Widely available (since July 2015).",
+      "hash": "b1aa74664ab9c0fb7825c8eed5eeb6938d1bd3d089f3d90dab2799d63e883f0b",
+      "id": "evidence-4078273b-7521-4409-97fc-977c6f5cc584",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event",
+      "obtainedAt": "2026-10-05T07:20:38.163Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event"
+    },
+    {
+      "applicability": "证实 InputEvent.isComposing 为只读布尔属性，指示 input 事件是否发生在 compositionstart 与 compositionend 之间；在 300ms 自动展示逻辑中用于过滤拼音组合输入中的临时拼音字符，仅在非组合态或 compositionend 提交后才调度防抖展示。",
+      "content": "InputEvent: isComposing property - Web APIs | MDN: The InputEvent.isComposing read-only property returns a boolean value indicating if the event is fired after compositionstart and before compositionend. Baseline: Widely available.",
+      "hash": "af251c720670831d8e156382da9b0edd949bd9cf4fab910a9d0109ceceda3447",
+      "id": "evidence-f4fc9e4f-e93d-4ac7-bcf5-bca207707149",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/InputEvent/isComposing",
+      "obtainedAt": "2026-10-05T07:20:48.988Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/InputEvent/isComposing"
+    },
+    {
+      "applicability": "记录当前规划环境缺少 Docker 守护进程支持的客观事实，表明受控端到端容器测试在规划阶段无法执行（状态为 unexecuted）；此属于规划工具环境限制而非用户项目约束，真实浏览器和原生 IME 验证须作为后续开发任务在宿主环境中落地。",
+      "content": "在当前规划环境尝试为 Node 受控试验准备执行环境（runtime: node），返回 status: unavailable。原因：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified。因此规划期受控 Docker 试验未执行。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop unavailable on host)",
+      "hash": "",
+      "id": "evidence-env-docker-unavailable-run-ea72daa3",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-quality-copy-mJswsX\\materials\\runtime\\planning\\run-ea72daa3-862d-4c9d-b406-d2b4272c1c68\\tools\\experiments\\prepare-408beb49-1beb-4874-a3e1-7740d5259497.ndjson",
+      "obtainedAt": "2026-10-05T15:19:49+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-408beb49-1beb-4874-a3e1-7740d5259497"
+    },
+    {
+      "applicability": "作为视觉布局映射、色块来源与产品范围界定的材料事实依据，核对布局元素映射，防止将示例内容误当业务需求。",
+      "content": "通过 material_index、material_image 及原生 view_file 工具对 D:\\Temp\\User\\pa-quality-copy-mJswsX\\materials\\inputs\\inp-1791129999124\\fixture.png 进行实际像素查看。图像为纯白背景，上方居中展示黑色文字“Q7M4-8261”；下方左侧为一个蓝色水平长方形色块，下方右侧为一个橙色实心圆形色块。依据用户输入规范，截图仅作为布局与视觉色块参考，原图中的文字“Q7M4-8261”为图像测试数据，不自动转换为固定业务需求。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-input-fixture-png-inspection",
+      "kind": "material",
+      "location": "D:\\Temp\\User\\pa-quality-copy-mJswsX\\materials\\inputs\\inp-1791129999124\\fixture.png",
+      "obtainedAt": "2026-10-05T15:17:12+08:00",
+      "outcome": "not-applicable",
+      "source": "material:input:inp-1791129999124"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "查证 W3C DOM Specification 中 Node.insertBefore 与 Element.replaceWith 在插入非法父子层级时的标准异常行为，确保回滚事务阶段异常捕获逻辑完备自洽。",
+      "kind": "research"
+    },
+    {
+      "goal": "在具备 Node.js/宿主浏览器的后续开发交付阶段，执行纯内存与合成 DOM 状态机测试，验证清空替换失败后原输入节点拓扑、代际与待校验任务恢复后置条件。",
+      "kind": "validation"
+    }
+  ],
+  "groups": [],
+  "questions": [],
+  "summary": "本任务完成了对技术栈与清空状态事务关键 Web 标准 API（Node.insertBefore, HTMLTextAreaElement.readOnly, Element: compositionend, InputEvent.isComposing）的官方规范查证，并记录了实际来源与原始哈希。查证证实：1. Node.insertBefore 获得全平台基准支持，支持在清空回滚或 DOM 异常恢复时将原输入框精准插回原拓扑位置，确保单输入框与 ID 唯一性；2. HTMLTextAreaElement.readOnly 允许用户选中并手动复制文本，支撑严重回插失败时的只读全文草稿兜底呈现；3. CompositionEvent 与 isComposing 明确了中文输入法组合态生命周期，支持节点闭包代际隔离以消除尾随事件竞态；4. 受控实验环境因宿主机 Docker 守护进程未启动而如实标记为 unexecuted，不冒充已实测；5. 发现 blk-tech-module 与 blk-tech-interface 存在事务递增顺序冲突及公共接口初始化装配契约缺失问题，已作为 blockers 提出供后续整合任务处理。",
+  "workItems": []
+}

@@ -101,7 +101,7 @@ export const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
     <div className="fixed inset-0 z-40 flex">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -113,17 +113,17 @@ export const ResponsiveDrawer: React.FC<ResponsiveDrawerProps> = ({
         aria-modal="true"
         aria-label={ariaLabel || title || '抽屉面板'}
         tabIndex={-1}
-        className={`fixed inset-y-0 ${sideClasses} ${width} max-w-full bg-[#FAF9F6] dark:bg-[#121316] border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col z-50 focus:outline-none ${className}`}
+        className={`fixed inset-y-0 ${sideClasses} ${width} max-w-full bg-surface-elevated border-border-default shadow-elevation-drawer flex flex-col z-50 focus:outline-none ${className}`}
       >
         {/* Header */}
-        <div className="h-12 px-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white/60 dark:bg-[#17181D]/60 backdrop-blur-md">
-          <h3 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
+        <div className="h-12 px-4 border-b border-border-subtle flex items-center justify-between shrink-0 bg-surface-elevated/80 backdrop-blur-md">
+          <h3 className="font-semibold text-xs text-text-primary truncate">
             {title || '面板详情'}
           </h3>
           <button
             onClick={onClose}
             aria-label="关闭抽屉"
-            className="p-2 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer min-touch-target flex items-center justify-center"
+            className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors cursor-pointer min-touch-target flex items-center justify-center"
           >
             <X className="w-4 h-4" />
           </button>

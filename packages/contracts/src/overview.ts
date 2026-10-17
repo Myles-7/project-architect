@@ -42,4 +42,5 @@ export interface ProjectSnapshot {
   questions: QuestionsState;
   readiness: ReadinessState;
   documents?: DocumentsState;
+  planning?: import('./planning.js').PlanningState;
 }

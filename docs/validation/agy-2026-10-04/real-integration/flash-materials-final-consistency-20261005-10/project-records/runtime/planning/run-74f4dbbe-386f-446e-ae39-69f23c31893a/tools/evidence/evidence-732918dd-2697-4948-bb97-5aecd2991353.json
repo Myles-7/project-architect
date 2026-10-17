@@ -1,0 +1,11 @@
+{
+  "id": "evidence-732918dd-2697-4948-bb97-5aecd2991353",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement",
+  "capturedAt": "2026-10-05T09:47:30.580Z",
+  "sha256": "522f9b5b197ff7caf856961de5df4f6b2e0a34b153743a84d180cf8dc46e4d9a",
+  "scope": "严重回滚失败草稿兜底与纯文本安全复制",
+  "path": "D:\\Temp\\User\\pa-quality-copy-xb3uFL\\materials\\runtime\\planning\\run-74f4dbbe-386f-446e-ae39-69f23c31893a\\tools\\evidence\\evidence-732918dd-2697-4948-bb97-5aecd2991353.json",
+  "approval": "candidate",
+  "content": "HTMLTextAreaElement readOnly property: A boolean that represents the element's readonly attribute, indicating that the user cannot modify the value of the control. value property: A string that represents the raw value contained in the control. select() method: Selects the contents of the control.",
+  "conclusion": "HTMLTextAreaElement 的 readOnly 属性保证内容不可篡改，value 属性为纯字符串，保留全部换行符与空白字符且不经过 HTML 解析，select() 支持全选文本。可安全用于严重回滚失败时的纯文本草稿复制兜底，不引入 DOM XSS 风险。"
+}

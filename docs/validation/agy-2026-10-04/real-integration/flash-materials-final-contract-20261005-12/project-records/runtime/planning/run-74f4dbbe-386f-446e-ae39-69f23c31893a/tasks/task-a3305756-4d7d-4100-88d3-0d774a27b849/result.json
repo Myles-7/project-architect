@@ -1,0 +1,37 @@
+{
+  "blockers": [
+    "[blk-tech-module] 证据ID严重损坏与虚构：该区块的 evidenceIds 数组中包含了 10 个形如 evidence-<context-sha256> 的无效伪造证据ID（如 evidence-e0bafb5d73493c553b18e0343821945b9d3113179c9b0c63e5954ea2058027ac、evidence-75640ad9ee0c6b162f483c65c276ea7641f6ca79d722c608ee85ca1cf6238bc3、evidence-3318603bb8ae9fbe0d4b5254b47976d05919f5f7e0aa541297222efcba6caae0 等）。经核验，这些ID全部直接源自 planning_context 上下文分块内容的 SHA256 哈希拼接，在 approvedEvidence 和 knownEvidence 中均不存在对应真实记录，违反了“证据ID对应完整不可变记录，禁止捏造”的系统规范。请整合任务将其替换为该模块实际依据的合法不可变证据ID（如 evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f、evidence-7302929b-2e70-4bf1-874e-8bd1e3a3dd54、evidence-8d52b774-8940-4f2b-892a-fa5b471b2b5e、evidence-4078273b-7521-4409-97fc-977c6f5cc584、evidence-f4fc9e4f-e93d-4ac7-bcf5-bca207707149、evidence-dab40954-74e0-4d24-bb31-1064f5dd626f 等）。",
+    "[blk-tech-interface] 证据ID列表包含大量虚构哈希：该区块的 evidenceIds 数组共有 18 个条目，其中前 15 个（从 evidence-e0bafb5d73493c55... 至 evidence-c8664010da8e4ba4...）全部为上下文分块 SHA256 拼接而成的虚构证据ID，仅最后 3 个为合法证据。虚假哈希破坏了公共接口与时序契约的溯源闭环。请整合任务清理上述 15 个无效哈希ID，仅保留并补充该接口设计实际依赖的真实官方标准证据（如 evidence-7302929b-2e70-4bf1-874e-8bd1e3a3dd54、evidence-8d52b774-8940-4f2b-892a-fa5b471b2b5e、evidence-4078273b-7521-4409-97fc-977c6f5cc584、evidence-f4fc9e4f-e93d-4ac7-bcf5-bca207707149、evidence-mdn-textcontent-xss-safety、evidence-e10045cb-3170-4cb6-9c56-de754c9c69da 等）。",
+    "[blk-deliv-acc-full-e2e] 证据ID列表混入伪造分块哈希：该区块的 evidenceIds 数组包含 12 个条目，其中前 8 个（如 evidence-21694c861da8a67923762886f784bfab58cbb2f54e150a0f02377fa1d923ea02、evidence-1e24749f7e44ef1f2215c0e25537ef428ddf5b7ea5dc7b6f632a933221fa816e 等）全部为上下文 JSON 片段的 SHA256 哈希拼接，证据库中无对应对象。请整合任务将其清理，恢复为真实的已批准验收依据证据（如 evidence-a8866f76-4ae6-466b-8fab-a69b806b7336、evidence-fc126627-6e55-40e5-8be5-388ef378a21b、evidence-e10045cb-3170-4cb6-9c56-de754c9c69da 等）。",
+    "[blk-deliv-val-standalone-runtime] 证据ID全量损坏：该区块声明的全部 8 个 evidenceIds（从 evidence-21694c861da8... 至 evidence-d3f3f2db12f2...）均为上下文 chunk SHA256 拼接伪造ID，导致该独立运行时验证任务完全缺乏有效证据关联。请整合任务将其彻底替换为真实的宿主浏览器/IME验证规范与环境客观证据（如 evidence-a8866f76-4ae6-466b-8fab-a69b806b7336、evidence-fc126627-6e55-40e5-8be5-388ef378a21b、evidence-e10045cb-3170-4cb6-9c56-de754c9c69da、evidence-26818016-03f1-4e6f-87b3-afaa4fdfeb82、evidence-320443a6-461c-4976-9039-908598ac05f0 等）。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "作为视觉布局映射、色块来源与产品范围界定的材料事实依据，核对布局元素映射，防止将示例内容误当业务需求。",
+      "content": "通过 material_index、material_image 及原生 view_file 工具对 D:\\Temp\\User\\pa-quality-copy-xb3uFL\\materials\\inputs\\inp-1791129999124\\fixture.png 进行实际像素查看。图像为纯白背景，上方居中展示黑色文字“Q7M4-8261”；下方左侧为一个蓝色水平长方形色块，下方右侧为一个橙色实心圆形色块。依据用户输入规范，截图仅作为布局与视觉色块参考，原图中的文字“Q7M4-8261”为图像测试数据，不自动转换为固定业务需求。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-input-fixture-png-inspection",
+      "kind": "material",
+      "location": "D:\\Temp\\User\\pa-quality-copy-xb3uFL\\materials\\inputs\\inp-1791129999124\\fixture.png",
+      "obtainedAt": "2026-10-05T17:44:27+08:00",
+      "outcome": "not-applicable",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "记录当前规划环境缺少 Docker 守护进程支持的客观事实，表明受控端到端容器测试在规划阶段无法执行（状态为 unexecuted）；此属于规划工具环境限制而非用户项目约束，真实浏览器和原生 IME 验证须作为后续开发任务在宿主环境中落地。",
+      "content": "在当前规划环境尝试为 Node 受控试验准备执行环境（runtime: node），返回 status: unavailable。原因：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified。因此规划期受控 Docker 试验未执行。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop unavailable on host)",
+      "id": "evidence-env-docker-unavailable-run-ea72daa3",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-quality-copy-xb3uFL\\materials\\runtime\\planning\\run-74f4dbbe-386f-446e-ae39-69f23c31893a\\tools\\experiments\\prepare-408beb49-1beb-4874-a3e1-7740d5259497.ndjson",
+      "obtainedAt": "2026-10-05T17:44:00+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-408beb49-1beb-4874-a3e1-7740d5259497"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "作为独立评审者，已全面完成对系统最新候选草案（workerResults.draft）、已批准蓝图（blueprint）、比较基线（changeReviewBaseline）及证据库的完整扫描与核验（597条记录均已按要求完全读取，通过 material_index、material_image 及原生 view_file 对 fixture.png 完成了实际像素审查）。\n审查结论：\n1. 业务与架构时序规范（已纠正并合格）：草案在正文与契约中已彻底闭合清空两阶段提交与原子回滚机制。针对 R6-B1，在 replaceWith 后发生异常时，回滚逻辑显式清理了 mountedReplacementNode 并回插原节点，恢复单一输入框拓扑与唯一 ID；针对 R6-B2，无论草稿是否为空或纯空格，均重新调度 300ms 防抖任务，300ms 后忠实清除旧展示并报错；接口代码已明确降级为非执行架构示意，以公共签名与状态所有权为权威契约；AppController 依赖注入与只读 textarea 兜底自洽。\n2. 实质性阻塞（Blockers）：在 blk-tech-module、blk-tech-interface、blk-deliv-acc-full-e2e 及 blk-deliv-val-standalone-runtime 共 4 个区块的 evidenceIds 数组中，存在大面积伪造/损坏的证据 ID（直接取自上下文分块 SHA256 哈希值前缀 evidence-），在正式证据库中均无实体记录，严重破坏了证据不可变性与可追溯性规范。必须在 blockers 中列出具体受影响区块与修复要求，交由登记整合任务修复。"
+}

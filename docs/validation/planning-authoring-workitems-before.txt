@@ -1,0 +1,111 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ apps/server/tests/planning-role-contract.test.ts (46 tests | 8 failed | 38 skipped) 25ms
+   ↓ Planning worker role output contracts > exports a selector that can constrain non-design workers independently
+   ↓ Planning worker role output contracts > validates research role boundaries even when a Provider reports structured success
+   ↓ Planning worker role output contracts > validates validation role boundaries even when a Provider reports structured success
+   ↓ Planning worker role output contracts > validates review role boundaries even when a Provider reports structured success
+   ↓ Planning worker role output contracts > validates forbidden review questions and follow-ups after a Provider returns them
+   ↓ Planning worker role output contracts > accepts honest research role results through the runtime boundary
+   ↓ Planning worker role output contracts > accepts honest validation role results through the runtime boundary
+   ↓ Planning worker role output contracts > accepts honest review role results through the runtime boundary
+   ↓ Planning worker role output contracts > permits omitted or empty workItems but rejects decomposition work from a research worker
+   ↓ Planning worker role output contracts > permits omitted or empty workItems but rejects decomposition work from a validation worker
+   ↓ Planning worker role output contracts > permits omitted or empty workItems but rejects decomposition work from a review worker
+   ↓ Planning worker role output contracts > rejects full blueprint groups from a research worker
+   ↓ Planning worker role output contracts > rejects full blueprint groups from a validation worker
+   ↓ Planning worker role output contracts > rejects full blueprint groups from a review worker
+   ↓ Planning worker role output contracts > rejects clarification content from a research worker
+   ↓ Planning worker role output contracts > rejects clarification content from a validation worker
+   ↓ Planning worker role output contracts > rejects clarification content from a review worker
+   ↓ Planning worker role output contracts > rejects user questions from a research worker
+   ↓ Planning worker role output contracts > rejects user questions from a validation worker
+   ↓ Planning worker role output contracts > rejects user questions from a review worker
+   ↓ Planning worker role output contracts > rejects follow-up work from an independent reviewer
+   ↓ Planning worker role output contracts > accepts research evidence, concrete blockers and registered follow-ups in the unified result shape
+   ↓ Planning worker role output contracts > accepts validation evidence, concrete blockers and registered follow-ups in the unified result shape
+   ↓ Planning worker role output contracts > accepts review findings without requiring design output or new work
+   × Planning worker role output contracts > retains complete design content while forbidding work registration for clarification workers 5ms
+     → expected undefined to be +0 // Object.is equality
+   × Planning worker role output contracts > retains complete design content while forbidding work registration for design workers 0ms
+     → expected undefined to be +0 // Object.is equality
+   × Planning worker role output contracts > retains complete design content while forbidding work registration for integration workers 0ms
+     → expected undefined to be +0 // Object.is equality
+   × Planning worker role output contracts > retains complete design content while forbidding work registration for revision workers 0ms
+     → expected undefined to be +0 // Object.is equality
+   × Planning worker role output contracts > rejects nonempty workItems in the actual clarification schema and acceptance boundary without dropping them 17ms
+     → expected true to be false // Object.is equality
+   × Planning worker role output contracts > rejects nonempty workItems in the actual design schema and acceptance boundary without dropping them 0ms
+     → expected true to be false // Object.is equality
+   × Planning worker role output contracts > rejects nonempty workItems in the actual integration schema and acceptance boundary without dropping them 0ms
+     → expected true to be false // Object.is equality
+   × Planning worker role output contracts > rejects nonempty workItems in the actual revision schema and acceptance boundary without dropping them 0ms
+     → expected true to be false // Object.is equality
+   ↓ Planning worker role output contracts > accepts omitted or empty workItems from clarification workers
+   ↓ Planning worker role output contracts > accepts omitted or empty workItems from design workers
+   ↓ Planning worker role output contracts > accepts omitted or empty workItems from integration workers
+   ↓ Planning worker role output contracts > accepts omitted or empty workItems from revision workers
+   ↓ Planning worker role output contracts > allows a complete scoped design with no work registration and keeps decomposition independent
+   ↓ Planning worker role output contracts > defaults new task kinds to the shared contract for separate decomposition validation
+   ↓ Planning worker role output contracts > gives research workers their role contract without current-stage design instructions
+   ↓ Planning worker role output contracts > gives validation workers their role contract without current-stage design instructions
+   ↓ Planning worker role output contracts > gives review workers their role contract without current-stage design instructions
+   ↓ Planning worker role output contracts > gives validation its own role and forbids a reviewer from scheduling or questioning
+   ↓ Planning worker role output contracts > describes model output capacity without imposing a cost gate on research
+   ↓ Planning worker role output contracts > describes model output capacity without imposing a cost gate on validation
+   ↓ Planning worker role output contracts > describes model output capacity without imposing a cost gate on review
+   ↓ Planning worker role output contracts > keeps complete stage instructions for design and clarification
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > retains complete design content while forbidding work registration for clarification workers
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > retains complete design content while forbidding work registration for design workers
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > retains complete design content while forbidding work registration for integration workers
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > retains complete design content while forbidding work registration for revision workers
+AssertionError: expected undefined to be +0 // Object.is equality
+
+- Expected: 
+0
+
++ Received: 
+undefined
+
+ ❯ apps/server/tests/planning-role-contract.test.ts:85:71
+     83| 
+     84|   it.each(authoringRoles)('retains complete design content while forbi…
+     85|     expect((selectSchema(kind) as any).properties.workItems.maxItems).…
+       |                                                                       ^
+     86|     expect(validate(kind, result({ groups: [group('delivery')], clarif…
+     87|     expect(() => schemas.assertPlanningTaskRole(result({ groups: [grou…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > rejects nonempty workItems in the actual clarification schema and acceptance boundary without dropping them
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > rejects nonempty workItems in the actual design schema and acceptance boundary without dropping them
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > rejects nonempty workItems in the actual integration schema and acceptance boundary without dropping them
+ FAIL  apps/server/tests/planning-role-contract.test.ts > Planning worker role output contracts > rejects nonempty workItems in the actual revision schema and acceptance boundary without dropping them
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ apps/server/tests/planning-role-contract.test.ts:94:36
+     92|     const original = structuredClone(output);
+     93|     expect(ajv.compile(PLANNING_TASK_SCHEMA)(output)).toBe(true);
+     94|     expect(validate(kind, output)).toBe(false);
+       |                                    ^
+     95|     expect(() => schemas.assertPlanningTaskRole(output, kind)).toThrow…
+     96|     expect(output).toEqual(original);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 38 skipped (46)
+   Start at  04:56:32
+   Duration  1.05s (transform 401ms, setup 0ms, collect 739ms, tests 25ms, environment 0ms, prepare 85ms)
+

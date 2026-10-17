@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "evidence": [
+    {
+      "id": "answer-dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "kind": "user",
+      "content": "即时直接清空",
+      "source": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "obtainedAt": "2026-10-04T16:12:46.337Z",
+      "applicability": "dec-clear-interaction-mode"
+    },
+    {
+      "applicability": "用户原始需求、功能范围界定与非目标约束依据",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T16:08:03.059Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "参考截图视觉元素与空间结构映射依据",
+      "content": "fixture.png 真实像素呈现白底背景，上方居中偏左为黑色无衬线文本“Q7M4-8261”，下方左侧为蓝色矩形色块，下方右侧为橙色圆形色块。布局结构对应为：顶部/上方结果展示区域，底部/下方左侧为主操作区域（确认按钮），底部/下方右侧为辅助操作区域（清空按钮）。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+      "kind": "material",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\inputs\\\\inp-1791129999124\\\\fixture.png",
+      "obtainedAt": "2026-10-04T16:08:06.988Z",
+      "outcome": "passed",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "可行性与安全防护分析依据：用户输入任意项目名可能包含 HTML 标签、特殊符号或潜在脚本字符串。项目名展示区必须使用 Node.textContent（或同等安全文本绑定）进行回显，从根本上杜绝 DOM 型 XSS 注入风险，确保纯前端展示的安全与鲁棒性。",
+      "content": "MDN 官方文档 Node: textContent property 指出：textContent 属性表示节点及其后代的文本内容。MDN 明确建议避免使用 innerHTML 来获取或设置元素内的文本，因为 innerHTML 处理原始 HTML 而非纯文本，容易受到 XSS 攻击；而 textContent 不调用 HTML 解析器，能够保证文本安全地作为纯文本呈现，避免 XSS 漏洞。",
+      "hash": "fde1787705a45a0ec71c5eab0e9c2a2acb0151d62eaf9a4092593c69e74dfcb8",
+      "id": "evidence-mdn-textcontent-xss-safety",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innerhtml",
+      "obtainedAt": "2026-10-04T16:08:26.012Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+    },
+    {
+      "applicability": "异常处理与交互体验依据：用户在输入框按 Enter 或点击确认提交时，若采用原生 form 或按钮结构，必须调用 preventDefault() 阻止浏览器默认页面刷新行为，从而保证纯前端单页面的即时校验、空值错误提示与失败保留输入得以稳定生效。",
+      "content": "MDN 官方文档 Event: preventDefault() method 指出：preventDefault() 方法告知用户代理该事件正在被显式处理，其默认行为（如表单提交导致页面刷新跳转、链接导航等）不应执行。",
+      "hash": "41e832f668dde9a4c32adbb89bedce1b323932d878f57b1bdea773d12da7a877",
+      "id": "evidence-mdn-event-prevent-default",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault",
+      "obtainedAt": "2026-10-04T16:08:43.712Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault"
+    },
+    {
+      "applicability": "规范项目名安全渲染，证实 Node.textContent 替换纯文本节点且不调用 HTML 解析器，从根本上防止 DOM 型 XSS 漏洞",
+      "content": "MDN 官方文档规范指出：Element.innerHTML 会调用 HTML 解析器处理原始 HTML 字符串，容易受到 XSS 跨站脚本攻击；而 Node.textContent 属性用于获取或设置节点内的纯文本内容，设置 textContent 会用包含指定字符串的单个文本节点替换该节点的所有子节点，不调用 HTML 解析器，因此在渲染不受信任的用户输入时具备天然安全性。",
+      "hash": "fde1787705a45a0ec71c5eab0e9c2a2acb0151d62eaf9a4092593c69e74dfcb8",
+      "id": "evidence-mdn-node-textcontent-official",
+      "kind": "official-source",
+      "location": "MDN Web APIs / Node / textContent",
+      "obtainedAt": "2026-10-04T16:17:03.536Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+    },
+    {
+      "applicability": "适用于纯前端文本输入框的取值、非空校验与清空重置操作。",
+      "content": "HTMLInputElement 接口提供操作 <input> 元素的属性与方法，包括 value 属性表示当前输入控件的字符串值，支持直接读写与清空，并在所有现代桌面浏览器中原生广泛支持。",
+      "hash": "0e241134468e95dd8137f1eea7e1d79ff38cde4ad4cba3fe3b436bf1f5870a70",
+      "id": "evidence-mdn-htmlinputelement",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement",
+      "obtainedAt": "2026-10-04T16:17:15.241Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement"
+    },
+    {
+      "applicability": "适用于输入框捕获 Enter 回车键并触发核对确认操作。",
+      "content": "KeyboardEvent.key 属性标准化返回用户按下的按键值（如 'Enter'），自 2017 年起已在主流现代桌面浏览器全面支持，适用于监听回车快捷键提交。",
+      "hash": "b6651158a5339f9a4f31e3c2134ad1f1c02cb201b5a93da584a195e5fed9bf6f",
+      "id": "evidence-mdn-keyboardevent-key",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key",
+      "obtainedAt": "2026-10-04T16:17:54.100Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key"
+    },
+    {
+      "applicability": "适用于依据参考图排布实现白底居中卡片、顶部展示区与底部按钮的弹性布局。",
+      "content": "CSS Flexible Box Layout（Flexbox）提供一维弹性布局模型，支持主轴与交叉轴的灵活对齐、居中分布与自适应扩展，广泛支持于所有主流现代桌面浏览器。",
+      "hash": "44c9f8916fe1fc868263573ca37021e8da27ab5c2a0b1e6ed678898bc1881449",
+      "id": "evidence-mdn-css-flexbox",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox",
+      "obtainedAt": "2026-10-04T16:18:22.239Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox"
+    },
+    {
+      "applicability": "适用于轻量单页面精准获取输入框、按钮和展示容器 DOM 节点并绑定事件。",
+      "content": "Document.querySelector() 方法依据 CSS 选择器返回匹配的第一个 Element，属于标准 DOM API，在所有主流桌面浏览器中原生支持，零框架依赖。",
+      "hash": "c3f2b60284884821f7570e86ae4e52d3acfbb3eea92d85afddab455553840fcf",
+      "id": "evidence-mdn-document-queryselector",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector",
+      "obtainedAt": "2026-10-04T16:18:30.609Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector"
+    },
+    {
+      "applicability": "记录规划环境受控试验不可用状态，确立交付阶段浏览器真实测试依赖",
+      "content": "在规划环境中通过 environment_prepare 探测 Node.js 受控实验容器运行时，由于 Docker 引擎管道未启动导致容器环境不可用，规划期受控试验未执行。所有 XSS 防护与性能耗时验证已完整编排为后续真实现代桌面浏览器前置验证任务。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop Linux Engine)",
+      "id": "evidence-exp-docker-env-unavailable",
+      "kind": "experiment",
+      "location": "tools/experiments/prepare-65356e0f-5685-4c49-a2be-b152d9ed0b9b.ndjson",
+      "obtainedAt": "2026-10-04T16:21:10.000Z",
+      "outcome": "unexecuted",
+      "source": "environment:prepare-65356e0f-5685-4c49-a2be-b152d9ed0b9b"
+    },
+    {
+      "applicability": "官方规范查证：用于 delivery 阶段指导纯静态单页面产物采用兼容 file:// 本地双击零服务器直接运行的脚本组织形态，并在交付验证任务中建立 file:// 与 http:// 双模式的端到端验收与验证标准。",
+      "content": "You need to pay attention to local testing — if you try to load the HTML file locally (i.e., with a file:// URL), you'll run into CORS errors due to JavaScript module security requirements. You need to do your testing through a server. Also, note that you might get different behavior from sections of script defined inside modules as opposed to in classic scripts.",
+      "hash": "deb285e95e1dca43e123ad6ef9f8eab6dd7bf2a022f373e5cfc37f24d88694e9",
+      "id": "evidence-320443a6-461c-4976-9039-908598ac05f0",
+      "kind": "official-source",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tools\\evidence\\research-deb285e95e1dca43e123ad6ef9f8eab6dd7bf2a022f373e5cfc37f24d88694e9.txt",
+      "obtainedAt": "2026-10-04T16:24:04.677Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+    },
+    {
+      "applicability": "当前规划环境受控运行环境检查：规划宿主机未启动 Docker Desktop Linux Engine，容器执行环境 unavailable。因此端到端全量浏览器测试与性能实测转为交付前置验证任务在个人开发者真实桌面浏览器环境中执行。",
+      "content": "environment_prepare (node) failed to connect to docker API at npipe:////./pipe/dockerDesktopLinuxEngine. Container execution is unavailable.",
+      "environment": "Node 24.13.0 on Docker Desktop Linux Engine (unavailable in current host)",
+      "hash": "c18a221fca48dd444458f4a7c0f1624c96c4e09886a111a43a054ec99f1c7128",
+      "id": "evidence-docker-env-prep-delivery",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tools\\experiments\\prepare-f8436798-b32b-41e3-ad57-05fa2786f8a4.ndjson",
+      "obtainedAt": "2026-10-04T16:24:30.000Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-f8436798-b32b-41e3-ad57-05fa2786f8a4"
+    },
+    {
+      "id": "answer-dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "kind": "user",
+      "content": "彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）",
+      "source": "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+      "obtainedAt": "2026-10-04T21:00:51.408Z",
+      "applicability": "dec-visual-layout-mapping"
+    }
+  ],
+  "topics": [
+    {
+      "key": "dec-clear-interaction-mode",
+      "aliases": [],
+      "history": [
+        "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d"
+      ],
+      "effectiveDecisionId": "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "lastAnswerKind": "selection",
+      "lastAnsweredQuestionId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+    },
+    {
+      "key": "dec-product-scope-boundary",
+      "aliases": [],
+      "history": [
+        "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583"
+      ],
+      "effectiveDecisionId": "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583"
+    },
+    {
+      "key": "dec-failure-preserve-input",
+      "aliases": [],
+      "history": [
+        "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911"
+      ],
+      "effectiveDecisionId": "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911"
+    },
+    {
+      "key": "dec-safe-text-rendering",
+      "aliases": [],
+      "history": [
+        "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78"
+      ],
+      "effectiveDecisionId": "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78"
+    },
+    {
+      "key": "dec-visual-layout-mapping",
+      "aliases": [],
+      "history": [
+        "dec-72513e55-a5a7-44e1-90ad-087b5927447e",
+        "dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0"
+      ],
+      "effectiveDecisionId": "dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "lastAnswerKind": "selection",
+      "lastAnsweredQuestionId": "run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button"
+    },
+    {
+      "key": "dec-tech-stack-native-esm",
+      "aliases": [],
+      "history": [
+        "dec-cb1eb212-815a-490e-a829-0219a93de6f5"
+      ],
+      "effectiveDecisionId": "dec-cb1eb212-815a-490e-a829-0219a93de6f5"
+    },
+    {
+      "key": "dec-tech-in-memory-state",
+      "aliases": [],
+      "history": [
+        "dec-85156520-0768-4968-9e8e-c0ad9e35a393"
+      ],
+      "effectiveDecisionId": "dec-85156520-0768-4968-9e8e-c0ad9e35a393"
+    },
+    {
+      "key": "dec-tech-deployment-zero-server",
+      "aliases": [],
+      "history": [
+        "dec-b5363cf6-4c99-493b-816b-92f82b05cd30"
+      ],
+      "effectiveDecisionId": "dec-b5363cf6-4c99-493b-816b-92f82b05cd30"
+    },
+    {
+      "key": "dec-delivery-script-packaging",
+      "aliases": [],
+      "history": [
+        "dec-a5bec314-d39d-41ac-9ea9-0d322bbdedb9"
+      ],
+      "effectiveDecisionId": "dec-a5bec314-d39d-41ac-9ea9-0d322bbdedb9"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "inp-01",
+      "raw": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "kind": "statement",
+      "createdAt": "2026-10-04T16:06:39.032Z"
+    },
+    {
+      "id": "b33f1cd7-dee5-49e5-ab04-da05e30564c5",
+      "raw": "模拟用户需求变更：确认按钮改为实时反馈：输入每次变化后等待300毫秒自动展示项目名，清空立即取消待展示任务并清掉结果；空值仍提示。删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收，保留无关块稳定 ID。此原文不是直接批准。",
+      "kind": "feedback",
+      "createdAt": "2026-10-04T16:28:08.102Z"
+    }
+  ],
+  "operations": [
+    {
+      "id": "questions:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+      "fingerprint": "abf6957eb054f0be6f827dc53d368938d8da6d75be9b97b7c69ce28cb2ab3734",
+      "revision": 3
+    },
+    {
+      "id": "simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+      "fingerprint": "40b3c87d76d5ac74dfa1bd6e4ea0394a869b31ae5505d2d3f9f904a2f41d31c0",
+      "revision": 4
+    },
+    {
+      "id": "proposal:change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1",
+      "fingerprint": "8b4c585f1bbf0ff96e1c6e67dc7bfdb104b8da515f4994877651c7374e1b6d87",
+      "revision": 5
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "fingerprint": "9ddbbd23bda89780a71d024503f818b73fd67c86e4cf4a5bb97e419f8b69c67b",
+      "revision": 6
+    },
+    {
+      "id": "proposal:change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0",
+      "fingerprint": "8aac48d36c92d068762d19db0949fc0975dd0547b9d0a82d83805c92f4aef2dd",
+      "revision": 7
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "fingerprint": "eae9223604c6b05116968a0dfa3e4b1238fec41b23baa21f20f843a9d5899de6",
+      "revision": 8
+    },
+    {
+      "id": "proposal:change-98e4cedc-717d-4d2b-8532-d9919924590f-delivery-0",
+      "fingerprint": "dda6f9587495e36835d87c8c443509dfab2bfb0a09e2ed555a91854c82f4a0e5",
+      "revision": 9
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-delivery-1791131287489",
+      "fingerprint": "2bcd2fd639d1f4b8ddb2f6cc284a4bd3e9923c1a11835a1e62fdf576842f8acb",
+      "revision": 10
+    },
+    {
+      "id": "api-automated-package-flash-materials-chinese-20261005-01-initial",
+      "fingerprint": "3c765841052b77a36e2cb6b1bfced55703166e18035657e97ebdb6ced895689c",
+      "revision": 11
+    },
+    {
+      "id": "feedback:real-flash-materials-chinese-20261005-01-feedback-1791131288046",
+      "fingerprint": "3b556e3ea9ac49e8003a5a9223bc68e1f455407f5615f5dfe42284537ae45ce1",
+      "revision": 12
+    },
+    {
+      "id": "questions:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4",
+      "fingerprint": "02370bc5dde3956ef380b54e9c38b0aaec2d402b2c8dba5bea8ba7faa93c8540",
+      "revision": 13
+    },
+    {
+      "id": "simulated-answer-flash-materials-chinese-resume-20261005-05-1791147651373",
+      "fingerprint": "2f3bf31863b9b9961f1221676097f0b632aaede588e1bd788819821eed900bec",
+      "revision": 14
+    },
+    {
+      "id": "proposal:change-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-5",
+      "fingerprint": "ce2cb73e27a51ba9de471c707e90c35bc079e04a5581ff64bc2c6f2658988dce",
+      "revision": 15
+    }
+  ],
+  "diagnostics": [],
+  "package": {
+    "revision": 11,
+    "sourceRevision": 10,
+    "basisHash": "ceb04befffb2b189662f4785067b15a396095e468c64c83460bfcc2465bac71c",
+    "operationId": "api-automated-package-flash-materials-chinese-20261005-01-initial",
+    "files": [
+      {
+        "name": "START_HERE.md",
+        "sha256": "444eee01db1b1a5af18162c67cdabea508da6d6df69236560b67216afd94ed06"
+      },
+      {
+        "name": "PROJECT.md",
+        "sha256": "42617b88a95191777a7287681e101862cc1c4040e0e6e120cf800933bace7726"
+      },
+      {
+        "name": "PRODUCT.md",
+        "sha256": "f61f3b83c87a7238fe8a238dadab98d657b4ed9f893afa2e04ba0e701c67e565"
+      },
+      {
+        "name": "USER_FLOWS.md",
+        "sha256": "e3db1e2e9feaa55042b4ad98c413fccaf5bbb66abb2a2b52f14ac70a9c2d36ad"
+      },
+      {
+        "name": "UX_UI_SPEC.md",
+        "sha256": "9b3356021567ca4d67bfbc0e5a178889f58805250e9b0ce7c26b9b0d9ccbd3ab"
+      },
+      {
+        "name": "TECHNICAL_GUIDE.md",
+        "sha256": "bb8e3708774fc51e553bb7adbdb6c1c132766b69cbc45ca9c7d80d3c2974461e"
+      },
+      {
+        "name": "DEVELOPMENT_PLAN.md",
+        "sha256": "2d7c0e2454b5d015b5c84a2a6250a87387a22db71139b60e564694d26d3c1926"
+      },
+      {
+        "name": "ACCEPTANCE.md",
+        "sha256": "cdd62d1a6cd9465dcf3b0ed2c955dd566c21ad6f262f4956baeefecccfdfd146"
+      },
+      {
+        "name": "AGENTS.md",
+        "sha256": "5dad700999fcbd1f8ff6d7adb0b90e9c4e59e51c3d688fcf6c064c064f12945f"
+      },
+      {
+        "name": "tasks.json",
+        "sha256": "704c6db10aa9925c2001bd0f8393f17aea1b480c0c5f5ab4ad61a5739b660a69"
+      }
+    ],
+    "directory": "artifacts/packages/10-ceb04befffb2-423d86c39e53"
+  }
+}

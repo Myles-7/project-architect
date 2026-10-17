@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import { ProjectStateEngine, FileStorage, DocumentDiffEngine } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 import type { DiscoveryResult } from '@project-architect/contracts';
+import { renderHistoricalDocuments } from '../fixtures/historical-documents.js';
 
-describe('Golden Document Review 2 — AI Knowledge Base (AI Application)', () => {
+describe('Historical Golden Document Review 2 — AI Knowledge Base (AI Application)', () => {
   let tempBaseDir: string;
   let storage: FileStorage;
   let stateEngine: ProjectStateEngine;
@@ -36,6 +37,11 @@ describe('Golden Document Review 2 — AI Knowledge Base (AI Application)', () =
       projectTags: ['Desktop App', 'AI Product', 'Knowledge Base'],
     });
 
+    const initialIdea = s0.decisions.items.find((decision) => decision.statement === 'Local-first personal second brain with hybrid vector search and local AI chat assistant');
+    expect(initialIdea?.status).toBe('candidate');
+    const confirmedInitial = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, s0.metadata.stateRevision);
+    expect(confirmedInitial.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
+
     const mockOutput: DiscoveryResult = {
       confirmed: ['SecondBrain AI', 'Local-first personal second brain'],
       candidates: ['Cloud sync integration'],
@@ -51,7 +57,7 @@ describe('Golden Document Review 2 — AI Knowledge Base (AI Application)', () =
 
     // Turn 1
     await orchestrator.runDiscoveryTurn(projectPath, {
-      expectedRevision: s0.metadata.stateRevision,
+      expectedRevision: confirmedInitial.metadata.stateRevision,
       userMessage: 'Target user is knowledge workers. MVP scope is note ingestion and local semantic search.',
     });
 
@@ -89,15 +95,18 @@ describe('Golden Document Review 2 — AI Knowledge Base (AI Application)', () =
       'confirmed'
     );
 
-    // Initial Compilation
-    const compileResult = await orchestrator.compileDocuments(projectPath);
+    // Render the historical fixture without publication
+    const compileResult = await renderHistoricalDocuments(projectPath, storage);
+    expect(compileResult.filesAfter).toEqual(compileResult.filesBefore);
+    expect(compileResult.manifest.sourceRevision).toBe(compileResult.snapshot.metadata.stateRevision);
+    expect(new Set(compileResult.renderedFiles.map(file => file.content)).size).toBe(compileResult.renderedFiles.length);
     expect(compileResult.readiness.ready).toBe(true);
     expect(compileResult.manifest.items.length).toBe(10); // 8 core + AI_SPEC.md + DESKTOP_SPEC.md
 
     // Verify TECHNICAL_GUIDE.md and specs/AI_SPEC.md exists and has source attribution
-    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
-    const aiSpecContent = await storage.readText(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'));
+    expect(compileResult.has('docs/TECHNICAL_GUIDE.md')).toBe(true);
+    expect(compileResult.has('docs/specs/DESKTOP_SPEC.md')).toBe(true);
+    const aiSpecContent = compileResult.content('docs/specs/AI_SPEC.md');
     expect(aiSpecContent).toContain('AI & Intelligence Specification');
 
     // Simulate state change (User changes target_user to team developers)

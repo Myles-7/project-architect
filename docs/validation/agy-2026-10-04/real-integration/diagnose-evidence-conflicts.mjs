@@ -1,0 +1,20 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+import { createHash } from 'node:crypto';
+
+const label=process.argv[2];
+if(!/^[a-z0-9-]+$/.test(label??''))throw new Error('Evidence label required');
+const root=resolve('docs/validation/agy-2026-10-04/real-integration',label);
+const manifest=JSON.parse(await readFile(join(root,'manifest.json'),'utf8'));
+const product=manifest.runs.find(run=>run.stage==='product'),technical=manifest.runs.find(run=>run.stage==='technical');
+const approved=JSON.parse(await readFile(join(root,`product-${product.id}-approved-snapshot.json`),'utf8'));
+const directory=join(root,'project-records','runtime','planning',technical.id),run=JSON.parse(await readFile(join(directory,'run.json'),'utf8'));
+const draft=[...run.tasks].reverse().find(task=>['design','integration','revision'].includes(task.kind)&&task.status==='completed');
+const result=JSON.parse(await readFile(join(directory,draft.outputRef),'utf8'));
+const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,canonical(value[key])])):value;
+const fingerprint=value=>createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
+const existing=new Map([...approved.planning.evidence,...approved.planning.changeSets.flatMap(change=>change.evidence)].map(record=>[record.id,record]));
+const conflicts=result.evidence.filter(record=>existing.has(record.id)&&fingerprint(existing.get(record.id))!==fingerprint(record)).map(record=>({id:record.id,changedFields:[...new Set([...Object.keys(existing.get(record.id)),...Object.keys(record)])].filter(key=>JSON.stringify(canonical(existing.get(record.id)[key]))!==JSON.stringify(canonical(record[key]))),previous:existing.get(record.id),incoming:record}));
+const diagnosis={label,runId:run.id,status:run.status,error:run.error,latestDraftTaskId:draft.id,latestDraftPath:join(directory,draft.outputRef),comparison:'Compare immutable approved product evidence and proposed technical evidence using canonical JSON; no Provider result or project state modified.',conflicts};
+await writeFile(join(root,'evidence-id-conflict-diagnostic.json'),JSON.stringify(diagnosis,null,2));
+console.log(JSON.stringify({label,status:run.status,error:run.error,latestDraftTaskId:draft.id,conflicts:conflicts.map(record=>({id:record.id,changedFields:record.changedFields}))}));

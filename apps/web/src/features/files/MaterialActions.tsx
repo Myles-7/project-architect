@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Eye, EyeOff, RefreshCw, Trash2, ArrowUpCircle } from 'lucide-react';
+import { ConfirmDialog } from '../../components/common/ConfirmDialog.js';
 import type { InputRef } from '@project-architect/contracts';
 
 export interface MaterialActionsProps {
@@ -23,6 +24,7 @@ export const MaterialActions: React.FC<MaterialActionsProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -33,14 +35,13 @@ export const MaterialActions: React.FC<MaterialActionsProps> = ({
     }
   };
 
-  const handleDeleteClick = async () => {
-    if (window.confirm(`确定要将材料 "${input.label}" 移入回收站吗？`)) {
-      setIsDeleting(true);
-      try {
-        await onDelete();
-      } finally {
-        setIsDeleting(false);
-      }
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } finally {
+      setIsDeleting(false);
+      setShowConfirmDelete(false);
     }
   };
 
@@ -78,8 +79,8 @@ export const MaterialActions: React.FC<MaterialActionsProps> = ({
           onClick={onRetryExtract}
           disabled={isProcessing}
           className="p-2 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer min-touch-target flex items-center justify-center"
-          aria-label={`重新提取材料 ${input.label}`}
-          title="重新提取文本"
+          aria-label={`刷新材料状态 ${input.label}`}
+          title="刷新材料状态"
         >
           <RefreshCw className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} />
         </button>
@@ -100,7 +101,7 @@ export const MaterialActions: React.FC<MaterialActionsProps> = ({
       {/* 4. Delete to Trash */}
       <button
         type="button"
-        onClick={handleDeleteClick}
+        onClick={() => setShowConfirmDelete(true)}
         disabled={isProcessing || isDeleting}
         className="p-2 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer min-touch-target flex items-center justify-center"
         aria-label={`删除材料 ${input.label} 到回收站`}
@@ -108,6 +109,18 @@ export const MaterialActions: React.FC<MaterialActionsProps> = ({
       >
         <Trash2 className="w-4 h-4" />
       </button>
+
+      {/* Non-blocking Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDelete}
+        title="移入回收站"
+        message={`确定要将材料 "${input.label}" 移入回收站吗？`}
+        confirmText="移入回收站"
+        isDestructive={true}
+        isLoading={isDeleting}
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setShowConfirmDelete(false)}
+      />
     </div>
   );
 };

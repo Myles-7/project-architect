@@ -3,18 +3,30 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "scripts": {
     "build": "pnpm -r --filter=!frontend build",
+    "build:server": "pnpm --filter @project-architect/server build",
     "start": "pnpm --filter @project-architect/server start",
     "start:server": "pnpm --filter @project-architect/server start",
+    "dev:server": "pnpm --filter @project-architect/server dev",
     "start:web": "pnpm --filter @project-architect/web dev",
     "dev:web": "pnpm --filter @project-architect/web dev",
+    "dev:mock": "pnpm --filter @project-architect/web dev:mock",
+    "dev:prototype": "pnpm --filter @project-architect/web dev:prototype",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "pnpm build && playwright test",
+    "schema:sync": "pnpm --filter @project-architect/contracts build && node scripts/sync-planning-schema.mjs",
+    "schema:check": "node scripts/sync-planning-schema.mjs --check",
+    "verify": "node scripts/pa.mjs verify",
     "lint": "npx --yes oxlint --ignore-pattern \"**/node_modules/**\" --ignore-pattern \"**/dist/**\" packages apps tests",
     "clean": "pnpm -r exec rm -rf dist node_modules"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@types/node": "^24.13.3",
     "typescript": "^5.7.3",
     "vitest": "^3.0.7"

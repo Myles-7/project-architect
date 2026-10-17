@@ -1,0 +1,627 @@
+Window: sessionStorage property - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Window 
+
+ sessionStorage 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ 正體中文 (繁體) 
+
+ Window: sessionStorage property
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The read-only sessionStorage property accesses a session Storage object for the current origin . sessionStorage is similar to localStorage ; the difference is that while localStorage is partitioned by origin only, sessionStorage is partitioned by both origin and browser tabs (top-level browsing contexts). The data in sessionStorage is only kept for the duration of the page session.
+
+ Whenever a document is loaded in a particular tab in the browser, a unique page session gets created and assigned to that particular tab. That page session is accessible only in that particular tab. The main document, and all embedded browsing contexts (iframes), are grouped by their origin and each origin has access to its own separate storage area.
+
+ If the page has an opener , the sessionStorage is initially a copy of the opener's sessionStorage object. However, they are still separate and changes to one do not affect the other. To prevent the sessionStorage from being copied, use one of the techniques that remove opener (see Window.opener ).
+
+ A page session lasts as long as the tab or the browser is open, and survives over page reloads and restores.
+
+ Opening a page in a new tab or window creates a new session with the value of the top-level browsing context, which differs from how session cookies work.
+
+ Closing the tab/window ends the session and clears the data in sessionStorage .
+
+ In this article
+
+ Value 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Value 
+
+ A Storage object which can be used to access the current origin's
+session storage space.
+
+ Exceptions 
+
+ SecurityError 
+
+ Thrown in one of the following cases:
+
+ The origin is not a valid scheme/host/port tuple . This can happen if the origin uses the file: or data: schemes, for example.
+
+ The request violates a policy decision. For example, the user has configured the browsers to prevent the page from persisting data.
+
+ Note that if the user blocks cookies, browsers will probably interpret this as an instruction to prevent the page from persisting data.
+
+ Examples 
+
+ Basic usage 
+
+ js 
+ // Save data to sessionStorage
+sessionStorage.setItem("key", "value");
+
+// Get saved data from sessionStorage
+let data = sessionStorage.getItem("key");
+
+// Remove saved data from sessionStorage
+sessionStorage.removeItem("key");
+
+// Remove all saved data from sessionStorage
+sessionStorage.clear();
+
+ Saving text between refreshes 
+
+ The following example autosaves the contents of a text field, and if the browser is
+refreshed, restores the text field content so that no writing is lost.
+
+ js 
+ // Get the text field that we're going to track
+let field = document.getElementById("field");
+
+// See if we have an autosave value
+// (this will only happen if the page is accidentally refreshed)
+if (sessionStorage.getItem("autosave")) {
+ // Restore the contents of the text field
+ field.value = sessionStorage.getItem("autosave");
+}
+
+// Listen for changes in the text field
+field.addEventListener("change", () => {
+ // And save the results into the session storage object
+ sessionStorage.setItem("autosave", field.value);
+});
+
+ Note: 
+Please refer to the Using the Web Storage API article for a full example.
+
+ Specifications 
+
+ Specification
+
+ HTML 
+# dom-sessionstorage-dev 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Using the Web Storage API 
+
+ Window.localStorage 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Nov 30, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Web Storage API 
+ Window 
+ Instance properties caches 
+ closed 
+ cookieStore 
+ crashReport 
+ credentialless 
+ crossOriginIsolated 
+ crypto 
+ customElements 
+ devicePixelRatio 
+ document 
+ documentPictureInPicture 
+ event 
+ external 
+ fence 
+ frameElement 
+ frames 
+ fullScreen 
+ history 
+ indexedDB 
+ innerHeight 
+ innerWidth 
+ isSecureContext 
+ launchQueue 
+ length 
+ localStorage 
+ location 
+ locationbar 
+ menubar 
+ mozInnerScreenX 
+ mozInnerScreenY 
+ name 
+ navigation 
+ navigator 
+ opener 
+ orientation 
+ origin 
+ originAgentCluster 
+ outerHeight 
+ outerWidth 
+ parent 
+ performance 
+ personalbar 
+ scheduler 
+ screen 
+ screenLeft 
+ screenTop 
+ screenX 
+ screenY 
+ scrollbars 
+ scrollMaxX 
+ scrollMaxY 
+ scrollX 
+ scrollY 
+ self 
+ sessionStorage 
+ sharedStorage 
+ speechSynthesis 
+ status 
+ statusbar 
+ toolbar 
+ top 
+ trustedTypes 
+ viewport 
+ visualViewport 
+ window 
+
+ Instance methods alert() 
+ atob() 
+ blur() 
+ btoa() 
+ cancelAnimationFrame() 
+ cancelIdleCallback() 
+ captureEvents() 
+ clearImmediate() 
+ clearInterval() 
+ clearTimeout() 
+ close() 
+ confirm() 
+ createImageBitmap() 
+ dump() 
+ fetch() 
+ fetchLater() 
+ find() 
+ focus() 
+ getComputedStyle() 
+ getDefaultComputedStyle() 
+ getScreenDetails() 
+ getSelection() 
+ matchMedia() 
+ moveBy() 
+ moveTo() 
+ open() 
+ postMessage() 
+ print() 
+ prompt() 
+ queryLocalFonts() 
+ queueMicrotask() 
+ releaseEvents() 
+ reportError() 
+ requestAnimationFrame() 
+ requestFileSystem() 
+ requestIdleCallback() 
+ requestResize() 
+ resizeBy() 
+ resizeTo() 
+ scroll() 
+ scrollBy() 
+ scrollByLines() 
+ scrollByPages() 
+ scrollTo() 
+ setImmediate() 
+ setInterval() 
+ setResizable() 
+ setTimeout() 
+ showDirectoryPicker() 
+ showOpenFilePicker() 
+ showSaveFilePicker() 
+ sizeToContent() 
+ stop() 
+ structuredClone() 
+ webkitConvertPointFromNodeToPage() 
+ webkitConvertPointFromPageToNode() 
+
+ Events afterprint 
+ appinstalled 
+ beforeinstallprompt 
+ beforeprint 
+ beforeunload 
+ blur 
+ devicemotion 
+ deviceorientation 
+ deviceorientationabsolute 
+ error 
+ focus 
+ gamepadconnected 
+ gamepaddisconnected 
+ hashchange 
+ languagechange 
+ load 
+ message 
+ messageerror 
+ offline 
+ online 
+ orientationchange 
+ pagehide 
+ pagereveal 
+ pageshow 
+ pageswap 
+ popstate 
+ rejectionhandled 
+ resize 
+ scrollsnapchange 
+ scrollsnapchanging 
+ storage 
+ unhandledrejection 
+ unload 
+ vrdisplayactivate 
+ vrdisplayconnect 
+ vrdisplaydeactivate 
+ vrdisplaydisconnect 
+ vrdisplaypresentchange 
+
+ Inheritance EventTarget 
+
+ Related pages for Web Storage API Storage 
+ StorageEvent 
+ Window .localStorage 
+ Window .sessionStorage 
+
+ Guides Using the Web Storage API 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

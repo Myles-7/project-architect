@@ -1,0 +1,11 @@
+{
+  "id": "evidence-28a997f6-8fc4-474f-8b84-24dac1e147e5",
+  "source": "https://nodejs.org/api/process.html",
+  "capturedAt": "2026-10-04T22:28:05.643Z",
+  "sha256": "9537f159e79118ff97e845a0bfb86dd66484ae5fe489240abbae3a4259c55390",
+  "scope": "指导静态源码审计脚本在发现违规项时显式抛出失败退出码",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\tools\\evidence\\evidence-28a997f6-8fc4-474f-8b84-24dac1e147e5.json",
+  "approval": "candidate",
+  "content": "Node.js 官方文档指出：process.exit([code]) 方法以指定的退出状态码同步终止进程；如果省略 code 则默认使用成功码 0。若要表示执行失败，必须显式调用 process.exit(1) 返回非零退出码；调用 console.warn 而不退出或正常退出 0 会使调用 shell 收到退出码 0，被外部脚本误判为测试通过。",
+  "conclusion": "在源码审计脚本中，发现危险 API 或残留关键字时必须显式调用 process.exit(1) 同步退出，确保返回非零状态码报告失败。"
+}

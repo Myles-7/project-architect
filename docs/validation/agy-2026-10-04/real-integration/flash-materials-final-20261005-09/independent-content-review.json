@@ -1,0 +1,41 @@
+{
+  "label": "flash-materials-final-20261005-09",
+  "checkedAt": "2026-10-05T08:09:16.189Z",
+  "status": "blocked",
+  "contentPassed": false,
+  "scope": "Independent reading of concrete counterexamples in the latest frozen review input. Full final content acceptance and final compiled package checks have not completed; no successful final verdict is implied.",
+  "finalReviewStatus": "pending",
+  "humanReview": "pending",
+  "targetApplicationExecution": "unexecuted",
+  "candidateContextSha256": "f6ae926c6c435d15af57ec679262fb9511e1ef30386534eea568cf7f0e98334b",
+  "candidatePreviewSha256": "7f71347aaab028a1fbe6906086fd05a1d3a2f3792c9aff7dff098a3e1c31cda1",
+  "taskId": "task-bc3bd22a-1b27-4f47-8bd8-74fb5aa9536a",
+  "blockCount": 30,
+  "findings": [
+    {
+      "id": "M1",
+      "blocks": [
+        "blk-feat-input-display",
+        "blk-flow-input-display",
+        "blk-tech-interface"
+      ],
+      "reason": "The input-display feature/flow increment inputGeneration before replacement; the technical contract increments only at successful commit. These two related input blocks need localized synchronization."
+    },
+    {
+      "id": "M2",
+      "blocks": [
+        "blk-tech-interface"
+      ],
+      "reason": "captureSnapshot is outside the illustrative try block although its failure is promised to be caught by handleReset."
+    },
+    {
+      "id": "M3",
+      "blocks": [
+        "blk-tech-interface"
+      ],
+      "reason": "Initialization declares isInitialized=true before binding, rendering and focus finish. Initialization failures and retry/one-listener semantics need a coherent ready commit point."
+    }
+  ],
+  "proposedQualityFeedback": "..\\quality-feedback-materials-final-consistency-20261005.txt",
+  "feedbackApplied": false
+}

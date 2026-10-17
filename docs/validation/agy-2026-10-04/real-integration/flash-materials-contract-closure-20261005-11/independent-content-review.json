@@ -1,0 +1,49 @@
+{
+  "label": "flash-materials-contract-closure-20261005-11",
+  "checkedAt": "2026-10-05T12:40:09.305Z",
+  "status": "blocked",
+  "contentPassed": false,
+  "scope": "Independent verification of concrete cross-contract counterexamples in the candidate bodies and related task fields. This blocked report is not a complete final semantic pass; full candidate and compiled-document reading is still required. Provider review has no successful terminal result. No final compiled-package or human acceptance is implied.",
+  "finalReviewStatus": "pending",
+  "humanReview": "pending",
+  "targetApplicationExecution": "unexecuted",
+  "candidateContextSha256": "576013d164360972d842e87c1305a22bf655af56b510f7f47fb8738a56ac5802",
+  "candidatePreviewSha256": "7ac0354b25bceccb418fae0ee35c47e7fc180f9d31edf6b74f8cc403a061dd60",
+  "taskId": "task-8744e719-21cc-4b1c-85f6-c1bb500c2918",
+  "blockCount": 30,
+  "findings": [
+    {
+      "id": "M4",
+      "blocks": [
+        "blk-tech-module",
+        "blk-tech-interface",
+        "blk-flow-input-display",
+        "blk-deliv-task-error-handling"
+      ],
+      "reason": "Only reset listener cleanup is specified; input/composition partial binding and retry cleanup lack ownership. focusInput runs before activeInputNode is set, so initialization can silently skip focus and still commit ready."
+    },
+    {
+      "id": "M6",
+      "blocks": [
+        "blk-tech-module",
+        "blk-tech-interface",
+        "blk-tech-error",
+        "blk-deliv-acc-full-e2e",
+        "blk-acc-reset"
+      ],
+      "reason": "Global notification creation/mount failure has no honest return boundary. Severe fallback promises a retained local snapshot without durable in-memory ownership or an actual retry/retrieval path after the function returns."
+    },
+    {
+      "id": "M7",
+      "blocks": [
+        "blk-deliv-acc-security-edge",
+        "blk-tech-error",
+        "blk-prod-outcomes"
+      ],
+      "reason": "The general runtime error acceptance promises the draft remains editable for any DOM/script error; the severe rollback contract allows the main editor to be unavailable. The security-edge acceptance is therefore in the affected scope."
+    }
+  ],
+  "proposedQualityFeedback": "..\\quality-feedback-materials-final-contract-20261005.txt",
+  "feedbackSha256": "cb4f09d43e892f322f33225bc919ef4bb5dbc2b1eddee96728a80c0be6222197",
+  "feedbackApplied": false
+}

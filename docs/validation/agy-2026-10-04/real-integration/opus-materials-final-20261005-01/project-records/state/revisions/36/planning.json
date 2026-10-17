@@ -1,0 +1,741 @@
+{
+  "schemaVersion": 1,
+  "evidence": [
+    {
+      "id": "answer-dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "kind": "user",
+      "content": "即时直接清空",
+      "source": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "obtainedAt": "2026-10-04T16:12:46.337Z",
+      "applicability": "dec-clear-interaction-mode"
+    },
+    {
+      "applicability": "用户原始需求、功能范围界定与非目标约束依据",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T16:08:03.059Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "参考截图视觉元素与空间结构映射依据",
+      "content": "fixture.png 真实像素呈现白底背景，上方居中偏左为黑色无衬线文本“Q7M4-8261”，下方左侧为蓝色矩形色块，下方右侧为橙色圆形色块。布局结构对应为：顶部/上方结果展示区域，底部/下方左侧为主操作区域（确认按钮），底部/下方右侧为辅助操作区域（清空按钮）。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+      "kind": "material",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\inputs\\\\inp-1791129999124\\\\fixture.png",
+      "obtainedAt": "2026-10-04T16:08:06.988Z",
+      "outcome": "passed",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "可行性与安全防护分析依据：用户输入任意项目名可能包含 HTML 标签、特殊符号或潜在脚本字符串。项目名展示区必须使用 Node.textContent（或同等安全文本绑定）进行回显，从根本上杜绝 DOM 型 XSS 注入风险，确保纯前端展示的安全与鲁棒性。",
+      "content": "MDN 官方文档 Node: textContent property 指出：textContent 属性表示节点及其后代的文本内容。MDN 明确建议避免使用 innerHTML 来获取或设置元素内的文本，因为 innerHTML 处理原始 HTML 而非纯文本，容易受到 XSS 攻击；而 textContent 不调用 HTML 解析器，能够保证文本安全地作为纯文本呈现，避免 XSS 漏洞。",
+      "hash": "fde1787705a45a0ec71c5eab0e9c2a2acb0151d62eaf9a4092593c69e74dfcb8",
+      "id": "evidence-mdn-textcontent-xss-safety",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innerhtml",
+      "obtainedAt": "2026-10-04T16:08:26.012Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+    },
+    {
+      "applicability": "异常处理与交互体验依据：用户在输入框按 Enter 或点击确认提交时，若采用原生 form 或按钮结构，必须调用 preventDefault() 阻止浏览器默认页面刷新行为，从而保证纯前端单页面的即时校验、空值错误提示与失败保留输入得以稳定生效。",
+      "content": "MDN 官方文档 Event: preventDefault() method 指出：preventDefault() 方法告知用户代理该事件正在被显式处理，其默认行为（如表单提交导致页面刷新跳转、链接导航等）不应执行。",
+      "hash": "41e832f668dde9a4c32adbb89bedce1b323932d878f57b1bdea773d12da7a877",
+      "id": "evidence-mdn-event-prevent-default",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault",
+      "obtainedAt": "2026-10-04T16:08:43.712Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault"
+    },
+    {
+      "applicability": "规范项目名安全渲染，证实 Node.textContent 替换纯文本节点且不调用 HTML 解析器，从根本上防止 DOM 型 XSS 漏洞",
+      "content": "MDN 官方文档规范指出：Element.innerHTML 会调用 HTML 解析器处理原始 HTML 字符串，容易受到 XSS 跨站脚本攻击；而 Node.textContent 属性用于获取或设置节点内的纯文本内容，设置 textContent 会用包含指定字符串的单个文本节点替换该节点的所有子节点，不调用 HTML 解析器，因此在渲染不受信任的用户输入时具备天然安全性。",
+      "hash": "fde1787705a45a0ec71c5eab0e9c2a2acb0151d62eaf9a4092593c69e74dfcb8",
+      "id": "evidence-mdn-node-textcontent-official",
+      "kind": "official-source",
+      "location": "MDN Web APIs / Node / textContent",
+      "obtainedAt": "2026-10-04T16:17:03.536Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+    },
+    {
+      "applicability": "适用于纯前端文本输入框的取值、非空校验与清空重置操作。",
+      "content": "HTMLInputElement 接口提供操作 <input> 元素的属性与方法，包括 value 属性表示当前输入控件的字符串值，支持直接读写与清空，并在所有现代桌面浏览器中原生广泛支持。",
+      "hash": "0e241134468e95dd8137f1eea7e1d79ff38cde4ad4cba3fe3b436bf1f5870a70",
+      "id": "evidence-mdn-htmlinputelement",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement",
+      "obtainedAt": "2026-10-04T16:17:15.241Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement"
+    },
+    {
+      "applicability": "适用于输入框捕获 Enter 回车键并触发核对确认操作。",
+      "content": "KeyboardEvent.key 属性标准化返回用户按下的按键值（如 'Enter'），自 2017 年起已在主流现代桌面浏览器全面支持，适用于监听回车快捷键提交。",
+      "hash": "b6651158a5339f9a4f31e3c2134ad1f1c02cb201b5a93da584a195e5fed9bf6f",
+      "id": "evidence-mdn-keyboardevent-key",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key",
+      "obtainedAt": "2026-10-04T16:17:54.100Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key"
+    },
+    {
+      "applicability": "适用于依据参考图排布实现白底居中卡片、顶部展示区与底部按钮的弹性布局。",
+      "content": "CSS Flexible Box Layout（Flexbox）提供一维弹性布局模型，支持主轴与交叉轴的灵活对齐、居中分布与自适应扩展，广泛支持于所有主流现代桌面浏览器。",
+      "hash": "44c9f8916fe1fc868263573ca37021e8da27ab5c2a0b1e6ed678898bc1881449",
+      "id": "evidence-mdn-css-flexbox",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox",
+      "obtainedAt": "2026-10-04T16:18:22.239Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout/Flexbox"
+    },
+    {
+      "applicability": "适用于轻量单页面精准获取输入框、按钮和展示容器 DOM 节点并绑定事件。",
+      "content": "Document.querySelector() 方法依据 CSS 选择器返回匹配的第一个 Element，属于标准 DOM API，在所有主流桌面浏览器中原生支持，零框架依赖。",
+      "hash": "c3f2b60284884821f7570e86ae4e52d3acfbb3eea92d85afddab455553840fcf",
+      "id": "evidence-mdn-document-queryselector",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector",
+      "obtainedAt": "2026-10-04T16:18:30.609Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector"
+    },
+    {
+      "applicability": "记录规划环境受控试验不可用状态，确立交付阶段浏览器真实测试依赖",
+      "content": "在规划环境中通过 environment_prepare 探测 Node.js 受控实验容器运行时，由于 Docker 引擎管道未启动导致容器环境不可用，规划期受控试验未执行。所有 XSS 防护与性能耗时验证已完整编排为后续真实现代桌面浏览器前置验证任务。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop Linux Engine)",
+      "id": "evidence-exp-docker-env-unavailable",
+      "kind": "experiment",
+      "location": "tools/experiments/prepare-65356e0f-5685-4c49-a2be-b152d9ed0b9b.ndjson",
+      "obtainedAt": "2026-10-04T16:21:10.000Z",
+      "outcome": "unexecuted",
+      "source": "environment:prepare-65356e0f-5685-4c49-a2be-b152d9ed0b9b"
+    },
+    {
+      "applicability": "官方规范查证：用于 delivery 阶段指导纯静态单页面产物采用兼容 file:// 本地双击零服务器直接运行的脚本组织形态，并在交付验证任务中建立 file:// 与 http:// 双模式的端到端验收与验证标准。",
+      "content": "You need to pay attention to local testing — if you try to load the HTML file locally (i.e., with a file:// URL), you'll run into CORS errors due to JavaScript module security requirements. You need to do your testing through a server. Also, note that you might get different behavior from sections of script defined inside modules as opposed to in classic scripts.",
+      "hash": "deb285e95e1dca43e123ad6ef9f8eab6dd7bf2a022f373e5cfc37f24d88694e9",
+      "id": "evidence-320443a6-461c-4976-9039-908598ac05f0",
+      "kind": "official-source",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tools\\evidence\\research-deb285e95e1dca43e123ad6ef9f8eab6dd7bf2a022f373e5cfc37f24d88694e9.txt",
+      "obtainedAt": "2026-10-04T16:24:04.677Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules"
+    },
+    {
+      "applicability": "当前规划环境受控运行环境检查：规划宿主机未启动 Docker Desktop Linux Engine，容器执行环境 unavailable。因此端到端全量浏览器测试与性能实测转为交付前置验证任务在个人开发者真实桌面浏览器环境中执行。",
+      "content": "environment_prepare (node) failed to connect to docker API at npipe:////./pipe/dockerDesktopLinuxEngine. Container execution is unavailable.",
+      "environment": "Node 24.13.0 on Docker Desktop Linux Engine (unavailable in current host)",
+      "hash": "c18a221fca48dd444458f4a7c0f1624c96c4e09886a111a43a054ec99f1c7128",
+      "id": "evidence-docker-env-prep-delivery",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-98e4cedc-717d-4d2b-8532-d9919924590f\\tools\\experiments\\prepare-f8436798-b32b-41e3-ad57-05fa2786f8a4.ndjson",
+      "obtainedAt": "2026-10-04T16:24:30.000Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-f8436798-b32b-41e3-ad57-05fa2786f8a4"
+    },
+    {
+      "id": "answer-dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "kind": "user",
+      "content": "彻底移除确认按钮，重构为单清空按钮纯实时反馈布局（推荐）",
+      "source": "question:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button",
+      "obtainedAt": "2026-10-04T21:00:51.408Z",
+      "applicability": "dec-visual-layout-mapping"
+    },
+    {
+      "applicability": "用户提出的实时反馈输入与删除确认按钮需求变更原文证据，作为 feedback 阶段设计变更组的依据来源。",
+      "content": "模拟用户需求变更：确认按钮改为实时反馈：输入每次变化后等待300毫秒自动展示项目名，清空立即取消待展示任务并清掉结果；空值仍提示。删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收，保留无关块稳定 ID。此原文不是直接批准。",
+      "hash": "62c4629f93646cb40a052290d9aedbddc4637a5ab929d3f4f8fded5c19e04feb",
+      "id": "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+      "kind": "user",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564.json",
+      "obtainedAt": "2026-10-04T16:29:05.113Z",
+      "source": "input:b33f1cd7-dee5-49e5-ab04-da05e30564c5"
+    },
+    {
+      "applicability": "MDN 官方关于 InputEvent.isComposing 规范，明确在输入法合成会话（如中文拼音输入选词）期间 isComposing 为 true，为实时防抖避免未上屏拼音误触发提供了原生规范依据。",
+      "content": "The InputEvent.isComposing read-only property returns a boolean value indicating if the event is fired after compositionstart and before compositionend.",
+      "hash": "c9f8115bf21d853abd938c725286e9458271812e81e32378d9c1d92ba3ac5e75",
+      "id": "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+      "kind": "official-source",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\research-c9f8115bf21d853abd938c725286e9458271812e81e32378d9c1d92ba3ac5e75.txt",
+      "obtainedAt": "2026-10-04T18:56:59.784Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/InputEvent/isComposing"
+    },
+    {
+      "applicability": "MDN 官方关于 compositionend 事件规范，指示当用户完成中文字符选词上屏或取消合成会话时触发，是触发中文项目名最终防抖展示的精确事件契约依据。",
+      "content": "The compositionend event is fired when a text composition system such as an input method editor completes or cancels the current composition session. For example, this event could be fired after a user finishes entering a Chinese character using a Pinyin Input method editor.",
+      "hash": "2d881555b1a1407e3565829f9be7b36ee90dcd7196fe4991cc3e4560339e7b9a",
+      "id": "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+      "kind": "official-source",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\research-2d881555b1a1407e3565829f9be7b36ee90dcd7196fe4991cc3e4560339e7b9a.txt",
+      "obtainedAt": "2026-10-04T20:52:15.620Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event"
+    },
+    {
+      "applicability": "规划环境受控试验 Docker 守护进程未启动导致容器环境不可用，真实 300ms 防抖响应延迟与清除定时器防幽灵渲染需在开发与交付验证任务中由本地现代桌面浏览器实测。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running",
+      "environment": "node:24.13.0-bookworm-slim (Docker unavailable)",
+      "hash": "d2c47bd7c0d6c515f97b1f7514bc193fd029e602af7d8b3234ce951eefebb174",
+      "id": "evidence-0fe0ac78-3369-4003-b087-b746e015ce63",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\experiments\\\\prepare-472274a9-b1ea-47bc-9de4-3518764a6c3f.ndjson",
+      "obtainedAt": "2026-10-04T21:29:22.717Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-472274a9-b1ea-47bc-9de4-3518764a6c3f"
+    },
+    {
+      "applicability": "规划环境受控试验沙箱 Docker 守护进程未启动导致环境不可用，真实防抖性能与定时器执行需移入开发与交付验证任务由本地桌面浏览器实测。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running",
+      "environment": "node:24.13.0-bookworm-slim (Docker unavailable)",
+      "hash": "f2d9f23eba4f2d8e216dbe4de0c7a20f8bdbcb6cf3d8cc49527bf04020eb0b09",
+      "id": "evidence-ef42cfd2-ccf5-4af7-bf6b-dc20586786a8",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\experiments\\\\prepare-28d4f51d-a7ab-46f7-9f9f-5dc5eaf23c67.ndjson",
+      "obtainedAt": "2026-10-04T16:29:10.206Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-28d4f51d-a7ab-46f7-9f9f-5dc5eaf23c67"
+    },
+    {
+      "applicability": "用于修正性能测量口径：DOMContentLoaded 事件在 HTML 文档完全解析且 defer 脚本执行后触发，不等待绘制完成，因此测量指标界定为首屏 DOM 解析就绪耗时而非绘制完成耗时。",
+      "content": "The DOMContentLoaded event fires when the HTML document has been completely parsed, and all deferred scripts have downloaded and executed. It doesn't wait for other things like images, subframes, and async scripts to finish loading.",
+      "hash": "9b325565454622c9a10a1649160ec3a8714cd9465390ddc69c0805c3907429df",
+      "id": "evidence-d686fe73-a405-4933-a3a6-7da164ea5c01",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event",
+      "obtainedAt": "2026-10-04T22:04:41.826Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event"
+    },
+    {
+      "applicability": "用于修正交互响应延迟口径：requestAnimationFrame 回调发生在浏览器执行下一次重绘之前，代表防抖逻辑完成至下一次重绘前的时间戳，不冒充物理像素绘制已完成。",
+      "content": "The window.requestAnimationFrame() method tells the browser you wish to perform an animation. It requests the browser to call a user-supplied callback function before the next repaint.",
+      "hash": "bc4a512deb613f05d113055298ceeaf8afe3ce63c471d1450229a1989b92bd48",
+      "id": "evidence-7a463cf7-74f1-4627-b9b3-24784ae3a9bc",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame",
+      "obtainedAt": "2026-10-04T22:05:02.539Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame"
+    },
+    {
+      "applicability": "用于统一静态脚本组织形态：采用经典脚本配合 defer 属性，在 HTML 解析后触发，既支持本地文件系统 file:// 双击无 CORS 限制直接运行，又兼容本地静态 HTTP 服务模式。",
+      "content": "defer: This Boolean attribute is set to indicate to a browser that the script is meant to be executed after the document has been parsed, but before firing DOMContentLoaded event. Scripts with the defer attribute will prevent the DOMContentLoaded event from firing until the script has loaded and finished evaluating.",
+      "hash": "de8f6b87e834f3158dd54ed7c693dc4eb052d5bf7d5dea7d8fadf037bc778e50",
+      "id": "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script",
+      "obtainedAt": "2026-10-04T22:05:11.082Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script"
+    },
+    {
+      "applicability": "适用于 300ms 防抖调度机制与交互响应时间契约。证实浏览器定时器受主线程排队、嵌套节流与后台标签页限制，不可作为绝对 300ms 触发的物理保证，应界定为排队阈值与待验证性能指标。",
+      "content": "MDN 官方文档 Window: setTimeout() 指出：Late timeouts: The timeout can also fire later than expected if the page (or the OS/browser) is busy with other tasks... Currently-executing code must complete before functions on the queue are executed... 且浏览器对非活动标签页存在最低超时节流限制（如 Chrome/Firefox 节流至 1 秒或 1 分钟）。因此 300ms 防抖等待是触发阈值，无法作为所有浏览器绝对精确 300ms 到期执行的实测保证。",
+      "hash": "e05d53596ebb56f13d18a0b46d631c3bdbec3d1a668c981198fb7ae8afdf05ab",
+      "id": "evidence-7ec331d7-1d2e-415d-abc5-fecbed731559",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout",
+      "obtainedAt": "2026-10-04T22:04:46.667Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout"
+    },
+    {
+      "applicability": "安全证据适用边界修订：限定 textContent 为单一文本节点安全渲染，取代历史过宽推断。明确历史 evidence-mdn-textcontent-xss-safety 与 evidence-mdn-node-textcontent-official 中关于“从根本上杜绝DOM型XSS”的适用说明已被本次范围限定取代，当前有效结论仅为用户项目名进入指定 textContent 文本节点时不被解析为 HTML/脚本。",
+      "content": "澄清历史安全证据适用边界：MDN 关于 Node.textContent 的规范证实 textContent 将内容作为纯文本节点插入 DOM，不调用 HTML 解析器，因此项目名展示区域可防止 HTML/脚本标签被解析执行。但此机制仅保证特定节点文本绑定的安全性，不能外推为全系统或整个单页面从根本上杜绝所有 DOM 型 XSS。全应用安全依赖无危险 API 调用（如 innerHTML/eval）、无未受信任 URL 导航、静态源码词法检查与端到端动态 Payload 注入验收共同保障。",
+      "hash": "9037d21be7838160972a03ffdca49815167e42c589c8ca372f558df46692b784",
+      "id": "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+      "kind": "user",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\\\tools\\\\evidence\\\\evidence-dab40954-74e0-4d24-bb31-1064f5dd626f.json",
+      "obtainedAt": "2026-10-04T22:26:25.313Z",
+      "outcome": "passed",
+      "source": "input:b4da0333-c07a-45a2-b87f-9aeb6453cc95"
+    },
+    {
+      "applicability": "规范本地轻量 HTTP 服务启动命令与端口一致性契约：Python http.server 默认监听 8000 端口，若访问 8080 端口必须显式传递端口参数（python -m http.server 8080）。",
+      "content": "http.server can also be invoked directly using the -m switch of the interpreter. The following example illustrates how to serve files relative to the current directory: python -m http.server [ OPTIONS ] [ port ]. The server listens to port 8000 by default. The default can be overridden by passing the desired port number as an argument: python -m http.server 9000.",
+      "hash": "4d83e799b7ad96d8441d15486816a37731578026694ba4d11a605d7534955115",
+      "id": "evidence-python-http-server-port-official",
+      "kind": "official-source",
+      "location": "https://docs.python.org/3/library/http.server.html",
+      "obtainedAt": "2026-10-04T22:26:35.289Z",
+      "outcome": "passed",
+      "source": "https://docs.python.org/3/library/http.server.html"
+    },
+    {
+      "applicability": "指导静态源码审计脚本规范：当发现禁用危险 API 或确认按钮残留关键字时，必须显式调用 process.exit(1) 返回非零失败退出码，不能仅调用 console.warn 后退出 0 导致外部自动验收误判为通过。",
+      "content": "The process.exit() method instructs Node.js to terminate the process synchronously with an exit status of code. If code is omitted, exit uses either the 'success' code 0 or the value of process.exitCode if it has been set. To exit with a 'failure' code: exit(1); The shell that executed Node.js should see the exit code as 1.",
+      "hash": "845ec5d06e1f6aeef3ec3be7f262e638263f71683b535216658acc65b3079452",
+      "id": "evidence-nodejs-process-exit-official",
+      "kind": "official-source",
+      "location": "https://nodejs.org/api/process.html",
+      "obtainedAt": "2026-10-04T22:26:52.902Z",
+      "outcome": "passed",
+      "source": "https://nodejs.org/api/process.html"
+    },
+    {
+      "applicability": "限定 textContent 的安全适用边界并澄清全应用 DOM XSS 的说明：单一节点的 textContent 赋值仅保证该数据汇点不被解析执行，不能等同于全系统杜绝 DOM XSS，需结合整应用源码审计与动态 Payload 原样回显测试。",
+      "content": "A cross-site scripting (XSS) attack is one in which an attacker is able to get a target site to execute malicious code as though it was part of the website... All XSS attacks depend on a website doing two things: Accepting some input that could have been crafted by an attacker; Including this input in a page without sanitizing it: that is, without ensuring that it won't be executable as JavaScript.",
+      "hash": "575cf0c159d69f4d2e554c7f0eec6b0ac776f1ad1f78e590068a3c9e5657e1ea",
+      "id": "evidence-mdn-xss-definition-boundary",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting",
+      "obtainedAt": "2026-10-04T22:27:22.400Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting"
+    },
+    {
+      "applicability": "规范 IME 拼音输入会话的生命周期控制：输入法启动新会话时需维护会话有效性，清空重置时立即使旧会话作废，防止清空后迟到的旧 compositionend 事件触发非预期的防抖调度或空值错误。",
+      "content": "The compositionstart event is fired when a text composition system such as an input method editor starts a new composition session. For example, this event could be fired after a user starts entering a Chinese character using a Pinyin Input method editor.",
+      "hash": "7707d106ca999e77eb09ca5959fe1d88cd77a5ac12ceccf99ca262b08253b098",
+      "id": "evidence-mdn-ime-compositionstart-session",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event",
+      "obtainedAt": "2026-10-04T22:27:37.629Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event"
+    },
+    {
+      "applicability": "自动质量验收反馈依据：指导清空时作废输入会话及尾随 input 事件隔离闭合契约、统一清空重置至重绘前调度延迟性能口径",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。核对对象是 flash-materials-quality-publish-20261005-04 的真实 sourceRevision 24 蓝图和 quality-reviewed-r2 开发包，独立证据为 MATERIALS_R2_CORE_INDEPENDENT_REVIEW.md 与 ime-contract-counterexample.json。此前 sourceRevision 20 继承包不代表最新设计，不得用其旧问题覆盖已经正确的 r2 修订。\n\n已经正确并应完整保留：即时单按钮清空、300ms实时展示、旧结果在手动删空时清除、纯空格原文保留、失败保留输入、经典脚本/IIFE与textContent、无确认按钮和Enter专属提交、前台测量、五轮均值唯一边界、明确8080参数和npx首次联网前提、十文件与真实任务DAG、原图SHA256和实际查看记录、历史证据及当前安全边界说明。保持30个当前有效块的稳定ID，仅修改下列两点及其真实相关契约；不要重写已有目标、范围、无关页面或正确的任务细节。普通实现继续委托AI，不新增用户选择题。当前目标应用尚未开发，任何未来浏览器或性能测试仍未执行。\n\n1. 输入法清空后迟到input的契约仍未闭合。blk-tech-interface 当前三个实际事件回调中，compositionend会检查currentSessionToken与activeSessionId，但input仅检查!isComposing && !e.isComposing，完全没有作废会话边界。用原始导出回调执行的合成VM允许：compositionstart→清空（activeSessionId递增、isComposing=false、value=''）→旧compositionend被拒绝→迟到noncomposing input仍schedule→300ms后新造空值错误；如果原生事件已经将旧草稿写回DOM，则又可展示旧文字。这是实际契约的合成反例，不是已经复现的原生浏览器/IME故障。\n\n请拟定可直接指导开发的最小一致策略，覆盖清空时作废输入会话以及相关input/beforeinput/composition尾随事件，不只在compositionend加一次令牌检查。策略需要说明事件如何关联已作废会话、新用户输入怎样恢复正常防抖、何时读取DOM或已接受草稿，以及旧事件对value的写回怎样隔离或恢复。可以选择明确的输入节点生命周期隔离（新节点/旧节点generation与event.target检查）、会话状态机与新输入意图边界，或其他具有具体可观察行为的方案；不要求特定技术，但不能声称普通InputEvent自带应用自增令牌，也不能用单个全局currentSessionToken证明任意旧事件身份。同步data_model、interface、error、相关flow/page、实现任务、验证与验收。保留新真实键入/粘贴/新中文组合输入可正常开始新300ms调度，不能以永远拒绝后续input规避问题。写清“旧会话尾随事件”和“新的用户输入”测试序列；原生IME、浏览器差异及无法在当前环境确认的顺序列为开发阶段实际验证，不写100%或彻底杜绝所有原生竞态的无证据承诺。复用已有官方证据，不重复启动已不可用Docker。\n\n2. 清空性能口径仍有残留。blk-deliv-val-perf-benchmark.passCriteria 写“清空重置渲染耗时”，但其steps测click事件起始→requestAnimationFrame重绘前回调，这只能是清空处理与重绘前调度的代理指标。将该指标在content、goal、normalBehavior、scope、verification、completionCriteria、steps、passCriteria和关联outcomes/acceptance中统一为准确名称，起止一致，保留五轮均值<=50ms及待验证状态，不声称physical paint或用户实际看见已经测得。DOM就绪和输入防抖的五轮均值标准已闭合，不擅自改次数或阈值。目标应用未实现，不能把合成回调测试或官方研究写成目标应用的性能实测通过。",
+      "environment": "browser / node planning environment",
+      "hash": "1d44377805500c1d2def2e30e44425a573459eaa1f6adae71cb8cf3c5d156b54",
+      "id": "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+      "kind": "user",
+      "location": "D:\\Temp\\User\\pa-quality-publish-N6k3tL\\projects\\proj-1791129999032\\runtime\\planning\\run-c0db49e0-1a0c-42d1-8771-8a8ee2cd2a83\\tools\\evidence\\evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9.json",
+      "obtainedAt": "2026-10-04T23:09:10.488Z",
+      "outcome": "passed",
+      "source": "input:f1b903e2-8899-458d-a8cb-d51d9626df64"
+    },
+    {
+      "applicability": "用于清空操作时替换输入节点（replaceWith / replaceChild），实现节点代际闭包隔离，使旧节点的迟到事件被隔离丢弃，不污染新输入节点。",
+      "content": "MDN 官方规范指出：Element.replaceWith() 方法用一组 Node 对象或字符串替换父节点子列表中的此 Element。该方法自 2018 年起已在主流现代桌面浏览器全面支持，适用于清空时安全替换活跃输入框 DOM 节点。",
+      "hash": "2aae27198a28d84070b24d4428e06c1ac390eef3a6417a64dba20d4907da2ee8",
+      "id": "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith",
+      "obtainedAt": "2026-10-04T23:41:10.156Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+    },
+    {
+      "applicability": "自动质量验收反馈：关于输入节点生命周期与定时器隔离契约的修订要求，采用清空时替换输入节点与节点代际闭包隔离方案。",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。只针对 flash-materials-quality-20261005-06 的 sourceRevision28 / quality-reviewed-r3 最新真实蓝图，旧证据和旧包保留。原生目标应用尚未开发；本轮只有导出契约的静态/合成反例，不能称浏览器实测。现在仅输入节点生命周期/定时器隔离契约仍阻断。请在待批准方案中采用明确的“清空时替换输入节点＋节点代际闭包隔离”作为最小修订建议，AI完成普通实现细节。",
+      "hash": "d3e69bb333a4112e32f50bf8a964a2b91959779df5b7eb3907c130386d4b2e88",
+      "id": "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+      "kind": "user",
+      "location": "materials/inputs/58d9b19d-41b2-4b33-9b82-848c086d1399",
+      "obtainedAt": "2026-10-04T23:41:22.473Z",
+      "outcome": "passed",
+      "source": "input:58d9b19d-41b2-4b33-9b82-848c086d1399"
+    },
+    {
+      "applicability": "用于事件处理前核验事件监听器绑定的真实节点与当前活跃节点一致性。核对 event.currentTarget 与 node === activeInputNode，确保仅处理直接绑定在当前活跃输入节点上的事件，丢弃已替换作废旧节点的冒泡或尾随事件。",
+      "content": "The currentTarget read-only property of the Event interface identifies the element to which the event handler has been attached.",
+      "hash": "659cef39146b234aaffd6211e8541383f6c351a197f1434b79fd28a423b928e3",
+      "id": "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget",
+      "obtainedAt": "2026-10-04T23:41:23.175Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget"
+    },
+    {
+      "applicability": "用于核验事件所属输入节点是否仍在文档树中。清空操作通过 replaceWith() 移出旧节点后，旧节点的 isConnected 变为 false，事件守卫检查 node.isConnected 若为 false 则直接丢弃事件，避免非挂载节点操作界面状态。",
+      "content": "The read-only isConnected property of the Node interface returns a boolean indicating whether the node is connected (directly or indirectly) to a Document object.",
+      "hash": "efc23d018757062e345938aca4cfdaaf3ad73cf4ecc99e7a0767cc3e0afb55a5",
+      "id": "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected",
+      "obtainedAt": "2026-10-04T23:41:31.567Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected"
+    },
+    {
+      "applicability": "R4 自动质量验收反馈依据：纠正原生事件重定向无依据保证、补齐伪代码变量定义与组装、落实输入框五类持久属性复制与瞬态重置",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。仅修订 flash-materials-final-20261004-01 的最新已批准 source32 / quality-reviewed-r4；原项目仍未开发。本轮三项阻塞来自真实导出内容的静态/合成复核。保留30个稳定块ID、29条基线历史证据完整对象、其余已正确的300ms输入/即时单按钮清空/手动删空/原文保留/失败恢复/textContent/defer-IIFE/端口8080/安装前提/十文件/全部DAG边和五轮均值<=50ms调度代理指标。只改关联内容及字段，不重新设计无关功能，不运行不可用Docker。\\n\\nR4-B1：blk-deliv-val-standalone-runtime.task.failureBehavior声称旧原生compositionend若重定向到新节点，generation guard会拒绝，这不成立。对新节点派发时currentTarget、active node、bornGeneration、连接检查全部匹配。删除该保证和“极其罕见”的无依据频率判断，所有投影保持一致。合成隔离保证限于旧节点/旧闭包；原生会话终结、重定向、真实焦点/辅助技术保持unexecuted。开发验证须记录Chrome/Edge/Firefox与Safari适用版本、操作系统、IME、原始事件日志；出现重定向/新会话被结束先修订清空策略及回归，不自造原生token、永久隔离、自动通过或全部浏览器竞态保证。\\n\\nR4-B2：blk-tech-interface完整JavaScript fence没有FeedbackBanner、displayElement、errorContainer的声明/注入/具体装配，正常timer及catch都会ReferenceError；模块方法列表getInputText/setInputText与实际返回API也不符。请明确实际DOM引用、AppController初始化顺序、FeedbackBanner具体方法签名及呈现/清除错误规则；每个使用的变量均定义或通过显式参数注入。可以采用小的初始化工厂并引用安全textContent renderer；完整伪代码应内部自洽，可以仅用明确浏览器DOM/定时器依赖装配。getInputText/setInputText若不是必要公开能力可从方法列表移除，或真正定义其与accepted draft/generation/定时器的一致性，不能只声明未实现。保留已有正确node闭包、capturedDraft、schedulerEpoch、stale callback拒绝及300ms逻辑。该代码是开发规范，合成核验不能称目标应用真实实现已测试。\\n\\nR4-B3：replaceInputNode仅复制id/name/class/placeholder/aria-label，但flow/acceptance要求全部持久DOM属性与无障碍配置保留，实际丢aria-describedby/aria-required/tabindex/style/data-test。采用明确安全的持久配置复制/clone策略，覆盖label关联、ARIA、tabindex、style及data属性；单独重置value/trustedDraft、瞬态aria-invalid和错误状态、重绑闭包监听与明确焦点行为。保留原属性保留验收，不能删掉要求迎合旧代码。给出这五类配置前后精确断言；实际布局、屏幕阅读器与原生焦点仍待实测。同步相关flow/page/data/interface/error/task全部字段/validation/acceptance；避免正文属性全保留而伪代码仍白名单。\\n\\n独立review核对三项与其余正确内容保留，普通细节由AI决定，生成待批准修订包。经公开Core脚本审批/新compiler导出仅自动验收，真人审阅pending。保留旧收据、旧产物与原证据；新证据另登记，不用相同ID覆写旧记录。",
+      "hash": "d6b41906e732983af973864801e3783ec129ff0309ac3bcbdbb839aa03567244",
+      "id": "evidence-17569c8c-1012-4071-8ebe-936b5fe286db",
+      "kind": "user",
+      "location": "input:5cc495c6-96a8-4442-8f77-668749156b46",
+      "obtainedAt": "2026-10-05T00:22:12.095Z",
+      "outcome": "not-applicable",
+      "source": "input:5cc495c6-96a8-4442-8f77-668749156b46"
+    },
+    {
+      "applicability": "记录规划期容器环境（Docker Desktop Linux Engine）不可用状态，确认自动化容器试验无法执行，多浏览器与原生输入法真机兼容性及性能基准实测须如实标为 unexecuted 并移入开发验证任务。",
+      "content": "environment_prepare (node) failed to connect to docker API at npipe:////./pipe/dockerDesktopLinuxEngine. Container execution is unavailable.",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop Linux Engine)",
+      "id": "evidence-exp-docker-env-unavailable-r4",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-quality-copy-hvYzoh\\\\materials\\\\runtime\\\\planning\\\\run-5385470e-f751-4ebb-a405-62174dc63145\\\\tools\\\\experiments\\\\prepare-a28f0c43-4808-4937-9b2c-aa54c1c3434b.ndjson",
+      "obtainedAt": "2026-10-05T08:20:39+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-a28f0c43-4808-4937-9b2c-aa54c1c3434b"
+    }
+  ],
+  "topics": [
+    {
+      "key": "dec-clear-interaction-mode",
+      "aliases": [],
+      "history": [
+        "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+        "dec-bd531b1b-1b49-4659-859c-7a2816990a43",
+        "dec-6cb555a8-aa0f-4278-ab24-7147276d1080",
+        "dec-4a461c2d-0f30-46a2-b396-d5e2fcd05886"
+      ],
+      "effectiveDecisionId": "dec-4a461c2d-0f30-46a2-b396-d5e2fcd05886",
+      "lastAnswerKind": "selection",
+      "lastAnsweredQuestionId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+    },
+    {
+      "key": "dec-product-scope-boundary",
+      "aliases": [],
+      "history": [
+        "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583"
+      ],
+      "effectiveDecisionId": "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583"
+    },
+    {
+      "key": "dec-failure-preserve-input",
+      "aliases": [],
+      "history": [
+        "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911"
+      ],
+      "effectiveDecisionId": "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911"
+    },
+    {
+      "key": "dec-safe-text-rendering",
+      "aliases": [],
+      "history": [
+        "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78",
+        "dec-51a3692c-1893-4ba0-9b6a-1764381908eb",
+        "dec-98f528f5-80df-4ae1-8151-ec0234ac8168"
+      ],
+      "effectiveDecisionId": "dec-98f528f5-80df-4ae1-8151-ec0234ac8168"
+    },
+    {
+      "key": "dec-visual-layout-mapping",
+      "aliases": [],
+      "history": [
+        "dec-72513e55-a5a7-44e1-90ad-087b5927447e",
+        "dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0"
+      ],
+      "effectiveDecisionId": "dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+      "lastAnswerKind": "selection",
+      "lastAnsweredQuestionId": "run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4-ques-visual-layout-confirm-button"
+    },
+    {
+      "key": "dec-tech-stack-native-esm",
+      "aliases": [],
+      "history": [
+        "dec-cb1eb212-815a-490e-a829-0219a93de6f5"
+      ]
+    },
+    {
+      "key": "dec-tech-in-memory-state",
+      "aliases": [],
+      "history": [
+        "dec-85156520-0768-4968-9e8e-c0ad9e35a393"
+      ],
+      "effectiveDecisionId": "dec-85156520-0768-4968-9e8e-c0ad9e35a393"
+    },
+    {
+      "key": "dec-tech-deployment-zero-server",
+      "aliases": [],
+      "history": [
+        "dec-b5363cf6-4c99-493b-816b-92f82b05cd30",
+        "dec-28f1afe2-c0fb-4805-bffb-ea33dc044fe0"
+      ],
+      "effectiveDecisionId": "dec-28f1afe2-c0fb-4805-bffb-ea33dc044fe0"
+    },
+    {
+      "key": "dec-delivery-script-packaging",
+      "aliases": [],
+      "history": [
+        "dec-a5bec314-d39d-41ac-9ea9-0d322bbdedb9"
+      ]
+    },
+    {
+      "key": "dec-tech-stack-native-classic-defer",
+      "aliases": [],
+      "history": [
+        "dec-b96e5737-b207-4156-9ac8-e6621d0985f4"
+      ],
+      "effectiveDecisionId": "dec-b96e5737-b207-4156-9ac8-e6621d0985f4"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "inp-01",
+      "raw": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "kind": "statement",
+      "createdAt": "2026-10-04T16:06:39.032Z"
+    },
+    {
+      "id": "b33f1cd7-dee5-49e5-ab04-da05e30564c5",
+      "raw": "模拟用户需求变更：确认按钮改为实时反馈：输入每次变化后等待300毫秒自动展示项目名，清空立即取消待展示任务并清掉结果；空值仍提示。删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收，保留无关块稳定 ID。此原文不是直接批准。",
+      "kind": "feedback",
+      "createdAt": "2026-10-04T16:28:08.102Z"
+    },
+    {
+      "id": "b30e9949-62a0-4fd8-b9eb-e553ede58563",
+      "raw": "这是一轮自动质量验收反馈，不是真人新增需求，也不是人工批准。依据原始输入说明、真实原图 fixture.png、已经通过公开 Core API 自动接受的即时清空与 300ms 自动展示变更，核对下列实际草案问题。已经正确解决的项保持原样；仅修订未解决项及其依赖闭包，仍作为待批准 ChangeSet。普通界面与实现细节已经明确委托 AI 拟定，不要再次把它们转成用户选择题。\n\n1. 清空行为：产品阶段曾追加“清空采用何种重置交互保护”选择题，这是本案例已明确委托的普通细节，多余提问已作为验收观察保留。当前即时直接清空是已批准行为：点击清空立即清掉输入、显示结果和错误提示，取消待执行的 300ms 展示任务并回焦输入；不要新增确认弹窗、二次点击或撤销确认操作。统一页面、流程、接口、任务与验收。\n2. ESM 与启动方式：先前 blk-tech-stack 选择“ESM 模块化”并称“完全支持离线本地直接运行”，blk-tech-deployment 又承诺直接双击 index.html、file:// 且无需 HTTP 服务。这不能直接作为所有主流浏览器的运行保证。请真实查证官方模块加载与本地文件安全规则，由 AI 自行选择一致方案：例如保留 ESM 并明确 localhost/HTTP 静态服务，或使用明确可直接文件运行的经典脚本/内联方案；不要询问用户普通技术选择。同步架构、技术栈、入口脚本组织、部署、开发任务与验收。无需服务端业务并不等于不允许本地静态资源服务。区分首次资源取得、已打开页面断网交互与离线重新打开的前提，不承诺尚未实现的缓存能力。\n3. 安全表述：textContent 可使项目名以纯文本而非 HTML 解释，必须提供恶意标记原样显示的实际验收；但这不能证明整个应用“从根本上杜绝 DOM 型 XSS”。删掉超出证据范围的绝对结论，保持用户内容仅进入文本节点的具体约束；保留失败时原始输入、错误提示与恢复路径。\n4. 300ms 自动展示一致性：逐块检查是否仍保留确认按钮、Enter 提交、确认按钮专属逻辑或点击后才展示的验收。已批准变更要求每次输入变化重置 300ms 任务，后发输入取代旧任务，清空立即取消；空值仍有提示且不保留旧结果。中文输入法 composition 期间与结束后的任务安排、清空竞争、后台计时延迟是普通实现细节，由 AI 拟定可观察行为及测试，不再追问用户。不要把“300ms 等待后触发”写成所有浏览器计时器在绝对 300ms 执行的已实测保证。\n5. 实测与支持范围：承诺 Chrome/Edge/Firefox/Safari 具体版本时，验证任务应覆盖相应浏览器或明确尚未实测。Docker/Chromium 当前不可用时记录 unexecuted 并留开发验证任务，不重复安排相同不可用平台试验，不把研究查证或 Runtime 完成写成浏览器实测通过。冷启动和交互指标标为待验证目标并给出设备、数据、测量起止与通过边界。\n6. 原图与范围：原始文字是行为规范，原图是布局参考；原图中的 Q7M4-8261 是图像读取证据，不能变成固定业务项目名或产品需求。保留实际原图哈希、原生查看证据与各阶段可追溯链接，不把 AI 归纳宣称为人类确认。保持单页面个人原型范围，不新增后端、登录、数据库、协作、支付或新页面。\n7. 最终任务去重与执行顺序：现有 product/technical 与 delivery 多次分别列出输入、清空与架构实现任务，它们指向同一功能，不能都当作互相独立的工作单元。最终仅保留职责清楚、可独立验收的实现任务，其他重复任务通过登记变更删除或合并，修复所有指向旧 ID 的依赖与需求追踪。blk-deliv-task-package 当前只依赖部署规范，standalone-runtime 只依赖包装任务；应补全 layout/input/reset/error 等真实实现任务依赖，再安排实现→打包→性能/安全集成验证。验证需已实现应用时不得成为首个可执行任务；可在应用尚未实现时执行的最小独立 spike 必须明确自有源码与实验目标。统一开发计划、导出 tasks.json 与 START_HERE。\n8. 验证方法本身可执行且不冒充渲染完成：blk-deliv-val-security-xss-audit 的第一条步骤正则，独立审阅按导出 tasks.json 实际读取并 new RegExp(pattern) 后得到 SyntaxError: Unterminated group，eval/document.write 的多层反斜杠转义有误。改为明确可复制执行的源码检查或测试程序，验证最终 JSON 解码后的命令/模式可解析，并保留动态恶意输入回显测试，不能只给不可执行的正则字符串。DOMContentLoaded 是文档解析/相应脚本执行相关事件，不证明首屏绘制完成；requestAnimationFrame 回调发生在下一次重绘之前，也不能直接作为绘制已完成的终点。真实查证官方测量语义，选用与承诺指标一致的可观察测量边界，必要时改名为 DOM 就绪或提交到绘制前回调耗时；不要宣称这些代理指标已证明用户可见绘制时间。\n\n请真实查证所需官方约束，保持无关块稳定 ID 和精确内容。独立评审应逐项核对实际输出及跨块契约，结构完成和覆盖检查通过不能替代内容质量验收。\n",
+      "kind": "feedback",
+      "createdAt": "2026-10-04T22:04:12.060Z"
+    },
+    {
+      "id": "b4da0333-c07a-45a2-b87f-9aeb6453cc95",
+      "raw": "这是一轮自动质量验收反馈，不是真人新增需求，也不是人工批准。源为已冻结的 flash-materials-quality-20261005-01 最新实际蓝图与 quality-reviewed 开发包，以及 independent-content-review.json、decoded-audit-command-probe.json 的独立检查。上一轮公开 Core API 自动接受不等于真人批准或目标应用实测。保持已经正确的即时直接清空、300ms 实时展示、经典脚本/IIFE、离线前提、textContent 文本节点约束、原图证据和去重后的任务图；仅修订下列未解决项及其真实依赖闭包，产物仍作为待批准 ChangeSet。普通技术与界面细节继续委托 AI 拟定，不新增用户选择题。\n\n1. 源码审计真实有效：blk-deliv-val-security-xss-audit 的第一条 Node -e 命令经 tasks.json 真实 JSON 解码后能够解析执行。隔离合成 app.js 的原七个样本——innerHTML 写入、outerHTML 写入、document.write(userInput)、eval(userInput)、new Function(userInput)、安全 textContent 赋值、安全 textContent renderer——都得到正确退出结果；但合法源码 eval (userInput) 和 new Function (userInput) 均被错误输出“静态安全检查通过：0 处危险 DOM/执行 API”，退出0。请选择并说明可执行的源码检查方案，覆盖声明禁止调用的普通空白形式，给出明确成功/失败边界，并实际解析执行最终 JSON 解码后的检查程序或命令。不要只替换成未经解析执行的正则字符串，也不要求特定 AST 或其他技术方案。审计对声明范围的能力应与措辞一致，静态词法扫描不能冒充全应用安全证明。保留恶意文本实际原样回显的目标应用动态测试，且保持尚未实现应用的动态测试为 unexecuted。确认按钮残留检查若发现残留也应清楚报告失败，而不是仅警告后让自动验收当成通过。\n\n2. IME 清空竞争与后台延迟：当前 blk-tech-interface 中 compositionend 总是调用 schedule；clear 只清除计时器并将 isComposing=false，缺少已作废输入法会话的失效规则。当前契约允许 compositionstart→点击清空恢复空白初始态→迟到的旧 compositionend→再次调度300ms→空值错误提示，甚至可能受后续原生事件影响重新写入旧会话内容。此为接口契约允许的反例，不是已经复现的真实浏览器故障。请由 AI 拟定一致的会话失效/事件顺序处理办法，使清空立即取消，并使来自旧会话的迟到事件不能恢复旧文本或自动制造空值错误。真实新输入仍正常启动新的300ms防抖。同步数据模型、事件接口、流程、错误恢复、实现任务及验收，明确可观察测试序列和未具备真实IME环境时的待验证状态。后台计时器可能产生明显延迟，不能仅写成“微小漂移”或保证绝对300ms完成；明确前台测量前提、后台/恢复前台的预期行为、清空及后发输入优先级，并给出可观察测试。保留无确认弹窗、无Enter专属提交、空值不保留旧结果、失败保留原始输入和回焦要求。\n\n3. 性能目标、次数与统计闭合：blk-deliv-val-perf-benchmark.normalBehavior 写“耗时实测在50~150ms”“总耗时在305~325ms”“点击清空5~20ms”，但目标应用没有实现或性能日志，这些区间没有实测证据。撤除这些编造实测区间，写清待验证目标而非声称测得。步骤与evidenceRequired目前为5轮，verification又要求10次交互和3次冷加载；passCriteria只要求均值，verification却同时要求最大值。请为每个指标选择一致的设备/浏览器/可见前台/缓存或冷启动状态、输入数据、次数、采样起止、统计方式和唯一通过边界，并同步相关产品目标、技术说明、任务、步骤、证据要求和验收。不同指标可以有不同次数，但同一指标的字段必须一致。DOM就绪使用相应Navigation Timing端点；input/compositionend至重绘前回调是防抖加处理及调度的代理指标；清空的起止也应明确且与选择的统计方式一致。删除仍把pre-repaint回调称作绘制完成、渲染已完成或物理可见耗时的用词。300ms防抖等待与DOM更新/调度延迟分开叙述，不声称未来测试已经通过。Safari真机验证仍待环境具备，不重复启动相同不可用Docker/Chromium应用试验，不把官方研究查证视为浏览器实测。\n\n4. 开发入口与真实顺序：当前tasks.json的四个实现任务→打包→集成验证依赖图正确，重复的product/technical实现任务已删除，保持这些正确ID与依赖。上一轮START_HERE首个可执行任务明确是layout-styling，却在同句写“先完成前置验证”，与需要完整应用/打包后才可执行的验证依赖冲突。以实际任务前提为准，使导出入口、开发计划和tasks.json一致：先执行当前可执行的实现任务，依赖就绪后再执行相应验证。若该句由导出模板而非蓝图生成，不通过伪造spike、无源码验证或调整正确任务图掩盖模板问题；在结构化结果中如实记录模板问题，交给实现方修复。应用尚未实现时可以运行的独立实验必须自带明确源码与目标，不能把未来应用验证放到实现之前。\n\n5. 保留边界与证据：原始文字是行为规范，fixture.png是布局证据。保持原图SHA256 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0、真实原生查看记录与阶段可追溯链接；Q7M4-8261不是固定业务名。保持个人单页面，无新后端、登录、数据库、协作、支付、新页面或持久化需求。旧证据及收据不重写，新增研究或修订按公开登记路径记录，无关块的稳定ID与精确内容保持不变。\n\n独立评审应直接逐项检查最新实际草案及跨块契约。blockers=[]、结构覆盖通过、Runtime完成、API自动接受、ZIP及Project Architect界面下载正确，均不能代替上述内容验收或目标应用实测。最终JSON解码的检查程序需实际解析执行，并明确合成源码检查与未来目标应用动态测试的区别。\n\n补充第二视角内容观察：blk-deliv-task-error-handling.verification 当前写“输入空字符串停止300ms，核对输入框下方出现红色明确提示，展示区不刷新”，但正式空值行为是清掉已显示的旧结果并恢复初始占位。不能用“展示区不刷新”允许旧项目名继续显示。请把该验证和相关任务、流程、接口、验收统一为可观察序列：“先输入有效旧项目名并等待展示成功→将输入文字全部删空→等待最新300ms防抖任务实际执行→旧项目名不再显示，展示区恢复灰色占位，空值错误提示明确且输入保持空值可编辑”；纯空格路径同样不保留旧结果，但原始空格保持。点击清空是另一条已批准即时路径，应立即复位并取消任务且不新增空值错误。不得把本观察写成已经执行过的目标应用浏览器测试；这是根据真实导出任务与正式行为的第二视角契约检查。\n\n补充启动命令端口契约：TECHNICAL_GUIDE 的本地HTTP启动方式和 ACCEPTANCE 的本地服务验收步骤写 npx serve .，却将访问地址固定为 http://localhost:8080；该命令没有明确指定8080监听端口。请根据官方工具文档修正为命令与地址一致且可复制使用的形式，例如明确指定 npx serve . --listen 8080，或采用官方支持的正确参数/对应地址；Python静态服务命令也与其端口地址保持一致。同步部署块、启动文档要求、交付任务和验收，不新增服务端业务。工具首次取得需联网及已安装运行时/工具的前提应如实说明，不能把可选npx启动方式写成离线无前提保证。START_HERE由实现方的新Compiler按真实任务依赖生成，模型只修订正式蓝图与任务，不自行产出或覆盖START_HERE来绕过模板修复。\n\n补充历史安全证据适用边界：TECHNICAL_GUIDE 的证据附录仍保留旧 evidence-mdn-textcontent-xss-safety / evidence-mdn-node-textcontent-official 的适用说明，包含“从根本上杜绝DOM型XSS注入风险”“从根本上防止DOM型XSS漏洞”，其中后者仍标passed；这会让读者误将textContent的单一文本写入安全规则当作全应用DOM XSS证明。遵守不可变证据契约，保留旧原文、来源、时间、哈希、工具记录及原结果，不重写历史证据；通过新增当前边界修订证据与明确可追溯说明，指出旧适用范围的过度外推已被当前限定取代，不再将其作为全面覆盖的有效安全结论。当前有效结论仅为‘用户项目名进入指定textContent文本节点时不被解析为HTML/脚本’，整应用安全仍取决于其他写入点、脚本/URL使用、实际源码审计及动态验收。同步当前技术说明和证据关联，确保导出附录读者能辨别历史断言与当前有效适用边界，而不是继续将过宽范围宣称passed。\n",
+      "kind": "feedback",
+      "createdAt": "2026-10-04T22:25:50.681Z"
+    },
+    {
+      "id": "f1b903e2-8899-458d-a8cb-d51d9626df64",
+      "raw": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。核对对象是 flash-materials-quality-publish-20261005-04 的真实 sourceRevision 24 蓝图和 quality-reviewed-r2 开发包，独立证据为 MATERIALS_R2_CORE_INDEPENDENT_REVIEW.md 与 ime-contract-counterexample.json。此前 sourceRevision 20 继承包不代表最新设计，不得用其旧问题覆盖已经正确的 r2 修订。\n\n已经正确并应完整保留：即时单按钮清空、300ms实时展示、旧结果在手动删空时清除、纯空格原文保留、失败保留输入、经典脚本/IIFE与textContent、无确认按钮和Enter专属提交、前台测量、五轮均值唯一边界、明确8080参数和npx首次联网前提、十文件与真实任务DAG、原图SHA256和实际查看记录、历史证据及当前安全边界说明。保持30个当前有效块的稳定ID，仅修改下列两点及其真实相关契约；不要重写已有目标、范围、无关页面或正确的任务细节。普通实现继续委托AI，不新增用户选择题。当前目标应用尚未开发，任何未来浏览器或性能测试仍未执行。\n\n1. 输入法清空后迟到input的契约仍未闭合。blk-tech-interface 当前三个实际事件回调中，compositionend会检查currentSessionToken与activeSessionId，但input仅检查!isComposing && !e.isComposing，完全没有作废会话边界。用原始导出回调执行的合成VM允许：compositionstart→清空（activeSessionId递增、isComposing=false、value=''）→旧compositionend被拒绝→迟到noncomposing input仍schedule→300ms后新造空值错误；如果原生事件已经将旧草稿写回DOM，则又可展示旧文字。这是实际契约的合成反例，不是已经复现的原生浏览器/IME故障。\n\n请拟定可直接指导开发的最小一致策略，覆盖清空时作废输入会话以及相关input/beforeinput/composition尾随事件，不只在compositionend加一次令牌检查。策略需要说明事件如何关联已作废会话、新用户输入怎样恢复正常防抖、何时读取DOM或已接受草稿，以及旧事件对value的写回怎样隔离或恢复。可以选择明确的输入节点生命周期隔离（新节点/旧节点generation与event.target检查）、会话状态机与新输入意图边界，或其他具有具体可观察行为的方案；不要求特定技术，但不能声称普通InputEvent自带应用自增令牌，也不能用单个全局currentSessionToken证明任意旧事件身份。同步data_model、interface、error、相关flow/page、实现任务、验证与验收。保留新真实键入/粘贴/新中文组合输入可正常开始新300ms调度，不能以永远拒绝后续input规避问题。写清“旧会话尾随事件”和“新的用户输入”测试序列；原生IME、浏览器差异及无法在当前环境确认的顺序列为开发阶段实际验证，不写100%或彻底杜绝所有原生竞态的无证据承诺。复用已有官方证据，不重复启动已不可用Docker。\n\n2. 清空性能口径仍有残留。blk-deliv-val-perf-benchmark.passCriteria 写“清空重置渲染耗时”，但其steps测click事件起始→requestAnimationFrame重绘前回调，这只能是清空处理与重绘前调度的代理指标。将该指标在content、goal、normalBehavior、scope、verification、completionCriteria、steps、passCriteria和关联outcomes/acceptance中统一为准确名称，起止一致，保留五轮均值<=50ms及待验证状态，不声称physical paint或用户实际看见已经测得。DOM就绪和输入防抖的五轮均值标准已闭合，不擅自改次数或阈值。目标应用未实现，不能把合成回调测试或官方研究写成目标应用的性能实测通过。\n\n当前sourceRevision24中9个无关块及原23条历史证据经过独立完整对象比较未变；继续保持它们原样，不覆盖、改写或删除。START_HERE由实际compiler按DAG编译，不生成伪前置试验，不修改已经正确的依赖来绕过模板。\n\n独立评审需直接检查最新候选的有效视图并逐项比较上述可执行事件契约；blockers=[]不代表合成反例或原生待验证问题已自动解决。最后仍经公开Core审批（自动验收记录，不冒称真人批准），新版本本地编译；不要自行编辑正式文件或旧收据。\n",
+      "kind": "feedback",
+      "createdAt": "2026-10-04T23:08:16.771Z"
+    },
+    {
+      "id": "58d9b19d-41b2-4b33-9b82-848c086d1399",
+      "raw": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。只针对 flash-materials-quality-20261005-06 的 sourceRevision28 / quality-reviewed-r3 最新真实蓝图，旧证据和旧包保留。原生目标应用尚未开发；本轮只有导出契约的静态/合成反例，不能称浏览器实测。\n\n已修正确内容完整保留：300ms实时反馈、即时单按钮清空、手动删空清除旧结果、纯空格原文保留、失败保留输入、无确认按钮和Enter专属提交、经典defer/IIFE/textContent、完整官方证据、端口8080命令、npx首次安装前提、10文件及任务DAG。性能全部字段目前已统一“清空重置至重绘前调度延迟”代理指标，五轮均值<=50ms；该项通过，不再改指标或夸成物理绘制实测。保留原30块稳定ID和28条历史证据原完整对象，新增证据另附。\n\n现在仅输入节点生命周期/定时器隔离契约仍阻断。r3隔离态期间会拒绝尾随input，但解除隔离之后仍使用一个全局currentSessionToken。反例A：旧compositionstart→reset→新keydown解除隔离→新input('Brand-New')并schedule→旧compositionend被拒绝分支强写当前value=''→挂起timer读DOM空值→新输入丢失且产生empty错误。反例B：旧会话reset后新compositionstart覆盖global token→旧compositionend误通过相等检查并置新会话isComposing=false。scheduler仅clearTimeout且直接callback，没检查generation/session/句柄快照；inputGeneration只是声明和清空递增却从未使用，末尾却说有双重守卫。不得继续用这种策略重新声称彻底杜绝竞态。\n\n请在待批准方案中采用明确的“清空时替换输入节点＋节点代际闭包隔离”作为最小修订建议，AI完成普通实现细节。技术契约至少准确表达：\n1. activeInputNode、单调递增inputGeneration、每节点独立组合输入状态；事件绑定时闭包捕获node和bornGeneration。input/beforeinput/compositionstart/compositionend的处理前先核对event.currentTarget、node===activeInputNode、bornGeneration===inputGeneration及节点仍在当前页面；失败立即返回，不能写新节点、改新会话状态或取消新timer。普通InputEvent没有应用自增token，不能假称其自带会话身份。\n2. 清空操作先增加代际并取消/作废定时器，再用新input节点替换旧节点，正确保留id、name、label关联、样式、可访问属性、监听绑定与焦点行为；新节点value=''/trustedDraft=''，清结果和错误。旧节点迟到事件只能到旧闭包并被拒绝，不操作activeInputNode。新节点键入、粘贴、组合输入均正常，不要求用户额外keydown才能解除永久隔离。组合输入状态属于节点闭包，旧end不可能重写新isComposing。不要把强制清新DOM作为拒绝旧事件动作。\n3. schedule接受“已接受的原始草稿快照、node、generation”，保存单调schedulerEpoch/本次timer身份；schedule替代、cancel、clear、compositionstart均使旧epoch失效。即使旧回调已经进入队列、clearTimeout来不及，执行时仍先检查epoch/generation/active node，过期立即return。有效回调只验证capturedDraft，再textContent输出；不要到期读取可能被旧事件更改的DOM。clear同步清空，失败保留对应已接受原文；新用户输入能正常300ms调度。\n4. 给出内部自洽、可以直接指导实现的事件/清空/scheduler接口与伪代码；所有被引用变量有定义且校验实际被使用。不得在正文声称守卫存在而示例缺失。同步data_model、interface、errors、相关flow/page、任务spec全部字段、validation及acceptance；只改真实关联句子，不整块删除原目标、范围和已正确验收。\n5. 精确测试：清空后旧节点end与input不得重显/造错；新节点input之后旧节点end不得抹新草稿/取消新timer；新节点compositionstart之后旧节点end不得结束新composition；旧timer已出队后clear/新输入再执行旧callback无效；新键入/粘贴/完整新中文composition仍可显示；清空替换后label/焦点/ARIA/布局保留。断言写具体状态与输出，不能只写“无竞态”。\n6. 该策略是待批准的技术建议，合成事件只能验证书面事件契约。浏览器是否把旧原生IME事件重新定向到新节点、替换节点能否结束原生会话、实际焦点/辅助技术行为，必须作为Chrome/Edge/Firefox和Safari适用环境的开发验证任务，说明证据与失败后修订策略；不得写100%/彻底杜绝所有浏览器竞态或已验证通过。不要重新运行不可用Docker。\n\n独立review必须核对真正的最新候选正文/字段及实际守卫代码，明确上述每个反例的对应规则。blockers=[]本身不证明内容通过。完成后仍由公开Core自动验收审批并编译新版本，不冒称真人批准，不编辑旧产物或收据。\n",
+      "kind": "feedback",
+      "createdAt": "2026-10-04T23:40:35.542Z"
+    },
+    {
+      "id": "5cc495c6-96a8-4442-8f77-668749156b46",
+      "raw": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。仅修订 flash-materials-final-20261004-01 的最新已批准 source32 / quality-reviewed-r4；原项目仍未开发。本轮三项阻塞来自真实导出内容的静态/合成复核。保留30个稳定块ID、29条基线历史证据完整对象、其余已正确的300ms输入/即时单按钮清空/手动删空/原文保留/失败恢复/textContent/defer-IIFE/端口8080/安装前提/十文件/全部DAG边和五轮均值<=50ms调度代理指标。只改关联内容及字段，不重新设计无关功能，不运行不可用Docker。\n\nR4-B1：blk-deliv-val-standalone-runtime.task.failureBehavior声称旧原生compositionend若重定向到新节点，generation guard会拒绝，这不成立。对新节点派发时currentTarget、active node、bornGeneration、连接检查全部匹配。删除该保证和“极其罕见”的无依据频率判断，所有投影保持一致。合成隔离保证限于旧节点/旧闭包；原生会话终结、重定向、真实焦点/辅助技术保持unexecuted。开发验证须记录Chrome/Edge/Firefox与Safari适用版本、操作系统、IME、原始事件日志；出现重定向/新会话被结束先修订清空策略及回归，不自造原生token、永久隔离、自动通过或全部浏览器竞态保证。\n\nR4-B2：blk-tech-interface完整JavaScript fence没有FeedbackBanner、displayElement、errorContainer的声明/注入/具体装配，正常timer及catch都会ReferenceError；模块方法列表getInputText/setInputText与实际返回API也不符。请明确实际DOM引用、AppController初始化顺序、FeedbackBanner具体方法签名及呈现/清除错误规则；每个使用的变量均定义或通过显式参数注入。可以采用小的初始化工厂并引用安全textContent renderer；完整伪代码应内部自洽，可以仅用明确浏览器DOM/定时器依赖装配。getInputText/setInputText若不是必要公开能力可从方法列表移除，或真正定义其与accepted draft/generation/定时器的一致性，不能只声明未实现。保留已有正确node闭包、capturedDraft、schedulerEpoch、stale callback拒绝及300ms逻辑。该代码是开发规范，合成核验不能称目标应用真实实现已测试。\n\nR4-B3：replaceInputNode仅复制id/name/class/placeholder/aria-label，但flow/acceptance要求全部持久DOM属性与无障碍配置保留，实际丢aria-describedby/aria-required/tabindex/style/data-test。采用明确安全的持久配置复制/clone策略，覆盖label关联、ARIA、tabindex、style及data属性；单独重置value/trustedDraft、瞬态aria-invalid和错误状态、重绑闭包监听与明确焦点行为。保留原属性保留验收，不能删掉要求迎合旧代码。给出这五类配置前后精确断言；实际布局、屏幕阅读器与原生焦点仍待实测。同步相关flow/page/data/interface/error/task全部字段/validation/acceptance；避免正文属性全保留而伪代码仍白名单。\n\n独立review核对三项与其余正确内容保留，普通细节由AI决定，生成待批准修订包。经公开Core脚本审批/新compiler导出仅自动验收，真人审阅pending。保留旧收据、旧产物与原证据；新证据另登记，不用相同ID覆写旧记录。\r\n",
+      "kind": "feedback",
+      "createdAt": "2026-10-05T00:19:50.228Z"
+    }
+  ],
+  "operations": [
+    {
+      "id": "questions:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+      "fingerprint": "abf6957eb054f0be6f827dc53d368938d8da6d75be9b97b7c69ce28cb2ab3734",
+      "revision": 3
+    },
+    {
+      "id": "simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+      "fingerprint": "40b3c87d76d5ac74dfa1bd6e4ea0394a869b31ae5505d2d3f9f904a2f41d31c0",
+      "revision": 4
+    },
+    {
+      "id": "proposal:change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1",
+      "fingerprint": "8b4c585f1bbf0ff96e1c6e67dc7bfdb104b8da515f4994877651c7374e1b6d87",
+      "revision": 5
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "fingerprint": "9ddbbd23bda89780a71d024503f818b73fd67c86e4cf4a5bb97e419f8b69c67b",
+      "revision": 6
+    },
+    {
+      "id": "proposal:change-61512c88-a371-461b-be4a-0a18237f2b2e-delivery-0",
+      "fingerprint": "8aac48d36c92d068762d19db0949fc0975dd0547b9d0a82d83805c92f4aef2dd",
+      "revision": 7
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-technical-1791130980340",
+      "fingerprint": "eae9223604c6b05116968a0dfa3e4b1238fec41b23baa21f20f843a9d5899de6",
+      "revision": 8
+    },
+    {
+      "id": "proposal:change-98e4cedc-717d-4d2b-8532-d9919924590f-delivery-0",
+      "fingerprint": "dda6f9587495e36835d87c8c443509dfab2bfb0a09e2ed555a91854c82f4a0e5",
+      "revision": 9
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-delivery-1791131287489",
+      "fingerprint": "2bcd2fd639d1f4b8ddb2f6cc284a4bd3e9923c1a11835a1e62fdf576842f8acb",
+      "revision": 10
+    },
+    {
+      "id": "api-automated-package-flash-materials-chinese-20261005-01-initial",
+      "fingerprint": "3c765841052b77a36e2cb6b1bfced55703166e18035657e97ebdb6ced895689c",
+      "revision": 11
+    },
+    {
+      "id": "feedback:real-flash-materials-chinese-20261005-01-feedback-1791131288046",
+      "fingerprint": "3b556e3ea9ac49e8003a5a9223bc68e1f455407f5615f5dfe42284537ae45ce1",
+      "revision": 12
+    },
+    {
+      "id": "questions:run-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-4",
+      "fingerprint": "02370bc5dde3956ef380b54e9c38b0aaec2d402b2c8dba5bea8ba7faa93c8540",
+      "revision": 13
+    },
+    {
+      "id": "simulated-answer-flash-materials-chinese-resume-20261005-05-1791147651373",
+      "fingerprint": "2f3bf31863b9b9961f1221676097f0b632aaede588e1bd788819821eed900bec",
+      "revision": 14
+    },
+    {
+      "id": "proposal:change-67045f9a-4c95-4756-b449-fb72f37327b6-delivery-5",
+      "fingerprint": "ce2cb73e27a51ba9de471c707e90c35bc079e04a5581ff64bc2c6f2658988dce",
+      "revision": 15
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-resume-20261005-06-feedback-1791149585518",
+      "fingerprint": "b420f204e5e4c19937cfe9e831b6a29b961460e7beac6d9fd15955f352e73bf0",
+      "revision": 16
+    },
+    {
+      "id": "api-automated-package-flash-materials-chinese-resume-20261005-06-revised",
+      "fingerprint": "546d3f3c6a3ab506bf17ca22babd75cbd3fefe68d2705ce89ccdaf109c3d3d08",
+      "revision": 17
+    },
+    {
+      "id": "feedback:real-flash-materials-quality-20261005-01-feedback-1791151451999",
+      "fingerprint": "24eeb35dc87e84dd4354a367c6b76c153035d995238bd91f9cb436619cb5d539",
+      "revision": 18
+    },
+    {
+      "id": "proposal:change-e7a309b3-95fb-462f-82b1-222e72e31a5e-delivery-0",
+      "fingerprint": "6edfeb1c06aa22408ec358ed2a5a2e9bc5442930e504c6cc12ad773cbfae8184",
+      "revision": 19
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-quality-20261005-01-feedback-1791151879316",
+      "fingerprint": "b07d56bb6f7e0d95081bccfd6bcfb2a499b75da9ece7a739f64de54ec5c00658",
+      "revision": 20
+    },
+    {
+      "id": "api-automated-package-flash-materials-quality-20261005-01-quality-reviewed",
+      "fingerprint": "160859e038ba645d6b8712e8791df6c6dab41e8db869e1750a990bc380bd64fa",
+      "revision": 21
+    },
+    {
+      "id": "feedback:real-flash-materials-quality-20261005-02-feedback-1791152750615",
+      "fingerprint": "0ea48c875638edf2e4262f5434df38526a7aa4917634c5d913f24f88dbcaf17a",
+      "revision": 22
+    },
+    {
+      "id": "proposal:change-17d98e59-12ea-4a62-8cdf-8b4e2911cd23-delivery-1",
+      "fingerprint": "894cda07097953b75cc24329bd445a6aa32fc9812dda5cd3a6bb69c5247b7286",
+      "revision": 23
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-quality-resume-20261005-03-feedback-1791153974566",
+      "fingerprint": "553e9522d7fa669d55094ea83f3d800e76215fb7cdc48a9d9bcc168a31c9d0d8",
+      "revision": 24
+    },
+    {
+      "id": "publish-flash-materials-quality-publish-20261005-04",
+      "fingerprint": "29187a9852c57a214854430558f0dcb7c7b4381f1448e9c1f21fbb5d9879454c",
+      "revision": 25
+    },
+    {
+      "id": "feedback:real-flash-materials-quality-20261005-06-feedback-1791155296698",
+      "fingerprint": "2e68dab12a9f0f5408b28d6ea974cd1a52f365a0f020435f9520fc4f1ef5ce39",
+      "revision": 26
+    },
+    {
+      "id": "proposal:change-c0db49e0-1a0c-42d1-8771-8a8ee2cd2a83-delivery-0",
+      "fingerprint": "5f18969eeffbc2ce603259af848b2bc428d86b883d26435a5384956ad3444300",
+      "revision": 27
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-quality-20261005-06-feedback-1791155700105",
+      "fingerprint": "4f0b35d78686ad9f511c5c979a75bceac30084eef063ab3f35f956ced2896413",
+      "revision": 28
+    },
+    {
+      "id": "api-automated-package-flash-materials-quality-20261005-06-quality-reviewed-r3",
+      "fingerprint": "9f7db779da0b6facbf259abe290dab6276e48528d702c2c1fda3778f47bc236a",
+      "revision": 29
+    },
+    {
+      "id": "feedback:real-flash-materials-final-20261004-01-feedback-1791157235461",
+      "fingerprint": "f75e482c06c7fdd48b831f0c7828f467527bcfaa8240ac4195f8d5949f044167",
+      "revision": 30
+    },
+    {
+      "id": "proposal:change-167084dd-7b42-4c3b-a43c-0fae51d1040a-delivery-0",
+      "fingerprint": "3ad1408a8312d0db4e6ff873ac42963abc7bc52ef32ff409c1652dcb26eda249",
+      "revision": 31
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-final-20261004-01-feedback-1791157795159",
+      "fingerprint": "b3ee8375e24b237dc958e292a1dda820b378d5d2e316035d59489194ce7f5472",
+      "revision": 32
+    },
+    {
+      "id": "api-automated-package-flash-materials-final-20261004-01-quality-reviewed-r4",
+      "fingerprint": "3a497b28b9fbb977796eefc226983b7f15141a4c87dbb7197cd442e23eb91403",
+      "revision": 33
+    },
+    {
+      "id": "feedback:real-flash-materials-final-20261005-02-feedback-1791159590139",
+      "fingerprint": "bda0b116c9dec069a2fc335fe72f56322b0cf128b585399a270367451165fc1a",
+      "revision": 34
+    },
+    {
+      "id": "proposal:change-5385470e-f751-4ebb-a405-62174dc63145-delivery-0",
+      "fingerprint": "9e566d28d8d8308523cf9914097e07122861eaccd850ba0448aa460d5ed3026b",
+      "revision": 35
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-final-20261005-02-feedback-1791160237148",
+      "fingerprint": "862cf5f80a10856d56fd2d2c0f28fe58504edbcaa1912fff85732352ba0abb33",
+      "revision": 36
+    }
+  ],
+  "diagnostics": [],
+  "package": {
+    "revision": 33,
+    "sourceRevision": 32,
+    "basisHash": "d7d6052422f208b3042fa76c6347a9cc436abc3e1c1985ef56fc0f377f5ce8e2",
+    "operationId": "api-automated-package-flash-materials-final-20261004-01-quality-reviewed-r4",
+    "files": [
+      {
+        "name": "START_HERE.md",
+        "sha256": "87f0c78745af40fca1579676eea62eac2f6be74a35b1b6b8231b985c9deedfb9"
+      },
+      {
+        "name": "PROJECT.md",
+        "sha256": "fa118818883923dd80902caf2dbcd72a1355f0c25972e02568d7e1f1d20f57cf"
+      },
+      {
+        "name": "PRODUCT.md",
+        "sha256": "0c55af47aa0fa0dd6ac8291b1819fd2ddc2af2124f7f31d40e0eb5dd5431ddb0"
+      },
+      {
+        "name": "USER_FLOWS.md",
+        "sha256": "b8d3a65df37426663b18e303d025377b9b35d2cac2f45ccf0475975f1c123fae"
+      },
+      {
+        "name": "UX_UI_SPEC.md",
+        "sha256": "ba7e0fc1f5d04089c95f8f74bd5e9b67761cc39e9a16cbb480bf39c899aa89ff"
+      },
+      {
+        "name": "TECHNICAL_GUIDE.md",
+        "sha256": "f1238ae401d0a6a2b51e811a2bf2e787edd35741989b8da89bac788a7b9a838b"
+      },
+      {
+        "name": "DEVELOPMENT_PLAN.md",
+        "sha256": "4442fbaf46d6c82157e30df3746d2f814e5388ddc8a2fe4eafde0fe1c0e16be8"
+      },
+      {
+        "name": "ACCEPTANCE.md",
+        "sha256": "2c14e7ece60e5d85932a325dad13acc458c3edc51db8e2045bafed6323d48996"
+      },
+      {
+        "name": "AGENTS.md",
+        "sha256": "0d1a28c19c1a1050e532b9a06a5fae072d7566e8948d0ef55011e2ce72cdc455"
+      },
+      {
+        "name": "tasks.json",
+        "sha256": "633e25f6896789609981c9bb64f3519c7e532c4b17af804fbebb885b2c9979ef"
+      }
+    ],
+    "directory": "artifacts/packages/32-d7d6052422f2-90867df768b6"
+  }
+}

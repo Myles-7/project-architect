@@ -1,0 +1,23 @@
+{
+  "name": "cleanup-without-unlock",
+  "method": "POST",
+  "route": "/api/projects/proj-legacy-planning-copy/planning/changesets/legacy-cleanup-59cc11023ae8a06c/approve",
+  "expectedStatus": 422,
+  "status": 422,
+  "request": {
+    "expectedRevision": 1,
+    "operationId": "legacy-without-unlock",
+    "groupIds": [
+      "cleanup-legacy-locked"
+    ]
+  },
+  "response": {
+    "success": false,
+    "error": {
+      "code": "LOCKED_CONFLICT",
+      "message": "旧决定需要明确解锁",
+      "recoverable": true
+    }
+  },
+  "responseSha256": "4f58088dada5239339883997bd341ff3c7efe3dfda46ec02831e14435bbfd781"
+}

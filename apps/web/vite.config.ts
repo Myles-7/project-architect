@@ -11,6 +11,21 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom', 'lucide-react', 'clsx', 'tailwind-merge'],
   },
+  build: {
+    chunkSizeWarningLimit: 3500,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('mermaid')) return 'vendor-mermaid';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+            if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'vendor-react';
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

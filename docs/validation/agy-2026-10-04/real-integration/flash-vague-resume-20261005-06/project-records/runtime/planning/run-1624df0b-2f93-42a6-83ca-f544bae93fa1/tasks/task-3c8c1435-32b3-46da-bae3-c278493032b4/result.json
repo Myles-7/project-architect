@@ -1,0 +1,306 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用于纯前端持久化防护设计，对抗浏览器静默驱逐与 Safari 7 天清理机制",
+      "content": "MDN 官方文档确认 StorageManager.persist() 方法在安全上下文（HTTPS）中运行，向浏览器请求持久化存储权限。若授予则 bucket 模式转为 persistent，在存储空间紧张时不会被浏览器根据 LRU 规则自动驱逐，仅在用户显式操作时清理。",
+      "hash": "61e3a1ce74716d1ff6ffe010c45422c4b77e11db823c23e7ee5b0e5b6222f625",
+      "id": "evidence-mdn-storage-persist-api",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T16:15:42.340Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist"
+    },
+    {
+      "applicability": "用于应用启动时探测当前存储持久化状态并据此提示用户或申请权限",
+      "content": "MDN 官方文档确认 StorageManager.persisted() 方法返回 Promise<boolean>，指示当前 Origin 的存储模式是否已经是 persistent，可用于应用启动时检测持久化授权状态。",
+      "hash": "db5d727711ff2c3f921a49b58cef8272cc8cdbfbe6908a2e469f3cbb993eb976",
+      "id": "evidence-mdn-storage-persisted-api",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T16:15:51.083Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persisted"
+    },
+    {
+      "applicability": "用于技术架构中解释为什么需要温和防丢提醒与定期全量导出",
+      "content": "MDN 官方关于 Storage quotas and eviction criteria 规范明确说明不同浏览器管理网站本地数据的配额与清理策略：当磁盘空间压力增大时浏览器会根据 LRU 驱逐策略删除非 persistent 站点的数据，Safari 亦有 7 天无交互清理机制。故单页离线应用须配备持久化申请与主动备份机制。",
+      "hash": "a47182c320ef508003bba9bfbebda838ded8982e4a1992679aa56293edd55a6c",
+      "id": "evidence-mdn-storage-eviction-policy",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T16:16:13.451Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria"
+    },
+    {
+      "applicability": "用于纯前端无后端依赖的本地 JSON 与 Markdown 备份导出实现",
+      "content": "MDN 官方关于 Blob 对象的规范说明，纯前端可通过 Blob 构造器封装文本（JSON、Markdown），结合 URL.createObjectURL 和 HTMLAnchorElement 触发本地无服务器文件下载保存。",
+      "hash": "bc8bddd1332c0cf7b69e8ce90ba6d014009294c62a36d7fc8509b19d03c134a4",
+      "id": "evidence-mdn-blob-spec",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T16:16:58.189Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Blob"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 核心技术栈与架构基准\n1. **视图层与状态管理**：\n   - 核心框架：React 19 (19.3) 结合 TypeScript 5.x，全面采用函数式组件与自定义 Hook 架构（引用 React 官方文档 evidence-react-official 与 TypeScript 规范 evidence-typescript）。\n   - 响应式状态流：采用 React 纯上下文与事件驱动模型（Context + Dexie.js useLiveQuery 响应式钩子），将 UI 状态与底层存储严格解耦，实现数据变更时的毫秒级视图自动刷新。\n2. **构建与打包工具**：\n   - 构建工具链：Vite（基于 Rolldown / Rollup 静态优化引擎，官方文档 evidence-vite-official）。\n   - 核心特性：ESModule 开发服务器提供毫秒级热重载（HMR < 50ms）；生产环境输出极简纯静态资源包（HTML/JS/CSS），无任何 Node.js 运行时后端依赖。\n3. **客户端数据库引擎与持久化保护基准**：\n   - 依据已确认决策 dec-22c4d85c-5b93-4fe2-846c-b47a8a67fbca，基于浏览器原生 IndexedDB（引用 W3C evidence-indexeddb-spec 与 MDN evidence-mdn-indexeddb, evidence-mdn-using-indexeddb），采用 Dexie.js 响应式封装库声明强类型 Schema 与复合索引。\n   - 宿主持久化保护：应用启动时通过 `navigator.storage.persisted()` 检测持久化模式，并主动调用 `navigator.storage.persist()` 请求浏览器永久存储权限（引用 MDN evidence-mdn-storage-persist-api, evidence-mdn-storage-eviction-policy），有效降低浏览器因磁盘压力对未备份数据的静默 LRU 驱逐概率与 Safari 7 天清理影响。\n4. **样式与视觉体系**：\n   - CSS 架构：Tailwind CSS，采用原子化 Utility-First 模式，构建期执行类名按需编译与 Tree-shaking，产物 CSS 压缩后预计小于 15KB，零运行时性能负担。\n   - 图标集：Lucide React，按需动态引入 SVG 图标组件。\n5. **Markdown 解析与安全渲染体系**：\n   - 依据已确认决策 dec-d6ff701c-4666-4605-a6da-ef57a741635e，采用 marked + DOMPurify 安全过滤组合，配合 Prism.js 实现轻量语法高亮。\n6. **运行环境要求与 Web API 依赖**：\n   - 目标浏览器基线：Chrome/Edge >= 109, Firefox >= 115 (ESR), Safari >= 16.4，兼容主流现代移动浏览器（iOS Safari, Android Chrome）。\n   - 关键宿主 Web API：\n     - `IndexedDB API 2.0/3.0+`：事务级客户端持久化存储。\n     - `StorageManager API`：`StorageManager.estimate()` 实时查询 Origin quota 与 usage；`StorageManager.persist()` 与 `persisted()` 进行存储持久化保护。\n     - `Clipboard API`（`navigator.clipboard.writeText`）：支持代码块一键复制，环境受限时降级为 `execCommand`。\n     - `File API / Blob / URL.createObjectURL`：支持浏览器端纯本地 JSON/Markdown 备份生成与下载触发（引用 W3C evidence-file-api, evidence-mdn-blob-spec）。\n7. **未验证试验与基线转移声明**：\n   - 规划阶段由于宿主 Docker 守护进程未启动（引用 evidence-exp-docker-env-prep），自动化容器沙盒基准未能执行。所有性能数字（1,000 条便签下全文检索延迟 < 150ms、首屏冷启动 TTI < 1.0s）明确作为待验证目标，完整移入交付阶段在真实浏览器环境中进行实测验收。",
+          "dependsOn": [
+            "page-main-workspace",
+            "block-scope-core-boundaries"
+          ],
+          "evidenceIds": [
+            "evidence-react-official",
+            "evidence-vite-official",
+            "evidence-typescript",
+            "evidence-exp-docker-env-prep",
+            "evidence-mdn-storage-persist-api",
+            "evidence-mdn-storage-eviction-policy"
+          ],
+          "id": "tech-core-architecture",
+          "kind": "technology",
+          "requirementIds": [
+            "block-scope-core-boundaries",
+            "block-outcomes-lightweight-experience"
+          ],
+          "stage": "technical",
+          "title": "纯前端轻量 Web 单页应用技术栈与运行环境规范"
+        },
+        {
+          "content": "### 模块划分与职责解耦设计\n系统划分为高内聚、低耦合的六大核心服务与展现模块：\n\n1. **存储驱动服务模块 (`StorageService`)**：\n   - **职责**：基于 Dexie.js 封装 IndexedDB 数据库连接、版本升级、对象仓库 CRUD、事务原子性保证，封装 `StorageManager.estimate()` 配额感知与 `StorageManager.persist()` / `persisted()` 持久化授权探测。\n   - **边界**：纯数据访问层，不包含 UI 状态或特定业务逻辑；发生底层配额超限或数据库锁冲突时抛出强类型受控错误。\n2. **便签领域业务模块 (`NoteService`)**：\n   - **职责**：处理便签核心业务逻辑，包括便签提交校验、正文 `#标签` 智能提取、便签生命周期流转（置顶、加星收藏、归档、软删除与撤销）、标签全局批量重命名。\n   - **边界**：协调 `StorageService` 进行事务写入，并在操作成功后向状态总线分发变更事件，同步递增未备份变更计数器。\n3. **即时检索与高亮引擎 (`SearchEngine`)**：\n   - **职责**：维护内存搜索索引缓存，执行带防抖的关键字分词、模糊匹配算法、多标签交集（AND）组合过滤，并生成关键词黄色高亮标记。\n   - **边界**：纯计算无副作用模块，输入查询词与便签列表，输出过滤后便签及高亮位置元数据。\n4. **备份管理与数据便携模块 (`BackupManager`)**：\n   - **职责**：执行全量便签数据序列化打包与 JSON / Markdown 导出下载触发（Markdown 导出包含 YAML FrontMatter 元数据头）；解析并严格校验外部导入的备份文件 Schema；执行智能增量合并（基于 ID 与时间戳比对）或全量覆盖事务；维护 `lastBackupAt` 与 `unbackedChangesCount` 状态；监测无痕隐身环境与长周期未备份状态。\n   - **边界**：保证导入导出的数据原子性，发生错误时自动回滚，不破坏现有本地数据。\n5. **Markdown 安全解析与渲染模块 (`MarkdownRenderer`)**：\n   - **职责**：采用 marked + DOMPurify 将纯文本便签内容编译为带结构的 HTML，集成白名单过滤防范 XSS，支持 GFM 任务清单复选框交互与 Prism.js 代码块语法高亮。\n   - **边界**：提供可复用的渲染组件与工具函数，隔绝未经消毒的第三方字符串。\n6. **主工作区交互与展现模块 (`WorkspaceUI`)**：\n   - **职责**：包含顶部操作栏、左侧标签云与备份状态区、快速捕获录入卡片、卡片流式主展区及详情模态弹窗；响应键盘全局快捷键（`N` 聚焦捕获、`/` 聚焦搜索、`Ctrl+Enter` 提交、`Esc` 退出）；处理隐身模式温和提示横幅与持久化授权状态反馈。\n   - **边界**：通过 React Hook 与 useLiveQuery 消费各服务层能力，管理组件内部交互状态（如骨架屏加载、草稿保留、悬浮反馈）。",
+          "dependsOn": [
+            "tech-core-architecture"
+          ],
+          "evidenceIds": [
+            "evidence-react-official",
+            "evidence-vite-official",
+            "evidence-indexeddb-spec",
+            "evidence-mdn-storage-persist-api"
+          ],
+          "id": "module-system-decomposition",
+          "kind": "module",
+          "requirementIds": [
+            "block-scope-core-boundaries",
+            "page-main-workspace"
+          ],
+          "stage": "technical",
+          "title": "系统核心模块划分与职责边界规范"
+        },
+        {
+          "content": "### 静态构建打包、本地运行与静态托管部署规范\n\n1. **工程构建与输出配置**：\n   - 构建命令：`npm run build`（调用 `vite build`）。\n   - 输出目录：`dist/` 纯静态文件夹。\n   - 产物优化策略：\n     - 代码分割（Code Splitting）：将 React 运行时、Lucide 图标包、Markdown 编译核心分块打包，消除冗余依赖。\n     - 资源相对路径：配置 `base: './'`，使得构建产物可直接在任意子目录或本地文件协议下免服务器直接启动。\n     - 压缩基准：全量生产产物 gzip 压缩后总体积控制在 150KB 以内，确保在常规网络环境下首屏加载能在 300ms 内完成。\n2. **多形态部署方案**：\n   - **方案 A：个人本地快速启动（开发与日常）**：\n     - 开发模式：`npm run dev`（Vite 极速开发服务，冷启动耗时 < 300ms）。\n     - 本地预览：`npm run preview`（轻量本地 HTTP 静态服务器）。\n   - **方案 B：纯前端无服务器静态托管（GitHub Pages / Cloudflare Pages / Vercel / Netlify）**：\n     - 零服务端配置，将 `dist/` 静态文件夹推送到静态托管平台即可。\n     - 配置单页路由重定向规则（SPA Fallback），保障刷新不出现 404。\n   - **方案 C：浏览器离线缓存（PWA 演进就绪）**：\n     - 引入轻量 Web App Manifest 与 Service Worker 资源预缓存机制，首次加载后完全支持在断网脱机状态下极速拉起应用。\n3. **环境安全上下文与存储权限要求**：\n   - 生产部署必须配置 HTTPS 协议或本地使用 `localhost` 访问，以保障浏览器 StorageManager API (`persist()`, `persisted()`) 与 Clipboard API 等关键特性的完整可用性（非安全上下文浏览器将禁用持久化申请与现代剪贴板）。",
+          "dependsOn": [
+            "tech-core-architecture"
+          ],
+          "evidenceIds": [
+            "evidence-vite-official",
+            "evidence-typescript",
+            "evidence-mdn-storage-persist-api"
+          ],
+          "id": "deployment-and-build-specification",
+          "kind": "deployment",
+          "requirementIds": [
+            "block-scope-core-boundaries",
+            "block-outcomes-lightweight-experience"
+          ],
+          "stage": "technical",
+          "title": "静态构建打包、本地运行与静态托管部署规范"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "grp-tech-core-architecture",
+      "impact": "明确 React 19 + TypeScript + Vite 纯静态工程基座与六大核心服务/界面模块边界，规范构建打包与静态托管部署。",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "前端轻量架构基座与核心模块解耦规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 客户端持久化存储与模糊检索架构\n1. **单一事实来源（Single Source of Truth）**：\n   - 所有便签实体、标签聚合关系与备份元数据完全保存在浏览器 IndexedDB 数据库 `SparkNotesDB`（版本 1）中，彻底规避 LocalStorage 的 5MB 限制与同步阻塞问题。\n   - 核心对象仓库（Object Store via Dexie.js）：\n     - `notes`：主键 `id` (UUID 字符串)；索引：`updatedAt`、`createdAt`、`status`、`*tags`（多值 Multi-entry 索引）、`isPinned`、`isFavorite`。\n     - `meta`：主键 `key` (字符串)，存放备份追踪器 `backup_tracker`、存储持久化状态 `storage_status` 与用户偏好设置 `user_preferences`。\n2. **宿主存储持久化与配额感知架构**：\n   - 初始化挂载：应用首次进入时调用 `StorageManager.persisted()` 检查当前 Origin 是否具备 persistent 授权；若为 false，向用户发起权限申请 `StorageManager.persist()`，并将结果同步记录至 `meta.storage_status`。\n   - 配额定期监测：在用户每次新增便签或进入数据管理面板时，异步调用 `navigator.storage.estimate()`，获取当前使用的 `usage` 与总额 `quota`。当 `usage / quota > 0.90` 时激活预警，防止突发写满导致 `QuotaExceededError`。\n3. **纯前端全文检索与模糊匹配算法架构**：\n   - 内存索引缓存：应用初始化加载时从 IndexedDB 异步读取全部非软删除便签列表放入内存状态；新增、修改、删除时通过 Dexie useLiveQuery 实时同步更新该内存镜像。\n   - 检索防抖：输入框挂载 80ms 轻度防抖定时器，确保高频打字流畅无卡顿。\n   - 匹配范围与分词：对正文文本、标签数组及日期文本执行不区分大小写的安全模糊匹配（支持空格多词分词逻辑与 `#` 标签精准匹配），命中内容动态生成带 `<mark class=\"highlight\">` 的 Safe HTML 高亮节点。\n   - 性能度量目标：在 1,000 条本地便签基准下，端到端检索过滤与 DOM 重排目标时间小于 150ms（含 80ms 防抖）。",
+          "dependsOn": [
+            "tech-core-architecture"
+          ],
+          "evidenceIds": [
+            "evidence-indexeddb-spec",
+            "evidence-mdn-indexeddb",
+            "evidence-mdn-using-indexeddb",
+            "evidence-storage-estimate",
+            "evidence-mdn-storage-persist-api",
+            "evidence-mdn-storage-eviction-policy"
+          ],
+          "id": "tech-storage-and-search",
+          "kind": "technology",
+          "requirementIds": [
+            "feature-quick-capture",
+            "feature-search-filter",
+            "feature-tag-organization"
+          ],
+          "stage": "technical",
+          "title": "客户端持久化存储与模糊检索技术架构"
+        },
+        {
+          "content": "### 客户端持久化数据模型与实体关系架构\n\n1. **便签实体定义 (`Note`)**：\n```typescript\nexport type NoteStatus = 'active' | 'archived' | 'deleted';\n\nexport interface Note {\n  id: string;               // 唯一主键，UUID v4 格式，如 \"550e8400-e29b-41d4-a716-446655440000\"\n  content: string;          // 便签正文纯文本，包含行内 Markdown 语法与标签，建议上限 100,000 字符\n  tags: string[];           // 标签名称数组，去除 \"#\" 前缀，元素去重，单标签字符长度 1~20\n  isPinned: boolean;        // 是否置顶展示，默认 false\n  isFavorite: boolean;      // 是否加星收藏，默认 false\n  status: NoteStatus;       // 生命周期状态：活跃(active)、已归档(archived)、软删除(deleted)\n  createdAt: number;        // 创建时间戳（毫秒级整型，Date.now()），生成后不可变更\n  updatedAt: number;        // 最后修改时间戳（毫秒级整型），任何正文、标签或状态变动时更新\n  deletedAt: number | null; // 软删除移入回收暂存池时间戳，活跃/归档状态时为 null\n  version: number;          // 实体结构版本号，当前基准为 1\n}\n```\n\n2. **应用全局元数据实体 (`AppMeta`)**：\n```typescript\nexport interface AppMeta {\n  key: string;              // 主键标识符，如 \"backup_tracker\", \"user_preferences\", \"storage_status\"\n  value: any;               // 强类型配置对象\n  updatedAt: number;        // 更新时间戳\n}\n\n// 备份追踪器元数据结构 (依据已确认决策 dec-b17f49d8-86c3-4a74-baee-856b5d753129 与防驱逐策略)\nexport interface BackupTrackerMeta {\n  lastBackupAt: number;          // 上次成功导出备份的时间戳\n  unbackedChangesCount: number;  // 距上次导出以来累计未备份变更次数（新增/编辑/归档/删除均 +1）\n  isPrivateModeDetected: boolean;// 是否检测到处于无痕隐身模式\n}\n\n// 存储持久化元数据结构\nexport interface StorageStatusMeta {\n  isPersisted: boolean;          // 是否获得 navigator.storage.persist() 持久化许可\n  lastCheckedAt: number;         // 上次检测时间戳\n}\n\n// 用户偏好元数据结构\nexport interface UserPreferencesMeta {\n  viewMode: 'grid' | 'compact';  // 便签流布局：瀑布流卡片或紧凑列表\n  theme: 'system' | 'light' | 'dark';\n}\n```\n\n3. **外部备份文件传输契约 (`BackupPayload`) 与 Markdown 导出规范**：\n```typescript\nexport interface BackupPayload {\n  app: 'SparkNotes';             // 固定应用标识符\n  schemaVersion: 1;              // 备份协议版本号\n  exportedAt: string;            // ISO 8601 标准时间字符串，如 \"2026-10-04T15:30:00.000Z\"\n  notesCount: number;            // 包含的便签总记录数\n  notes: Note[];                 // 便签完整数据数组\n}\n\n// 单条便签导出的 Markdown 格式规范（包含 FrontMatter）\n// ---\n// id: 550e8400-e29b-41d4-a716-446655440000\n// tags: [前端, React]\n// pinned: false\n// favorite: true\n// createdAt: 2026-10-04T15:30:00.000Z\n// updatedAt: 2026-10-04T15:35:00.000Z\n// ---\n// 便签正文 Markdown 内容...\n```\n\n4. **实体状态机流转与约束规范**：\n- **创建**：初始状态为 `status = 'active'`, `isPinned = false`, `isFavorite = false`, `deletedAt = null`。\n- **置顶切换**：`isPinned` 取反，`updatedAt = Date.now()`。\n- **收藏切换**：`isFavorite` 取反，`updatedAt = Date.now()`。\n- **归档**：`status = 'archived'`, `updatedAt = Date.now()`。\n- **软删除**：`status = 'deleted'`, `deletedAt = Date.now()`, 开启 5 秒防误触撤销计时。\n- **撤销删除**：`status = 'active'`, `deletedAt = null`，恢复原列表顺序。\n- **彻底清除**：倒计时结束后或用户确认清空时，从 IndexedDB 执行物理主键删除。",
+          "dependsOn": [
+            "tech-storage-and-search"
+          ],
+          "evidenceIds": [
+            "evidence-indexeddb-spec",
+            "evidence-file-api",
+            "evidence-typescript",
+            "evidence-mdn-blob-spec"
+          ],
+          "id": "data-model-core-entities",
+          "kind": "data_model",
+          "requirementIds": [
+            "feature-quick-capture",
+            "feature-note-card-view",
+            "feature-data-portability"
+          ],
+          "stage": "technical",
+          "title": "客户端持久化数据模型与实体关系架构"
+        },
+        {
+          "content": "### 核心服务契约与接口定义\n\n1. **存储服务接口 (`IStorageService`)**：\n```typescript\nexport interface IStorageService {\n  // 数据库生命周期\n  init(): Promise<void>;\n  close(): Promise<void>;\n\n  // 持久化保护与配额\n  requestPersistence(): Promise<boolean>;                 // 调用 StorageManager.persist()\n  isPersisted(): Promise<boolean>;                        // 调用 StorageManager.persisted()\n  getStorageQuota(): Promise<{ usage: number; quota: number; percentUsed: number }>;\n\n  // 便签 CRUD 操作\n  getNoteById(id: string): Promise<Note | null>;\n  listNotes(filter?: {\n    status?: NoteStatus;\n    isFavorite?: boolean;\n    isPinned?: boolean;\n    tags?: string[];\n  }): Promise<Note[]>;\n  saveNote(note: Note): Promise<void>;                     // 写入单条，自动更新 updatedAt\n  deleteNote(id: string, hard?: boolean): Promise<void>;  // hard=false 为软删除，hard=true 为物理删除\n  restoreNote(id: string): Promise<void>;                 // 撤销恢复软删除便签\n\n  // 批量操作\n  batchUpdateTags(oldTag: string, newTag: string): Promise<{ affectedCount: number }>; // 事务级批量重命名标签\n  batchImportNotes(notes: Note[], mode: 'merge' | 'overwrite'): Promise<{ inserted: number; updated: number }>;\n  clearAllData(): Promise<void>;\n\n  // 元数据管理\n  getMeta<T>(key: string): Promise<T | null>;\n  setMeta<T>(key: string, value: T): Promise<void>;\n}\n```\n\n2. **检索服务接口 (`ISearchService`)**：\n```typescript\nexport interface SearchQueryOptions {\n  query: string;               // 搜索文本，支持正文关键词与 \"#tag\" 过滤\n  activeStatus?: NoteStatus;   // 状态过滤，默认为 'active'\n  activeTags?: string[];       // 选中的标签交集过滤列表\n  onlyFavorites?: boolean;     // 是否仅筛选已收藏便签\n}\n\nexport interface SearchHit {\n  note: Note;\n  matchedFields: ('content' | 'tags')[];\n  highlightedContent: string;  // 安全的 HTML 字符串，命中的关键字被 <mark class=\"highlight\"> 包裹\n}\n\nexport interface ISearchService {\n  setIndexSource(notes: Note[]): void;                    // 更新内存索引镜像\n  search(options: SearchQueryOptions): {\n    results: SearchHit[];\n    totalMatched: number;\n    searchDurationMs: number;\n  };\n}\n```\n\n3. **备份服务接口 (`IBackupService`)**：\n```typescript\nexport interface IBackupService {\n  // 导出\n  exportJsonBackup(): Promise<{ blob: Blob; fileName: string; count: number }>;\n  exportMarkdownBundle(): Promise<{ blob: Blob; fileName: string; count: number }>; // 导出带 FrontMatter 的 Markdown 整合包\n\n  // 导入与校验\n  validateBackupFile(rawJsonText: string): {\n    valid: boolean;\n    errorReason?: string;\n    payload?: BackupPayload;\n  };\n  executeImport(payload: BackupPayload, mode: 'merge' | 'overwrite'): Promise<{\n    success: boolean;\n    insertedCount: number;\n    updatedCount: number;\n  }>;\n\n  // 状态感知\n  checkBackupReminderNeeded(tracker: BackupTrackerMeta): boolean; // 变更超20条或超7天\n  detectPrivateMode(): Promise<boolean>;                          // 隐身模式检测\n}\n```\n\n4. **Markdown 解析服务接口 (`IMarkdownService`)**：\n```typescript\nexport interface IMarkdownService {\n  renderToSafeHtml(markdownText: string): string; // 解析 Markdown 并经由 DOMPurify 白名单消毒\n  extractTagsFromText(text: string): string[];    // 正则提取正文中的 \"#标签\" 列表\n}\n```",
+          "dependsOn": [
+            "module-system-decomposition",
+            "data-model-core-entities"
+          ],
+          "evidenceIds": [
+            "evidence-indexeddb-spec",
+            "evidence-file-api",
+            "evidence-storage-estimate",
+            "evidence-mdn-storage-persist-api",
+            "evidence-mdn-blob-spec"
+          ],
+          "id": "interface-service-contracts",
+          "kind": "interface",
+          "requirementIds": [
+            "feature-quick-capture",
+            "feature-search-filter",
+            "feature-data-portability",
+            "feature-note-detail-edit"
+          ],
+          "stage": "technical",
+          "title": "模块服务接口、契约定义与数据流转规范"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "grp-tech-core-architecture"
+      ],
+      "id": "grp-tech-storage-data-contracts",
+      "impact": "规范 IndexedDB (Dexie.js) 单一事实来源、StorageManager 持久化与配额感知、Note/AppMeta 实体结构及 CRUD/Search/Backup 强类型服务契约。",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "客户端持久化存储、数据模型与服务契约规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 全局错误体系、降级策略与状态保留规范\n\n1. **结构化受控错误字典 (`AppError` 层次体系)**：\n   - `StorageQuotaExceededError`（配额超限错误）：\n     - **触发条件**：IndexedDB 写入时抛出 `QuotaExceededError` 或 StorageManager 检测到已使用配额超过 95%。\n     - **状态保留与恢复**：快速捕获输入框或详情编辑弹窗**绝不清空用户正在编辑的文字**；弹窗保持开启，按钮恢复可点击态；页面顶部浮出琥珀色醒目警示横幅：“本地存储空间已满，无法写入新内容，请立即导出 JSON 备份以释放空间”；提供一键导出快捷操作。\n   - `StoragePersistenceDeniedWarning`（持久化授权被拒或不受支持）：\n     - **触发条件**：浏览器安全策略拒绝 `navigator.storage.persist()`，或运行于非 HTTPS 环境。\n     - **状态保留与恢复**：应用正常降级使用非持久化配额（best-effort），不阻断读写；侧边栏提示点在达到“超20条未备份或超7天”时正常工作，且在数据设置面板注明“当前运行在临时配额模式，请保持定期导出备份以防浏览器清理”。\n   - `PrivateBrowsingModeWarning`（无痕隐身模式状态）：\n     - **触发条件**：探测到浏览器处于隐身/无痕模式（如配额远低于常规或临时内存模式）。\n     - **状态保留与恢复**：页面顶部轻量横幅提示：“您当前处于无痕浏览模式，标签页关闭后本地数据可能被浏览器清除，建议在关闭前导出备份”；横幅支持用户一键关闭，不阻断核心操作。\n   - `DatabaseLockOrUpgradeError`（数据库锁与版本冲突错误）：\n     - **触发条件**：多标签页并发访问导致数据库升级被阻止或事务锁死。\n     - **状态保留与恢复**：系统在 1 秒后自动执行一次指数退避重试；若重试仍失败，弹出非模态 Toast 提示：“检测到其他标签页正在更新存储，请关闭多余页面后刷新重试”。\n   - `BackupValidationError`（备份文件解析与校验失败）：\n     - **触发条件**：上传的文件非合法 JSON、缺少 `schemaVersion`、`notes` 数组缺失或单条记录缺少必填字段（`id`, `content`, `createdAt`）。\n     - **状态保留与恢复**：**严禁向数据库写入任何脏数据**，本地现有数据保持原样不被污染；弹窗展示明确红色错误文案（如“导入失败：第 15 条记录缺少有效 id 字段”），用户点击重试可重新选择有效文件。\n   - `TransactionRollbackError`（批量操作事务中断）：\n     - **触发条件**：标签全局批量重命名或增量合并导入过程中途发生异常。\n     - **状态保留与恢复**：底层 IndexedDB 读写事务自动回滚（Rollback），未完成的局部修改彻底撤销，关联便签全部保持修改前的标签名称，界面提示“操作已安全回滚，未对既有便签产生修改”。\n   - `ClipboardPermissionError`（剪贴板访问受阻）：\n     - **触发条件**：浏览器安全上下文不支持 `navigator.clipboard` 或用户拒绝剪贴板写入权限。\n     - **状态保留与恢复**：无缝降级为调用传统 `document.execCommand('copy')` 方案；若仍被拦截，临时弹出全选文本框并高亮文本，提示用户手动按 `Ctrl/Cmd + C` 复制。\n\n2. **明确的失败后行为承诺矩阵**：\n   - **快速捕获提交失败**：输入框保留原文本，光标不丢失，单行展开状态维持，按钮恢复可点击。\n   - **便签卡片编辑失败**：详情弹窗禁止自动退出，保留当前修改草稿于内存，弹出“保存失败，请检查空间或重试”。\n   - **软删除撤销超时写入失败**：便签从回收池平滑还原至原列表位置，Toast 提示“删除同步失败，便签已恢复显示”，绝不丢弃数据。\n   - **全量覆盖导入失败**：必须在原数据导出临时快照后执行清空；若写入中断，立即使用快照回滚还原原有数据。\n   - 绝不使用“永不丢失”“100%保证”等无证据绝对化用语，一切以事务隔离与输入框状态保留机制为技术准则。",
+          "dependsOn": [
+            "interface-service-contracts"
+          ],
+          "evidenceIds": [
+            "evidence-indexeddb-spec",
+            "evidence-storage-estimate",
+            "evidence-mdn-storage-persist-api",
+            "evidence-mdn-storage-eviction-policy"
+          ],
+          "id": "error-architecture-and-recovery",
+          "kind": "error",
+          "requirementIds": [
+            "feature-quick-capture",
+            "feature-note-card-view",
+            "feature-data-portability",
+            "feature-note-detail-edit"
+          ],
+          "stage": "technical",
+          "title": "全局错误类型体系、降级策略与状态恢复机制"
+        },
+        {
+          "content": "由于规划阶段宿主 Docker 容器环境不可用（引用 evidence-exp-docker-env-prep），性能指标（如 1,000 条便签基准下检索端到端延迟 < 150ms、首屏冷启动 TTI < 1.0s、StorageManager.persist() 权限表现）不能宣称已实测通过。本验证任务正式明确未验证能力、实测环境、度量方式、数据规模及失败处理，移交交付阶段在真实浏览器中闭环验证。",
+          "dependsOn": [
+            "tech-storage-and-search",
+            "interface-service-contracts"
+          ],
+          "evidenceIds": [
+            "evidence-exp-docker-env-prep",
+            "evidence-storage-estimate",
+            "evidence-mdn-storage-persist-api"
+          ],
+          "id": "val-browser-storage-and-search-perf",
+          "kind": "validation",
+          "requirementIds": [
+            "block-outcomes-lightweight-experience",
+            "feature-search-filter",
+            "feature-data-portability"
+          ],
+          "stage": "technical",
+          "task": {
+            "assumptions": [
+              "测试机器硬件不低于常规个人电脑基准（4核 CPU，8GB 内存）",
+              "浏览器运行于标准安全上下文（localhost 或 HTTPS）"
+            ],
+            "completionCriteria": [
+              "在 1,000 条便签基准下，10 次搜索的平均响应时间小于 150ms（含 80ms 防抖）",
+              "页面冷启动至首屏卡片交互时间 TTI 实测小于 1.0 秒",
+              "模拟存储配额满载时，快速捕获输入框与详情编辑弹窗文本保留率达到 100%",
+              "StorageManager.persist() 授权流及超20条变更/超7天防丢提醒触发判定实测符合预期"
+            ],
+            "environment": "主流桌面 PC（Windows 11 / macOS 14 / Ubuntu 22.04），Chrome 120+ / Edge 120+ / Firefox 122+ 真实浏览器环境",
+            "evidenceRequired": [
+              "Chrome DevTools Performance 性能面板记录分析文件",
+              "控制台自动化基准测试脚本运行耗时日志截图与数据文本",
+              "全量 JSON 导出与覆盖导入前后数据 MD5 一致性核对报告"
+            ],
+            "exclusions": "排除服务端性能测试（无后端架构），排除网络往返延迟（纯本地离线持久化）",
+            "failureBehavior": "若实测检索响应时间超过 250ms，触发长列表虚拟滚动（Virtual Scroll）优化与前缀索引重构；若配额异常未捕获，加固存储事务失败监听并降级使用 LocalStorage 草稿应急保护；若持久化权限被拒，降级为温和防丢提醒加强模式",
+            "goal": "在真实宿主浏览器中实测验证 IndexedDB (Dexie.js) 本地持久化稳定性、StorageManager.persist() 持久化申请行为、1,000 条便签基准下的全文模糊检索端到端延迟（含 80ms 防抖）及存储配额满载告警与状态保留机制。",
+            "modules": [
+              "StorageService",
+              "SearchEngine",
+              "BackupManager",
+              "WorkspaceUI"
+            ],
+            "normalBehavior": "批量注入 1,000 条便签耗时 < 800ms；键入检索词后，包含 80ms 防抖整体端到端 UI 渲染完成延迟稳定在 150ms 以内；全量导出 1,000 条便签生成的 JSON/Markdown 文件校验无损耗；首屏冷启动 TTI < 1.0s；StorageManager.persist() 在支持环境成功返回 true。",
+            "onFailure": "若性能未达标，将检索算法升级为基于内存倒排索引或 Trie 树索引，并引入分页虚拟滚动；若配额异常处理失败，补齐跨标签页存储状态同步与本地草稿自动暂存机制。",
+            "passCriteria": [
+              "10 次复合关键词搜索平均端到端延迟 <= 150ms",
+              "批量写入 1,000 条数据无丢损，导出并重新导入后条目数与字段校验一致性达 100%",
+              "配额超限异常注入时，输入框及编辑弹窗内文本 100% 完整保留未丢失",
+              "StorageManager 持久化与防丢提醒触发无未捕获异常"
+            ],
+            "scope": "覆盖 Chrome、Edge、Firefox 真实浏览器；利用测试脚本自动批量注入 1,000 条便签样本集（涵盖单行、多行、代码块、丰富标签）；执行全文检索、动态高亮、JSON/Markdown 导出与导入合并全链路性能及稳定性检验；验证持久化申请与防丢提醒阈值逻辑。",
+            "steps": [
+              "1. 运行构建命令并在真实 Chrome 浏览器中启动本地预览页面",
+              "2. 在浏览器控制台执行基准数据灌入脚本，批量生成 1,000 条混合格式便签并写入 IndexedDB",
+              "3. 开启 Performance 性能分析，输入 10 组包含中文、英文、符号及 #标签 的查询词，记录从击键到界面渲染完成的时间差",
+              "4. 触发全量 JSON 与 Markdown 导出，检验生成文件哈希与便签结构，随后执行增量合并导入比对一致性",
+              "5. 模拟存储配额满状态，执行便签提交，验证错误横幅展示与输入框内容保留情况",
+              "6. 检验 StorageManager.persist() 调用与超20条变更温和防丢状态点点亮逻辑"
+            ],
+            "verification": [
+              "使用 Chrome DevTools Performance 面板测量键盘事件至重新排版完成的真实时间戳",
+              "调用 StorageManager.estimate() 与 StorageManager.persist() 校验配额估算与持久化授权拦截流程",
+              "通过测试脚本核对导入导出便签集合的双向深度相等（Deep Equal）"
+            ]
+          },
+          "title": "宿主浏览器端持久化容量与全文检索性能实测验证任务"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "grp-tech-storage-data-contracts"
+      ],
+      "id": "grp-tech-error-resilience-validation",
+      "impact": "建立配额超限、隐身模式与数据库锁冲突的受控错误体系与输入草稿零丢失保护机制，并将未能在沙盒实测的存储与检索性能基准作为待验证任务移入交付阶段。",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "全局受控错误容灾、状态保留与实测验证体系"
+    }
+  ],
+  "questions": [],
+  "summary": "完成技术阶段（technical）完整设计方案修订与细化，保持全部稳定块 ID 与跨阶段关联。针对产品阶段最新确认的防 Safari 7 天清理/浏览器静默驱逐、隐身浏览模式状态提示以及 Markdown 格式导出规范，查阅 MDN 官方 StorageManager.persist()、StorageManager.persisted()、Storage quotas and eviction criteria 及 Blob 规范，将持久化授权与探测、配额感知、受控错误体系与降级保护完整落地至技术架构、模块解耦、数据模型、服务接口契约与部署规范中。所有指标明确作为待验证目标，移入交付阶段真实浏览器实测验收。所有变更组状态为 pending 待批准。"
+}

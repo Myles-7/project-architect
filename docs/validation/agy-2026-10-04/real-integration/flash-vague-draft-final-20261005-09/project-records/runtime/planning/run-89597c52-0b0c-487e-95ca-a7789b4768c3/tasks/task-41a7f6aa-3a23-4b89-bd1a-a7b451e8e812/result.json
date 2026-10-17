@@ -1,0 +1,236 @@
+{
+  "blockers": [
+    "【痛点4缺失缺口】先前草案在 block-problem-fragmented-ideas 中仅保留了3个痛点，丢失了原正式批准的核心痛点“无序堆积导致灵感沉没与查找困难”，影响到标签过滤、全文检索与置顶收藏的价值闭环依据。依据：feedback 输入 11aa9e60-8bcb-4731-b3b3-79511d6ae147 第1项明确要求恢复4个痛点。受影响块 ID：block-problem-fragmented-ideas。",
+    "【非目标界定与快捷键统一缺口】block-non-goals-exclusions 需明确界定“不做复杂树形文件夹/无限层级嵌套”与“不做重量级 WYSIWYG 富文本排版编辑器”；且全字段提交快捷键统一为 Ctrl/Cmd+Enter，消除回车直接保存。受影响块 ID：block-non-goals-exclusions, feature-quick-capture, flow-quick-capture, acceptance-quick-capture。",
+    "【接口定义与元数据完整性缺口】interface-service-contracts 缺少 requestPersistence()、isPersisted()、detectPrivateMode()、checkBackupReminderNeeded() 契约；缺少 AppMeta {key, value, updatedAt} 与 libraryGeneration 结构定义；saveNote 需强制必填 expectedRevision，在同事务 CAS（get→比较→put）中执行，且对新创建与编辑更新进行严格方法分离（独立 createNote 动作，禁止 upsert 隐式复活已删除便签）。受影响块 ID：interface-service-contracts, data-model-core-entities, task-foundation-and-storage, acceptance-foundation-and-storage。",
+    "【隐私模式探测的客观技术边界】detectPrivateMode 在现代浏览器（Chrome/Safari/Firefox）中缺乏标准 Web API 支持，属于启发式尽力探测（best-effort heuristic detection）与待验证能力，不能宣称能 100% 识别所有浏览器隐私模式。受影响块 ID：interface-service-contracts, acceptance-foundation-and-storage, val-storage-and-search-benchmark。依据：MDN Storage API 与跨浏览器反指纹安全策略。",
+    "【备份往返与草稿隔离契约缺口】BackupPayload 需完整列明元数据字段（appMeta, backupTracker, libraryGeneration, tags, notes）及各字段严格类型校验规则；需提供独立的“导出当前未保存草稿”动作；sessionStorage 需按 spark_draft_${libraryGeneration}_${noteId} 进行隔离，并诚实说明其在标签页彻底关闭后无法恢复的平台限制。受影响块 ID：feature-data-portability, flow-data-portability, task-data-portability, acceptance-data-portability, error-architecture-and-recovery。依据：MDN sessionStorage 规范。",
+    "【冷启动与检索时延度量标准闭合】冷启动必须统一度量起点为导航起始（navigationStart / PerformanceNavigationTiming.startTime 0），首屏可交互 TTI 目标 <= 1.0s，不能从骨架屏消失起算；检索必须从敲击开始含 80ms 防抖及 DOM 渲染完成，P95 <= 150ms。受影响块 ID：block-outcomes-lightweight-experience, tech-storage-and-search, val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark。依据：MDN PerformanceNavigationTiming 规范。",
+    "【验证任务状态诚实化】当前规划环境 Docker 不可用（experiment:experiment-c122c3c2-4830-486d-853c-5cfd6083dd52 状态为 unavailable），目标应用及 CodingAgent 尚未开发，所有性能基准、跨浏览器（Safari 17+）兼容性及隐私模式实测任务必须如实标为 unexecuted，在交付任务中说明失败后影响与修订路径，不可冒充已实测通过。受影响块 ID：val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark。",
+    "材料证据 evidence-50fdc1f2-14f9-4ab4-94fd-9e40d8eb8d9c 没有有效注册来源。",
+    "材料证据 evidence-d2e7cbcd-de25-42e7-82b9-d8c8f7855fe1 没有有效注册来源。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用户需求明确要求删除灵感改为进入回收区，保留七天且可以还原，超过七天必须提示并执行永久删除；归档后提供常规取消归档恢复路径。",
+      "content": "用户需求明确要求删除灵感改为进入回收区，保留七天且可以还原，超过七天必须提示并执行永久删除；归档后提供常规取消归档恢复路径；更新受影响功能、流程、任务和验收。",
+      "hash": "2d127ecc687b40c9e5080abf14ae5a68b7c75463ee3a998505644f3c4a43848c",
+      "id": "evidence-50fdc1f2-14f9-4ab4-94fd-9e40d8eb8d9c",
+      "kind": "material",
+      "obtainedAt": "2026-10-05T00:36:34.656Z",
+      "source": "input:2fde8c14-93b9-4137-b3f2-6c7d624c77c0"
+    },
+    {
+      "applicability": "明确回收区 7 天到期判定毫秒区间 RETENTION_MS = 604,800,000 ms、时钟回拨防御、归档常驻取消归档按钮与硬删除禁止复活等完整契约与验收标准。",
+      "content": "七天规则形成具体Given/When/Then：删除并刷新/重开仍可还原；回收页停留跨到期自动标出待清理但不暗删；到期执行用户确认物理清理，取消不写；重复删除不延长七天；到期清理/还原/编辑并发版本冲突可见，永久删除之后旧编辑不得重新创建。定义七天毫秒区间、边界>=、本地时钟偏移限制；归档视图常驻取消归档恢复路径。",
+      "hash": "978682ed75a482c1930f40b4821d32b0133c430d54a9f6158b46937790bb21dd",
+      "id": "evidence-d2e7cbcd-de25-42e7-82b9-d8c8f7855fe1",
+      "kind": "material",
+      "obtainedAt": "2026-10-05T00:36:37.505Z",
+      "source": "input:11aa9e60-8bcb-4731-b3b3-79511d6ae147"
+    },
+    {
+      "applicability": "用户已确认决策 dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c 的方案依据，确立回收区常驻琥珀色超期横幅与二次确认物理清空的交互规范。",
+      "content": "在回收区便签超过 7 天保留期限时，采用回收区常驻提示横幅 + 用户主动确认一键清空：在侧边栏“回收区”入口展示过期预警状态点；用户切换至回收区视图时，顶部常驻琥珀色提示横幅“有 X 条便签已超过 7 天保留期限”，提供【清空已过期便签】与【一键彻底清空】按钮，经二次确认弹窗后执行物理删除。",
+      "hash": "1e02b2403ec59f06b44c091e1168e537773942da6331b6e8a2eb31cee70e669f",
+      "id": "evidence-13e59cff-cc99-4071-85fb-1b46ea554ba1",
+      "kind": "user",
+      "obtainedAt": "2026-10-05T00:36:39.967Z",
+      "source": "question:run-65c5ee22-af96-4d2c-b6f2-d2b4e9126daf-delivery-0-question-trash-expiry-trigger-mode"
+    },
+    {
+      "applicability": "确立 IndexedDB 存储规范，规范对象仓库合法键类型（布尔值不是有效键），以及同事务（readwrite transaction）内 get-compare-put 的 CAS 乐观并发控制与全量覆盖读写原子性。",
+      "content": "This document defines APIs for a database of records holding simple values and hierarchical objects. Each record consists of a key and some value. Moreover, the database maintains indexes over records it stores. An application developer directly uses an API to locate records either by their key or by using an index. A query language can be layered on this API. An indexed database can be implemented using a persistent B-tree data structure.",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-w3c-indexeddb-spec",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:48:50.348Z",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    },
+    {
+      "applicability": "确立浏览器存储配额与驱逐规则依据。Safari 在开启防跟踪保护时会对 7 天无交互的脚本数据执行主动驱逐，为系统的“超过 7 天未备份触发温和防丢提醒”及回收区 7 天生命周期管理提供了直接官方技术依据。",
+      "content": "Safari proactively evicts data when cross-site tracking prevention is turned on. If an origin has no user interaction, such as click or tap, in the last seven days of browser use, its data created from script will be deleted. Cookies set by server are exempt from this eviction... When an origin's data is evicted by the browser, all of its data, not parts of it, is deleted at the same time... This eviction mechanism only applies to origins that are not persistent and skips over origins that have been granted data persistence by using navigator.storage.persist().",
+      "hash": "a47182c320ef508003bba9bfbebda838ded8982e4a1992679aa56293edd55a6c",
+      "id": "evidence-mdn-storage-quotas-eviction",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:50:25.742Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "查证跨标签页通过 BroadcastChannel 或 StorageEvent 监听回收区彻底删除与硬删除事件的最佳实践，确保其他标签页即时同步便签销毁状态。",
+      "kind": "research"
+    },
+    {
+      "goal": "在真实浏览器多标签页环境中验证便签物理删除后并发保存被 NoteNotFoundError 拦截且不发生 upsert 复活的行为。",
+      "kind": "validation"
+    }
+  ],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 便签流多视图展示、生命周期流转与回收区保留保护功能\n\n1. **四大系统视图与形态自适应展示**：\n   - 视图划分：【全部灵感】（活跃便签流为主，支持置顶排版）、【已收藏】（加星 Favorite 过滤）、【已归档】（Archived 归档箱）、【回收区】（Trashed 暂存保护区，各带独立计数徽标）。\n   - 双布局形态：支持网格瀑布流（Masonry Card Flow）与紧凑列表（Compact List）双形态无缝切换，切换偏好持久化保存在本地 Storage 中。\n   - 响应式适配：桌面端多列自适应排列；移动端自适应单列流，卡片内边距与字号经触控优化。\n\n2. **W3C 规范兼容的内存高效置顶与排序**：\n   - 严格遵循 W3C IndexedDB 规范与证据 evidence-w3c-indexeddb-spec，对象仓库中 `isPinned` 与 `isFavorite` 保持布尔类型，但**绝不声明底层布尔索引**。\n   - 查询层通过状态索引（`status`）拉取便签集合后，在客户端内存中执行毫秒级重排：\n     * 置顶便签（`isPinned === true`）优先级最高，置于流顶部，多条置顶便签内部按 `updatedAt` 降序排列；\n     * 普通便签按 `updatedAt` 降序排列；\n     * 置顶便签采用专属浅蓝色微弱光晕与顶置图标视觉区分。\n\n3. **已归档视图常驻取消归档恢复路径（彻底消除 5 秒 Toast 依赖）**：\n   - 在【已归档】视图中，每张卡片右下角常驻展示明确的【取消归档】（Unarchive）操作按钮。\n   - 点击该按钮立即触发底层存储事务：原子将便签更新为 `status = 'active'`, `updatedAt = Date.now()`, `revision += 1`，并将变更计数递增 1；\n   - 界面平滑淡出该卡片并将其重新呈现在【全部灵感】流中；\n   - 该操作为直接持久化写入，刷新页面或重新打开浏览器依然持久生效，彻底消除仅依赖 5 秒临时撤销 Toast 的脆弱机制。\n\n4. **回收区 7 天到期规则的精确判定与保留保护机制**：\n   - **移入回收区（Trash）**：\n     * 用户点击卡片【移入回收区】操作，原子记录 `previousStatus = status`（精确记录移入前是 active 还是 archived），更新 `status = 'trashed'`, `trashedAt = Date.now()`, `revision += 1`，未备份计数 +1；\n     * 便签即时从主视图与标签聚合池中剥离，移入回收区视图。\n   - **重复删除幂等防篡改保护**：\n     * 若便签当前状态已是 `status === 'trashed'`，重复触发移入回收区动作时被系统幂等安全拦截；\n     * **严格保证绝不得将 previousStatus 改写为 'trashed'，绝不得重置 trashedAt 时间戳，绝不得重置或延长 7 天保留期限**。\n   - **精确到期毫秒区间定义与判定公式**：\n     * 定义常量 `RETENTION_MS = 604,800,000 ms`（精确对应 7 * 24 * 60 * 60 * 1000 毫秒）；\n     * 到期判定严格采用大于等于边界：`Date.now() - trashedAt >= RETENTION_MS`（即 `now - trashedAt >= 604,800,000`）。\n   - **本地时钟回拨防御机制**：\n     * 若检测到 `Date.now() < trashedAt`（本地系统时钟发生人为回拨或 NTP 校准漂移），存储服务与 UI 视图防御性判定为未超期，记录调试告警日志，**绝不提前误删**。\n   - **回收区超期常驻提示横幅与二次确认清理（依据 dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c）**：\n     * 侧边栏【回收区】入口在存在任一超期便签时常驻琥珀色预警红点；\n     * 用户切换至回收区视图时，顶部常驻琥珀色提示横幅：“有 X 条便签已超过 7 天保留期限”，提供【清空已过期便签】与【一键彻底清空】操作入口；\n     * **跨到期停留动态标注但严禁暗删**：若用户停留在回收区页面跨越到期时间点，界面通过响应式定时器重新评估并动态打上超期标签与刷新横幅计数，**绝对不在后台静默自动物理删除**；\n     * **二次确认物理清空**：点击清理超期或清空回收区时，强制弹出模态二次确认弹窗（“彻底删除后数据将永久无法恢复，确认执行？”）；仅当用户明确点击确认后，在单原子事务中物理销毁（`hardDelete`）；用户若点击取消，则零数据库写入。\n\n5. **从回收区精准还原（Restore）**：\n   - 回收区卡片操作区常驻提供【还原】按钮与剩余有效天数胶囊（未超期显示“剩余 X 天”，超期显示“已超期”）；\n   - 点击【还原】按钮触发 CAS 更新：\n     * 状态精准还原至移入前状态：`status = previousStatus || 'active'`；\n     * 清空回收元数据：`previousStatus = undefined`, `trashedAt = null`；\n     * 更新元数据：`updatedAt = Date.now()`, `revision += 1`，未备份计数 +1；\n     * 便签恢复至对应的活跃或归档流，原有多标签、置顶（isPinned）与加星收藏（isFavorite）属性 100% 完整保持，刷新或重开持久生效。\n\n6. **并发竞争保护与物理删除后禁止隐式复活**：\n   - 当便签在回收区被物理彻底删除（`hardDelete`）后，底层主键记录被永久抹除；\n   - 若其他打开该便签的陈旧标签页或会话尝试提交编辑修改（`saveNote`），存储服务在单原子事务中检索主键不存在，立即抛出受控异常 `NoteNotFoundError` 并阻断写入；\n   - **严格禁止通过 saveNote 的 upsert 机制隐式复活已删除便签**！界面展示明确提示：“此便签已被彻底删除”，保留当前输入文字供用户复制或另存为全新便签；\n   - 并发还原与编辑冲突：依据单条便签的 `revision` 修订号执行 CAS 锁（`get -> 比较 revision -> put`），版本不匹配时拦截写入并返回黄色冲突提示。",
+          "dependsOn": [
+            "page-main-workspace"
+          ],
+          "evidenceIds": [
+            "evidence-50fdc1f2-14f9-4ab4-94fd-9e40d8eb8d9c",
+            "evidence-d2e7cbcd-de25-42e7-82b9-d8c8f7855fe1",
+            "evidence-13e59cff-cc99-4071-85fb-1b46ea554ba1",
+            "evidence-w3c-indexeddb-spec",
+            "evidence-mdn-storage-quotas-eviction"
+          ],
+          "id": "feature-note-card-view",
+          "kind": "feature",
+          "requirementIds": [
+            "block-scope-core-boundaries"
+          ],
+          "stage": "product",
+          "title": "便签流多视图展示、生命周期流转与回收区保留功能"
+        },
+        {
+          "content": "### 便签状态流转、回收区 7 天保留与还原清空交互流详细步骤\n\n1. **步骤 1：视图系统切换与卡片展示交互流**：\n   - 用户在侧边栏点击【全部灵感】、【已收藏】、【已归档】或【回收区】导航项；\n   - 系统根据选定视图过滤便签集合（常规视图严格排除 `status === 'trashed'`，回收区仅展示 `status === 'trashed'`）；\n   - 在活跃便签流中，组件根据 `isPinned` 与 `updatedAt` 在客户端内存中进行两段式降序重排：置顶便签稳居顶部独立区域，普通便签在其下方流式排列；\n   - 用户点击顶部工具栏的视图形态切换图标，便签流在瀑布流网格与紧凑列表之间平滑过渡，偏好配置写入 localStorage。\n\n2. **步骤 2：加星收藏与置顶快速标记交互流**：\n   - 用户鼠标悬停于活跃便签卡片上，或在移动端触控卡片快捷操作区；\n   - 点击星标（Star）图标：调用 `toggleFavorite(id, currentRevision)`，同事务内比对 revision，自增 `revision + 1`，卡片星标点亮，【已收藏】计数徽标即时刷新；\n   - 点击置顶（Pin）图标：调用 `togglePin(id, currentRevision)`，同事务内比对 revision，更新 `isPinned = !isPinned`, 自增 `revision + 1`；卡片以 200ms 平滑位移动画重排至顶部置顶区。\n\n3. **步骤 3：便签归档与已归档视图常驻取消归档恢复流**：\n   - **归档操作**：在全部灵感视图中点击卡片【归档】按钮，存储层原子更新 `status = 'archived'`, `updatedAt = Date.now()`, `revision += 1`；卡片从全部流中淡出，侧边栏【已归档】计数自增 1；\n   - **常驻取消归档操作**：\n     * 用户切换至【已归档】视图，浏览所有归档卡片；\n     * 每张卡片操作栏右侧**常驻显示【取消归档】操作按钮**（非仅依赖短暂 Toast）；\n     * 用户点击【取消归档】按钮：系统调用 `unarchiveNote(id, currentRevision)`，原子更新 `status = 'active'`, `updatedAt = Date.now()`, `revision += 1`；\n     * 卡片以 150ms 淡出动效从归档视图移出，【全部灵感】计数徽标 +1，【已归档】计数徽标 -1；\n     * 用户刷新页面或重新打开浏览器，该便签依然稳定保持为活跃状态。\n\n4. **步骤 4：移入回收区与防重复删除幂等交互流**：\n   - 用户点击卡片【移入回收区】（垃圾桶图标）按钮；\n   - 存储服务校验当前便签状态：\n     * 若当前状态为 `status !== 'trashed'`，原子记录 `previousStatus = status`（若此前是 active 则记录 active，此前是 archived 则记录 archived），写入 `status = 'trashed'`, `trashedAt = Date.now()`, `revision += 1`，未备份计数 +1；\n     * 卡片从当前视图移除，侧边栏【回收区】计数徽标 +1；\n     * 底部弹出轻量 Toast：“便签已移入回收区，将保留 7 天 [撤销]”；\n   - **防重复删除拦截**：若因快速连击或多会话并发再次调用移入回收区，存储服务检测到 `status === 'trashed'`，立即执行幂等忽略，**严格绝不改写 previousStatus，绝不刷新 trashedAt 时间戳**，保护 7 天到期周期的连续性。\n\n5. **步骤 5：回收区驻留、7 天到期计算与本地时钟回拨防御流**：\n   - 回收区卡片加载时，调用 `NoteLifecycleUtils` 对每条记录计算到期状态：\n     * 定义常量 `RETENTION_MS = 604,800,000`；\n     * 若 `Date.now() - trashedAt >= RETENTION_MS`（>= 边界），判定为“已超期”，卡片右上角渲染琥珀色超期胶囊标签；\n     * 若 `Date.now() - trashedAt < RETENTION_MS` 且 `Date.now() >= trashedAt`，判定为“保留中”，计算剩余天数并渲染浅灰胶囊标签“剩余 X 天”；\n     * 若 `Date.now() < trashedAt`（检测到本地时钟回拨），触发防御分支，判定为未超期，展示“保留中”，控制台记录时钟异常警告，**严禁提前标记过期或误删**；\n   - **停留在回收区跨过到期节点**：若用户保持在回收区视图，页面后台定时器（每 60 秒轮询或基于页面可见性重新计算）动态刷新计算结果，将刚满 7 天的卡片平滑标记为已超期并自增顶部横幅中的超期计数，**系统绝对不在后台静默自动物理删除，杜绝暗删**。\n\n6. **步骤 6：超期常驻横幅与二次确认物理清空交互流**：\n   - 依据决策 dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c，当回收区存在 `Date.now() - trashedAt >= 604,800,000` 的超期便签时：\n     * 侧边栏【回收区】入口点亮琥珀色预警圆点；\n     * 回收区视图顶部常驻渲染琥珀色提示横幅：“有 X 条便签已超过 7 天保留期限”，右侧提供【清空已过期便签】与【一键彻底清空】按钮；\n   - **清空已过期便签流程**：\n     * 用户点击【清空已过期便签】按钮；\n     * 屏幕正中弹出模态二次确认弹窗：“将永久物理删除 X 条超过 7 天保留期限的便签，此操作不可撤销，确认继续？”；\n     * 若用户点击【取消】，弹窗关闭，界面无任何变更，零数据库写入；\n     * 若用户点击【确认彻底删除】，存储服务在单原子读写事务内提取全部满足超期条件的记录，批量执行物理硬删除（`hardDelete`）；\n     * 未超期的便签 100% 完整保留在回收区；超期横幅随超期数归零而平滑折叠隐去；\n   - **一键彻底清空流程**：\n     * 用户点击【一键彻底清空】按钮，弹出二次确认弹窗；\n     * 用户确认后，在单原子事务中清空回收区全部便签（调用 `emptyTrash`）；若写入中断（如存储异常），事务整体回滚，不留脏状态。\n\n7. **步骤 7：回收区卡片精准还原交互流**：\n   - 用户在回收区视图浏览便签，点击卡片右下角的【还原】按钮；\n   - 系统调用 `restoreNote(id, expectedRevision)` 接口；\n   - 存储服务校验当前 revision 一致性，执行原子更新：\n     * 状态还原：`status = note.previousStatus || 'active'`；\n     * 清理回收字段：`previousStatus = undefined`, `trashedAt = null`；\n     * 更新版本：`updatedAt = Date.now()`, `revision = note.revision + 1`，未备份计数 +1；\n   - 便签以 150ms 淡出动效离开回收区：\n     * 若原为 active，精准恢复至【全部灵感】视图；\n     * 若原为 archived，精准恢复至【已归档】视图；\n   - 原有的标签集合、置顶标记与加星收藏标记全部无损复原，刷新或重启浏览器状态一致。\n\n8. **步骤 8：并发冲突与硬删除禁止隐式复活异常交互流**：\n   - **硬删除后禁止复活拦截**：\n     * 假设标签页 A 已确认彻底物理删除了便签 X，但标签页 B 仍驻留该便签的详情编辑弹窗；\n     * 标签页 B 用户点击【保存并退出】调用 `saveNote(noteX, expectedRev, sessionGen)`；\n     * 存储服务在事务中执行 `db.notes.get(noteX.id)`，发现记录不存在；\n     * 存储服务**严禁执行 upsert 写入**，直接抛出 `NoteNotFoundError` 拦截；\n     * 界面弹出警示对话框：“该便签已在其他会话中被彻底删除，无法保存”，提供【复制当前修改】与【另存为新便签（保留副本）】选项，防止死灰复燃与数据静默篡改；\n   - **并发版本冲突消解**：\n     * 标签页 A 执行了还原操作（`revision` 从 2 递增为 3）；\n     * 标签页 B 仍以 `expectedRevision = 2` 尝试执行状态修改；\n     * 存储服务检测到 `cur.revision !== expectedRevision`，返回 `conflict: true` 与数据库当前记录；\n     * 界面展示黄色冲突通知横幅，阻断脏写并提示用户重新拉取最新状态。",
+          "dependsOn": [
+            "feature-note-card-view"
+          ],
+          "evidenceIds": [
+            "evidence-50fdc1f2-14f9-4ab4-94fd-9e40d8eb8d9c",
+            "evidence-d2e7cbcd-de25-42e7-82b9-d8c8f7855fe1",
+            "evidence-13e59cff-cc99-4071-85fb-1b46ea554ba1",
+            "evidence-w3c-indexeddb-spec",
+            "evidence-mdn-storage-quotas-eviction"
+          ],
+          "id": "flow-note-card-actions",
+          "kind": "flow",
+          "requirementIds": [
+            "feature-note-card-view"
+          ],
+          "stage": "product",
+          "title": "便签状态流转、回收区 7 天保留与还原清空交互流"
+        },
+        {
+          "content": "开发便签流式多视图展示组件 NoteFeed 与卡片组件 NoteCard，涵盖置顶内存重排、归档常驻恢复入口、回收区 7 天精确到期判定、时钟回拨防御、超期琥珀色横幅、二次确认物理清空、精准还原 previousStatus、单条 revision CAS 乐观锁与物理删除后禁止 upsert 隐式复活。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "flow-note-card-actions"
+          ],
+          "evidenceIds": [
+            "evidence-50fdc1f2-14f9-4ab4-94fd-9e40d8eb8d9c",
+            "evidence-d2e7cbcd-de25-42e7-82b9-d8c8f7855fe1",
+            "evidence-13e59cff-cc99-4071-85fb-1b46ea554ba1",
+            "evidence-w3c-indexeddb-spec",
+            "evidence-mdn-storage-quotas-eviction"
+          ],
+          "id": "task-note-card-view",
+          "kind": "task",
+          "requirementIds": [
+            "feature-note-card-view",
+            "flow-note-card-actions",
+            "interface-service-contracts",
+            "data-model-core-entities"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "依赖底层 StorageService 已实现无 boolean 索引的 Dexie Schema 与严格 CAS 接口（task-foundation-and-storage）",
+              "UI 渲染框架为 React 19，构建工具为 Vite"
+            ],
+            "completionCriteria": [
+              "NoteFeed 与 NoteCard 单元与集成测试用例通过率 100%",
+              "归档视图常驻取消归档按钮功能可用率 100%，刷新或重开持久生效",
+              "回收区 7 天到期判定（>= 604,800,000 ms）与时钟回拨防御测试 100% 通过",
+              "停留在回收区跨过到期节点不暗删且二次确认物理删除机制健全",
+              "重复移入回收区防篡改 previousStatus 与 trashedAt 幂等测试 100% 通过",
+              "便签硬删除后禁止 upsert 隐式复活测试 100% 通过",
+              "消除 boolean 索引并在内存中实现置顶重排算法正确率 100%"
+            ],
+            "environment": "Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+ 桌面浏览器环境，Node 18+ 开发构建环境",
+            "evidenceRequired": [
+              "Vitest 与 React Testing Library 组件测试报告",
+              "NoteLifecycleUtils 7 天毫秒判定与时钟回拨防御单元测试用例日志",
+              "并发 CAS 乐观锁与 NoteNotFoundError 拦截测试用例日志"
+            ],
+            "exclusions": "不包含快速捕获卡片 QuickCaptureCard 的键盘输入监听实现，不包含标签管理面板的全局重命名弹窗实现，不包含外部备份 JSON 文件的底层解析器实现",
+            "failureBehavior": "操作失败时 UI 回滚至变更前状态并触发 Toast 告警；并发版本冲突弹出冲突消解横幅；陈旧保存对已删除便签抛出 NoteNotFoundError 拦截并禁止复活；物理清空时若用户取消则不执行写操作，若存储异常则事务整体回滚保持原数据",
+            "goal": "实现便签流式多视图展示组件 NoteFeed 与卡片组件 NoteCard，涵盖置顶内存重排、归档常驻恢复入口、回收区 7 天精确到期判定、时钟回拨防御、超期琥珀色横幅、二次确认物理清空、精准还原 previousStatus、单条 revision CAS 乐观锁与物理删除后禁止 upsert 隐式复活。",
+            "modules": [
+              "NoteFeed",
+              "NoteCard",
+              "RecycleBinBanner",
+              "ConfirmDialog",
+              "NoteLifecycleUtils",
+              "NoteSortingUtils"
+            ],
+            "normalBehavior": "多视图平滑切换；置顶便签稳居顶部；归档卡片常驻显示取消归档按钮并即时响应；回收区卡片展示剩余天数；超期便签显示常驻横幅；二次确认后物理删除；还原后精准恢复原状态；并发保存与还原通过 CAS 乐观锁自增 revision。",
+            "onFailure": "操作异常时展示轻量 Toast 错误提示，保留当前卡片状态供用户重试；若遭遇主键不存在异常，弹窗引导用户复制草稿或另存为新便签",
+            "passCriteria": [
+              "NoteSortingUtils 内存置顶与时间降序排序测试全部通过",
+              "NoteLifecycleUtils 604,800,000 ms 边界判定与时钟回拨防御测试全部通过",
+              "重复 trash 幂等保护测试全部通过",
+              "restore 精准恢复 previousStatus（active 与 archived）测试全部通过",
+              "已物理删除便签调用 saveNote 抛出 NoteNotFoundError 且不发生 upsert 测试全部通过",
+              "已归档视图【取消归档】常驻按钮点击与状态流转测试全部通过",
+              "回收区超期常驻横幅展示与二次确认弹窗物理清空测试全部通过"
+            ],
+            "scope": "1. 实现 NoteFeed 组件与多视图切换（全部、已收藏、已归档、回收区）及布局形态切换（瀑布流/紧凑列表）；\n2. 实现 NoteCard 组件，包含标题摘要、轻量 Markdown 预览、标签胶囊与快捷操作浮层；\n3. 在已归档视图中常驻展示【取消归档】按钮，点击执行原子 CAS 更新恢复至 active；\n4. 实现置顶便签（isPinned）与更新时间（updatedAt）的客户端内存高效降序重排，严格遵守 W3C 无 boolean 索引规范；\n5. 实现回收区 7 天到期判定算法（now - trashedAt >= 604,800,000 ms）与本地时钟回拨防御；\n6. 实现停留跨期动态状态标注（严禁暗删）；\n7. 实现回收区顶部常驻琥珀色超期横幅（依据 dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c）及二次确认物理删除弹窗；\n8. 实现重复移入回收区防重置 previousStatus 与 trashedAt 幂等逻辑；\n9. 实现回收区【还原】精确恢复至 previousStatus；\n10. 联动 StorageService 落地单条 revision CAS 并发控制，便签彻底删除后拦截陈旧写入，抛出 NoteNotFoundError 禁止 upsert 隐式复活。",
+            "steps": [
+              "1. 编写 NoteSortingUtils，实现基于 isPinned（true 优先）与 updatedAt（降序）的高性能客户端内存重排算法",
+              "2. 编写 NoteLifecycleUtils，声明常量 RETENTION_MS = 604800000，实现超期判定函数 isTrashExpired(trashedAt, now) 与剩余保留天数格式化函数，包含时钟回拨防御",
+              "3. 构建 NoteCard 组件，支持 active、archived、trashed 视图形态：在 archived 视图中常驻渲染【取消归档】按钮；在 trashed 视图中常驻渲染【还原】与【彻底删除】按钮及剩余天数胶囊",
+              "4. 构建 NoteFeed 组件，管理视图筛选（全部/收藏/归档/回收区）与布局形态（瀑布流/紧凑列表），集成 useLiveQuery 响应式更新",
+              "5. 构建 RecycleBinBanner 组件，根据超期便签计数常驻渲染琥珀色提示横幅，提供清空超期与清空全部按钮",
+              "6. 构建 ConfirmDialog 模态弹窗，提供防误删强确认拦截",
+              "7. 封装卡片动作处理器：togglePin、toggleFavorite、unarchiveNote、trashNote（幂等校验）、restoreNote（恢复 previousStatus）、hardDeleteNote 与 CAS 乐观锁异常捕获",
+              "8. 实现陈旧保存拦截与 NoteNotFoundError 错误处理，严禁 upsert 隐式复活",
+              "9. 编写 Vitest 自动化测试套件验证各种正常与异常边界"
+            ],
+            "verification": [
+              "使用 fake-indexeddb 与 React Testing Library 渲染 NoteFeed 并测试置顶卡片排版位置",
+              "测试在已归档视图点击【取消归档】按钮后便签原子更新为 active 并从当前列表移出",
+              "测试移入回收区后持久化记录 previousStatus 与 trashedAt，二次重复删除时字段不被重置",
+              "测试处于回收区的便签点击【还原】精准恢复为原 active 或 archived 状态",
+              "测试 trashedAt 达到 now - 604,800,000 ms 时精准触发超期横幅，时钟回拨时防御性保持未超期",
+              "测试停留在回收区跨过到期时间时，界面标注超期但不发生静默物理删除",
+              "测试点击清空超期便签时弹出二次确认对话框，取消无写入，确认后物理硬删除超期记录",
+              "测试对已硬删除便签调用 saveNote 抛出 NoteNotFoundError 拦截，断言对象仓库无新增记录"
+            ]
+          },
+          "title": "便签卡片流展示、回收区 7 天生命周期与操作开发任务"
+        },
+        {
+          "content": "### 便签卡片展示、回收区 7 天生命周期与清空验收标准（Given / When / Then）\n\n- **场景 1：已归档视图常驻【取消归档】按钮与持久恢复路径**\n  - **Given** 系统中存在状态为 `archived` 的便签（id=\"note-archived-1\", revision=2），用户切换至【已归档】视图，\n  - **When** 用户在卡片右下角直接点击常驻的【取消归档】按钮，\n  - **Then** 存储服务原子更新该便签为 `status='active'`, `updatedAt=Date.now()`, `revision=3`；便签立即以 150ms 淡出动效从归档视图移出并在【全部灵感】视图中呈现；刷新页面或重新打开浏览器，该便签依然保持 active 状态，彻底消除仅依赖 5 秒 Toast 撤销的不可靠机制。\n\n- **场景 2：便签移入回收区与重复删除幂等防篡改**\n  - **Given** 一条活跃便签（id=\"note-trash-1\", status='active', revision=1），\n  - **When** 用户点击卡片【移入回收区】按钮，随后在短时间内再次触发移入回收区操作，\n  - **Then** 第一次操作记录 `previousStatus = 'active'`, `status = 'trashed'`, `trashedAt = T1`, `revision = 2`；第二次重复删除被系统幂等安全拦截，绝不将 `previousStatus` 改成 `'trashed'`，绝不刷新 `trashedAt` 为更新时间（到期倒计时绝对不被重置延长）；便签从主视图移入回收区。\n\n- **场景 3：回收区便签精准恢复 previousStatus 原始状态**\n  - **Given** 便签 A 移入回收区前为 `status='archived'`，便签 B 移入回收区前为 `status='active'`，\n  - **When** 用户进入回收区视图，分别点击便签 A 与便签 B 的【还原】按钮，\n  - **Then** 便签 A 严格恢复为 `status='archived'`, `previousStatus=undefined`, `trashedAt=null`；便签 B 严格恢复为 `status='active'`, `previousStatus=undefined`, `trashedAt=null`；二者 revision 均自增 1，原有的多标签与置顶收藏状态完整保留，刷新页面状态保持一致。\n\n- **场景 4：回收区 7 天到期精确判定（>= 604,800,000 ms 边界）与本地时钟回拨防御**\n  - **Given** 回收区中有便签 A（trashedAt = now - 604,800,000 ms，即刚好到达 7 天保留边界）、便签 B（trashedAt = now - 604,799,000 ms，差 1 秒满 7 天）、便签 C（trashedAt = now + 3,600,000 ms，本地系统时钟发生人为回拨或 NTP 漂移），\n  - **When** 系统渲染回收区视图并计算过期便签列表，\n  - **Then** 便签 A 精准识别为已过期（`now - trashedAt >= 604,800,000`）；便签 B 识别为未过期并展示“剩余 1 天”胶囊；便签 C 触发时钟回拨防御，防御性判定为未过期并记录警告，绝不提前误删。\n\n- **场景 5：用户停留在回收区视图跨过 7 天到期节点时不暗删与动态标注**\n  - **Given** 用户停留在回收区视图界面，某条便签在停留期间由未超期跨越至满 7 天，\n  - **When** 定时器或响应式查询刷新视图状态，\n  - **Then** 界面动态将该便签标记为已超期，并更新顶部常驻琥珀色横幅中的超期计数；系统绝不在后台静默自动物理删除该便签，严禁未经用户确认的暗删。\n\n- **场景 6：回收区超期常驻横幅与二次确认物理清空**\n  - **Given** 回收区存在 3 条已超期便签与 2 条未超期便签，顶部展示常驻琥珀色横幅“有 3 条便签已超过 7 天保留期限”，\n  - **When** 用户点击【清空已过期便签】按钮，\n  - **Then** 系统弹出模态二次确认弹窗：“将永久物理删除 3 条已超期便签，此操作不可恢复，确认执行？”；若用户点击取消，弹窗关闭且零数据库写入；若用户点击确认，在单原子事务中物理硬删除 3 条超期便签，剩余 2 条未超期便签 100% 完整保留。\n\n- **场景 7：彻底删除后陈旧会话尝试保存禁止 upsert 隐式复活**\n  - **Given** 便签（id=\"note-hard-del\"）已在回收区被用户确认物理删除（hardDelete），但标签页 B 仍残留打开该便签的编辑会话，\n  - **When** 标签页 B 尝试提交保存修改（`saveNote(noteHardDel, 1, 1)`），\n  - **Then** 存储服务在事务中查询目标 ID 记录为空，抛出 `NoteNotFoundError` 拦截写入，绝不通过 upsert 方式在数据库中隐式重新插入或复活该便签；前端展示提示：“便签已被彻底删除”，保留当前输入草稿供复制。\n\n- **场景 8：并发编辑与还原 CAS 乐观锁冲突拦截**\n  - **Given** 回收区便签（id=\"note-conflict\", revision=2），在标签页 A 中被点击【还原】（自增至 revision=3），\n  - **When** 标签页 B 仍持有 revision=2 尝试执行还原或状态修改，\n  - **Then** 标签页 B 提交时比对 `cur.revision (3) !== expectedRevision (2)`，写入被严格拦截，UI 弹出版本冲突提示并拉取最新状态。\n\n- **场景 9：W3C 无 boolean 索引规范与客户端内存置顶排序**\n  - **Given** 数据库存有 100 条便签，其中 5 条设置了 `isPinned: true`，其余为 `false`，\n  - **When** 组件调用 `listNotes({ status: 'active' })` 并执行渲染，\n  - **Then** IndexedDB 查询完全基于 `status` 与 `updatedAt` 索引，绝不使用 boolean 字段查询；组件在内存中优先排列 5 条置顶便签（内部按 updatedAt 降序），置顶区后排列普通便签（按 updatedAt 降序）。",
+          "dependsOn": [
+            "task-note-card-view"
+          ],
+          "evidenceIds": [
+            "evidence-50fdc1f2-14f9-4ab4-94fd-9e40d8eb8d9c",
+            "evidence-d2e7cbcd-de25-42e7-82b9-d8c8f7855fe1",
+            "evidence-13e59cff-cc99-4071-85fb-1b46ea554ba1",
+            "evidence-w3c-indexeddb-spec",
+            "evidence-mdn-storage-quotas-eviction"
+          ],
+          "id": "acceptance-note-card-view",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-note-card-view",
+            "flow-note-card-actions"
+          ],
+          "stage": "delivery",
+          "title": "便签卡片展示、回收区 7 天生命周期与清空验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-41a7f6aa-3a23-4b89-bd1a-a7b451e8e812-group-feed-and-lifecycle",
+      "impact": "落实便签流视图排版、置顶排序、归档常驻恢复路径、回收区7天生命周期判定、时钟回拨防御、彻底删除二次确认、CAS乐观锁防并发复活及对应交互流程、开发任务与验收标准",
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "便签流多视图展示、生命周期流转与回收区保留保护规范"
+    }
+  ],
+  "questions": [],
+  "summary": "针对最新自动质量验收反馈与工作划分目标，已在 workPartition 范围内严格落实便签流展示、生命周期流转、回收区 7 天保留保护功能、交互流程、开发任务与验收标准：1) 闭合 feature-note-card-view 对应的交互流程规范 flow-note-card-actions，形成完整的卡片操作、状态流转与清空交互闭环；2) 以 RETENTION_MS = 604,800,000 ms（>= 边界）严格定义超期判定公式，加入本地时钟回拨防御，停留在回收区跨过到期节点动态标注超期但严禁暗删，超期清理与一键彻底清空需二次确认弹窗后物理删除（hardDelete），重复删除幂等拦截防重置 trashedAt 与 previousStatus；3) 落实并发竞争保护与物理删除后禁止复活机制，便签被彻底物理删除后，陈旧会话尝试保存时抛出 NoteNotFoundError 拦截，严禁通过 upsert 隐式复活；4) 在已归档视图中每张卡片常驻提供明确的【取消归档】按钮，点击后原子更新 status='active' 并自增 revision，彻底消除对 5 秒 Toast 撤销的不可靠依赖；5) 严格遵守 W3C IndexedDB 规范消除 boolean 索引，置顶与时间排序由客户端内存高效重排；6) 编写 NoteFeed 与 NoteCard 组件完整结构化开发任务 task-note-card-view 及覆盖全部边界的 9 大 Given/When/Then 验收标准 acceptance-note-card-view。所有变更均作为待批准建议提交。"
+}

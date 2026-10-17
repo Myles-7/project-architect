@@ -1,0 +1,43 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/PlanningService.test.ts (14 tests | 1 failed) 3228ms
+   ✓ Planning approval safety > draft never confirms; approval is atomic and idempotent and preserves provenance  334ms
+   ✓ Planning approval safety > refuses stale proposals and locked replacement without partial writes  487ms
+   × Planning approval safety > allows a user to save draft lock intent, applies it only on approval, and requires explicit unlock for replacement 151ms
+     → 变更分组结构无效
+   ✓ Planning approval safety > rejects invalid hand-edit metadata without any write: {"locked":"true"} 169ms
+   ✓ Planning approval safety > rejects invalid hand-edit metadata without any write: {"approvedBy":"pretend-approval"} 169ms
+   ✓ Planning approval safety > rejects invalid hand-edit metadata without any write: {"approvedAt":"2026-10-04T00:00:00Z"} 170ms
+   ✓ Planning approval safety > continues to reject Provider-origin lock and approval metadata 123ms
+   ✓ Planning approval safety > free text and delegation preserve raw input without confirmed decisions  322ms
+   ✓ Planning approval safety > explicit choices retain topic and survive reload, resolved topic does not get repeated 207ms
+   ✓ Planning approval safety > persists explicit selection keys and kind with the full original options across a fresh engine reload 215ms
+   ✓ Planning approval safety > persists custom kind and raw text without selection keys or confirmation 217ms
+   ✓ Planning approval safety > persists delegate kind and raw text without selection keys or confirmation 216ms
+   ✓ Planning approval safety > persists defer kind and raw text without selection keys or confirmation 260ms
+   ✓ Planning approval safety > rejects dependent question batch, poor choices, vague readiness and orphaned group approval 188ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/core/tests/PlanningService.test.ts > Planning approval safety > allows a user to save draft lock intent, applies it only on approval, and requires explicit unlock for replacement
+Error: 变更分组结构无效
+ ❯ fail packages/core/src/planning/PlanningService.ts:12:61
+     10|   constructor(public code: string, message: string) { super(message); }
+     11| }
+     12| function fail(code: string, message: string): never { throw new Planni…
+       |                                                             ^
+     13| function reflectDecisionChanges(s:ProjectSnapshot):void {
+     14|   const hash=effectiveDecisionHash(s);
+ ❯ PlanningService.validateGroups packages/core/src/planning/PlanningService.ts:163:167
+ ❯ PlanningService.edit packages/core/src/planning/PlanningService.ts:198:10
+ ❯ packages/core/tests/PlanningService.test.ts:48:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  03:57:28
+   Duration  4.07s (transform 312ms, setup 0ms, collect 577ms, tests 3.23s, environment 0ms, prepare 79ms)
+

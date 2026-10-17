@@ -1,0 +1,467 @@
+StorageManager: estimate() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ StorageManager 
+
+ estimate() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ Русский 
+
+ 中文 (简体) 
+
+ StorageManager: estimate() method
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since September 2023.
+
+ See full compatibility
+
+ Learn more
+
+ Secure context: This feature is available only in secure contexts (HTTPS), in some or all supporting browsers .
+
+ Note: This feature is available in Web Workers .
+
+ The estimate() method of the StorageManager interface asks the Storage Manager for how much storage the current origin takes up ( usage ), and how much space is available ( quota ).
+
+ This method operates asynchronously, so it returns a Promise which resolves once the information is available. The promise's fulfillment handler is called with an object containing the usage and quota data.
+
+ In this article
+
+ Syntax 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ js 
+ estimate()
+
+ Parameters 
+
+ None.
+
+ Return value 
+
+ A Promise that resolves to an object with the following properties:
+
+ quota 
+
+ A numeric value in bytes which provides a conservative approximation of the total storage the user's device or computer has available for the site origin or Web app. It's possible that there's more than this amount of space available though you can't rely on that being the case.
+
+ usage 
+
+ A numeric value in bytes approximating the amount of storage space currently being used by the site or Web app, out of the available space as indicated by quota . Unit is byte.
+
+ usageDetails 
+
+ An object containing a breakdown of usage by storage system. All included properties will have a usage greater than 0 and any storage system with 0 usage will be excluded from the object.
+
+ Note: 
+The returned values are not exact: between compression, deduplication, and obfuscation for security reasons, they will be imprecise.
+
+ You may find that the quota varies from origin to origin. This variance is based on factors such as:
+
+ How often the user visits
+
+ Public site popularity data
+
+ User engagement signals like bookmarking, adding to homescreen, or accepting push notifications
+
+ Exceptions 
+
+ TypeError 
+
+ Thrown if obtaining a local storage shelf failed. For example, if the current origin is an opaque origin or if the user has disabled storage.
+
+ Examples 
+
+ In this example, we obtain the usage estimates and present the percentage of storage capacity currently used to the user.
+
+ HTML 
+
+ html 
+ You're currently using about <span id="percent"></span>% of your estimated
+storage quota (<span id="quota"></span>).
+
+ JavaScript 
+
+ js 
+ navigator.storage.estimate().then((estimate) => {
+ document.getElementById("percent").textContent = (
+ (estimate.usage / estimate.quota) *
+ 100
+ ).toFixed(2);
+ document.getElementById("quota").textContent =
+ `${(estimate.quota / 1024 / 1024).toFixed(2)}MB`;
+});
+
+ Result 
+
+ Specifications 
+
+ Specification
+
+ Storage 
+# dom-storagemanager-estimate 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Storage API 
+
+ Storage , the object returned by Window.localStorage 
+
+ StorageManager 
+
+ navigator.storage 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Oct 31, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Storage API 
+ StorageManager 
+ Instance methods estimate() 
+ getDirectory() 
+ persist() 
+ persisted() 
+
+ Related pages for Storage Navigator .storage 
+ WorkerNavigator .storage 
+
+ Guides Storage quotas and eviction criteria 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

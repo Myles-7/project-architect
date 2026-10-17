@@ -41,7 +41,7 @@ export const TechnicalDetails: React.FC<TechnicalDetailsProps> = ({
           <Terminal className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
           <span className="font-medium text-[11px]">{title}</span>
           {revision !== undefined && (
-            <span className="px-1.5 py-0.2 rounded font-mono text-[10px] bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+            <span className="px-1.5 py-0.5 rounded font-mono text-xs bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
               {`rev.${revision}`}
             </span>
           )}
@@ -131,12 +131,12 @@ export const TechnicalDetails: React.FC<TechnicalDetailsProps> = ({
           {/* Raw References */}
           {rawRefs.length > 0 && (
             <div className="space-y-1">
-              <div className="text-[10px] uppercase font-semibold text-zinc-400">底层实体引用 (Refs)</div>
+              <div className="text-xs uppercase font-semibold text-zinc-400">底层实体引用 (Refs)</div>
               <div className="flex flex-wrap gap-1">
                 {rawRefs.map((r, i) => (
                   <span
                     key={i}
-                    className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                    className="font-mono text-xs px-1.5 py-0.5 rounded bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                   >
                     {String(r)}
                   </span>

@@ -198,9 +198,214 @@
       "decisionKey": "built_in_assets_assumption",
       "statement": "首个版本内置的像素风家具与角色素材直接使用开源免费或免版税的素材包。",
       "reason": "首期研发资源有限，使用开源免费的像素素材可以跳过复杂的人物和家具绘制工作，将精力集中在核心的互动功能上。",
+      "status": "resolved",
+      "createdAt": "2026-08-28T15:13:40.762Z",
+      "resolvedAt": "2026-08-31T11:13:32.279Z",
+      "resolvedDecisionRef": "decision:dec-1788174812279-mew0",
+      "linkedDecisionRefs": [
+        "decision:dec-1788174812279-mew0"
+      ]
+    },
+    {
+      "id": "asm-mth5603x-0nh0",
+      "area": "ux_ui_direction",
+      "decisionKey": "offline_visual_state",
+      "statement": "当其中一方离线（关闭网页或断网）时，其虚拟形象在对方屏幕上自动切换为睡觉或在沙发上发呆的挂机动画。",
+      "reason": "在本地优先（Local-First）和无干扰陪伴的定位下，网络连接断开是常态，用挂机动画代替人物消失能维持同居室的连贯和温馨氛围。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:15:01.004Z",
+      "resolvedAt": "2026-08-31T12:02:12.029Z",
+      "resolvedDecisionRef": "decision:dec-1788177732029-6ubx",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177732029-6ubx"
+      ]
+    },
+    {
+      "id": "asm-mth5603x-10yo",
+      "area": "ux_ui_direction",
+      "decisionKey": "licensed_assets_use",
+      "statement": "首个版本内置的像素风家具与角色素材直接使用开源免费或免版税的素材包。",
+      "reason": "从零绘制成套的像素风素材成本极高，直接使用现成高质素材能保证 MVP 的上线速度。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:15:01.004Z",
+      "resolvedAt": "2026-08-31T12:02:45.880Z",
+      "resolvedDecisionRef": "decision:dec-1788177765880-3g26",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177765880-3g26"
+      ]
+    },
+    {
+      "id": "asm-mth5aqmx-ivwq",
+      "area": "ux_ui_direction",
+      "decisionKey": "default_room_size",
+      "statement": "首期虚拟同居室采用固定大小的单房间网格布局，不提供多房间或超大地图滚动。",
+      "reason": "这样可以极大简化像素家具的拖拽摆放逻辑和画布渲染，适合移动端屏幕展示。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:18:42.009Z",
+      "resolvedAt": "2026-08-31T12:00:32.889Z",
+      "resolvedDecisionRef": "decision:dec-1788177632889-huog",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177632889-huog"
+      ]
+    },
+    {
+      "id": "asm-mth5aqmx-89ma",
+      "area": "core_features",
+      "decisionKey": "cloud_model_cost",
+      "statement": "接入的主流大模型云端服务由用户自行提供 API Key，系统本身不内置付费的大模型额度。",
+      "reason": "由于是纯个人私密使用，且为无服务器/轻量服务器架构，自行提供 Key 可以免去平台运营成本。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:18:42.009Z",
+      "resolvedAt": "2026-08-31T12:02:20.260Z",
+      "resolvedDecisionRef": "decision:dec-1788177740260-89mc",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177740260-89mc"
+      ]
+    },
+    {
+      "id": "asm-1788175269895-9txq",
+      "area": "ux_ui_direction",
+      "decisionKey": "character_movement_style",
+      "statement": "首发内置 2-3 套精美默认形象与“UX/UI 方向”素材，暂缓自由文件上传与复杂编辑器。",
+      "reason": "统一视觉美术基调，避免前期处理复杂的图片裁剪与多端适配成本。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:21:09.895Z",
+      "resolvedAt": "2026-08-31T12:02:33.472Z",
+      "resolvedDecisionRef": "decision:dec-1788177753472-defs",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177753472-defs"
+      ]
+    },
+    {
+      "id": "asm-mth5g554-0q7l",
+      "area": "ux_ui_direction",
+      "decisionKey": "default_ui_language",
+      "statement": "界面默认语言为简体中文，暂不考虑多语言切换",
+      "reason": "符合用户以及其对象的日常习惯，首期无需为多语言切换投入额外精力。",
       "status": "active",
-      "createdAt": "2026-08-28T15:13:40.762Z"
+      "createdAt": "2026-08-31T11:22:54.088Z"
+    },
+    {
+      "id": "asm-mth5jkd0-u12i",
+      "area": "technical_boundary",
+      "decisionKey": "public_network_latency",
+      "statement": "由于采用轻量 WebSocket 服务器或 WebRTC 直连，双方在不同网络环境下的实时状态同步延迟可以容忍在数秒之内。",
+      "reason": "核心定位为“无干扰陪伴”而非高频竞技游戏，对亚秒级超低延迟没有强需求。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:25:33.780Z",
+      "resolvedAt": "2026-08-31T12:02:39.415Z",
+      "resolvedDecisionRef": "decision:dec-1788177759415-l68l",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177759415-l68l"
+      ]
+    },
+    {
+      "id": "asm-mth5jkd0-8uuv",
+      "area": "ux_ui_direction",
+      "decisionKey": "avatar_sprite_format",
+      "statement": "MVP 版本内置的虚拟形象动作动画以简单的 2D 序列帧或静态切图形式存在，通过替换图片源实现状态切换。",
+      "reason": "首期内置形象能够降低资产制作门槛，确保能在移动端浏览器上轻量且快速加载。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:25:33.780Z",
+      "resolvedAt": "2026-08-31T12:01:47.438Z",
+      "resolvedDecisionRef": "decision:dec-1788177707438-h3ol",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177707438-h3ol"
+      ]
+    },
+    {
+      "id": "asm-mth5qyw6-2lqf",
+      "area": "ux_ui_direction",
+      "decisionKey": "screen_orientation",
+      "statement": "移动端网页主要采用竖屏交互布局。",
+      "reason": "用户在使用手机浏览器访问情侣空间时，竖屏交互更符合单手操作的习惯，也更容易与时间轴和日记等垂直滚动的列表视图结合。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:31:19.206Z",
+      "resolvedAt": "2026-08-31T12:01:53.252Z",
+      "resolvedDecisionRef": "decision:dec-1788177713252-5iqg",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177713252-5iqg"
+      ]
+    },
+    {
+      "id": "asm-mth5qyw6-5s3h",
+      "area": "technical_boundary",
+      "decisionKey": "network_protocol",
+      "statement": "实时状态同步采用标准的 WebSocket 协议进行全双工通信。",
+      "reason": "WebSocket 协议技术成熟、延迟低，是目前在 Web 浏览器端实现低延迟双向状态广播的最佳轻量选择。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:31:19.206Z",
+      "resolvedAt": "2026-08-31T12:02:01.190Z",
+      "resolvedDecisionRef": "decision:dec-1788177721190-tkza",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177721190-tkza"
+      ]
+    },
+    {
+      "id": "asm-auto-mth5qyw6-wsx",
+      "statement": "暂定默认：当一方在后台或锁屏状态时，网站的实时消息与互动通知机制尚未明确。",
+      "reason": "决定是维持绝对的无干扰陪伴模式，还是提供轻度的即时状态提醒。",
+      "area": "ux_ui_direction",
+      "decisionKey": "background_notifications",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:31:19.206Z",
+      "resolvedAt": "2026-08-31T12:00:46.738Z",
+      "resolvedDecisionRef": "decision:dec-1788177646738-u8ud",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177646738-u8ud"
+      ]
+    },
+    {
+      "id": "asm-mth5vxib-qa96",
+      "area": "ux_ui_direction",
+      "decisionKey": "device_adaptation_priority",
+      "statement": "优先适配移动端浏览器，确保随时随地可以方便地更新状态，同时兼容桌面端浏览器的正常访问。",
+      "reason": "由于用户点击“吃饭”等状态更新通常发生在日常生活中移动端便携使用的场景，优先适配移动端符合使用习惯，且可通过标准的响应式网页设计低成本实现。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:35:10.691Z",
+      "resolvedAt": "2026-08-31T12:01:39.894Z",
+      "resolvedDecisionRef": "decision:dec-1788177699894-qxhe",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177699894-qxhe"
+      ]
+    },
+    {
+      "id": "asm-mth5z6pl-yp0m",
+      "area": "technical_boundary",
+      "decisionKey": "internet_dependency",
+      "statement": "双人进行实时互动时，两台设备均处于可用 Internet 的网络环境中，不考虑完全离线的局域网直连。",
+      "reason": "虽为本地优先（Local-First），但由于两人通常不在同一物理空间，依赖公网服务器中转（WebSocket）是保障稳定连接最易实现的方案。",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:37:42.585Z",
+      "resolvedAt": "2026-08-31T12:01:19.844Z",
+      "resolvedDecisionRef": "decision:dec-1788177679844-1j42",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177679844-1j42"
+      ]
+    },
+    {
+      "id": "asm-mth5z6pl-a95f",
+      "area": "page_structure",
+      "decisionKey": "device_browser",
+      "statement": "双方使用的手机浏览器为 iOS Safari 或 Android Chrome/Edge 等主流现代浏览器。",
+      "reason": "这些浏览器对 WebSocket 和 LocalForage 等 Web 基础 API 支持良好，能保障无感同步与本地缓存的平稳运行。",
+      "status": "active",
+      "createdAt": "2026-08-31T11:37:42.585Z"
+    },
+    {
+      "id": "asm-auto-mth5z6pl-sw6",
+      "statement": "暂定默认：尚未明确在一方锁屏或切后台时，如何同步或通知对方的消息与状态。",
+      "reason": "由于网页在手机后台运行的限制，若不提前约定体验预期，可能会导致互动滞后或体验不佳。",
+      "area": "ux_ui_direction",
+      "decisionKey": "background_notifications",
+      "status": "resolved",
+      "createdAt": "2026-08-31T11:37:42.585Z",
+      "resolvedAt": "2026-08-31T12:00:54.529Z",
+      "resolvedDecisionRef": "decision:dec-1788177654529-i2gw",
+      "linkedDecisionRefs": [
+        "decision:dec-1788177654529-i2gw"
+      ]
     }
   ],
-  "updatedAt": "2026-08-28T15:13:40.773Z"
+  "updatedAt": "2026-09-25T01:23:54.038Z"
 }

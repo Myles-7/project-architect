@@ -1,0 +1,512 @@
+Node: isConnected property - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Node 
+
+ isConnected 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Français 
+
+ 日本語 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ Node: isConnected property
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since January 2020.
+
+ See full compatibility
+
+ Learn more
+
+ The read-only isConnected property of the Node interface returns a boolean indicating whether the node is connected (directly or indirectly) to a Document object.
+
+ In this article
+
+ Value 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ Value 
+
+ A boolean value that is true if the node is connected to its relevant context object, and false if not.
+
+ Note: 
+An Attr node always returns false for isConnected , even when its ownerElement is connected.
+This is because, even though an attribute is associated with an element via ownerElement , it is not part of the node tree — it has no parent node, and it is its own root node.
+Since isConnected is only true when a node's root is a document, an Attr node is never considered connected.
+
+ Examples 
+
+ Standard DOM 
+
+ A standard DOM example:
+
+ js 
+ let test = document.createElement("p");
+console.log(test.isConnected); // Returns false
+document.body.appendChild(test);
+console.log(test.isConnected); // Returns true
+
+ Shadow DOM 
+
+ A shadow DOM example:
+
+ js 
+ // Create a shadow root
+const shadow = this.attachShadow({ mode: "open" });
+
+// Create some CSS to apply to the shadow DOM
+const style = document.createElement("style");
+console.log(style.isConnected); // returns false
+
+style.textContent = `
+.wrapper {
+ position: relative;
+}
+
+.info {
+ font-size: 0.8rem;
+ width: 200px;
+ display: inline-block;
+ border: 1px solid black;
+ padding: 10px;
+ background: white;
+ border-radius: 10px;
+ opacity: 0;
+ transition: 0.6s all;
+ positions: absolute;
+ bottom: 20px;
+ left: 10px;
+ z-index: 3
+}
+`;
+
+// Attach the created style element to the shadow DOM
+
+shadow.appendChild(style);
+console.log(style.isConnected); // Returns true
+
+ Specifications 
+
+ Specification
+
+ DOM 
+# ref-for-dom-node-isconnected① 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Jun 15, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Document Object Model (DOM) 
+ Node 
+ Instance properties baseURI 
+ childNodes 
+ firstChild 
+ isConnected 
+ lastChild 
+ nextSibling 
+ nodeName 
+ nodeType 
+ nodeValue 
+ ownerDocument 
+ parentElement 
+ parentNode 
+ previousSibling 
+ textContent 
+
+ Instance methods appendChild() 
+ cloneNode() 
+ compareDocumentPosition() 
+ contains() 
+ getRootNode() 
+ hasChildNodes() 
+ insertBefore() 
+ isDefaultNamespace() 
+ isEqualNode() 
+ isSameNode() 
+ lookupNamespaceURI() 
+ lookupPrefix() 
+ normalize() 
+ removeChild() 
+ replaceChild() 
+
+ Events selectstart 
+
+ Inheritance EventTarget 
+
+ Related pages for DOM AbortController 
+ AbortSignal 
+ AbstractRange 
+ Attr 
+ CDATASection 
+ CharacterData 
+ Comment 
+ CustomEvent 
+ DOMError 
+ DOMException 
+ DOMImplementation 
+ DOMParser 
+ DOMTokenList 
+ Document 
+ DocumentFragment 
+ DocumentType 
+ Element 
+ Event 
+ EventTarget 
+ HTMLCollection 
+ MutationObserver 
+ MutationRecord 
+ NamedNodeMap 
+ NodeIterator 
+ NodeList 
+ ProcessingInstruction 
+ QuotaExceededError 
+ Range 
+ ShadowRoot 
+ StaticRange 
+ Text 
+ TreeWalker 
+ XMLDocument 
+ XPathEvaluator 
+ XPathExpression 
+ XPathResult 
+ XSLTProcessor 
+
+ Guides Anatomy of the DOM 
+ Attribute reflection 
+ Selection and traversal on the DOM tree 
+ Building and updating the DOM tree 
+ Working with events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

@@ -8,6 +8,7 @@ import {
   ProjectStateEngine,
   ProjectForkService,
   DiscoveryTurnStore,
+  StateCommitManager,
 } from '../src/index.js';
 
 describe('ProjectForkService Unit Tests', () => {
@@ -27,6 +28,13 @@ describe('ProjectForkService Unit Tests', () => {
     await rm(tempBaseDir, { recursive: true, force: true });
   });
 
+  it('derives an omitted fork name from the exact verified snapshot metadata', async () => {
+    const sourcePath = guard.resolveProjectPath('default-name-source');
+    await engine.createProject({ projectId: 'default-name-source', projectPath: sourcePath, name: '来源快照名称', idea: '保留原名' });
+    const fork = await ProjectForkService.forkProject({ sourcePath, newProjectId: 'default-name-fork', storage, guard, engine });
+    expect(fork.snapshot.metadata.name).toBe('来源快照名称 (副本)');
+  });
+
   it('atomically forks project, rewrites all state file projectIds, resets readiness, and injects forkedFrom', async () => {
     const sourceProjectId = 'source-project';
     const sourcePath = guard.resolveProjectPath(sourceProjectId);
@@ -34,19 +42,19 @@ describe('ProjectForkService Unit Tests', () => {
     await engine.createProject({
       projectId: sourceProjectId,
       projectPath: sourcePath,
-      projectName: 'Source App',
+      name: 'Source App',
       idea: 'A source project for forking',
     });
 
-    // Simulate an approved readiness disposition
+    // A real Core commit preserves the approval in the source revision.
     const readyPath = join(sourcePath, 'state', 'readiness.json');
     const readyData = await storage.readJson<any>(readyPath);
-    readyData.current = {
+    readyData.current = { ...readyData.current,
       userDisposition: 'approved',
       userApprovedAt: new Date().toISOString(),
       approvedBy: 'architect',
     };
-    await storage.writeJson(readyPath, readyData);
+    await new StateCommitManager(storage).commit(sourcePath, 2, { readiness: readyData }, 1);
 
     const turnStore = new DiscoveryTurnStore(storage);
     await turnStore.appendTurn(sourcePath, {
@@ -106,12 +114,13 @@ describe('ProjectForkService Unit Tests', () => {
     expect(forkedReadiness.current.userDisposition).toBe('pending');
     expect(forkedReadiness.current.userApprovedAt).toBeUndefined();
 
-    const forkedTurns = await new DiscoveryTurnStore(storage).loadTurns(targetDir);
+    expect(await new StateCommitManager(storage).verifySnapshot(targetDir, 3)).toBe(true);
+    expect(await new StateCommitManager(storage).verifySnapshot(targetDir, 2)).toBe(true);
+    expect(await new DiscoveryTurnStore(storage).loadTurns(targetDir)).toEqual([]);
+    const transfers = await storage.listFiles(join(targetDir, 'history', 'transfers'));
+    const forkedTurns = await new DiscoveryTurnStore(storage).loadTurns(join(targetDir, 'history', 'transfers', transfers[0]!));
     expect(forkedTurns).toHaveLength(1);
-    expect(forkedTurns[0]).toMatchObject({
-      projectId: newProjectId,
-      status: 'cancelled',
-    });
+    expect(forkedTurns[0]).toMatchObject({ projectId: sourceProjectId, status: 'running' });
 
     // Verify original source project is unchanged
     const originalSnap = await engine.getSnapshot(sourcePath);
@@ -124,7 +133,7 @@ describe('ProjectForkService Unit Tests', () => {
     await engine.createProject({
       projectId: sourceProjectId,
       projectPath: sourcePath,
-      projectName: 'Source Exist',
+      name: 'Source Exist',
       idea: 'Test',
     });
 
@@ -134,7 +143,7 @@ describe('ProjectForkService Unit Tests', () => {
     await engine.createProject({
       projectId: existingTargetId,
       projectPath: existingTargetPath,
-      projectName: 'Target Collide',
+      name: 'Target Collide',
       idea: 'Collision',
     });
 

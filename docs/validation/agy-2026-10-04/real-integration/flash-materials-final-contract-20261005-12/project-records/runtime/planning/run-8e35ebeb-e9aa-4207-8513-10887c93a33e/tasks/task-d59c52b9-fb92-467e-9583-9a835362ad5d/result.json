@@ -1,0 +1,37 @@
+{
+  "blockers": [
+    "【M4 接口与时序缺口】InputController.bindInputNode 缺少节点监听解绑/清理契约（缺少 unbindInputNode 或监听句柄清理持有权），同节点重复绑定未保证幂等或安全解绑；AppController.init 初始化装配存在时序逻辑缺陷：在阶段 4 调用 InputController.focusInput()，但此时 activeInputNode 尚未在阶段 5 原子提交（仍为 null），导致首屏聚焦静默失效；且 init 失败清理逻辑仅解绑了清空按钮，未解绑 initialInputNode 上的 input/composition 监听，重试会导致双重监听与双重 schedule。受影响区块：blk-tech-module, blk-tech-interface, blk-tech-data-model, blk-flow-input-display, blk-deliv-task-package。依据：rawInputs/12（M4 质量反馈）。",
+    "【M6 严重回滚失败闭包缺口】FeedbackBanner.showGlobalError 契约当前返回 void 且未捕获动态创建/挂载异常，存在未捕获抛错及在 window.onerror 下无限递归风险，需改为内部捕获并返回 boolean 标识是否真实送达；ResetController 严重回滚失败时草稿仅存在于方法局部变量，缺少明确的内存恢复状态所有权（如 ResetController.recoveryDraft）和可调用的恢复重试入口（禁止刷新、不承诺跨刷新）；只读 textarea 仅在挂载成功时承诺手动复制，挂载与通知皆失败时诚实标记为内存保留、显示不可用，不得以 console 伪装用户可见交互。受影响区块：blk-tech-module, blk-tech-interface, blk-tech-data-model, blk-tech-error, blk-deliv-task-error-handling。依据：rawInputs/12（M6 质量反馈）。",
+    "【M7 验收场景与严重回滚契约冲突】blk-deliv-acc-security-edge Scenario 4 宣称任意 DOM/脚本异常后输入框草稿完好保留且开发者可直接微调，与 blk-tech-error E04 中严重回插失败（原节点脱离、主编辑器暂时受限、需降级至只读 textarea 复制取回）的契约相冲突。需局部同步区分普通非破坏性异常与严重回滚失败三个诚实分支（只读挂载成功手动复制 / 挂载失败提示内存保留 / 连通知失败诚实标记），不承诺主编辑器完全恢复。受影响区块：blk-deliv-acc-security-edge, blk-tech-error。依据：rawInputs/12（M7 关联闭包同步要求）。",
+    "【规划运行环境与平台实测边界限制】规划运行环境 Docker API 不可用（failed to connect to docker daemon），外部网络请求受限（fetch failed）；目标前端应用程序尚未编写开发，所有关于 Chrome/Edge/Firefox/Safari 真实浏览器环境下的原生 IME 尾随事件重定向、原生焦点/辅助技术行为及 5 轮性能均值打点测量在规划期均保持 unexecuted，不得把静态/合成推导冒充浏览器实测通过。受影响区块：blk-deliv-val-standalone-runtime, blk-deliv-val-perf-benchmark, blk-deliv-val-security-xss-audit。依据：environment_prepare 真实执行结果与 rawInputs/12 平台验证约束。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用户原始需求与边界约束依据：明确为纯前端单页面本地原型核对工具，文字说明定义行为，截图仅作布局参考，无需服务端与登录协作，失败保留输入且空值有提示。",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-126af0ab-0e6e-48a2-9abe-226de8d5fd5f",
+      "kind": "material",
+      "location": "D:\\Temp\\User\\pa-quality-copy-A7Ubqe\\materials\\inputs\\inp-01\\source.txt",
+      "obtainedAt": "2026-10-05T12:53:12.081Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "参考截图真实像素与视觉布局映射依据：白底、上方文本、下方左矩形与右圆形。文字负责行为，示例文字“Q7M4-8261”不构成固定业务项目名。经已批准变更，左侧确认按钮剔除，右侧橙色圆形对应清空按钮。",
+      "content": "通过原生 view_file 打开并完整审视注册路径 fixture.png 的实际像素：图像为纯白底色，上方偏左位置为黑色大字文本“Q7M4-8261”；下方排布两个几何色块，左侧为一个蓝色水平长方形（矩形），右侧为一个橙色实心正圆形。空间结构对应顶部展示区、底部操作区；按用户文字要求，文字负责行为，截图仅作为布局排布参考，不将图中示例字符固定为业务需求。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-bc9be7a0-a631-45df-8273-d63fde3832c5",
+      "kind": "material",
+      "location": "D:\\Temp\\User\\pa-quality-copy-A7Ubqe\\materials\\inputs\\inp-1791129999124\\fixture.png",
+      "obtainedAt": "2026-10-05T12:53:21.787Z",
+      "outcome": "passed",
+      "source": "material:input:inp-1791129999124"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "已通过 material_index、material_read 与原生 view_file 工具完整审阅用户原始需求材料 input:inp-01 及注册截图 fixture.png（SHA256: 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0）的真实像素。确认原始约束为轻量纯前端单页面本地原型核对，文字负责行为，原图仅作布局参考，图中的示例文字“Q7M4-8261”不构成固定业务需求；核心验收为 300ms 实时展示、空值警示与失败保留输入。结合最新质量验收反馈（rawInputs/12）独立分析，识别出三项具体技术契约缺陷：1. M4 接口与时序缺口：InputController 缺少节点监听解绑契约（unbindInputNode），AppController.init 在 activeInputNode 提交前调用 focusInput() 导致首屏聚焦静默失效，且 init 失败清理未解绑输入框监听引发重试时双重监听；2. M6 严重回滚失败闭包缺口：showGlobalError 缺少内部异常捕获与 boolean 返回值，严重失败草稿缺少明确内存状态所有权（ResetController.recoveryDraft）和恢复重试入口，只读容器挂载与通知皆失败时需诚实标记为内存保留、显示不可用；3. M7 blk-deliv-acc-security-edge Scenario 4 泛化宣称任意错误均保持主输入框可微调，与严重回插失败主编辑器受限需降级至只读 textarea 复制取回的契约冲突，需细化同步。当前规划环境 Docker API 未就绪、外部网络受限，目标应用尚未实现，跨平台真实浏览器/IME/无障碍测试保持 unexecuted，不冒充已实测。所有建议与具体缺口已如实记录为 blockers，交由整合任务处理，不越权修改正式项目或生成 groups。"
+}

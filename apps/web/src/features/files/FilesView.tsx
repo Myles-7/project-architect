@@ -4,9 +4,6 @@ import {
   FileText,
   Image as ImageIcon,
   Plus,
-  CheckCircle2,
-  AlertCircle,
-  AlertTriangle,
   Search,
   Eye,
   EyeOff,
@@ -19,7 +16,12 @@ import { ConflictModal } from '../../components/common/ConflictModal.js';
 import { EmptyState } from '../../components/common/EmptyState.js';
 import { useToast } from '../../components/common/Toast.js';
 import { ApiClientError } from '../../api/client.js';
-import type { InputRef, InputMaterialKind } from '@project-architect/contracts';
+import type { InputRef, InputMaterialKind, DecisionStatus, InputMaterialStatus } from '@project-architect/contracts';
+import { materialFailureMessage } from './materialUploads.js';
+import { MaterialStatusNotice } from './MaterialStatusNotice.js';
+
+const decisionStatusLabels: Record<DecisionStatus, string> = { candidate: '候选待确认', confirmed: '已确认', locked: '已锁定', superseded: '已替代', rejected: '已拒绝', deprecated: '已停用' };
+const materialStatusLabels: Record<InputMaterialStatus, string> = { saved: '已保存', processing: '处理中', ready: '可读取', used: '已使用', failed: '处理失败', excluded: '已排除' };
 
 export const FilesView: React.FC = () => {
   const { state, apiClient, refreshSnapshot } = useProjectSession();
@@ -95,6 +97,8 @@ export const FilesView: React.FC = () => {
 
       await refreshSnapshot();
       setSelectedInputId(res.inputRef.id);
+      const extractionFailure = materialFailureMessage(res.inputRef);
+      if (extractionFailure) throw new Error(extractionFailure);
       success(`已成功挂载输入材料: ${filename}`, '材料挂载成功');
     } catch (err: any) {
       if (err instanceof ApiClientError && err.statusCode === 409) {
@@ -144,24 +148,28 @@ export const FilesView: React.FC = () => {
   const handleRetryExtract = async () => {
     if (!activeProjectId) return;
     try {
-      await refreshSnapshot();
-      success('已触发重新提取并同步状态', '重试完成');
+      const latest = await refreshSnapshot();
+      if (!latest) { error('无法读取最新材料状态', '刷新失败'); return; }
+      const input = latest.metadata.inputRefs.find(item => item.id === selectedInput?.id);
+      const extractionFailure = input ? materialFailureMessage(input) : null;
+      if (extractionFailure) error(extractionFailure, '提取仍未成功');
+      else success('已读取最新材料状态', '状态已刷新');
     } catch (err: any) {
       error(err.message || '重试提取失败', '操作受阻');
     }
   };
 
   return (
-    <div className="max-w-4xl w-full mx-auto space-y-6">
+    <div className="workspace-materials max-w-5xl w-full mx-auto space-y-6">
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+          <p className="planning-eyebrow">PROJECT MATERIALS</p><h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
             <Paperclip className="w-4 h-4 text-orange-500" />
             <span>输入材料与附件 ({inputRefs.length})</span>
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            受 Workspace 边界保护的安全文档与原型素材
+            添加想法、文档与设计参考，查看可读状态和使用情况。
           </p>
         </div>
 
@@ -194,7 +202,7 @@ export const FilesView: React.FC = () => {
                 placeholder="搜索材料..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-surface-card border border-border-subtle rounded-xl text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
@@ -202,7 +210,7 @@ export const FilesView: React.FC = () => {
               {filteredInputs.map((item) => {
                 const isSelected = selectedInput?.id === item.id;
                 const isImage = item.kind === 'image';
-                const isAvailable = item.analysisAvailability === 'available';
+                const isAvailable = item.analysisAvailability === 'available' && item.status !== 'failed';
 
                 return (
                   <div
@@ -211,7 +219,7 @@ export const FilesView: React.FC = () => {
                     className={`p-3 rounded-xl border transition-all cursor-pointer space-y-1.5 ${
                       isSelected
                         ? 'border-orange-500 bg-orange-50/30 dark:bg-orange-950/20 shadow-2xs'
-                        : 'border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#17181D] hover:border-zinc-300 dark:hover:border-zinc-700'
+                        : 'border-border-subtle bg-surface-card hover:border-border-default'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -221,20 +229,20 @@ export const FilesView: React.FC = () => {
                         ) : (
                           <FileText className="w-4 h-4 text-orange-500 shrink-0" />
                         )}
-                        <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                        <span className="text-xs font-semibold text-text-primary truncate">
                           {item.label}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-zinc-400 shrink-0">
+                      <span className="text-xs font-mono text-text-muted shrink-0">
                         {item.id}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px]">
+                    <div className="flex items-center justify-between text-xs">
                       <span
-                        className={`inline-flex items-center gap-1 font-medium px-1.5 py-0.2 rounded ${
+                        className={`inline-flex items-center gap-1 font-medium px-1.5 py-0.5 rounded ${
                           item.status === 'excluded'
-                            ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500'
+                            ? 'bg-surface-subtle text-text-muted'
                             : isAvailable
                             ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300'
                             : 'bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300'
@@ -242,11 +250,13 @@ export const FilesView: React.FC = () => {
                       >
                         {item.status === 'excluded'
                           ? '已排除上下文'
+                          : item.status === 'failed'
+                          ? '提取失败 · 原件保留'
                           : isAvailable
                           ? '可参与分析'
                           : '仅归档保存'}
                       </span>
-                      <span className="text-zinc-400">{new Date(item.createdAt).toLocaleDateString()}</span>
+                      <span className="text-text-muted">{new Date(item.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 );
@@ -257,10 +267,10 @@ export const FilesView: React.FC = () => {
           {/* Right: Selected Material Detail & Analysis Capability */}
           <div className="md:col-span-7">
             {selectedInput ? (
-              <div className="p-5 rounded-2xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs space-y-4">
-                <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
+              <div className="p-5 rounded-2xl bg-surface-card border border-border-subtle shadow-elevation-card space-y-4">
+                <div className="flex items-center justify-between border-b border-border-subtle pb-3">
                   <div className="space-y-0.5">
-                    <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                    <h3 className="text-sm font-bold text-text-primary">
                       {selectedInput.label}
                     </h3>
                     <div className="text-[11px] font-mono text-zinc-400">
@@ -277,7 +287,7 @@ export const FilesView: React.FC = () => {
                       onRetryExtract={handleRetryExtract}
                     />
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                      className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase ${
                         selectedInput.status === 'ready' || selectedInput.status === 'used'
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
                           : selectedInput.status === 'failed'
@@ -285,7 +295,7 @@ export const FilesView: React.FC = () => {
                           : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
                       }`}
                     >
-                      {selectedInput.status}
+                      {materialStatusLabels[selectedInput.status]}
                     </span>
                   </div>
                 </div>
@@ -293,69 +303,39 @@ export const FilesView: React.FC = () => {
                 {/* Extraction Capability & Stats Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
                   <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                    <div className="text-zinc-400">实际提取字符数</div>
+                    <div className="text-zinc-400">摘要字符数</div>
                     <div className="font-semibold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">
                       {selectedInput.summary ? `${selectedInput.summary.length} 字符` : '0 字符'}
                     </div>
                   </div>
                   <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                    <div className="text-zinc-400">截断状态</div>
-                    <div className="font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                      完整未截断
+                    <div className="text-zinc-400">材料可用性</div>
+                    <div className="font-semibold text-zinc-800 dark:text-zinc-200 mt-0.5">
+                      {selectedInput.status === 'failed' ? '提取失败' : selectedInput.status === 'excluded' ? '已排除' : selectedInput.analysisAvailability === 'available' ? '文本可读取' : selectedInput.kind === 'image' ? '图片按需读取' : '仅归档'}
                     </div>
                   </div>
                   <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                    <div className="text-zinc-400">引用决策事实</div>
+                    <div className="text-zinc-400">关联决定记录</div>
                     <div className="font-semibold text-zinc-800 dark:text-zinc-200 mt-0.5">
                       {referringDecisions.length} 项
                     </div>
                   </div>
                   <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/60 dark:border-zinc-800/60">
-                    <div className="text-zinc-400">关联推演轮次</div>
-                    <div className="font-semibold text-purple-600 dark:text-purple-400 mt-0.5">
-                      Turn 1
+                    <div className="text-zinc-400">来源轮次</div>
+                    <div className="font-semibold text-zinc-800 dark:text-zinc-200 mt-0.5">
+                      {selectedInput.clientTurnId || '未记录'}
                     </div>
                   </div>
                 </div>
 
                 {/* Capability Honesty Notice */}
-                {selectedInput.kind === 'image' ? (
-                  <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold">
-                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span>图片附件分析声明</span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed">
-                      该素材为原型图片。已安全保存至项目的本地存储目录中，但当前本地模型不支持多模态视觉理解，未执行视觉内容提取。
-                    </p>
-                  </div>
-                ) : selectedInput.status === 'failed' ? (
-                  <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-xs text-red-900 dark:text-red-200 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold">
-                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-                      <span>解析提取失败</span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed">
-                      {selectedInput.errorMessage || '文件编码或格式无法正确读取，已跳过解析。'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/60 text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>已就绪并注入分析上下文</span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed">
-                      文本内容已包含在 Discovery 推演上下文中，供 Agent 提炼业务边界与决策事实。
-                    </p>
-                  </div>
-                )}
+                <MaterialStatusNotice input={selectedInput} />
 
                 {/* Summary / Extracted content */}
                 {selectedInput.summary && (
                   <div className="space-y-1.5 pt-2">
                     <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                      材料摘要与提取事实
+                      材料内容摘要
                     </div>
                     <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed font-mono">
                       {selectedInput.summary}
@@ -372,12 +352,14 @@ export const FilesView: React.FC = () => {
                       ) : (
                         <Eye className="w-3.5 h-3.5 text-emerald-500" />
                       )}
-                      <span>推演分析上下文注入</span>
+                      <span>用于 AI 规划</span>
                     </div>
                     <div className="text-[11px] text-zinc-500">
                       {selectedInput.status === 'excluded'
                         ? '当前已主动排除，AI 推演时不注入此材料内容'
-                        : '当前已纳入分析，AI 推演时将作为事实输入'}
+                        : selectedInput.status === 'failed'
+                        ? '提取失败，当前不会将此材料内容用于规划'
+                        : '规划任务可按需读取，提炼的建议仍需用户确认'}
                     </div>
                   </div>
                   <button
@@ -398,11 +380,11 @@ export const FilesView: React.FC = () => {
                 <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                   <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
                     <Link className="w-3.5 h-3.5 text-orange-500" />
-                    <span>引用此材料的确立决策 ({referringDecisions.length})</span>
+                    <span>引用此材料的决定记录 ({referringDecisions.length})</span>
                   </div>
                   {referringDecisions.length === 0 ? (
                     <div className="text-xs text-zinc-400 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-                      暂无已确立决策溯源此参考材料（当回答问题或确立架构选择溯源此素材时将在此展示）。
+                      暂无决定记录引用此材料。候选与已确认记录会分别标明状态。
                     </div>
                   ) : (
                     <div className="space-y-1.5">
@@ -415,11 +397,11 @@ export const FilesView: React.FC = () => {
                             <div className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
                               {d.statement}
                             </div>
-                            <div className="text-[10px] font-mono text-zinc-400 mt-0.5">
-                              {d.decisionKey} · 状态: {d.status}
+                            <div className="text-xs font-mono text-zinc-400 mt-0.5">
+                              {d.decisionKey} · {decisionStatusLabels[d.status]}
                             </div>
                           </div>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-950/80 text-orange-700 dark:text-orange-300 shrink-0">
+                          <span className="text-xs font-mono px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-950/80 text-orange-700 dark:text-orange-300 shrink-0">
                             {d.area}
                           </span>
                         </div>

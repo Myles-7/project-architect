@@ -1,0 +1,123 @@
+{
+  "id": "run-c0db49e0-1a0c-42d1-8771-8a8ee2cd2a83",
+  "projectId": "proj-1791129999032",
+  "stage": "feedback",
+  "basis": {
+    "revision": 26,
+    "hash": "2f1fe6ea3cf09561ed1f5b76f5580fde37ac77b6b8e7dca8bc5a91b8acb328ad"
+  },
+  "operationId": "real-flash-materials-quality-20261005-06-feedback-1791155296698",
+  "request": {
+    "stage": "feedback",
+    "expectedRevision": 25,
+    "operationId": "real-flash-materials-quality-20261005-06-feedback-1791155296698",
+    "feedback": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。核对对象是 flash-materials-quality-publish-20261005-04 的真实 sourceRevision 24 蓝图和 quality-reviewed-r2 开发包，独立证据为 MATERIALS_R2_CORE_INDEPENDENT_REVIEW.md 与 ime-contract-counterexample.json。此前 sourceRevision 20 继承包不代表最新设计，不得用其旧问题覆盖已经正确的 r2 修订。\n\n已经正确并应完整保留：即时单按钮清空、300ms实时展示、旧结果在手动删空时清除、纯空格原文保留、失败保留输入、经典脚本/IIFE与textContent、无确认按钮和Enter专属提交、前台测量、五轮均值唯一边界、明确8080参数和npx首次联网前提、十文件与真实任务DAG、原图SHA256和实际查看记录、历史证据及当前安全边界说明。保持30个当前有效块的稳定ID，仅修改下列两点及其真实相关契约；不要重写已有目标、范围、无关页面或正确的任务细节。普通实现继续委托AI，不新增用户选择题。当前目标应用尚未开发，任何未来浏览器或性能测试仍未执行。\n\n1. 输入法清空后迟到input的契约仍未闭合。blk-tech-interface 当前三个实际事件回调中，compositionend会检查currentSessionToken与activeSessionId，但input仅检查!isComposing && !e.isComposing，完全没有作废会话边界。用原始导出回调执行的合成VM允许：compositionstart→清空（activeSessionId递增、isComposing=false、value=''）→旧compositionend被拒绝→迟到noncomposing input仍schedule→300ms后新造空值错误；如果原生事件已经将旧草稿写回DOM，则又可展示旧文字。这是实际契约的合成反例，不是已经复现的原生浏览器/IME故障。\n\n请拟定可直接指导开发的最小一致策略，覆盖清空时作废输入会话以及相关input/beforeinput/composition尾随事件，不只在compositionend加一次令牌检查。策略需要说明事件如何关联已作废会话、新用户输入怎样恢复正常防抖、何时读取DOM或已接受草稿，以及旧事件对value的写回怎样隔离或恢复。可以选择明确的输入节点生命周期隔离（新节点/旧节点generation与event.target检查）、会话状态机与新输入意图边界，或其他具有具体可观察行为的方案；不要求特定技术，但不能声称普通InputEvent自带应用自增令牌，也不能用单个全局currentSessionToken证明任意旧事件身份。同步data_model、interface、error、相关flow/page、实现任务、验证与验收。保留新真实键入/粘贴/新中文组合输入可正常开始新300ms调度，不能以永远拒绝后续input规避问题。写清“旧会话尾随事件”和“新的用户输入”测试序列；原生IME、浏览器差异及无法在当前环境确认的顺序列为开发阶段实际验证，不写100%或彻底杜绝所有原生竞态的无证据承诺。复用已有官方证据，不重复启动已不可用Docker。\n\n2. 清空性能口径仍有残留。blk-deliv-val-perf-benchmark.passCriteria 写“清空重置渲染耗时”，但其steps测click事件起始→requestAnimationFrame重绘前回调，这只能是清空处理与重绘前调度的代理指标。将该指标在content、goal、normalBehavior、scope、verification、completionCriteria、steps、passCriteria和关联outcomes/acceptance中统一为准确名称，起止一致，保留五轮均值<=50ms及待验证状态，不声称physical paint或用户实际看见已经测得。DOM就绪和输入防抖的五轮均值标准已闭合，不擅自改次数或阈值。目标应用未实现，不能把合成回调测试或官方研究写成目标应用的性能实测通过。\n\n当前sourceRevision24中9个无关块及原23条历史证据经过独立完整对象比较未变；继续保持它们原样，不覆盖、改写或删除。START_HERE由实际compiler按DAG编译，不生成伪前置试验，不修改已经正确的依赖来绕过模板。\n\n独立评审需直接检查最新候选的有效视图并逐项比较上述可执行事件契约；blockers=[]不代表合成反例或原生待验证问题已自动解决。最后仍经公开Core审批（自动验收记录，不冒称真人批准），新版本本地编译；不要自行编辑正式文件或旧收据。\n"
+  },
+  "effectiveConfig": {
+    "concurrency": 4,
+    "designModel": "gemini-3.8-flash-high",
+    "reviewModel": "gemini-3.8-flash-high",
+    "officialHosts": [
+      "antigravity.google",
+      "www.antigravity.google",
+      "modelcontextprotocol.io",
+      "ts.sdk.modelcontextprotocol.io",
+      "nodejs.org",
+      "docs.docker.com",
+      "docs.python.org",
+      "playwright.dev",
+      "react.dev",
+      "www.typescriptlang.org",
+      "vite.dev",
+      "expressjs.com",
+      "developer.mozilla.org",
+      "www.w3.org",
+      "www.rfc-editor.org",
+      "docs.github.com",
+      "docs.anthropic.com",
+      "ai.google.dev"
+    ]
+  },
+  "status": "reviewable",
+  "tasks": [
+    {
+      "id": "task-a72f2869-4fbe-4520-8f39-de8981fb0ebb",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "2f1fe6ea3cf09561ed1f5b76f5580fde37ac77b6b8e7dca8bc5a91b8acb328ad",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:08:16.958Z",
+      "completedAt": "2026-10-04T23:11:38.265Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-a72f2869-4fbe-4520-8f39-de8981fb0ebb/result.json",
+      "outputHash": "9b1d94fac6f0dbfd1933348531f3661e3592a4e5cb1d9bfe47479f87dc097341"
+    },
+    {
+      "id": "task-2e062e90-ed79-4359-96ab-ffc75c3e9630",
+      "kind": "research",
+      "goal": "独立分析材料中的约束、异常使用场景与可行性风险；只返回证据和建议。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "2f1fe6ea3cf09561ed1f5b76f5580fde37ac77b6b8e7dca8bc5a91b8acb328ad",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:08:17.035Z",
+      "completedAt": "2026-10-04T23:09:43.170Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-2e062e90-ed79-4359-96ab-ffc75c3e9630/result.json",
+      "outputHash": "2f4fe1970c7115e312b81054807756f45b78b4779944012331f9c03048d713c1"
+    },
+    {
+      "id": "task-5bc4d5e7-0602-41d5-b7ca-8bc3ee5316a8",
+      "kind": "integration",
+      "goal": "整合当前工作者产物，交付本阶段完整、自洽的待批准变更包。",
+      "dependsOn": [
+        "task-a72f2869-4fbe-4520-8f39-de8981fb0ebb",
+        "task-2e062e90-ed79-4359-96ab-ffc75c3e9630"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "2f1fe6ea3cf09561ed1f5b76f5580fde37ac77b6b8e7dca8bc5a91b8acb328ad",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:11:38.336Z",
+      "completedAt": "2026-10-04T23:13:56.252Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-5bc4d5e7-0602-41d5-b7ca-8bc3ee5316a8/result.json",
+      "outputHash": "6934ec7828c9485676c7ac2b7c216a108b5747f47b00bf7005322c6828dc90f4"
+    },
+    {
+      "id": "task-d85a3227-f50b-43ea-a495-53846884d38f",
+      "kind": "review",
+      "goal": "独立检查最新草案与证据，返回具体阻塞；只有全部满足时 blockers=[]。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "2f1fe6ea3cf09561ed1f5b76f5580fde37ac77b6b8e7dca8bc5a91b8acb328ad",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:13:56.340Z",
+      "completedAt": "2026-10-04T23:14:59.154Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-d85a3227-f50b-43ea-a495-53846884d38f/result.json",
+      "outputHash": "1efd58e9dda78e182c7e2eef196bf31908ded70b89b4d0738319f237ba29852b"
+    }
+  ],
+  "createdAt": "2026-10-04T23:08:16.855Z",
+  "updatedAt": "2026-10-04T23:14:59.270Z",
+  "pendingQuestions": [],
+  "nextEventSeq": 17,
+  "progressSignatures": [
+    "fcd3b55339bfa2b83ac79ad977005bc88aa7511d21e39755922b33a6822bbf8b"
+  ],
+  "deferredQuestions": [],
+  "unfinishedBlockIds": [],
+  "summary": "本轮依据自动质量验收反馈（input:f1b903e2-8899-458d-a8cb-d51d9626df64）完成受影响契约的精确修订与闭合：\n1. 输入会话全链路隔离与尾随事件守卫：拟定最小一致性会话状态机（sessionState: 'idle' | 'active' | 'quarantined'）与代际计数（inputGeneration/activeSessionId）。清空时进入 quarantined 隔离态，第一优先级销毁防抖任务，强制重置 DOM value 与受信任草稿 lastAcceptedDraft 为 ''；拦截并静默丢弃所有来自旧会话的迟到 compositionend、beforeinput 及尾随 input 事件，若 DOM 被旧事件写回则立即纠正为 ''，彻底杜绝清空后制造虚假空值报错与幽灵回显；当检测到真实物理输入意图（物理 keydown、paste 或新 compositionstart）时，自动解除隔离恢复 active 状态，接纳后续合法 input 顺畅启动 300ms 防抖倒计时。明确了旧会话尾随事件与新用户输入的两个可观察测试序列，将原生 IME/浏览器差异如实列为开发阶段真机实测用例，不作无证据绝对承诺。\n2. 统一清空性能口径：将清空响应指标在 product outcomes、delivery validation、acceptance 及任务全部字段（content、goal、normalBehavior、scope、verification、completionCriteria、steps、passCriteria）中统一命名为“清空重置至重绘前调度延迟（Reset to Pre-repaint Dispatch Latency）”，测量端点严格闭合为清空按钮 click 事件触发至 requestAnimationFrame 重绘前回调，统一保持 5 轮冷测试均值 <= 50ms 的唯一通过边界，明确作为重绘前调度的代理指标，不宣称物理像素可见绘制已测得，当前目标应用未实现如实标为 unexecuted。\n3. 严格保持基准方案完整性：全部 30 个块 ID 稳定对应，未修改的 15 个无关块继续由正式蓝图提供，不重复生成，所有决策、原图证据与任务 DAG 关系保持完全一致。",
+  "clarification": null,
+  "changeSetId": "change-c0db49e0-1a0c-42d1-8771-8a8ee2cd2a83-delivery-0"
+}

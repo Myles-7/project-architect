@@ -50,21 +50,22 @@ describe('V1 Readiness Gate & Documents Security Tests', () => {
         disposition: 'approved',
         expectedRevision: 1,
       })
-      .expect(422);
+      .expect(410);
 
     expect(approveRes.body.success).toBe(false);
-    expect(approveRes.body.error.code).toBe('READINESS_NOT_APPROVED');
+    expect(approveRes.body.error.code).toBe('LEGACY_WORKFLOW_RETIRED');
 
     // 3. Attempt to generate documents directly -> must be rejected with 422
     const genRes = await request(app)
       .post(`/api/projects/${projectId}/documents/generate`)
       .send({
         expectedRevision: 1,
+        operationId: 'unapproved-package',
       })
       .expect(422);
 
     expect(genRes.body.success).toBe(false);
-    expect(genRes.body.error.code).toBe('READINESS_NOT_APPROVED');
+    expect(genRes.body.error.code).toBe('STAGE_NOT_APPROVED');
   });
 
   it('P1: documents read endpoint strictly blocks non-registered files (403 ACCESS_DENIED)', async () => {

@@ -1,0 +1,174 @@
+{
+  "blockers": [
+    "官方证据 evidence-react-official 缺少 research_read 获取记录；请真实查证或转为未验证任务。",
+    "官方证据 evidence-vite-official 缺少 research_read 获取记录；请真实查证或转为未验证任务。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "个人开发者随手灵感记录与整理核心诉求",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "id": "evidence-user-input-inp-01",
+      "kind": "user",
+      "location": "inputs/inp-01/source.txt",
+      "obtainedAt": "2026-10-04T22:07:58.067Z",
+      "outcome": "not-applicable",
+      "source": "input:inp-01"
+    },
+    {
+      "applicability": "轻量 Web 单页应用形态边界与非目标限定依据",
+      "content": "确认选择轻量 Web 单页应用（浏览器即开即用），通过浏览器书签或常驻标签页随手记录与整理，依赖浏览器环境开启，不提供系统级全局快捷键。",
+      "id": "evidence-platform-form",
+      "kind": "user",
+      "location": "dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "obtainedAt": "2026-10-04T14:59:10.732Z",
+      "outcome": "not-applicable",
+      "source": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form"
+    },
+    {
+      "applicability": "前端框架选型依据",
+      "content": "React 19 提供现代声明式 UI 与组件化状态流模型，纯客户端单页渲染。",
+      "id": "evidence-react-official",
+      "kind": "official-source",
+      "location": "dec-8550d453-7c29-4076-9673-fc1cee581819",
+      "obtainedAt": "2026-10-04T15:58:45.282Z",
+      "outcome": "not-applicable",
+      "source": "https://react.dev"
+    },
+    {
+      "applicability": "构建工具与工程架构依据",
+      "content": "Vite 提供基于原生 ESM 的快速本地开发服务器与 Rollup 纯静态打包能力。",
+      "id": "evidence-vite-official",
+      "kind": "official-source",
+      "location": "dec-8550d453-7c29-4076-9673-fc1cee581819",
+      "obtainedAt": "2026-10-04T15:58:45.282Z",
+      "outcome": "not-applicable",
+      "source": "https://vite.dev"
+    },
+    {
+      "applicability": "客户端持久化与对象仓库合法索引键类型约束",
+      "content": "W3C IndexedDB 规范规定数据库支持多对象仓库与事务操作。可作为有效键类型的包括 Number, Date, String, Binary, Array；Boolean 不是有效键类型，不能直接建立单键或复合索引。",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-indexeddb-spec",
+      "kind": "official-source",
+      "location": "W3C Indexed Database API 3.0",
+      "obtainedAt": "2026-10-04T16:42:27.318Z",
+      "outcome": "not-applicable",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    },
+    {
+      "applicability": "禁止在布尔字段（isPinned, isFavorite）上声明 IndexedDB 索引，改用内存集合过滤",
+      "content": "Indexed Database API 3.0 Section: A value is said to be a valid key if it is a Number, Date, String, Binary, or Array. Boolean values are NOT valid keys in IndexedDB.",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-w3c-indexeddb-key-types",
+      "kind": "official-source",
+      "location": "W3C IndexedDB 3.0",
+      "obtainedAt": "2026-10-04T16:42:27.318Z",
+      "outcome": "not-applicable",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    },
+    {
+      "applicability": "客户端数据持久化保护依据",
+      "content": "StorageManager.persist() 允许 Web 应用请求持久化存储权限，防止浏览器在存储压力下自动清除本地数据。",
+      "id": "evidence-mdn-storage-persist-api",
+      "kind": "official-source",
+      "location": "MDN Web Docs",
+      "obtainedAt": "2026-10-04T21:19:49.549Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist",
+      "hash": "61e3a1ce74716d1ff6ffe010c45422c4b77e11db823c23e7ee5b0e5b6222f625"
+    },
+    {
+      "applicability": "规划环境容器不可用，将验证移入交付阶段开发验证任务中并标注未验证",
+      "content": "Node.js 运行时受控验证环境准备因 Docker Desktop 守护进程未启动而不可用（failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine）。",
+      "environment": "node:24.13.0-bookworm-slim",
+      "id": "evidence-env-node-docker-unavailable",
+      "kind": "experiment",
+      "location": "local-planning-environment",
+      "obtainedAt": "2026-10-04T22:08:57.000Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-d9169204-1c77-466c-a4cb-38ecc5d5e551"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 用户面临的核心痛点与现状分析\n\n1. **记录启动门槛过高，碎片灵感极易瞬时流失**：\n   - **现状**：现有综合类笔记软件（如 Notion、Obsidian 等）往往体积庞大、启动缓慢，要求用户先选择笔记本、创建层级页面、撰写结构化标题，甚至等待远程云端加载同步。此外，在纯前端 Web SPA 单页应用形态下，受限于浏览器安全沙箱限制，应用无法像原生桌面应用那样提供操作系统全局穿透的全局快捷键唤起。\n   - **影响**：个人开发者在编码或查阅资料时产生的瞬时灵感，若必须经历繁琐的前置交互或页面加载等待，其瞬时火花在数秒内迅速消散，导致用户放弃记录。\n\n2. **零散堆积导致灵感沉没与查找困难**：\n   - **现状**：若退而求其次使用系统记事本、代码临时文件或简单草稿纸，碎片文本迅速膨胀成灾，缺乏标签分类、即时全文模糊检索与状态标记。\n   - **影响**：记录之后极难回顾，碎片线索迅速沦为数字废料，无法在后续开发或思考中形成有效价值输入。\n\n3. **层级文件夹模型带来的认知焦虑与维护负担**：\n   - **现状**：传统的树状文件夹分类要求用户在记录当下就预判其未来归属，分类标准极易模糊与重叠。\n   - **影响**：随手记录伴随着分类决策困难；对于个人开发者而言，维护和整理多级目录的成本甚至远超随手灵感本身的价值。\n\n4. **数据隐私风险、平台格式锁定与误删不可逆**：\n   - **现状**：许多轻量记录工具依赖中心化后端或要求手机号登录，存在商业服务停运下线、数据被窥视或泄漏的风险；且若缺乏回收缓冲保护，误删操作往往直接导致数据永久销毁。\n   - **影响**：用户无法完全拥有自己的灵感资产，缺乏长期安全感；急需一款纯本地存储（IndexedDB）、具备 7 天回收期与安全还原机制、支持标准格式备份导出的极轻量个人工具。",
+          "dependsOn": [
+            "block-target-user-scenarios"
+          ],
+          "evidenceIds": [
+            "evidence-user-input-inp-01"
+          ],
+          "id": "block-problem-fragmented-ideas",
+          "kind": "problem",
+          "requirementIds": [],
+          "stage": "product",
+          "title": "随手灵感碎片化与整理负担痛点"
+        },
+        {
+          "content": "### 本版本明确排除的非目标（Non-Goals）\n\n1. **不做系统级操作系统全局快捷键与后台常驻守护进程**：\n   - 受限于现代 Web 浏览器沙箱安全机制与纯前端轻量 Web 单页应用（SPA）的技术形态，应用不包含原生系统钩子或后台 Daemon，坚决不承诺操作系统级的全局热键唤起；\n   - 快捷键能力仅限定在浏览器窗口处于激活焦点状态下的页面级快捷键（例如按 `N` 聚焦输入框、`/` 激活搜索框、`Ctrl/Cmd + Enter` 保存、`Esc` 取消重置），依赖用户将网页保存在常驻标签页或浏览器书签中即开即用。\n\n2. **不做面向公众群体的多用户系统、远程中心化鉴权与社区发布平台**：\n   - 产品定位仅面向个人开发者本人本地使用，不引入 JWT/OAuth/手机号/邮箱注册登录体系，坚决不做远程数据库强制鉴权、团队权限管理、工作空间共享或多人公开发布社区，保持零服务端依赖的极致轻巧。\n\n3. **不做复杂树形文件夹体系与无限嵌套目录**：\n   - 不设计多级树状目录与文件夹分类树，所有内容完全由扁平便签卡片、多维标签（Tags）与即时模糊检索承接，彻底消除多层级分类的认知与整理负担。\n\n4. **不做重量级富文本 WYSIWYG 排版编辑器**：\n   - 不集成重型富文本编辑器（如复杂表格编辑、富文本绘图画布、视频流插入等），保持编辑器毫秒级极速唤起，聚焦纯文本与行内轻量 Markdown（标题、列表、待办复选框、超链接、代码块语法高亮）的敏捷排版与纯粹输入体验。\n\n5. **不做多人在线实时协同编辑与分布式冲突解决机制**：\n   - 专注单人本地工具属性，不引入 CRDT/OT 复杂的分布式网络协同算法。\n\n6. **不做大体积多媒体二进制云端存储托管**：\n   - 不提供图片/音频/视频的远程云存储上传服务，仅支持纯文本内容及外部超链接。\n\n7. **首版本不做强依赖 Service Worker 的离线重新打开保证（PWA 离线缓存作为演进就绪架构，首版不承诺脱机冷启动）**：\n   - 首版本运行依赖标准 HTTP/HTTPS 静态托管（或本地 localhost）提供初始静态资源的首次加载；首版聚焦保障已加载打开页面后的纯本地断网离线读写与 IndexedDB 持久化，不承诺未配置 Service Worker 缓存时的首次脱机冷启动。",
+          "dependsOn": [
+            "block-scope-core-boundaries"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form"
+          ],
+          "id": "block-non-goals-exclusions",
+          "kind": "non_goals",
+          "requirementIds": [],
+          "stage": "product",
+          "title": "明确的非目标与版本功能边界"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "group-product-foundation-scope",
+      "impact": "明确个人开发者轻量单页应用定位，剔除操作系统级全局快捷键承诺，限定在浏览器获焦快捷键与书签常驻标签使用场景；界定首版已打开页面的本地断网离线操作边界，排除强依赖 Service Worker 离线冷启动与多用户/云端复杂性；同步痛点与非目标定义。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "随手灵感痛点剖析与版本非目标边界修订"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 模块划分与职责解耦设计（规范与契约加固版）\n\n系统划分为高内聚、低耦合的六大核心服务与展现模块：\n\n1. **存储驱动服务模块 (`StorageService`)**：\n   - **职责与索引策略**：基于 Dexie.js 封装原生 IndexedDB 数据库 `SparkNotesDB`。依据 W3C IndexedDB 规范对可索引键类型的官方约束（有效键类型不包含 Boolean，证据 `evidence-w3c-indexeddb-key-types` 与 `evidence-indexeddb-spec`），对象仓库 `notes` 仅对合法有效键建立底层索引：`id, updatedAt, createdAt, status, trashedAt, *tags`；布尔属性 `isPinned` 与 `isFavorite` 绝不声明为底层键索引，查询与排序全部采用内存集合过滤或派生处理，彻底规避非法类型索引错误。\n   - **回收区 7 天生命周期管理与状态精准恢复**：\n     - `trashNote(id)`：移入回收区时，原子记录原状态 `previousStatus = note.status`（精确记录为 `'active'` 或 `'archived'`，彻底杜绝还原时一律恢复为 active 的缺陷），设置 `status = 'trashed'`, `trashedAt = Date.now()`, `updatedAt = Date.now()`。\n     - `restoreNote(id)`：从回收区还原时精准还原为 `previousStatus`（原为归档则恢复归档，原为活跃则恢复活跃），清空 `trashedAt = null`，保留原标签与置顶收藏状态。\n     - `listExpiredTrashedNotes(retentionDays = 7)`：查询 `trashedAt` 距今超 7 天（> 604,800,000 毫秒）的超期便签。\n     - `purgeExpiredTrashedNotes(retentionDays = 7)` 与 `emptyTrash()`：采用 Dexie 读写事务 `db.transaction('rw', db.notes, ...)` 批量彻底物理删除，失败自动整体回滚，不破坏未超期便签。\n   - **原子导入事务与元数据维护**：\n     - `batchImportNotes(notes, mode)`：无论是智能增量合并还是全量覆盖恢复，所有对 `notes` 仓库的清理/写入以及对 `meta` 仓库（更新备份追踪器时间戳与未备份计数归零）的操作，必须在**同一个 Dexie 原子读写事务**内执行完成；写入若遇配额超限或异常，事务原生自动完整回滚，本地现有数据完好保留，严禁使用内存临时快照回写代替原生原子事务。\n   - **乐观并发版本冲突控制**：\n     - `saveNote(note)`：针对浏览器多标签页并发编辑同一便签的场景，在持久化时比对存储中的 `updatedAt` 时间戳；若检测到底层记录已被其他标签页更新（`stored.updatedAt > note.updatedAt`），抛出 `ConcurrentModificationError`，提示用户冲突并保留当前草稿供对比或覆盖，禁止静默覆盖或静默丢失。\n   - **宿主存储感知**：封装 `StorageManager.persist()` 持久化申请与 `estimate()` 配额监控，配额满时抛出受控 `StorageQuotaExceededError`。\n\n2. **便签领域业务模块 (`NoteService`)**：\n   - **职责**：处理便签核心业务逻辑、实体合法性校验与状态机流转。\n   - **编辑状态机与草稿保护**：明确区分【保存并退出】、【继续编辑】与【放弃修改】三条独立路径，**禁止在关闭弹窗或失焦时静默自动保存**；保存失败时拦截关闭弹窗，输入域与编辑框中的草稿 100% 保持在内存与 UI 中，提供就地复制与重试。\n   - **回收区与归档业务流转**：从归档箱提供常规【取消归档】路径（恢复为 active）；在便签移入回收区、还原、归档或清理成功后，原子递增应用未备份变更计数器 `unbackedChangesCount`。\n\n3. **即时检索与高亮引擎 (`SearchEngine`)**：\n   - **职责**：维护内存搜索索引镜像。\n   - **检索作用域隔离**：常规主工作区（全部灵感、已收藏、已归档视图）严格排除处于回收区（`status === 'trashed'`）的便签；回收区专属视图限定在回收区便签集合内检索。\n   - **分词与防抖**：采用 80ms 轻度防抖，中英文模糊子串匹配，正则特殊符号安全转义，生成 `<mark class=\"highlight\">` 黄色安全高亮。\n\n4. **备份管理与数据便携模块 (`BackupManager`)**：\n   - **职责与契约规范**：严格统一备份协议顶层结构契约：统一采用顶层键 `schemaVersion: 1`（杜绝 `version: 1` 与 `schemaVersion: 1` 混用，自导出文件 100% 可自导入）。\n   - **导出能力**：导出 JSON 备份默认包含回收区暂存便签（保留 `previousStatus`、`status` 与 `trashedAt`），同时在界面提供【排除回收区便签】复选框供按需过滤；支持 Markdown 文档导出（默认排除回收区）。\n   - **导入强校验与超期检测**：导入前对文件 JSON 结构、`schemaVersion` 及单条便签必填字段进行强模式校验，非法格式直接拦截报错并终止，零污染；导入后立即触发超期便签检测，若存在超 7 天便签即刻激活侧边栏过期预警点与常驻横幅；变更计数器与备份提醒状态在导入后相应更新。\n\n5. **Markdown 安全解析与渲染模块 (`MarkdownRenderer`)**：\n   - **职责**：基于 marked 编译轻量 Markdown 语法，DOMPurify 执行严格 HTML 白名单 XSS 消毒，Prism.js 执行代码块语法着色，并提供代码块一键安全复制。\n   - **回收区只读保护**：当便签处于回收区时，强制锁定为只读模式，禁用编辑与待办 Checkbox 点击，展示醒目只读警示条。\n\n6. **主工作区交互与展现模块 (`WorkspaceUI`)**：\n   - **职责**：包含顶部操作栏、左侧导航面板、便签流展示区、回收区专属视图（`RecycleBinView`）、便签详情与编辑模态弹窗。\n   - **交互可达性与快捷键规范**：\n     - 坚决移除系统级全局热键承诺，仅在浏览器页面获取焦点时监听键盘事件（`N` 聚焦快速捕获、`/` 激活搜索框、`Ctrl/Cmd + Enter` 提交、`Esc` 关闭/重置）；\n     - 移动端与触控设备全面适配：支持点击/触控直接多选标签交集筛选（不仅依赖键盘 `Ctrl/Cmd`），支持抽屉式导航栏展开与手势滑动；\n     - 常驻回收区超期横幅与二次确认：当存在超 7 天便签时侧边栏点亮琥珀色预警圆点，回收区顶部常驻提示横幅，提供【清空已过期便签】与【一键彻底清空】按钮，单条彻底删除与批量清空必须经模态二次确认弹窗防误触。",
+          "dependsOn": [
+            "tech-core-architecture"
+          ],
+          "evidenceIds": [
+            "evidence-react-official",
+            "evidence-vite-official",
+            "evidence-indexeddb-spec",
+            "evidence-w3c-indexeddb-key-types",
+            "evidence-mdn-storage-persist-api"
+          ],
+          "id": "module-system-decomposition",
+          "kind": "module",
+          "requirementIds": [
+            "block-scope-core-boundaries",
+            "page-main-workspace"
+          ],
+          "stage": "technical",
+          "title": "系统核心模块划分与职责边界规范"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "group-product-foundation-scope"
+      ],
+      "id": "group-tech-system-decomposition",
+      "impact": "加固六大核心服务与展现模块的架构契约：依据 W3C IndexedDB 规范约束对象仓库索引，彻底杜绝非法布尔键索引；明确回收区 7 天保留、previousStatus 精准还原与批量物理删除；统一 BackupPayload 顶层 schemaVersion: 1 与 Dexie 原子导入事务；确立多标签页乐观并发冲突检测；确立编辑状态机三分支与内存草稿保护，禁止失焦静默保存；规范移动端多选触控与常驻回收区提示横幅。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "系统核心模块解耦与职责边界规范修订"
+    }
+  ],
+  "questions": [],
+  "summary": "完成草案修订，补齐并完成登记范围中的核心痛点（block-problem-fragmented-ideas）、非目标与边界规范（block-non-goals-exclusions）以及系统核心模块解耦规范（module-system-decomposition）。依据用户反馈与 W3C 规范彻底剔除系统级全局唤起承诺与非法布尔索引，严格对齐 7 天回收期生命周期、previousStatus 精准还原与 Dexie 原子导入导出契约。",
+  "workItems": []
+}

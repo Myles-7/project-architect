@@ -1,0 +1,11 @@
+Captured first harness regression outcome before replacing the historical mixed fixture with current public Core execution.
+Command: explicit Node --test docs/validation/agy-2026-10-04/real-integration/answer-provenance.test.mjs
+Outcome: 7 tests, 6 passed, 1 failed, 0 skipped; exit code 1.
+
+Failing test: real mixed selection and delegation confirms only the selected question and preserves delegation.
+AssertionError: false !== true.
+Frozen source: flash-vague-resume-20261005-06, Core revision 21.
+Both questions had status=answered and correct text, but no saved answerKind or selectedOptionKeys.
+Verifier result: selection validQuestion=false; delegated questionAnswered=false; exact selection provenance, no delegated decision, unchanged effective topic and original delegation text otherwise passed.
+
+The strict verifier was not weakened for the old fixture. The historical evidence remains unchanged and has an explicit rejection regression. The positive mixed fixture now calls the current public Core answer API in an isolated temporary project, then reloads from disk.

@@ -1,0 +1,228 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ × apps/server/tests/planning-draft-revision.test.ts > revises an unapproved first product through HTTP, keeps the source candidate and never approves it 246ms
+   → expected 202 "Accepted", got 422 "Unprocessable Entity"
+ × apps/server/tests/planning-draft-revision.test.ts > freezes only pending groups of a partial approval and preserves the approved prefix as Core facts 327ms
+   → 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ × apps/server/tests/planning-draft-revision.test.ts > carries only the source manual pending lock intent to the same stable block via a traced Core edit 293ms
+   → 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ × apps/server/tests/planning-draft-revision.test.ts > rejects wrong stage before any formal or runtime writes 240ms
+   → expected Error: 尚无正式方案可修订 { code: 'STAGE_NOT_…' } to match object { code: 'INVALID_CHANGESET' }
+ × apps/server/tests/planning-draft-revision.test.ts > rejects missing source before any formal or runtime writes 180ms
+   → expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'INVALID_CHANGESET' }
+ × apps/server/tests/planning-draft-revision.test.ts > rejects empty source id before any formal or runtime writes 175ms
+   → expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'INVALID_INTENT' }
+ × apps/server/tests/planning-draft-revision.test.ts > rejects malformed source id before any formal or runtime writes 182ms
+   → expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'INVALID_INTENT' }
+ × apps/server/tests/planning-draft-revision.test.ts > rejects missing feedback before any formal or runtime writes 176ms
+   → expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'INVALID_INTENT' }
+ ✓ apps/server/tests/planning-draft-revision.test.ts > rejects wrong revision before any formal or runtime writes 185ms
+ × apps/server/tests/planning-draft-revision.test.ts > rejects a stale source before recording additional feedback 258ms
+   → expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'STALE_BASIS' }
+ × apps/server/tests/planning-draft-revision.test.ts > continues a cancelled draft revision from its frozen candidate after server restart 192ms
+   → 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ × apps/server/tests/planning-draft-revision.test.ts > refuses changed frozen source on restart without accepting it or calling a Provider 180ms
+   → 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ × apps/server/tests/planning-draft-revision.test.ts > refuses missing frozen source on restart without accepting it or calling a Provider 171ms
+   → 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ × apps/server/tests/planning-draft-revision.test.ts > recovers a start interrupted after feedback commit by replaying its exact operation once 203ms
+   → expected [Function] to throw error including 'EIO after feedback commit' but got '请先澄清目标用户、问题、结果、范围和约束，或明确委托。'
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > revises an unapproved first product through HTTP, keeps the source candidate and never approves it
+Error: expected 202 "Accepted", got 422 "Unprocessable Entity"
+ ❯ apps/server/tests/planning-draft-revision.test.ts:76:149
+     74| it('revises an unapproved first product through HTTP, keeps the source…
+     75|   const { snapshot, source } = await seed();
+     76|   const reply = await request(app).post(`/api/projects/${snapshot.meta…
+       |                                                                                                                                                     ^
+     77|   const run = await settled(reply.body.data.id);
+     78|   expect(run.status).toBe('reviewable');
+ ❯ Test._assertStatus node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:309:14
+ ❯ node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:365:13
+ ❯ Test._assertFunction node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:342:13
+ ❯ Test.assert node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:195:23
+ ❯ localAssert node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:138:14
+ ❯ Server.<anonymous> node_modules/.pnpm/supertest@7.2.2/node_modules/supertest/lib/test.js:152:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > freezes only pending groups of a partial approval and preserves the approved prefix as Core facts
+Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ ❯ PlanningRuntime.startLocked apps/server/src/planning/PlanningRuntime.ts:85:33
+     83|       }
+     84|       const readiness=this.productReadiness(readinessSnapshot,clarific…
+     85|       if(!readiness.ready)throw new PlanningError('CLARIFICATION_REQUI…
+       |                                 ^
+     86|     }
+     87|     if(request.feedback)snapshot=await this.service.recordInput(path,r…
+ ❯ PlanningRuntime.exclusive apps/server/src/planning/PlanningRuntime.ts:49:281
+ ❯ apps/server/tests/planning-draft-revision.test.ts:103:30
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'CLARIFICATION_REQUIRED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > carries only the source manual pending lock intent to the same stable block via a traced Core edit
+Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ ❯ PlanningRuntime.startLocked apps/server/src/planning/PlanningRuntime.ts:85:33
+     83|       }
+     84|       const readiness=this.productReadiness(readinessSnapshot,clarific…
+     85|       if(!readiness.ready)throw new PlanningError('CLARIFICATION_REQUI…
+       |                                 ^
+     86|     }
+     87|     if(request.feedback)snapshot=await this.service.recordInput(path,r…
+ ❯ PlanningRuntime.exclusive apps/server/src/planning/PlanningRuntime.ts:49:281
+ ❯ apps/server/tests/planning-draft-revision.test.ts:116:30
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'CLARIFICATION_REQUIRED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > rejects wrong stage before any formal or runtime writes
+AssertionError: expected Error: 尚无正式方案可修订 { code: 'STAGE_NOT_…' } to match object { code: 'INVALID_CHANGESET' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_CHANGESET",
++ PlanningError {
++   "code": "STAGE_NOT_APPROVED",
+  }
+
+ ❯ apps/server/tests/planning-draft-revision.test.ts:134:3
+    132| ])('rejects %s before any formal or runtime writes', async (_name, cha…
+    133|   const { snapshot } = await seed(), before = await files();
+    134|   await expect(runtime.start(path, change(intent(snapshot.metadata.sta…
+       |   ^
+    135|   expect(await files()).toEqual(before); expect(contexts).toEqual([]);
+    136| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > rejects missing source before any formal or runtime writes
+AssertionError: expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'INVALID_CHANGESET' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_CHANGESET",
++ PlanningError {
++   "code": "CLARIFICATION_REQUIRED",
+  }
+
+ ❯ apps/server/tests/planning-draft-revision.test.ts:134:3
+    132| ])('rejects %s before any formal or runtime writes', async (_name, cha…
+    133|   const { snapshot } = await seed(), before = await files();
+    134|   await expect(runtime.start(path, change(intent(snapshot.metadata.sta…
+       |   ^
+    135|   expect(await files()).toEqual(before); expect(contexts).toEqual([]);
+    136| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > rejects empty source id before any formal or runtime writes
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > rejects malformed source id before any formal or runtime writes
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > rejects missing feedback before any formal or runtime writes
+AssertionError: expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'INVALID_INTENT' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_INTENT",
++ PlanningError {
++   "code": "CLARIFICATION_REQUIRED",
+  }
+
+ ❯ apps/server/tests/planning-draft-revision.test.ts:134:3
+    132| ])('rejects %s before any formal or runtime writes', async (_name, cha…
+    133|   const { snapshot } = await seed(), before = await files();
+    134|   await expect(runtime.start(path, change(intent(snapshot.metadata.sta…
+       |   ^
+    135|   expect(await files()).toEqual(before); expect(contexts).toEqual([]);
+    136| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > rejects a stale source before recording additional feedback
+AssertionError: expected Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。 { code: '…' } to match object { code: 'STALE_BASIS' }
+
+- Expected
++ Received
+
+- {
+-   "code": "STALE_BASIS",
++ PlanningError {
++   "code": "CLARIFICATION_REQUIRED",
+  }
+
+ ❯ apps/server/tests/planning-draft-revision.test.ts:142:3
+    140|   const changed = await runtime.service.recordInput(path, '新材料改变了依据', …
+    141|   const before = await files();
+    142|   await expect(runtime.start(path, intent(changed.metadata.stateRevisi…
+       |   ^
+    143|   expect(await files()).toEqual(before); expect(contexts).toEqual([]);
+    144| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > continues a cancelled draft revision from its frozen candidate after server restart
+Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ ❯ PlanningRuntime.startLocked apps/server/src/planning/PlanningRuntime.ts:85:33
+     83|       }
+     84|       const readiness=this.productReadiness(readinessSnapshot,clarific…
+     85|       if(!readiness.ready)throw new PlanningError('CLARIFICATION_REQUI…
+       |                                 ^
+     86|     }
+     87|     if(request.feedback)snapshot=await this.service.recordInput(path,r…
+ ❯ PlanningRuntime.exclusive apps/server/src/planning/PlanningRuntime.ts:49:281
+ ❯ apps/server/tests/planning-draft-revision.test.ts:149:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'CLARIFICATION_REQUIRED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > refuses changed frozen source on restart without accepting it or calling a Provider
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > refuses missing frozen source on restart without accepting it or calling a Provider
+Error: 请先澄清目标用户、问题、结果、范围和约束，或明确委托。
+ ❯ PlanningRuntime.startLocked apps/server/src/planning/PlanningRuntime.ts:85:33
+     83|       }
+     84|       const readiness=this.productReadiness(readinessSnapshot,clarific…
+     85|       if(!readiness.ready)throw new PlanningError('CLARIFICATION_REQUI…
+       |                                 ^
+     86|     }
+     87|     if(request.feedback)snapshot=await this.service.recordInput(path,r…
+ ❯ PlanningRuntime.exclusive apps/server/src/planning/PlanningRuntime.ts:49:281
+ ❯ apps/server/tests/planning-draft-revision.test.ts:161:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'CLARIFICATION_REQUIRED' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  apps/server/tests/planning-draft-revision.test.ts > recovers a start interrupted after feedback commit by replaying its exact operation once
+AssertionError: expected [Function] to throw error including 'EIO after feedback commit' but got '请先澄清目标用户、问题、结果、范围和约束，或明确委托。'
+
+Expected: "EIO after feedback commit"
+Received: "请先澄清目标用户、问题、结果、范围和约束，或明确委托。"
+
+ ❯ apps/server/tests/planning-draft-revision.test.ts:179:3
+    177|   });
+    178|   const request = intent(snapshot.metadata.stateRevision);
+    179|   await expect(runtime.start(path, request)).rejects.toThrow('EIO afte…
+       |   ^
+    180|   expect((await runtime.service.get(path)).planning!.inputs.filter(ite…
+    181|   expect(contexts).toEqual([]); await runtime.shutdown();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  13 failed | 1 passed (14)
+   Start at  07:12:58
+   Duration  4.81s (transform 556ms, setup 0ms, collect 1.51s, tests 3.01s, environment 0ms, prepare 93ms)
+

@@ -74,8 +74,9 @@ describe('End-to-End Multi-Turn State Flow Test', () => {
     expect(t2Res.snapshot.metadata.stateRevision).toBe(2);
 
     // === Turn 3: User answers and confirms Candidate ===
-    const cand = t2Res.snapshot.decisions.items.find((d) => d.status === 'candidate');
+    const cand = t2Res.snapshot.decisions.items.find((d) => d.statement === 'Store clipboard entries in local SQLite/JSON storage');
     expect(cand).toBeDefined();
+    expect(cand?.status).toBe('candidate');
 
     const t3Snap = await engine.confirmDecision(testProjectDir, `decision:${cand!.id}`, 2);
     expect(t3Snap.metadata.stateRevision).toBe(3);
@@ -100,16 +101,20 @@ describe('End-to-End Multi-Turn State Flow Test', () => {
       questions: [],
     });
 
-    // Also lock initial offline decision
-    const initDec = t4Snap.decisions.items.find((d) => d.id === 'dec-01');
-    await engine.lockDecision(testProjectDir, `decision:${initDec!.id}`, 4);
+    // Explicitly confirm and lock the separate initial offline constraint.
+    const initDec = t4Snap.decisions.items.find((d) => d.statement === 'A pure offline clipboard history tool for Windows');
+    expect(initDec?.status).toBe('candidate');
+    const initialConfirmed = await engine.confirmDecision(testProjectDir, `decision:${initDec!.id}`, t4Snap.metadata.stateRevision);
+    const initialLocked = await engine.lockDecision(testProjectDir, `decision:${initDec!.id}`, initialConfirmed.metadata.stateRevision);
+    expect(initialLocked.decisions.items.find((decision) => decision.id === initDec!.id)?.status).toBe('locked');
 
     const t5Res = await orchestrator.runDiscoveryTurn(testProjectDir, {
       userMessage: 'Could we also sync automatically to cloud?',
-      expectedRevision: 5,
+      expectedRevision: initialLocked.metadata.stateRevision,
     });
 
-    expect(t5Res.snapshot.metadata.stateRevision).toBe(6);
+    expect(t5Res.snapshot.metadata.stateRevision).toBe(initialLocked.metadata.stateRevision + 1);
+    expect(t5Res.snapshot.decisions.items.find((decision) => decision.id === initDec!.id)).toMatchObject({ status: 'locked', statement: initDec!.statement });
     // Conflict detector must have identified the conflict against the locked offline decision
     expect(t5Res.snapshot.gaps.conflicts.length).toBeGreaterThan(0);
     const conflict = t5Res.snapshot.gaps.conflicts[0];

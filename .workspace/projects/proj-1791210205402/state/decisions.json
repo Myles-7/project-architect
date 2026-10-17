@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1791210205402",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "风格",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    },
+    {
+      "id": "dec-preset-cli-01",
+      "area": "technical_boundary",
+      "statement": "支持 --json 格式化输出与管道输入 (stdin NDJSON) 组合使用。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "confirmedBy": "user",
+      "decisionKey": "pipe_friendly",
+      "rationale": "使工具不仅供人类阅读，亦可无缝无损地接入自动化流水线脚本。",
+      "affectedAreas": [
+        "technical_boundary",
+        "user_flows"
+      ],
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    },
+    {
+      "id": "dec-preset-cli-02",
+      "area": "user_flows",
+      "statement": "首发支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y)。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "confirmedBy": "user",
+      "decisionKey": "headless_ci_support",
+      "dependsOn": [
+        "dec-preset-cli-01"
+      ],
+      "rationale": "既能兼顾新手首次配置体验，又能确保无头 CI 环境零挂起。",
+      "affectedAreas": [
+        "user_flows",
+        "mvp_scope"
+      ],
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    }
+  ],
+  "traces": [],
+  "updatedAt": "2026-10-05T14:23:25.402Z"
+}

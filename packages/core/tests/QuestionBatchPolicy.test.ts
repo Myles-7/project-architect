@@ -26,8 +26,8 @@ function gaps(count: number): GapItem[] {
 
 describe('B3 question batch policy', () => {
   it.each([
-    [0, 'initial', 12], [2, 'initial', 12], [3, 'explore', 8],
-    [5, 'explore', 8], [6, 'converge', 4], [8, 'converge', 4],
+    [0, 'initial', 3], [2, 'initial', 3], [3, 'explore', 3],
+    [5, 'explore', 3], [6, 'converge', 3], [8, 'converge', 3],
   ] as const)('maps %i clear areas to %s with max %i', (count, stage, max) => {
     expect(new QuestionBatchPolicy().evaluate(snapshot(count))).toMatchObject({ stage, maxQuestions: max });
   });
@@ -36,11 +36,11 @@ describe('B3 question batch policy', () => {
     expect(new QuestionBatchPolicy().evaluate(snapshot(4, 'readiness-review'))).toMatchObject({ stage: 'readiness', maxQuestions: 2 });
   });
 
-  it('selects twelve initial questions and defers unresolved dependencies', () => {
+  it('selects at most three initial questions and defers unresolved dependencies', () => {
     const input = gaps(14);
     input[0]!.dependsOn = ['unknown_parent'];
     const result = new QuestionSelector().select(input, snapshot(0));
-    expect(result.gapsToAsk).toHaveLength(12);
+    expect(result.gapsToAsk).toHaveLength(3);
     expect(result.gapsToAsk.some((gap) => gap.id === 'g-0')).toBe(false);
     expect(result.diagnostics.invalidDependencies).toBe(1);
   });

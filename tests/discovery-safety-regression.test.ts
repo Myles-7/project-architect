@@ -153,7 +153,13 @@ describe('Discovery Safety Regression Suite', () => {
 
     const s = res.snapshot;
     // Anti-repetition: Must NOT ask about platform or mobile exclusion
-    const generatedQuestion = s.questions.items.find((question) => question.status === 'proposed');
+    const generatedQuestions = s.questions.items.filter((question) => question.status === 'proposed');
+    for (const question of generatedQuestions) {
+      expect(question.question).not.toContain('移动端');
+      expect(question.question).not.toContain('Web');
+    }
+    const generatedQuestion = generatedQuestions.find((question) => question.decisionKey?.includes('user_flows'));
+    expect(generatedQuestion).toBeDefined();
     const questionText = generatedQuestion?.question || '';
     expect(questionText).not.toContain('移动端');
     expect(questionText).not.toContain('Web');

@@ -37,6 +37,10 @@ export class DocumentExportService {
     this.storage = storage;
   }
 
+  createZip(files: Array<{ path: string; data: Uint8Array }>): Buffer {
+    return this.buildZipBuffer(files);
+  }
+
   /**
    * Generates a complete ZIP archive of all compiled project documents in memory.
    *

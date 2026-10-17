@@ -1,0 +1,525 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "IndexedDB 规范键类型约束（Boolean 不得作为索引键）",
+      "content": "W3C IndexedDB 规范规定支持的键类型包括 Number、String、Date、BufferSource 和 Array。Boolean 不是合法键类型，不能作为 IndexedDB 索引键，布尔值需在内存中过滤或映射为数字存储。",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-133fe143-b3cb-4d0f-ac93-874871031c4d",
+      "kind": "official-source",
+      "location": "https://www.w3.org/TR/IndexedDB/",
+      "obtainedAt": "2026-10-04T16:42:27.318Z",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 全文模糊检索引擎与关键词高亮交付规范（防抖闭合与范围隔离）\n\n1. **80ms 防抖闭合管道与检索引擎架构**：\n   - 实现 `SearchBar` 与 `SearchEngine` 模块，在顶部搜索框输入流上挂载严格的 80ms 防抖管道（Debounce Pipeline）。\n   - 依据 W3C IndexedDB 规范（evidence-133fe143-b3cb-4d0f-ac93-874871031c4d，Boolean 非合法索引键），检索引擎采用常驻内存的便签镜像进行全文分词模糊匹配，对 `isPinned` 与 `isFavorite` 属性执行纯内存布尔过滤，杜绝在 IndexedDB 中声明无效的 boolean 物理索引。\n   - 检索范围覆盖便签正文纯文本、标签（tags 数组）及创建时间等元信息。\n\n2. **检索性能度量口径与闭合判定边界**：\n   - 在 1,000 条便签数据规模下（包含常规活跃、归档及处于回收区的便签），从键盘击键输入事件（Keydown/Input）发生起，计入 80ms 防抖管道耗时，到完成分词模糊匹配及 DOM 重新排版渲染完成的真实端到端耗时（End-to-End Latency）：\n     - **通过判定（Pass）**：10 次连续检索的平均端到端耗时严格 `<= 150ms`（且 P95 `<= 200ms`）。\n     - **降级优化区间（Degradation）**：平均端到端耗时处于 `150ms < t <= 250ms` 时，自动启用性能优化（通过 `React.memo` 阻断非匹配卡片冗余重绘，并引入 `useDeferredValue` 优化搜索流响应）。\n     - **失败重构标准（Fail）**：平均端到端耗时 `> 250ms` 时，判定为检索性能未达标，将内存线性扫描升级为分词倒排索引（Inverted Index），并对便签流启用虚拟滚动列表（Virtual Scrolling）。\n   - 彻底消除 150ms~250ms 无定义区间，界定严密闭合。\n\n3. **检索作用域与回收区范围隔离规范**：\n   - **主工作区常规检索**：处于【全部灵感】、【已收藏】或【已归档】系统视图时，搜索范围严格限定为活跃与归档便签，**自动排除回收区（status === 'trashed'）便签**，避免已删除内容干扰正常搜索结果。\n   - **回收区限定检索**：当用户切换至【回收区】（RecycleBinView）视图时，顶部搜索框的数据源自动切换为回收区便签集合，实现回收区内部快速定位与还原。\n\n4. **前台快捷键唤醒与特殊字符安全防崩**：\n   - 仅在页面处于前台焦点状态时监听按键：敲击 `/` 键自动聚焦搜索框并全选内容；按下 `Esc` 键或点击 `×` 立即清空搜索输入并恢复未过滤列表；坚决排除系统级全局唤起。\n   - 针对用户输入的连续正则表达式保留字符（如 `.*+?^${}()|[]\\`）执行完全安全转义，防止正则崩溃；命中的关键词使用安全纯文本节点切分，包裹 `<mark class=\"highlight\">` 黄色高亮标签，经 DOMPurify 过滤防范 XSS。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "feature-search-filter",
+            "flow-search-filter"
+          ],
+          "evidenceIds": [
+            "evidence-org-model",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-133fe143-b3cb-4d0f-ac93-874871031c4d"
+          ],
+          "id": "task-search-filter",
+          "kind": "task",
+          "requirementIds": [
+            "feature-search-filter",
+            "flow-search-filter",
+            "interface-service-contracts",
+            "error-architecture-and-recovery"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "待检索便签常驻内存镜像规模在 1,000 条基准内，内存占用受控在现代浏览器常规限制中",
+              "浏览器支持标准 DOM KeyboardEvent 与 RegExp API"
+            ],
+            "completionCriteria": [
+              "全文模糊匹配、安全高亮与 80ms 防抖单元测试通过率 100%",
+              "常规检索排除回收区便签及回收区内部限定检索验证通过率 100%",
+              "特殊正则符号安全转义零异常测试通过"
+            ],
+            "environment": "Chrome / Edge / Firefox / Safari 真实桌面浏览器环境，Node.js 18+ 开发构建环境",
+            "exclusions": "不引入服务端中心化检索引擎（纯客户端轻量内存检索），不使用系统级全局快捷键（仅限页面前台焦点快捷键），不对 boolean 字段建立 IndexedDB 物理索引",
+            "failureBehavior": "连续特殊正则符号自动安全转义，无匹配项时展示清晰空状态引导与重置按钮；高亮节点解析异常降级展示纯文本；检索延迟在 150~250ms 之间时触发 React.memo 降级优化，超过 250ms 触发倒排索引与虚拟滚动",
+            "goal": "实现带 80ms 防抖闭合管道的前端全文模糊检索与关键词安全高亮引擎，落实常规视图与回收区范围隔离及内存过滤策略。",
+            "modules": [
+              "SearchBar",
+              "SearchEngine",
+              "WorkspaceUI",
+              "NoteService"
+            ],
+            "normalBehavior": "用户在页面前台按 / 键聚焦搜索框；输入查询词经 80ms 防抖管道触发检索；常规视图严格排除回收区便签；回收区视图限定在回收区检索；命中文本安全包裹黄色高亮；按 Esc 键一键重置清空恢复全量卡片流。",
+            "onFailure": "若检索耗时超标，优先启用 React.memo 阻断卡片重绘并引入 useDeferredValue，必要时切换至倒排索引结构",
+            "passCriteria": [
+              "防抖后精准过滤并高亮关键字，端到端耗时严格闭合判定生效",
+              "常规检索与回收区范围隔离逻辑准确无串扰"
+            ],
+            "scope": "开发 SearchBar 与 SearchEngine 模块、80ms 防抖闭合管道、视图作用域隔离（常规视图排除 status === 'trashed'，回收区视图限定检索 trashed）、正则特殊字符转义与黄色 <mark> 标签生成、页面前台快捷键监听（/ 聚焦、Esc 重置）。",
+            "steps": [
+              "1. 封装 SearchEngine 模糊匹配算法，集成正则特殊字符安全转义与安全文本节点高亮切分",
+              "2. 接入视图作用域感知，常规视图过滤排除 trashed 便签，回收区视图限定检索 trashed 便签",
+              "3. 实现基于闭合计时器的 80ms 防抖管道与页面前台快捷键监听（/ 聚焦、Esc 重置）",
+              "4. 编写自动化单元测试与边界场景测试验证隔离逻辑与特殊字符防崩"
+            ],
+            "verification": [
+              "单元测试验证 80ms 防抖计时器准确性与连续击键重置逻辑",
+              "测试常规视图检索严格排除 status === 'trashed' 回收区便签",
+              "测试回收区视图内部检索精准匹配并高亮处于回收区的便签",
+              "注入各类正则特殊字符验证完全安全转义零报错崩溃"
+            ]
+          },
+          "title": "全文模糊检索引擎与关键词高亮开发任务（防抖闭合与范围隔离）"
+        },
+        {
+          "content": "### 即时全文模糊检索验收标准（Given / When / Then）\n\n- **场景 1：80ms 防抖管道与端到端检索闭合判定**\n  - **Given** 本地数据库已灌入 1,000 条混合格式便签样本，\n  - **When** 用户在顶部搜索框连续键入查询词并在最后一次击键后等待，\n  - **Then** 系统在 80ms 防抖后精确触发检索计算，从击键至卡片列表重排完成的平均端到端耗时实测 `<= 150ms`（通过）；若耗时处于 `150ms < t <= 250ms` 触发 React.memo 阻断冗余渲染，若 `> 250ms` 判定未达标触发倒排索引重构。\n\n- **场景 2：常规视图严格排除回收区便签**\n  - **Given** 数据库中存在一条包含“架构评审”的回收区便签（`status === 'trashed'`），另有一条活跃便签也包含“架构评审”，\n  - **When** 用户在【全部灵感】视图搜索“架构评审”，\n  - **Then** 搜索结果中仅展示该活跃便签，回收区便签被严格隔离过滤不显示，避免已删除内容干扰正常搜索。\n\n- **场景 3：回收区内部限定检索与关键词黄色高亮**\n  - **Given** 用户切换至侧边栏【回收区】系统视图，\n  - **When** 用户在搜索框键入“架构评审”，\n  - **Then** 搜索范围自动限定在回收区便签集合内，结果精准列出处于回收区的该条便签，命中的关键词包裹 `<mark class=\"highlight\">` 黄色高亮背景，且支持直接点击【还原】。\n\n- **场景 4：页面前台快捷键激活与重置还原**\n  - **Given** 页面处于前台焦点状态且未聚焦在其他表单输入框，\n  - **When** 用户按下键盘斜杠键 `/`，随后按下 `Esc`，\n  - **Then** 按下 `/` 立即聚焦搜索框并高亮边框；按下 `Esc` 搜索框立即清空并失焦，卡片流平滑恢复全量显示。\n\n- **场景 5：连续正则特殊字符转义与防崩溃验证**\n  - **Given** 用户在搜索框中键入连续特殊正则保留符号（如 `.*+?^${}()|[]\\`），\n  - **When** 防抖触发检索比对，\n  - **Then** 检索引擎自动执行完全字符转义，页面零报错零白屏，展示清晰的无匹配结果空状态引导。",
+          "dependsOn": [
+            "task-search-filter"
+          ],
+          "evidenceIds": [
+            "evidence-org-model",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be"
+          ],
+          "id": "acceptance-search-filter",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-search-filter",
+            "flow-search-filter"
+          ],
+          "stage": "delivery",
+          "title": "全文模糊检索与关键词高亮验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9-search-filter",
+      "impact": "完善带 80ms 防抖闭合边界的检索引擎，建立严格闭合的端到端性能判定区间，实现常规视图排除回收区便签与回收区内部限定检索范围隔离，保障特殊字符转义防崩。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "即时全文模糊检索与关键词高亮交付任务及验收规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 便签详情模态弹窗与实时编辑交付规范（并发冲突与草稿保护）\n\n1. **沉浸式模态弹窗与安全 Markdown 排版**：\n   - 开发 `NoteDetailModal` 组件，集成 marked 编译器与 DOMPurify 安全白名单过滤，彻底消除 XSS 注入风险。\n   - 集成 Prism.js 代码块语法高亮与右上角一键复制功能；支持 GitHub Flavored Markdown (GFM) 任务清单复选框交互。\n\n2. **三态操作流与禁止静默自动保存规范**：\n   - 彻底废除任何关闭动作一律静默自动保存的设计，建立明确的三态操作流：\n     1) **保存并退出（Save & Exit）**：用户点击“保存”按钮或在文本编辑区按下快捷键 `Ctrl + S` / `Cmd + S`，触发数据校验与持久化写入；写入成功后关闭弹窗，便签流卡片即时更新，未备份变更计数器 `unbackedChangesCount` 递增 1。\n     2) **放弃修改（Discard Changes）**：用户点击“放弃”按钮，或在草稿存在未保存修改时尝试通过点击遮罩层/按下 `Esc` 键退出时，系统严禁静默自动保存！立即弹出模态二次确认提示：“当前有未保存的修改，确定放弃吗？”；用户确认放弃后关闭弹窗，编辑内容完全回滚为进入编辑时的原始内容；用户选择“继续编辑”则停留在当前编辑状态，焦点恢复。\n     3) **禁止静默自动保存**：任何退出动作（点击关闭图标、按 `Esc`、点击遮罩）均不得在未经用户明确保存操作时静默落盘；仅当正文无任何修改时，按 `Esc` 或点击遮罩才直接平滑关闭。\n\n3. **两标签页乐观并发冲突检测与解决（OCC）**：\n   - 基于实体 `updatedAt` 毫秒时间戳进行并发冲突判定：在用户打开弹窗进入编辑模式时，记录初始读取时间戳 `originalUpdatedAt = note.updatedAt`。\n   - 当用户触发保存时，`NoteService.saveNote()` 首先比对底层 IndexedDB 中该便签的最新 `updatedAt`：若底层最新 `updatedAt > originalUpdatedAt`（表明该便签在此期间已被另一浏览器标签页修改并保存），系统立即判定为并发版本冲突（Concurrency Conflict），拦截覆盖写入。\n   - 发生冲突时，弹窗绝对不关闭，正在编辑的修改完整保留在当前编辑域中，界面展示冲突解决面板，提供三种明确策略：\n     1) 【保留草稿为新便签】：系统将当前草稿生成一个带有新 UUID 的独立便签写入数据库，避免内容覆盖；\n     2) 【强制覆盖其他修改】：在用户明确二次确认后以当前草稿覆盖底层记录，更新 `updatedAt = Date.now()`；\n     3) 【放弃并加载最新版本】：放弃当前修改，拉取底层最新的便签内容刷新编辑弹窗。\n   - 明确区分：实体数据模型中的 `updatedAt` 专用于记录级并发冲突判定，而 `schemaVersion` 专用于数据 Schema 结构版本迁移，两者职责清晰隔离，绝不混淆。\n\n4. **回收区便签只读保护与精准状态还原**：\n   - 若便签处于回收区（`status === 'trashed'`），详情弹窗强制以【只读预览模式】打开，禁用直接编辑切换与待办 Checkbox 勾选。\n   - 弹窗顶部常驻黄色警示横幅：“此便签处于回收区，不可直接编辑。请先【还原】后再行修改，或点击【彻底删除】物理清理”。\n   - 弹窗提供【还原便签】与【彻底删除】快捷按钮：\n     - 点击【还原便签】：依据便签历史记录恢复其移入回收区前的原状态（若移入前为 `archived` 则恢复为 `archived`，若为 `active` 则恢复为 `active`，不一律盲目恢复为 active），清空 `trashedAt = null`，警示条消失并平滑解锁编辑。\n     - 点击【彻底删除】：弹出模态二次确认对话框，用户确认后执行底层物理删除并关闭弹窗。\n\n5. **存储配额超限与保存失败草稿保留机制**：\n   - 若本地持久化层写入抛出 `StorageQuotaExceededError`（存储配额满）或底层写入异常：\n     - 详情编辑弹窗绝对不关闭，用户正在编辑的草稿文本 100% 完整保留在当前组件的 React 内存状态与 DOM 文本域中，不发生任何清空或重置。\n     - 弹窗顶部浮出醒目红色告警横幅：“保存失败：本地存储已满或数据库异常，已修改内容已保留”。\n     - 告警横幅内提供三条安全恢复通道：\n       1) 【重试保存】：在用户清理空间或释放配额后重新尝试落盘；\n       2) 【一键复制草稿】：调用 Clipboard API 将当前修改后的纯文本草稿复制至系统剪贴板（若剪贴板受阻，提供文本框供用户手动 Ctrl+C）；\n       3) 【导出为草稿文件】：通过 File API（Blob）将当前草稿直接下载保存为本地 `.txt` 文本文件，为用户资产提供兜底保护。\n     - 严格遵循浏览器沙箱规则，不给出“零丢稿/100%保证”等无证据绝对化断言，明确由 React 内存保持 + 弹窗拦截防关闭 + 剪贴板复制 + 本地文件应急导出构筑防御闭环。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "feature-note-detail-edit",
+            "flow-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-capture-modality",
+            "evidence-react-official",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-mdn-storage-estimate-01"
+          ],
+          "id": "task-note-detail-edit",
+          "kind": "task",
+          "requirementIds": [
+            "feature-note-detail-edit",
+            "flow-note-detail-edit",
+            "interface-service-contracts",
+            "error-architecture-and-recovery"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "宿主环境支持 DOM 模态弹窗事件、Clipboard API 及标准 File/Blob 下载",
+              "便签实体包含 updatedAt 毫秒时间戳"
+            ],
+            "completionCriteria": [
+              "Markdown 安全渲染与 DOMPurify XSS 拦截率 100%",
+              "三态退出与禁止静默保存逻辑单元测试通过率 100%",
+              "并发版本冲突拦截率与解决分支测试通过率 100%",
+              "回收区只读保护与状态保持还原测试通过率 100%",
+              "配额超限注入下草稿保留与防关闭测试全部通过"
+            ],
+            "environment": "Chrome / Edge / Firefox / Safari 真实桌面浏览器环境，Node.js 18+ 开发构建环境",
+            "exclusions": "不集成富文本绘图画板与复杂公式排版，不引入基于 OT/CRDT 的多人实时协同光标（单人本地工具属性），不建立 boolean 物理索引",
+            "failureBehavior": "有未保存修改时按 Esc 或点击遮罩弹出放弃确认，禁止静默自动保存；两标签页并发保存冲突时拦截覆盖并提供三种解决策略；存储配额满时弹窗绝对不关闭，草稿保留在编辑域中，提供复制与导出为 .txt 入口",
+            "goal": "交付便签详情阅读与 Markdown 编辑模态弹窗，实现明确的三态退出交互、乐观并发冲突检测、回收区只读保护及配额超限草稿防御闭环。",
+            "modules": [
+              "NoteDetailModal",
+              "MarkdownRenderer",
+              "NoteService",
+              "WorkspaceUI",
+              "StorageService"
+            ],
+            "normalBehavior": "点击便签卡片展开居中详情弹窗；阅读模式下格式化排版并高亮代码；常规便签点击编辑进入等宽文本区；点击保存或按 Ctrl/Cmd+S 落盘并关闭弹窗；内容无变更时按 Esc 平滑关闭；回收区便签强制只读展示并提供精准还原按钮。",
+            "onFailure": "Markdown 解析异常回退为纯文本等宽展示，保证正文可读；并发冲突或配额失败时弹窗保持开启并保留草稿文本供复制与导出",
+            "passCriteria": [
+              "DOMPurify 拦截恶意脚本注入",
+              "未保存修改退出时拦截静默保存并弹出放弃确认对话框",
+              "并发版本冲突检测准确阻断覆盖并提供处理分支",
+              "配额超限下草稿文本 100% 保留在输入域且弹窗不关闭"
+            ],
+            "scope": "NoteDetailModal 组件开发、MarkdownRenderer 白名单管道、三态退出交互（保存并退出、放弃修改二次确认、继续编辑；禁止静默自动保存）、两标签页乐观并发冲突检测（基于 updatedAt）、回收区只读保护条与精准状态还原、存储超限草稿保留与应急导出恢复。",
+            "steps": [
+              "1. 封装 MarkdownRenderer 组件，配置 marked 解析器与 DOMPurify 白名单规则及 Prism.js 代码高亮",
+              "2. 开发 NoteDetailModal 组件，实现编辑/阅读模式切换与三态退出交互（保存退出、放弃修改二次确认、继续编辑，拦截静默自动保存）",
+              "3. 实现基于 updatedAt 的乐观并发冲突比对逻辑与冲突解决面板（保留为新便签、强制覆盖、放弃刷新）",
+              "4. 接入回收区只读保护条与精准状态还原流转（还原为删除前的 active 或 archived 状态）",
+              "5. 实现配额满受控异常捕获：弹窗防关闭、草稿在文本域中保留、醒目告警横幅、一键复制与导出为 .txt 应急通道"
+            ],
+            "verification": [
+              "组件测试验证未保存修改时按 Esc 触发放弃确认对话框，禁止静默落盘",
+              "模拟两标签页并发保存测试 updatedAt 冲突拦截与保留为新便签分支",
+              "测试回收区便签只读保护及还原时精准恢复移入前的 active 或 archived 状态",
+              "模拟存储写入异常测试弹窗保持开启、文本 100% 保留在输入域及应急导出 .txt 功能"
+            ]
+          },
+          "title": "便签详情模态弹窗与实时编辑开发任务（并发冲突与草稿保护）"
+        },
+        {
+          "content": "### 便签详情模态与 Markdown 实时编辑验收标准（Given / When / Then）\n\n- **场景 1：保存后退出、放弃修改确认与禁止静默自动保存**\n  - **Given** 用户在便签详情编辑框中对正文进行了增删修改，\n  - **When** 用户尝试点击弹窗右上角关闭按钮、点击背景遮罩层或按下 `Esc` 键，\n  - **Then** 系统拦截退出动作，严禁静默自动保存；屏幕弹出模态二次确认对话框“当前有未保存的修改，确定放弃吗？”；用户若点击“放弃”，弹窗关闭且内容回滚为原版本；用户若点击“继续编辑”，确认框关闭，原弹窗保持开启且草稿完好保留。\n\n- **场景 2：两标签页并发修改与乐观并发冲突解决**\n  - **Given** 某便签在两个浏览器标签页 A 和 B 中同时被打开编辑，\n  - **When** 标签页 A 率先点击保存成功，随后标签页 B 尝试触发保存，\n  - **Then** 标签页 B 检测到底层记录的 `updatedAt` 大于编辑初始时间戳，立即判定为并发冲突，拦截直接覆盖写入；弹窗保持开启并展示冲突提示横幅，提供【保留草稿为新便签】、【强制覆盖】与【放弃并刷新】选项；用户选择保留为新便签后，当前草稿被另存为一张全新便签，原便签保持标签页 A 的修改不变。\n\n- **场景 3：回收区便签只读保护与精准还原至原状态**\n  - **Given** 一条在归档状态（`status === 'archived'`）下被移入回收区的便签，\n  - **When** 用户在回收区视图点击卡片打开详情弹窗，\n  - **Then** 弹窗顶部呈现黄色警示横幅提示“处于回收区不可编辑”，输入框禁用；用户点击弹窗中的【还原便签】按钮，便签成功还原至 `status === 'archived'`（精准恢复删除前的归档状态而非盲目恢复为 active），警示横幅消失并切入正常编辑模式。\n\n- **场景 4：Markdown 格式化排版与代码一键复制**\n  - **Given** 某便签正文中包含 JavaScript 代码块与 GFM 任务清单，\n  - **When** 用户点击进入详情弹窗并点击代码块右上角复制按钮，\n  - **Then** 正文清晰呈现代码语法着色与层级排版，代码纯文本被写入剪贴板并提示“已复制”，DOMPurify 拦截所有恶意脚本注入。\n\n- **场景 5：存储配额满弹窗防关闭、草稿保留与应急导出 .txt**\n  - **Given** 用户在编辑弹窗中输入了重要长篇草稿，\n  - **When** 用户点击保存但本地 IndexedDB 抛出配额超限异常（QuotaExceededError），\n  - **Then** 详情模态弹窗维持开启不关闭，已修改的全部草稿文本 100% 完整保留在文本编辑框中；顶部展示红色警告横幅，提供“重试保存”、“复制草稿”与“导出为本地 .txt”下载通道，防止草稿内容遗失。",
+          "dependsOn": [
+            "task-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-capture-modality",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be"
+          ],
+          "id": "acceptance-note-detail-edit",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-note-detail-edit",
+            "flow-note-detail-edit"
+          ],
+          "stage": "delivery",
+          "title": "便签详情模态与 Markdown 实时编辑验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9-note-detail-edit",
+      "impact": "明确详情编辑退出/放弃/继续三态交互，禁止所有关闭动作静默自动保存；基于 updatedAt 实现两标签页乐观并发冲突检测与解决策略；实现回收区便签只读保护与还原流转；完善存储超限弹窗防关闭、草稿保留与应急导出兜底。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "便签详情模态与 Markdown 实时编辑交付任务及验收规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 本地数据备份导出、恢复与防丢提醒交付规范（统一协议与单事务覆盖）\n\n1. **统一备份传输契约与自闭环往返保证**：\n   - 导出与导入契约顶层严格统一为 `schemaVersion: 1` 规范，彻底消除 `version: 1` 与 `schemaVersion: 1` 的不一致：\n     ```json\n     {\n       \"app\": \"SparkNotes\",\n       \"schemaVersion\": 1,\n       \"exportedAt\": \"2026-10-05T00:00:00.000Z\",\n       \"notesCount\": 25,\n       \"notes\": [ ... ]\n     }\n     ```\n   - 严密保证自导出自导入（Roundtrip）一致性：系统导出的 JSON 备份文件，使用系统自带的导入模块必须 100% 顺利通过强校验并完整还原数据。\n\n2. **回收区便签导出策略与排除选项**：\n   - 依据决策 `product.backup_trash_inclusion_policy`，默认导出全量包含处于回收区（`status === 'trashed'`）的便签，并完整保留其 `trashedAt` 移入时间戳与关联标签，保证跨设备/跨浏览器迁移时 7 天保留生命周期的连续性。\n   - 在数据管理面板导出设置中提供【包含回收区便签】复选框（默认勾选），允许用户按需取消勾选，仅导出活跃及归档便签。\n   - 导出的文件名遵循规范：`spark-notes-backup-YYYY-MM-DD.json`。\n\n3. **文件格式与 Schema 强校验管道**：\n   - 用户拖拽或选择 `.json` 文件后，`BackupManager.validateBackupFile()` 执行前置强校验：\n     1) JSON 语法有效性解析；\n     2) 根对象结构校验：`app === 'SparkNotes'` 且 `schemaVersion === 1`；\n     3) `notes` 必须为有效数组，且单条记录必须包含 `id` (string), `content` (string), `tags` (string[]), `isPinned` (boolean), `isFavorite` (boolean), `status` ('active' | 'archived' | 'trashed'), `createdAt` (number), `updatedAt` (number), 以及 `trashedAt` (number | null)；\n     4) 若校验失败，弹出明确错误提示：“导入失败：备份文件格式不符合 SparkNotes Schema v1 规范（具体错误原因）”，彻底阻断写入流程，绝不触碰本地既有数据。\n\n4. **单事务全覆盖导入（Atomic Overwrite Import）与原生回滚**：\n   - 全量覆盖导入（Overwrite Mode）的清空、批量写入与元数据更新必须在同一个原子 Dexie 事务中完成：\n     ```typescript\n     await db.transaction('rw', [db.notes, db.meta], async () => {\n       await db.notes.clear();\n       await db.notes.bulkAdd(validatedNotes);\n       await db.meta.put({\n         key: 'backup_tracker',\n         value: {\n           lastBackupAt: Date.now(),\n           unbackedChangesCount: 0,\n           isPrivateModeDetected: tracker.isPrivateModeDetected\n         },\n         updatedAt: Date.now()\n       });\n     });\n     ```\n   - 彻底废除“先读取内存快照再尝试回写”的非原子操作！完全依赖 IndexedDB/Dexie 的原生 ACID 事务保证：若在清空后写入过程中遭遇配额超限（QuotaExceededError）或进程中断，底层事务原生自动完整回滚（Rollback），原有全部便签数据与元数据完全恢复，绝不产生“数据已清空但新数据未写入”的半成品损坏状态。\n\n5. **增量合并导入与超期便签即时警示**：\n   - 增量合并模式（Merge Mode）：逐条比对便签 `id` 与 `updatedAt`，若备份文件中的记录更新则执行覆盖，若不存在则新增插入。\n   - 超期便签即时感知：若导入的回收区便签存在 `trashedAt` 距今超过 7 天（`Date.now() - trashedAt > 7 * 86400 * 1000`），事务提交后系统立即激活侧边栏【回收区】入口的琥珀色过期预警圆点，并在用户切入回收区视图时常驻展示琥珀色过期横幅提示清理。\n\n6. **变更追踪与温和防丢提醒**：\n   - 本地元数据维护 `unbackedChangesCount` 与 `lastBackupAt`。新增、编辑、移入回收区、还原及彻底删除操作均自增变更计数 1。\n   - 累计达到 20 条变更或距离上次备份超过 7 天时，侧边栏底部温和点亮琥珀色提示小圆点，展示微文案“有未备份灵感 [立即导出]”，不产生阻断式弹窗打扰；用户点击“立即导出”成功下载后，计数器归零并复位提示点。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "feature-data-portability",
+            "flow-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form",
+            "evidence-file-api",
+            "evidence-mdn-storage-eviction-01",
+            "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be"
+          ],
+          "id": "task-data-portability",
+          "kind": "task",
+          "requirementIds": [
+            "feature-data-portability",
+            "flow-data-portability",
+            "interface-service-contracts",
+            "error-architecture-and-recovery"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "浏览器支持标准 Blob, File 与 FileReader API",
+              "宿主存储支持 Dexie 复合对象仓库读写事务"
+            ],
+            "completionCriteria": [
+              "自导出自导入闭环往返测试通过率 100%",
+              "全覆盖导入单原子事务及异常回滚测试通过率 100%",
+              "畸形文件与非法 Schema 拦截阻断率 100%",
+              "超期回收便签即时警示感知测试通过率 100%",
+              "未备份变更追踪与温和提醒触发复位测试全部通过"
+            ],
+            "environment": "Chrome / Edge / Firefox / Safari 真实桌面浏览器环境，Node.js 18+ 开发构建环境",
+            "exclusions": "不搭建中心化远程云端同步服务（保持纯前端离线自主掌控），不使用临时内存快照回写代替数据库原生原子事务",
+            "failureBehavior": "导入格式错误或缺少必填字段立即强行拦截报错，绝不触碰本地既有数据；全覆盖导入遇配额超限或中断，Dexie 原生事务自动完整回滚，原有数据完整无损保留；导出受阻保持面板并提示重试或手动复制",
+            "goal": "交付标准 JSON/Markdown 数据备份导出与恢复模块，统一 schemaVersion:1 规范，实现单事务全覆盖导入原子回滚与超期便签即时警示。",
+            "modules": [
+              "BackupManager",
+              "DataManagementModal",
+              "StorageService",
+              "WorkspaceUI"
+            ],
+            "normalBehavior": "点击导出生成统一 schemaVersion:1 的 JSON 文件并触发下载，未备份计数清零；支持按需排除回收区便签；导入合法文件执行增量合并或全覆盖；全覆盖清空与写入在单原子事务中完成；导入超 7 天回收便签即时点亮侧边栏预警圆点与常驻横幅；累积 20 条变更侧边栏显示温和提示点。",
+            "onFailure": "若下载受浏览器安全策略阻断，提供在文本区域直接生成格式化 JSON 供用户手动复制的备用方案",
+            "passCriteria": [
+              "导出的 JSON 顶层符合 schemaVersion:1 且自导入完全通过",
+              "全覆盖导入中断时数据库 100% 原生回滚至导入前状态",
+              "导入含超期便签即时触发过期横幅与侧边栏警示点"
+            ],
+            "scope": "BackupManager 模块开发、DataManagementModal 面板开发、统一 JSON Schema v1 规范导出与校验、回收区便签默认包含与排除复选框、单事务全覆盖导入与失败原生回滚、增量智能合并与超期即时感知、未备份变更追踪与温和提醒。",
+            "steps": [
+              "1. 规范 BackupManager 导出数据格式，顶层固定 schemaVersion: 1，支持 includeTrash 选项与标准命名",
+              "2. 实现 validateBackupFile 强校验函数，校验 app 标识、schemaVersion 及便签单条必填字段",
+              "3. 实现基于 Dexie 原生事务的 executeImport 方法，单事务包裹 notes 清空、bulkAdd 与 meta 更新，杜绝内存快照回写",
+              "4. 接入导入后超期便签扫描逻辑，即时联动侧边栏预警圆点与回收区过期横幅",
+              "5. 实现 DataManagementModal 界面交互与未备份变更追踪器（unbackedChangesCount）"
+            ],
+            "verification": [
+              "自动化往返测试验证系统自导出的 JSON 备份文件自导入通过率 100%",
+              "注入配额超限异常验证全覆盖导入单原子事务原生回滚，核对原有便签零丢失",
+              "上传损坏与非法 Schema JSON 文件验证 100% 拦截且本地数据零污染",
+              "测试导入包含超 7 天回收便签后侧边栏过期预警圆点与常驻横幅即时激活",
+              "测试便签变更自增 unbackedChangesCount 与导出成功后复位清零"
+            ]
+          },
+          "title": "数据备份导出、恢复与防丢提醒开发任务（统一协议与单事务覆盖）"
+        },
+        {
+          "content": "### 数据备份导出与恢复验收标准（Given / When / Then）\n\n- **场景 1：统一 schemaVersion: 1 规范与标准自导出自导入闭环（Roundtrip 校验）**\n  - **Given** 本地数据库存有 20 条活跃便签与 5 条处于回收区的便签，\n  - **When** 用户在数据面板点击“导出 JSON 备份”（默认勾选“包含回收区便签”），随后将导出的文件重新上传至导入面板执行校验，\n  - **Then** 导出的 JSON 文件顶层字段严格为 `schemaVersion: 1` 且包含 25 条便签记录；导入模块执行 `validateBackupFile` 强校验顺利返回通过，自导入自闭环通过率 100%，无字段类型丢失。\n\n- **场景 2：全覆盖导入单原子事务与配额超限原生回滚保护**\n  - **Given** 本地数据库存有 10 条便签，用户上传了一份包含 100 条便签的合法备份文件并选择“全量覆盖导入”，\n  - **When** 底层在清空原有数据并写入新数据过程中模拟注入配额超限异常（QuotaExceededError），\n  - **Then** Dexie 原生读写事务自动完整回滚（Rollback），界面弹出错误警告；刷新页面核对本地数据库，原有的 10 条便签 100% 完整保留，杜绝数据被清空却未写入新数据的损坏状态。\n\n- **场景 3：非法格式与损坏文件强校验拦截**\n  - **Given** 用户尝试上传一份缺少 `schemaVersion`、或 `notes` 缺失 `id` / `status` 字段的畸形 JSON 文件，\n  - **When** 系统执行文件格式与 Schema 强校验，\n  - **Then** 弹窗明确显示红色错误“导入失败：备份文件格式不符合 SparkNotes Schema v1 规范”，底层存储拦截阻断，本地现有便签数据完整无损。\n\n- **场景 4：增量合并导入与超 7 天回收便签即时激活预警**\n  - **Given** 用户本地有 10 条便签，上传的备份文件中包含 2 条移入回收区已超 7 天（`trashedAt` 距今超 168 小时）的便签，\n  - **When** 用户选择“智能增量合并”并点击确认，\n  - **Then** 系统批量写入事务顺利提交，提示导入成功；侧边栏【回收区】入口立即点亮琥珀色过期预警圆点；切换至回收区视图，顶部常驻琥珀色提示横幅“有 2 条便签已超过 7 天保留期限”，提供清空超期便签操作。\n\n- **场景 5：累计 20 条变更或超 7 天未备份温和提示点亮与一键导出复位**\n  - **Given** 用户在日常记录中累计执行了 20 次便签的新增、编辑、移入回收区或删除，\n  - **When** 达到第 20 次操作完成时，\n  - **Then** 侧边栏底部温和点亮琥珀色小圆点并展示微文案“有未备份灵感 [立即导出]”，不弹出任何打断式模态框；点击“立即导出”后直接触发下载并将提示点复位清零。",
+          "dependsOn": [
+            "task-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form",
+            "evidence-file-api",
+            "evidence-6ddb77ee-acc4-4ae3-a560-e67f902a47ad",
+            "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d"
+          ],
+          "id": "acceptance-data-portability",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-data-portability",
+            "flow-data-portability"
+          ],
+          "stage": "delivery",
+          "title": "数据备份导出与恢复验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9-data-portability",
+      "impact": "统一备份契约顶层 schemaVersion: 1 规范，实现标准 JSON 自导出自导入往返闭环；实现全量覆盖导入的单原子 Dexie 事务与配额失败原生回滚保证；完善回收区便签导出策略与导入后超期即时感知；加固未备份变更追踪与温和防丢提醒。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "本地数据备份导出与恢复交付任务及验收规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 纯前端生产构建优化与静态部署交付规范（依赖闭包与离线运行）\n\n1. **构建依赖闭包加固（Complete Dependency Closure）**：\n   - 生产构建与打包任务必须依赖所有业务与展现实现任务，形成完整的可执行依赖闭包：\n     `dependsOn: [\"task-foundation-and-storage\", \"task-quick-capture\", \"task-note-card-view\", \"task-tag-organization\", \"task-search-filter\", \"task-note-detail-edit\", \"task-data-portability\"]`。\n   - 彻底修复前序草案缺失 `task-tag-organization`、`task-search-filter`、`task-note-detail-edit` 的依赖断裂问题，确保全部业务功能代码与模块测试通过后再行执行全量生产打包。\n\n2. **Vite 生产构建优化与产物体积基准**：\n   - 生产构建命令：`npm run build`（调用 `vite build`），编译输出纯静态 `dist/` 目录。\n   - **代码拆分（Code Splitting）策略**：\n     - `vendor-react`: 拆分 `react`, `react-dom`；\n     - `vendor-storage`: 拆分 `dexie`, `dexie-react-hooks`；\n     - `vendor-markdown`: 拆分 `marked`, `dompurify`, `prismjs`；\n     - `vendor-icons`: 拆分 `lucide-react`。\n   - **产物体积基准**：全量静态产物经 gzip 压缩后总体积严格控制在 150KB 以内，确保在常规网络环境下首屏资源加载能在 300ms 内完成。\n\n3. **运行环境与安全上下文明确界定（排除 file:// 协议免服务器伪承诺）**：\n   - 产物基于 ES Module (ESM) 规范，受现代浏览器安全策略（CORS 及 module script 加载限制）约束，必须在标准 HTTP/HTTPS 静态服务器或本地 `localhost` 下运行（如 `npm run preview`、`npx serve` 或推送到 GitHub Pages / Cloudflare Pages / Vercel / Netlify 等静态托管平台），不支持直接通过 `file://` 协议免服务器双击打开运行。\n   - **安全上下文（Secure Context）要求**：生产环境必须配置 HTTPS 协议或本地使用 `localhost` 访问，以保证浏览器 StorageManager API (`persist()`, `persisted()`, `estimate()`) 与 Clipboard API 的完整可用性（非安全上下文浏览器将禁用持久化申请与现代剪贴板）。\n\n4. **离线运行能力真实边界界定（据实缩小承诺）**：\n   - 首版明确界定离线能力范围为“已打开应用页面在断网状态下的完全自主离线运行能力”：在首次通过 HTTP/HTTPS 加载页面成功后，即便网络中断断网，当前已打开的标签页中的所有本地便签新建、编辑、Markdown 预览、标签筛选、检索、回收区管理及本地 JSON 导出均 100% 正常运行，无阻断性网络报错。\n   - 首版不承诺在断网状态下的首次打开或脱机冷启动拉起（离线重新打开依赖未来 PWA / Service Worker 缓存机制，首版排除 Service Worker 强行保证，避免超前承诺）。\n   - 明确排除多用户登录鉴权与系统级全局唤起快捷键。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "task-quick-capture",
+            "task-note-card-view",
+            "task-tag-organization",
+            "task-search-filter",
+            "task-note-detail-edit",
+            "task-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-vite-official",
+            "evidence-vite-static-deploy",
+            "evidence-typescript",
+            "evidence-mdn-storage-persist-api"
+          ],
+          "id": "task-build-and-deploy",
+          "kind": "task",
+          "requirementIds": [
+            "deployment-and-build-specification",
+            "tech-core-architecture"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "构建环境具备 Node.js 18+ 与 npm / pnpm 包管理工具",
+              "运行环境支持 ES2022+ 标准的现代浏览器"
+            ],
+            "completionCriteria": [
+              "生产构建 0 错误 0 告警顺利通过且产物完整生成",
+              "全量 gzip 压缩产物总体积严格 <= 150KB",
+              "本地静态服务及 HTTPS 托管加载控制台 0 网络与脚本报错",
+              "已打开页面在断网状态下本地 CRUD 与备份导出验证全部通过"
+            ],
+            "environment": "Node.js 18+ 构建环境，本地轻量静态 HTTP 服务器或标准 HTTPS 静态托管平台",
+            "exclusions": "不编写服务端 Dockerfile 与后端编排（纯前端无服务器架构），不承诺通过 file:// 协议免服务器双击运行，首版不承诺断网首次脱机打开（排除 Service Worker 强保证），不引入多用户鉴权",
+            "failureBehavior": "TypeScript 类型错误或依赖缺失时构建立即阻断并输出明确错误行号，不输出半成品损坏产物；构建产物体积超标时触发 visualizer 依赖分析并执行按需导入优化",
+            "goal": "完成纯前端生产构建优化与打包配置，补齐对全部业务任务的依赖闭包，输出纯静态无后端依赖产物包，明确 localhost/HTTPS 运行规范与离线能力真实边界。",
+            "modules": [
+              "ViteBuildConfig",
+              "DeploymentScripts"
+            ],
+            "normalBehavior": "执行 npm run build 极速完成打包，生成 dist/ 静态目录；依赖合理分包且 gzip 压缩总体积 <= 150KB；通过 localhost 或 HTTPS 静态托管拉起服务应用完整可用；首次加载后断网脱机状态下所有本地数据功能正常运行。",
+            "onFailure": "若打包产物体积超标，启用 rollup-plugin-visualizer 分析依赖，执行按需导入与代码瘦身优化",
+            "passCriteria": [
+              "npm run build 成功退出（exit code 0）且输出 dist 目录",
+              "打包产物无硬编码绝对路径引用，使用相对路径资源引用",
+              "全量 gzip 压缩总体积 <= 150KB"
+            ],
+            "scope": "vite.config.ts 生产构建优化配置、Rollup 代码分包、产物 gzip 体积控制、构建依赖闭包维护、本地静态服务器预览验证、单页静态路由 Fallback 与安全上下文配置。",
+            "steps": [
+              "1. 优化 vite.config.ts 构建配置，配置 rollupOptions 分包策略（react、storage、markdown、icons）与相对路径资源引用",
+              "2. 执行 npm run build 验证构建流程、依赖闭包与进程退出码",
+              "3. 测量生产产物 gzip 压缩体积，核验总体积严格控制在 150KB 以内",
+              "4. 使用 npm run preview 本地静态服务器加载产物，验证控制台零报错与安全上下文",
+              "5. 执行断网模拟，验证已打开页面的本地便签操作与备份导出功能完整性"
+            ],
+            "verification": [
+              "执行 npm run build 检查全量构建与进程退出码（Exit Code 0）",
+              "检查 dist/ 目录产物体积报告，验证全量产物 gzip 压缩后总体积严格 <= 150KB",
+              "在本地轻量静态 HTTP 服务器拉起产物，验证页面加载零报错且 StorageManager API 可用",
+              "模拟网络切断断网状态，验证已打开页面中便签的新增、编辑、检索与备份导出正常运行"
+            ]
+          },
+          "title": "纯前端生产构建优化与静态部署任务（依赖闭包与离线运行）"
+        },
+        {
+          "content": "### 静态打包构建与部署验收标准（Given / When / Then）\n\n- **场景 1：生产构建依赖完整性与产物输出验证**\n  - **Given** 全部业务交付任务（存储、捕获、卡片流、标签、检索、详情编辑、数据备份）均已完成实现与单元测试，\n  - **When** 开发者在终端执行 `npm run build`，\n  - **Then** 构建进程返回退出码 0，在 `dist/` 目录生成完整的纯静态产物；经过 gzip 压缩后总体积严格控制在 150KB 以内；vendor 依赖合理分包。\n\n- **场景 2：基于 localhost/HTTP 静态托管运行与安全上下文校验**\n  - **Given** 构建生成的 `dist/` 静态产物目录，\n  - **When** 开发者通过本地轻量静态 HTTP 服务器（如 `npm run preview` 或 `npx serve`）拉起服务并在浏览器中访问，\n  - **Then** 页面正常加载所有样式与脚本，控制台 0 报错；`StorageManager.persisted()` 与 `StorageManager.estimate()` 正常可用；明确验证在没有 Web 服务器的直接 `file://` 协议下会因现代浏览器 CORS/ESM 限制而受阻，确认需在 localhost/HTTP 服务下运行。\n\n- **场景 3：已打开页面在断网脱机状态下的完全离线读写与导出验证**\n  - **Given** 用户在浏览器中已成功加载并打开应用主页面，\n  - **When** 开发者在系统层面切断网络连接或在浏览器开发者工具 Network 面板勾选 Offline，\n  - **Then** 用户在页面中连续执行快速记录便签、修改详情、搜索过滤、移入回收区及导出 JSON 备份，全部操作均毫秒级在本地 IndexedDB 完成，界面零网络报错阻断，本地数据完整保持。\n\n- **场景 4：单页应用路由与静态托管刷新兼容性验证**\n  - **Given** 应用部署在静态托管平台（如 GitHub Pages、Cloudflare Pages 或 Vercel），\n  - **When** 用户在单页应用各状态页面执行浏览器硬刷新（F5），\n  - **Then** 静态服务器正确提供 index.html（SPA Fallback），页面状态平滑恢复，无 404 页面丢失错误。",
+          "dependsOn": [
+            "task-build-and-deploy"
+          ],
+          "evidenceIds": [
+            "evidence-vite-official",
+            "evidence-vite-static-deploy"
+          ],
+          "id": "acceptance-build-and-deploy",
+          "kind": "acceptance",
+          "requirementIds": [
+            "deployment-and-build-specification",
+            "tech-core-architecture"
+          ],
+          "stage": "delivery",
+          "title": "静态打包构建与部署验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9-build-and-deploy",
+      "impact": "补齐构建任务对全部业务实现任务的完整依赖闭包；界定基于标准 HTTP/HTTPS 静态托管与 localhost 的运行方式及安全上下文边界，明确排除 file:// 协议免服务器伪承诺；据实界定首版已打开页面断网运行边界，排除 Service Worker 强行保证。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "纯前端生产构建优化与静态部署交付任务及验收规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "### 真实浏览器存储基准与全文检索性能实测验证任务（多端覆盖与闭合判定）\n\n1. **未验证状态声明与可执行依赖明确**：\n   - 由于规划阶段宿主 Docker 容器环境不可用（引用 evidence-exp-docker-env-prep），性能指标（如 1,000 条便签规模下检索端到端延迟 <= 150ms、首屏冷启动 TTI <= 1.0s、超期便签批量清理延迟）不能宣称已实测通过，全部定为“待验证目标，非已实测事实”。\n   - 作为交付阶段完成所有业务与构建任务后的综合实测验证任务，其 `dependsOn` 必须依赖真实构建与业务交付任务：\n     `dependsOn: [\"task-build-and-deploy\", \"task-search-filter\", \"task-data-portability\", \"task-note-detail-edit\"]`，确保具备可执行的前置代码与产物基座。\n\n2. **真实多浏览器环境覆盖（包含 Safari 17+ / WebKit）**：\n   - 真实测试环境覆盖桌面主流浏览器：Chrome 120+、Edge 120+、Firefox 122+ 以及 Safari 17+ (macOS / WebKit)。\n   - 重点测试 Safari / WebKit 存储策略差异：针对 Safari 7 天无交互清理策略（ITP 限制）与 WebKit IndexedDB 偶发配额限制，验证 StorageManager API 申请持久化授权行为与温和备份提醒机制。\n\n3. **检索性能度量口径与严密闭合边界**：\n   - **数据规模**：自动化脚本向本地 IndexedDB 灌入 1,000 条混合格式便签样本（包含 900 条常规活跃/归档便签，100 条回收区便签，其中部分移入时间超过 7 天）。\n   - **测量起止点**：从键盘击键输入事件发生起，计入 80ms 防抖管道耗时，到检索引擎完成模糊匹配并更新 React DOM 渲染完成的真实端到端时间（End-to-End Latency）。\n   - **测量方法**：在基准 PC 硬件（4核 CPU / 8GB 内存）上，使用自动化基准测试脚本在 Chrome、Edge、Firefox 及 Safari 中分别连续执行 10 次不同长度关键词模糊搜索，记录每次耗时并统计平均耗时与 P95 耗时。\n   - **闭合判定标准**：\n     1) **通过标准（Pass）**：10 次检索平均端到端耗时 `<= 150ms`（且 P95 `<= 200ms`）。\n     2) **降级优化标准（Degradation）**：`150ms < 平均耗时 <= 250ms` 时，引入 `React.memo` 阻断卡片列表冗余重绘，并使用 `useDeferredValue` 优化搜索流响应。\n     3) **失败重构标准（Fail）**：平均耗时 `> 250ms` 时，判定为检索性能未达标，将检索算法升级为内存分词倒排索引，并引入虚拟滚动列表。\n\n4. **冷启动与超期清理事务度量口径**：\n   - **应用冷启动可交互时间（TTI）**：在清除浏览器 HTTP 缓存后，从导航拉起页面到 6 块骨架屏脉冲动画消失、便签列表卡片完全可响应点击交互的端到端耗时，实测指标 `<= 1.0 秒`。\n   - **回收区超期便签批量清理事务**：在 50 条超 7 天回收区便签规模下，测量用户二次确认后 `purgeExpiredTrashedNotes` 批量删除事务耗时，指标 `<= 200ms`；并模拟事务中途异常，验证底层事务完整回滚率达到 100%。\n\n5. **模拟存储配额满载防御与草稿保留验证**：\n   - 注入配额满载受控异常（QuotaExceededError），在快速捕获输入框与详情编辑弹窗中触发保存：\n     - 验证输入框与编辑弹窗在弹出告警横幅后绝对不关闭、不重置；\n     - 验证用户正在编辑的长文草稿完整保留在文本域中；\n     - 验证告警横幅内的“一键复制”与“导出为本地 .txt 文件”恢复通道正常可用；\n     - 确认系统严格遵循 IndexedDB 单一存储事实，不引入 localStorage 破坏单一事实来源。",
+          "dependsOn": [
+            "task-build-and-deploy",
+            "task-search-filter",
+            "task-data-portability",
+            "task-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-exp-docker-env-prep",
+            "evidence-storage-estimate",
+            "evidence-mdn-storage-persist-api",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-133fe143-b3cb-4d0f-ac93-874871031c4d"
+          ],
+          "id": "val-storage-and-search-benchmark",
+          "kind": "validation",
+          "requirementIds": [
+            "block-outcomes-lightweight-experience",
+            "feature-search-filter",
+            "feature-data-portability",
+            "feature-note-card-view"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "测试宿主机器为常规桌面 PC（4核 CPU，8GB 内存以上）",
+              "测试浏览器为最新稳定版 Chrome、Edge、Firefox 及 Safari 17+",
+              "测试运行于标准安全上下文（localhost 或 HTTPS）"
+            ],
+            "completionCriteria": [
+              "1,000 条便签规模下，10 次搜索平均端到端延迟严格 <= 150ms（P95 <= 200ms）",
+              "回收区超期便签批量清理事务执行时间 <= 200ms 且回滚测试通过率 100%",
+              "浏览器首次无缓存冷启动至首屏卡片交互时间 TTI 实测 <= 1.0 秒",
+              "配额满载注入下编辑弹窗防关闭且草稿文本保留率达到 100%",
+              "主流浏览器（Chrome/Edge/Firefox/Safari 17+）兼容性实测全部通过"
+            ],
+            "environment": "Windows 11 / macOS 14 / Ubuntu 22.04 桌面宿主，Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+ 真实浏览器，标准安全上下文",
+            "evidenceRequired": [
+              "Chrome DevTools 与 Safari Web Inspector 性能录制分析报告",
+              "自动化基准测试脚本运行耗时日志数据与统计截图",
+              "回收区超期便签批量清理与全覆盖导入事务回滚测试报告",
+              "配额超限注入下弹窗保持开启与草稿保留截图"
+            ],
+            "exclusions": "排除服务端性能测试（无后端架构），排除网络往返延迟（纯本地离线持久化），不对 boolean 字段建立物理索引",
+            "failureBehavior": "检索平均延迟若在 150~250ms 之间，触发 React.memo 与 useDeferredValue 轻量优化；若大于 250ms，重构为内存倒排索引并引入虚拟滚动；回收区查询超时优化复合索引；配额异常捕获失败加固全局事务监听与应急导出逻辑",
+            "goal": "在真实主流浏览器（Chrome/Edge/Firefox 及 Safari 17+）中实测验证 1,000 条便签规模下的全文检索端到端闭合延迟、首屏冷启动 TTI、回收区超期清理事务耗时及配额超限草稿防御机制。",
+            "modules": [
+              "StorageService",
+              "SearchEngine",
+              "BackupManager",
+              "WorkspaceUI",
+              "NoteDetailModal"
+            ],
+            "normalBehavior": "批量注入 1,000 条便签耗时 < 800ms；全文检索端到端平均延迟 <= 150ms；回收区超期清理批量事务耗时 <= 200ms；首屏冷启动 TTI <= 1.0s；多浏览器表现一致。",
+            "onFailure": "若检索平均耗时在 150~250ms 之间，启用 React.memo 与 useDeferredValue；若大于 250ms，升级为倒排索引并引入虚拟滚动列表；若 Safari 存储受限，加固温和备份提醒频率与持久化授权重试逻辑。",
+            "passCriteria": [
+              "10 次复合关键词搜索平均端到端延迟严格 <= 150ms 且 P95 <= 200ms",
+              "首屏冷启动 TTI <= 1.0s",
+              "回收区批量清理事务耗时 <= 200ms 且异常回滚 100% 保持数据无损",
+              "配额超限注入下草稿文本 100% 完整保留未丢失",
+              "Safari 17+ 存储与配额防御实测通过"
+            ],
+            "scope": "覆盖桌面主流浏览器（含 Safari 17+ WebKit）；利用自动化基准测试脚本注入 1,000 条混合格式测试样本（含超 7 天回收便签）；实测检索端到端耗时（含 80ms 防抖）、回收区超期查询与批量删除事务耗时、首屏冷启动 TTI、全覆盖导入单事务原子性、配额超限草稿保留与应急导出防线。",
+            "steps": [
+              "1. 执行 npm run build 并在真实 Chrome、Edge、Firefox 及 Safari 17+ 浏览器中拉起本地静态预览",
+              "2. 运行自动化基准数据灌入脚本，批量写入 1,000 条混合格式便签（含超 7 天回收便签）",
+              "3. 开启 Performance 性能录制，连续执行 10 次模糊搜索，记录并核算平均耗时与 P95 耗时",
+              "4. 测量回收区超期查询与批量删除事务耗时，注入中断验证事务回滚数据一致性",
+              "5. 测量首屏冷启动 TTI 与配额超限注入下的弹窗防关闭及草稿保留情况"
+            ],
+            "verification": [
+              "使用 Chrome DevTools 与 Safari Web Inspector Performance 面板测量键盘事件至重新排版渲染完成的真实端到端耗时",
+              "自动化脚本统计 10 次不同关键词模糊检索平均耗时与 P95 分位耗时",
+              "测试脚本核对回收区超期便签批量删除前后数据一致性与事务回滚率",
+              "模拟配额超限注入，验证编辑弹窗防关闭、草稿在文本域中保留率 100% 及应急导出 .txt 可用性"
+            ]
+          },
+          "title": "真实浏览器存储基准与全文检索性能实测验证任务（多端覆盖与闭合判定）"
+        },
+        {
+          "content": "### 真实浏览器性能基准与配额防御验收标准（Given / When / Then）\n\n- **场景 1：1,000 条便签规模全文检索响应耗时闭合判定**\n  - **Given** 数据库中批量灌入了 1,000 条真实便签样本，\n  - **When** 用户在顶部搜索框输入复合关键词（含 80ms 防抖管道），\n  - **Then** 从击键结束到视图卡片列表重新排版完成的真实端到端耗时在主流浏览器（Chrome/Edge/Firefox/Safari）中平均实测 `<= 150ms`（P95 `<= 200ms`）判定通过；若耗时在 `150ms < t <= 250ms` 触发 React.memo 降级优化，若 `> 250ms` 判定未达标触发倒排索引与虚拟滚动重构。\n\n- **场景 2：冷启动首屏交互时间（TTI）实测达标**\n  - **Given** 浏览器处于未缓存首次打开状态，\n  - **When** 用户导航访问应用本地静态预览服务页面，\n  - **Then** 骨架屏脉冲动画在 1.0 秒内完全消失，首屏卡片流平滑呈现并可立即响应点击与输入（TTI `<= 1.0s`）。\n\n- **场景 3：回收区超期便签批量清理耗时与事务原子性**\n  - **Given** 回收区中存在 50 条驻留超过 7 天的超期便签，\n  - **When** 用户点击【清空已过期便签】并在模态弹窗中二次确认，\n  - **Then** 批量删除事务在 200ms 内顺利完成，视图无卡顿刷新，未超期便签 100% 完整保留；模拟事务中途异常时底层事务自动完整回滚，超期便签完好保留在数据库中。\n\n- **场景 4：模拟配额超限下编辑弹窗防关闭、草稿保留与应急导出**\n  - **Given** 注入存储配额超限异常，\n  - **When** 用户在快速捕获输入框或详情编辑弹窗中触发保存，\n  - **Then** 输入框与编辑弹窗绝对不关闭、不重置，编辑文本完整保留在输入区域；界面浮现琥珀色告警并提供重试保存、一键复制及导出为本地 `.txt` 文件的应急恢复入口。\n\n- **场景 5：Safari 17+ / WebKit 真实环境兼容性与持久化感知**\n  - **Given** 在 macOS Safari 17+ 真实浏览器环境中访问应用，\n  - **When** 应用主进程初始化并调用 StorageManager 接口，\n  - **Then** 能够准确感知 WebKit 下存储配额与持久化状态，无 WebKit 特有 IndexedDB 异常抛出，回收区 7 天防丢提醒正常运转。",
+          "dependsOn": [
+            "val-storage-and-search-benchmark"
+          ],
+          "evidenceIds": [
+            "evidence-exp-docker-env-prep",
+            "evidence-storage-estimate",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be"
+          ],
+          "id": "acceptance-storage-and-search-benchmark",
+          "kind": "acceptance",
+          "requirementIds": [
+            "val-storage-and-search-benchmark",
+            "block-outcomes-lightweight-experience"
+          ],
+          "stage": "delivery",
+          "title": "真实浏览器性能基准与配额防御验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-e3e5b81f-5a99-495b-8fbf-9ab9431587a9-storage-search-benchmark",
+      "impact": "作为交付阶段完成实现后的端到端实测验证，依赖构建任务与核心业务任务；覆盖桌面主流浏览器（含 Safari 17+ / WebKit）；统一 1,000 条便签规模下 80ms 防抖检索端到端闭合判定基准；实测首屏冷启动 TTI、回收区超期清理事务耗时及配额满载草稿保留防线。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "真实浏览器性能基准与配额防御实测交付验证任务及验收规范"
+    }
+  ],
+  "questions": [],
+  "summary": "已完成反馈阶段交付范围（检索、详情编辑、数据备份、构建部署与性能实测基准）的系统化修订。彻底解决 INVALID_CHANGESET 变更组依赖问题，将 10 个必需块按主题清晰拆分为 5 个独立变更组（dependsOn: []，无断裂依赖）；全面落地 80ms 防抖闭合检索引擎与范围隔离、详情编辑三态退出与 updatedAt 两标签页乐观并发冲突检测、统一 schemaVersion:1 自闭环自导出自导入与单事务全覆盖原生回滚、构建部署全业务依赖闭包与运行上下文规范、以及真实主流浏览器（含 Safari 17+）性能与配额超限草稿防御实测基准。",
+  "workItems": []
+}

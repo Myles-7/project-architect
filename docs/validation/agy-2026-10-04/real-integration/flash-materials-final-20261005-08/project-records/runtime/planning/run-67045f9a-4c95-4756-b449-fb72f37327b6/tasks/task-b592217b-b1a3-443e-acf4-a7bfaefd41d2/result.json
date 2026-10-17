@@ -1,0 +1,46 @@
+{
+  "blockers": [
+    "【开发验证缺口】：在规划 feedback 阶段缺少实际目标应用与构建产物（index.html、styles.css、app.js 尚未完成开发编写），缺少待开发的功能模块代码实现（DebounceScheduler 防抖调度器、InputController 输入监听器与 ResetController 清除定时器取消排队逻辑尚未落地），且缺少本地真实桌面浏览器测试运行平台（Docker 守护进程未启动导致试验沙箱不可用，且当前规划环境不具备真实运行桌面浏览器 Chromium/Chrome/Edge/Firefox 进行 Performance API 打点与 DOM 首帧重绘测量的条件）。本任务目标属于后续开发与交付阶段在真实浏览器环境下的测量目标，不得当作当前规划阶段可执行试验，试验如实记录为 unexecuted。",
+    "【验证时机与所需证据】：需在后续技术实现（Implementation）与交付（Delivery）阶段，当单页面静态代码与模块编码完成、静态文件交付包同级组装就绪后，由技术验证任务（blk-tech-val-performance）与交付前置验证任务（blk-deliv-val-perf-benchmark）在本地现代主流桌面浏览器（Chrome/Edge/Firefox 最新稳定版）真实环境中执行实测。所需证据包括：在浏览器 DevTools 控制台与 Performance 面板记录的 5 轮耗时数据日志（使用 performance.now() 与 requestAnimationFrame 测量从最后一次 input 事件触发至 300ms 定时器回调执行及 DOM 文本重绘完成的整体耗时 ≤350ms，且纯 DOM 渲染更新延迟 ≤50ms），以及在输入后 150ms 快速点击清空按钮时验证 clearTimeout 立即销毁排队任务、300ms 到期后展示区始终保持初始灰字占位符无旧文字幽灵回显的实测快照与集成验收用例通过记录（blk-deliv-acc-full-e2e Scenario 4）。",
+    "【受影响块 ID 与依据】：受影响蓝图块包括：预期产品成效与衡量目标（blk-prod-outcomes）、技术开发任务（blk-tech-task-impl）、技术验证任务（blk-tech-val-performance）、交付任务（blk-deliv-task-input-workflow、blk-deliv-task-reset-workflow）、端到端集成验收规范（blk-deliv-acc-full-e2e）及交付前置性能基准实测任务（blk-deliv-val-perf-benchmark）。依据来源：用户需求变更原文 input:b33f1cd7-dee5-49e5-ab04-da05e30564c5、MDN Window: clearTimeout() 官方规范 https://developer.mozilla.org/en-US/docs/Web/API/Window/clearTimeout（evidence-3383ef1f-8429-4ff9-afe9-7436eed5cdae）及受控试验沙箱准备不可用记录 experiment:prepare-8418c4be-348e-464d-a1df-f4517b36bc3c（evidence-215182a7-8698-4d52-a6cb-a105b5c49f0f）。交由登记整合任务统一处理，不在此生成 groups。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用户提出的实时反馈输入与删除确认按钮需求变更原文证据，作为 feedback 阶段设计变更组的根本依据。",
+      "content": "模拟用户需求变更：确认按钮改为实时反馈：输入每次变化后等待300毫秒自动展示项目名，清空立即取消待展示任务并清掉结果；空值仍提示。删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收，保留无关块稳定 ID。此原文不是直接批准。",
+      "hash": "62c4629f93646cb40a052290d9aedbddc4637a5ab929d3f4f8fded5c19e04feb",
+      "id": "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+      "kind": "user",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564.json",
+      "obtainedAt": "2026-10-04T16:29:05.113Z",
+      "source": "input:b33f1cd7-dee5-49e5-ab04-da05e30564c5"
+    },
+    {
+      "applicability": "MDN 官方 Web API 规范证实 clearTimeout(timeoutID) 能有效销毁先前由 setTimeout 建立的延时任务，从底层标准验证了清空按钮与防抖调度器联动（在 handleReset 中立即调用 clearTimeout）在机制上可有效杜绝异步回调执行，避免 300ms 防抖待展示任务在清空后造成幽灵渲染。",
+      "content": "The clearTimeout() method of the Window interface cancels a timeout previously established by calling Window.setTimeout(). If the parameter provided does not identify a previously established action, this method does nothing.",
+      "hash": "fe177385084b93d6360509f329d325111f5b0a031287e139eb3f07d29a26a25b",
+      "id": "evidence-3383ef1f-8429-4ff9-afe9-7436eed5cdae",
+      "kind": "official-source",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\research-fe177385084b93d6360509f329d325111f5b0a031287e139eb3f07d29a26a25b.txt",
+      "obtainedAt": "2026-10-04T16:37:53.859Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/clearTimeout"
+    },
+    {
+      "applicability": "规划环境受控试验沙箱 Docker 守护进程未启动导致环境不可用，且当前规划 feedback 阶段尚未进行前端编码实现，缺少实际应用构建产物与真实桌面浏览器运行时环境；300ms 防抖响应延迟实测与清除定时器防幽灵渲染逻辑无法在规划阶段执行，需作为开发验证任务移入后续开发与交付阶段在真实桌面浏览器实测。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "node:24.13.0-bookworm-slim (Docker unavailable)",
+      "hash": "2ce2a6b4c57ac2a3e6f5f8ba59f1b5c7846d26196355762c7f3964088b3f1b7c",
+      "id": "evidence-215182a7-8698-4d52-a6cb-a105b5c49f0f",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\experiments\\\\prepare-8418c4be-348e-464d-a1df-f4517b36bc3c.ndjson",
+      "obtainedAt": "2026-10-04T20:50:09.326Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-8418c4be-348e-464d-a1df-f4517b36bc3c"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "在当前 feedback 阶段对任务目标“在后续开发与交付阶段，在本地现代主流桌面浏览器真实环境中实测 300ms 防抖响应延迟与清除定时器防幽灵渲染逻辑”进行受控验证核对。通过 material_index、material_read 与 view_file 完整查阅用户原始输入 inp-01 与参考截图 fixture.png，通过 research_read 查阅 MDN 官方 Web API 文档中关于 Window: clearTimeout() 的官方规范，验证了 clearTimeout 取消先前建立的 setTimeout 任务在机制上的完全可行性。调用 environment_prepare 尝试准备受控试验沙箱环境，检测到 Docker API 管道不可用（Docker 守护进程未启动）。更重要的是，本任务目标明确属于后续开发与交付阶段针对实际构建产物在真实现代主流桌面浏览器环境中的实测验证，当前处于规划反馈阶段，缺少实际前端单页面构建产物（index.html、styles.css、app.js）、待开发功能模块（DebounceScheduler、InputController、ResetController）与真实浏览器运行平台，不能把“后续开发完成后在真实应用测量”当作当前规划可执行试验，受控试验如实记录为 unexecuted。已在 blockers 中详细列明具体开发验证缺口、验证时机、所需证据及受影响蓝图块 ID，移交登记整合任务统一处理；groups 输出为空数组，questions 输出为空数组，clarification 设为 null，不输出 workItems，不以未来才能执行的工作延长当前规划验证。"
+}

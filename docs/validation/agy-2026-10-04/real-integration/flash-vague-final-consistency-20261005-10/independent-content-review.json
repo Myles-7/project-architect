@@ -1,0 +1,78 @@
+{
+  "label": "flash-vague-final-consistency-20261005-10",
+  "checkedAt": "2026-10-05T10:35:48.463Z",
+  "status": "blocked",
+  "contentPassed": false,
+  "scope": "Independent reading of selected exact counterexamples in the frozen latest candidate. Not a complete final artifact review or target execution.",
+  "candidateContextSha256": "588bb477d3e48e54452b4ab5698ad35616f105ee66d8565859eddbd3e7c620af",
+  "candidatePreviewSha256": "c63e2f9e533c746c04235396f646af60b9acf2bc7b525a60e72457918c62ca61",
+  "taskId": "task-ef636012-4132-408c-b20c-92132c43d345",
+  "blockCount": 43,
+  "findings": [
+    {
+      "id": "N9",
+      "blocks": [
+        "interface-service-contracts",
+        "feature-data-portability"
+      ],
+      "excerpts": [
+        "importOverwrite(file: File)",
+        "validateBackupFile(file: File)"
+      ],
+      "reason": "Import accepts only File. Validation returns no preview database revision/generation or byte identity. The promised re-preview after another tab writes cannot be expressed in the public contract."
+    },
+    {
+      "id": "N10",
+      "blocks": [
+        "interface-service-contracts",
+        "acceptance-foundation-and-storage"
+      ],
+      "excerpts": [
+        "purgeExpiredTrash(",
+        "listExpiredTrashedNotes()"
+      ],
+      "reason": "Foundation acceptance invokes listExpiredTrashedNotes(), which the latest IStorageService does not declare. Use an existing listNotes plus the documented expiry predicate or define one coherent public method everywhere."
+    },
+    {
+      "id": "N11",
+      "blocks": [
+        "data-model-core-entities",
+        "acceptance-quick-capture"
+      ],
+      "excerpts": [
+        "export interface SessionDraft",
+        "sessionStorage.setItem"
+      ],
+      "reason": "SessionDraft is a structured, versioned object, but quick-capture acceptance specifies directly storing content text. Producer, getDraft(), restore validation, and draft file export need the same shape."
+    },
+    {
+      "id": "N12",
+      "blocks": [
+        "data-model-core-entities",
+        "feature-data-portability"
+      ],
+      "excerpts": [
+        "appMeta: AppMeta[]",
+        "backupTracker: BackupTrackerMeta"
+      ],
+      "reason": "Backup duplicates tracker metadata inside an open-ended AppMeta[] and a separate backupTracker; it does not close duplicate-key consistency, library generation handling, imported tracker/reminder policy, or complete per-field validation."
+    },
+    {
+      "id": "N13",
+      "blocks": [
+        "feature-quick-capture",
+        "acceptance-quick-capture"
+      ],
+      "excerpts": [
+        "#Dexie",
+        "Dexie"
+      ],
+      "reason": "The normative tag rule normalizes case, while quick-capture acceptance expects Dexie after entering #Dexie. Also specify editable-focus and IME guards for N so typing ordinary n never steals the cursor."
+    }
+  ],
+  "proposedQualityFeedback": "..\\quality-feedback-notes-contract-closure-20261005.txt",
+  "feedbackApplied": false,
+  "finalReviewStatus": "pending",
+  "humanReview": "pending",
+  "targetApplicationExecution": "unexecuted"
+}

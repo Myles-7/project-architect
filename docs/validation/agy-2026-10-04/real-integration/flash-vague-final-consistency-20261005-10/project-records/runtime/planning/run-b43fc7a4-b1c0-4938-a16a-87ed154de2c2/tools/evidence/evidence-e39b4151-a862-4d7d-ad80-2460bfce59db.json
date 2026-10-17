@@ -1,0 +1,11 @@
+{
+  "id": "evidence-e39b4151-a862-4d7d-ad80-2460bfce59db",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria",
+  "capturedAt": "2026-10-04T15:07:26.105Z",
+  "sha256": "afa8f4647cc2ec03dce3fae34577e1d506e2d3e330b38c879f22c00e19c7f696",
+  "scope": "浏览器本地存储选型与容量限制官方标准",
+  "path": "D:\\Temp\\User\\pa-real-integration-EYMmL3\\vague\\runtime\\planning\\run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2\\tools\\evidence\\evidence-e39b4151-a862-4d7d-ad80-2460bfce59db.json",
+  "approval": "candidate",
+  "content": "MDN官方文档指出：Web Storage (localStorage) 每个域名通常被严格限制在约 5 MiB，且为同步阻塞调用，超限时抛出 QuotaExceededError。相比之下，IndexedDB 采用动态配额系统：Chromium 允许使用高达磁盘 60% 空间，Firefox 允许 10%（上限 10 GiB，持久化后可达 50%），Safari 约 60%。但默认在 best-effort 模式下受 LRU 存储压力驱逐，且 Safari 在开启防追踪时若连续 7 天无用户交互会主动清除脚本数据。可通过 navigator.storage.persist() 申请常驻存储保护数据，并通过 navigator.storage.estimate() 获取使用量与配额。",
+  "conclusion": "LocalStorage 每个域名限制约 5MB，超出抛出 QuotaExceededError；IndexedDB 容量上限大（可达磁盘总容量 10%~60%），但默认处于 best-effort 模式，面临存储压力驱逐与 Safari 7 天无交互的主动驱逐风险；可通过 navigator.storage.persist() 申请持久化，并通过 navigator.storage.estimate() 探测空间。"
+}

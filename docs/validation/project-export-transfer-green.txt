@@ -1,0 +1,19 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ✓ packages/core/tests/ProjectExportImportService.test.ts (4 tests) 1336ms
+   ✓ ProjectExportImportService Unit Tests > exports one Core snapshot while a concurrent formal commit waits for archive reading  387ms
+   ✓ ProjectExportImportService Unit Tests > exports and imports a full project archive accurately without loss  397ms
+   ✓ ProjectExportImportService Unit Tests > P0-5: detects collision and renames imported project safely with timestamp suffix when same project exists  483ms
+ ✓ packages/core/tests/ProjectForkService.test.ts (2 tests) 580ms
+   ✓ ProjectForkService Unit Tests > atomically forks project, rewrites all state file projectIds, resets readiness, and injects forkedFrom  412ms
+ ✓ packages/core/tests/ProjectTransferIntegrity.test.ts (6 tests) 11563ms
+   ✓ Project transfer integrity against genuine frozen Core state > preserves every historical byte through fork, new-ID import, collision import and same-ID round trip  9852ms
+   ✓ Project transfer integrity against genuine frozen Core state > isolates an in-flight run without changing its receipts and permits a fresh registered run  357ms
+   ✓ Project transfer integrity against genuine frozen Core state > preserves readiness and document history while staling unapproved proposals in the new identity  314ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  07:05:48
+   Duration  12.93s (transform 552ms, setup 0ms, collect 1.53s, tests 13.48s, environment 0ms, prepare 276ms)
+

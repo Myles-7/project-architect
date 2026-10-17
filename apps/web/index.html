@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Project Architect — 本地 AI 项目构思工作台</title>
     <meta name="description" content="在编码前把项目想清楚，把模糊想法转化为工程级规范与 Coding Agent 蓝图。" />
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('pa_theme_preference');
+          var isDark = theme === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+            : theme === 'light' ? false : true;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="bg-[#FAF9F6] dark:bg-[#0C0D0F] text-[#0F1115] dark:text-[#EDEDED]">
     <div id="root"></div>

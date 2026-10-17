@@ -1,0 +1,403 @@
+{
+  "status": "passed",
+  "startedAt": "2026-10-04T17:49:01.569Z",
+  "node": "v24.19.0",
+  "nodeExecutable": "C:\\Users\\Li Cheng Xin\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "mode": "Compiled production modules; public HTTP operations on a synthetic legacy-project copy",
+  "limits": "Synthetic compatibility and fault-injection evidence only; no genuine user data, model calls or human approvals",
+  "providerCalls": 0,
+  "checks": [
+    {
+      "name": "source-and-both-copies-start-identical",
+      "passed": true
+    },
+    {
+      "name": "fixture-has-no-planning-files-and-preserves-old-ready-format",
+      "passed": true
+    },
+    {
+      "name": "initial-planning-read-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/01-initial-planning-read.json"
+      }
+    },
+    {
+      "name": "initial-snapshot-read-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/02-initial-snapshot-read.json"
+      }
+    },
+    {
+      "name": "legacy-readiness-is-ready-and-approved-as-fixture-input",
+      "passed": true
+    },
+    {
+      "name": "legacy-readiness-does-not-approve-empty-blueprint",
+      "passed": true
+    },
+    {
+      "name": "explicit-question-gap-link-restores-decision-key",
+      "passed": true
+    },
+    {
+      "name": "unlinked-decision-remains-unassigned",
+      "passed": true
+    },
+    {
+      "name": "historical-answer-is-unknown-with-full-options-and-no-selection-keys",
+      "passed": true
+    },
+    {
+      "name": "migration-diagnostics-are-traceable-to-ambiguous-records",
+      "passed": true,
+      "details": [
+        "主题 storage:location 有多个有效旧决定，需审阅合并。",
+        "旧决定 legacy-research-question 可能把问题、委托或不确定表达当作事实，需审阅后清理。",
+        "旧决定 legacy-unlinked 缺少明确的问题或决策键关联，暂时保留原记录，需审阅后确认主题。"
+      ]
+    },
+    {
+      "name": "cleanup-is-unapproved-and-retains-all-original-records",
+      "passed": true
+    },
+    {
+      "name": "ready-cannot-compile-package-http-status",
+      "passed": true,
+      "details": {
+        "actual": 422,
+        "expected": 422,
+        "evidence": "http/03-ready-cannot-compile-package.json"
+      }
+    },
+    {
+      "name": "package-generation-requires-actual-stage-approval",
+      "passed": true
+    },
+    {
+      "name": "cleanup-without-unlock-http-status",
+      "passed": true,
+      "details": {
+        "actual": 422,
+        "expected": 422,
+        "evidence": "http/04-cleanup-without-unlock.json"
+      }
+    },
+    {
+      "name": "locked-cleanup-requires-explicit-unlock",
+      "passed": true
+    },
+    {
+      "name": "compatible-http-reads-and-rejected-writes-do-not-change-project-files",
+      "passed": true
+    },
+    {
+      "name": "normal-input-commit-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/05-normal-input-commit.json"
+      }
+    },
+    {
+      "name": "normal-operation-persists-new-structure-at-version-2",
+      "passed": true
+    },
+    {
+      "name": "normal-operation-uses-verified-two-phase-manifest",
+      "passed": true
+    },
+    {
+      "name": "planning-after-normal-input-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/06-planning-after-normal-input.json"
+      }
+    },
+    {
+      "name": "normal-input-does-not-auto-cleanup-or-confirm-blueprint",
+      "passed": true
+    },
+    {
+      "name": "approve-question-cleanup-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/07-approve-question-cleanup.json"
+      }
+    },
+    {
+      "name": "explicit-cleanup-retains-rejected-record-and-approval-source",
+      "passed": true
+    },
+    {
+      "name": "planning-before-explicit-unlock-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/08-planning-before-explicit-unlock.json"
+      }
+    },
+    {
+      "name": "partial-cleanup-keeps-only-one-current-basis-review-package",
+      "passed": true
+    },
+    {
+      "name": "partial-cleanup-remaining-groups-and-targets-are-unique",
+      "passed": true,
+      "details": {
+        "packageId": "legacy-cleanup-57429fd79fa4f6f1",
+        "remainingGroupIds": [
+          "cleanup-legacy-linked",
+          "cleanup-legacy-locked"
+        ],
+        "remainingDecisionIds": [
+          "legacy-linked",
+          "legacy-locked"
+        ]
+      }
+    },
+    {
+      "name": "partial-cleanup-repeat-read-1-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/09-partial-cleanup-repeat-read-1.json"
+      }
+    },
+    {
+      "name": "partial-cleanup-repeat-read-1-reuses-the-same-remaining-groups",
+      "passed": true
+    },
+    {
+      "name": "partial-cleanup-repeat-read-2-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/10-partial-cleanup-repeat-read-2.json"
+      }
+    },
+    {
+      "name": "partial-cleanup-repeat-read-2-reuses-the-same-remaining-groups",
+      "passed": true
+    },
+    {
+      "name": "partial-cleanup-repeated-http-reads-preserve-all-project-file-bytes",
+      "passed": true
+    },
+    {
+      "name": "second-cleanup-approval-reuses-the-partially-approved-package",
+      "passed": true
+    },
+    {
+      "name": "approve-unlocked-cleanup-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/11-approve-unlocked-cleanup.json"
+      }
+    },
+    {
+      "name": "explicit-unlock-permits-cleanup-without-deleting-history",
+      "passed": true
+    },
+    {
+      "name": "cleanup-approvals-are-recorded-in-formal-history",
+      "passed": true
+    },
+    {
+      "name": "normal-commit-persists-linked-question-without-inventing-old-selection",
+      "passed": true
+    },
+    {
+      "name": "historical-document-and-ready-history-retained-after-commits",
+      "passed": true
+    },
+    {
+      "name": "original-legacy-revision-is-preserved-byte-for-byte",
+      "passed": true
+    },
+    {
+      "name": "accepted-pointer-matches-last-complete-approved-operation",
+      "passed": true
+    },
+    {
+      "name": "planning-after-restart-recovery-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/12-planning-after-restart-recovery.json"
+      }
+    },
+    {
+      "name": "snapshot-after-restart-recovery-http-status",
+      "passed": true,
+      "details": {
+        "actual": 200,
+        "expected": 200,
+        "evidence": "http/13-snapshot-after-restart-recovery.json"
+      }
+    },
+    {
+      "name": "public-http-read-recovers-last-verified-version",
+      "passed": true
+    },
+    {
+      "name": "recovery-restores-formal-structure-without-approving-blueprint",
+      "passed": true
+    },
+    {
+      "name": "recovery-removes-incomplete-revision-marker-and-staging",
+      "passed": true
+    },
+    {
+      "name": "recovery-does-not-rewrite-last-complete-snapshot",
+      "passed": true
+    },
+    {
+      "name": "recovery-preserves-legacy-revision-and-historical-document",
+      "passed": true
+    },
+    {
+      "name": "no-provider-calls",
+      "passed": true
+    },
+    {
+      "name": "original-synthetic-source-never-modified",
+      "passed": true
+    },
+    {
+      "name": "unoperated-copy-never-modified",
+      "passed": true
+    }
+  ],
+  "requests": [
+    {
+      "name": "initial-planning-read",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy/planning",
+      "status": 200,
+      "evidence": "http/01-initial-planning-read.json"
+    },
+    {
+      "name": "initial-snapshot-read",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy",
+      "status": 200,
+      "evidence": "http/02-initial-snapshot-read.json"
+    },
+    {
+      "name": "ready-cannot-compile-package",
+      "method": "POST",
+      "route": "/api/projects/proj-legacy-planning-copy/planning/package",
+      "status": 422,
+      "evidence": "http/03-ready-cannot-compile-package.json"
+    },
+    {
+      "name": "cleanup-without-unlock",
+      "method": "POST",
+      "route": "/api/projects/proj-legacy-planning-copy/planning/changesets/legacy-cleanup-59cc11023ae8a06c/approve",
+      "status": 422,
+      "evidence": "http/04-cleanup-without-unlock.json"
+    },
+    {
+      "name": "normal-input-commit",
+      "method": "POST",
+      "route": "/api/projects/proj-legacy-planning-copy/planning/inputs",
+      "status": 200,
+      "evidence": "http/05-normal-input-commit.json"
+    },
+    {
+      "name": "planning-after-normal-input",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy/planning",
+      "status": 200,
+      "evidence": "http/06-planning-after-normal-input.json"
+    },
+    {
+      "name": "approve-question-cleanup",
+      "method": "POST",
+      "route": "/api/projects/proj-legacy-planning-copy/planning/changesets/legacy-cleanup-57429fd79fa4f6f1/approve",
+      "status": 200,
+      "evidence": "http/07-approve-question-cleanup.json"
+    },
+    {
+      "name": "planning-before-explicit-unlock",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy/planning",
+      "status": 200,
+      "evidence": "http/08-planning-before-explicit-unlock.json"
+    },
+    {
+      "name": "partial-cleanup-repeat-read-1",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy/planning",
+      "status": 200,
+      "evidence": "http/09-partial-cleanup-repeat-read-1.json"
+    },
+    {
+      "name": "partial-cleanup-repeat-read-2",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy/planning",
+      "status": 200,
+      "evidence": "http/10-partial-cleanup-repeat-read-2.json"
+    },
+    {
+      "name": "approve-unlocked-cleanup",
+      "method": "POST",
+      "route": "/api/projects/proj-legacy-planning-copy/planning/changesets/legacy-cleanup-57429fd79fa4f6f1/approve",
+      "status": 200,
+      "evidence": "http/11-approve-unlocked-cleanup.json"
+    },
+    {
+      "name": "planning-after-restart-recovery",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy/planning",
+      "status": 200,
+      "evidence": "http/12-planning-after-restart-recovery.json"
+    },
+    {
+      "name": "snapshot-after-restart-recovery",
+      "method": "GET",
+      "route": "/api/projects/proj-legacy-planning-copy",
+      "status": 200,
+      "evidence": "http/13-snapshot-after-restart-recovery.json"
+    }
+  ],
+  "services": [
+    {
+      "base": "http://127.0.0.1:61496",
+      "startedAt": "2026-10-04T17:49:01.766Z",
+      "stopped": true,
+      "stoppedAt": "2026-10-04T17:49:02.621Z"
+    },
+    {
+      "base": "http://127.0.0.1:61506",
+      "startedAt": "2026-10-04T17:49:02.639Z",
+      "stopped": true,
+      "stoppedAt": "2026-10-04T17:49:02.823Z"
+    }
+  ],
+  "paths": {
+    "source": "D:\\桌面\\项目构思\\docs\\validation\\legacy-migration-http\\cleanup-dedup-2026-10-04T17-48-node24\\synthetic-source\\legacy-source",
+    "untouchedCopy": "D:\\桌面\\项目构思\\docs\\validation\\legacy-migration-http\\cleanup-dedup-2026-10-04T17-48-node24\\untouched-copy",
+    "operatedCopy": "D:\\桌面\\项目构思\\docs\\validation\\legacy-migration-http\\cleanup-dedup-2026-10-04T17-48-node24\\operated-workspace\\projects\\proj-legacy-planning-copy",
+    "evidence": "D:\\桌面\\项目构思\\docs\\validation\\legacy-migration-http\\cleanup-dedup-2026-10-04T17-48-node24"
+  },
+  "finishedAt": "2026-10-04T17:49:02.836Z",
+  "allServicesStopped": true
+}

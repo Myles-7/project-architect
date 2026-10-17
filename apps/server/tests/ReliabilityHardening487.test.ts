@@ -8,6 +8,7 @@ import { WorkspaceGuard, ProjectStateEngine, FileStorage } from '@project-archit
 import { MockAIProvider, AIOrchestrator } from '@project-architect/agent';
 import { ErrorCode } from '@project-architect/contracts';
 import type { Express } from 'express';
+import { approvedPlanningFixture } from '../../../tests/fixtures/approved-planning.js';
 
 describe('Phase 4.8.7 Reliability Hardening: Resilient API Server, Error Mapping & Authorization Flow', () => {
   let tempBaseDir: string;
@@ -73,14 +74,12 @@ describe('Phase 4.8.7 Reliability Hardening: Resilient API Server, Error Mapping
     expect(res409.status).toBe(409);
     expect(res409.body.error.code).toBe(ErrorCode.STATE_REVISION_CONFLICT);
 
-    // 1.4 422 Unprocessable (Readiness not approved)
-    // Move to readiness review
-    await request(app).post(`/api/projects/${projectId}/readiness/review`).send({});
+    // 1.4 422 Unprocessable (Design stages not approved)
     const res422 = await request(app)
       .post(`/api/projects/${projectId}/documents/generate`)
-      .send({ expectedRevision: rev + 1 });
+      .send({ expectedRevision: rev, operationId: 'unapproved-package' });
     expect(res422.status).toBe(422);
-    expect(res422.body.error.code).toBe(ErrorCode.READINESS_NOT_APPROVED);
+    expect(res422.body.error.code).toBe('STAGE_NOT_APPROVED');
   });
 
   it('2. Registry Persistence: Server restart recovers recent projects list from workspace JSON', async () => {
@@ -136,7 +135,7 @@ describe('Phase 4.8.7 Reliability Hardening: Resilient API Server, Error Mapping
     expect(failRes.body.error.message).not.toContain('/Users/');
   });
 
-  it('4. Full Lifecycle & Document Flow: Readiness Review -> Disposition -> Document Compile -> Read Document', async () => {
+  it('4. Approved Planning -> Package Compile -> Verified File Read', async () => {
     // 1. Create project & add core decisions
     const createRes = await request(app)
       .post('/api/projects')
@@ -146,43 +145,19 @@ describe('Phase 4.8.7 Reliability Hardening: Resilient API Server, Error Mapping
 
     const snap0 = (await request(app).get(`/api/projects/${projectId}`)).body.data.snapshot;
     const pPath = guard.resolveProjectPath(projectId);
-    await engine.addDecision(pPath, 'target_user', 'Engineers', snap0.metadata.stateRevision, 'confirmed');
+    const approvedIdea=await engine.confirmDecision(pPath,`decision:${snap0.decisions.items[0].id}`,snap0.metadata.stateRevision);
+    await engine.addDecision(pPath, 'target_user', 'Engineers', approvedIdea.metadata.stateRevision, 'confirmed');
     const snap1 = (await request(app).get(`/api/projects/${projectId}`)).body.data.snapshot;
     await engine.addDecision(pPath, 'mvp_scope', 'Local compiler', snap1.metadata.stateRevision, 'confirmed');
     const snap2 = (await request(app).get(`/api/projects/${projectId}`)).body.data.snapshot;
     rev = snap2.metadata.stateRevision;
 
-    // 2. Evaluate readiness
-    const reviewRes = await request(app)
-      .post(`/api/projects/${projectId}/readiness/review`)
-      .send({ expectedRevision: rev });
-    expect(reviewRes.status).toBe(200);
-    expect(reviewRes.body.data.projectSnapshot.metadata.stage).toBe('readiness-review');
-    rev = reviewRes.body.stateRevision;
+    // Explicitly approved Planning fixtures replace the retired publication lifecycle.
+    rev = (await approvedPlanningFixture(engine, pPath)).metadata.stateRevision;
+    const generated = await request(app).post(`/api/projects/${projectId}/documents/generate`).send({ expectedRevision: rev, operationId: 'reliability-package' }).expect(200);
+    expect(generated.body.data.manifest.files.length).toBeGreaterThanOrEqual(10);
+    const read = await request(app).get(`/api/projects/${projectId}/planning/package/files/AGENTS.md`).expect(200);
+    expect(read.text).toContain('E2E Flow App');
 
-    // 3. User Disposition: Approve
-    const approveRes = await request(app)
-      .post(`/api/projects/${projectId}/readiness/approve`)
-      .send({
-        disposition: 'approved',
-        expectedRevision: rev,
-      });
-    expect(approveRes.status).toBe(200);
-    expect(approveRes.body.data.snapshot.metadata.stage).toBe('approved');
-    rev = approveRes.body.stateRevision;
-
-    // 4. Generate Documents
-    const genRes = await request(app)
-      .post(`/api/projects/${projectId}/documents/generate`)
-      .send({ expectedRevision: rev });
-    expect(genRes.status).toBe(200);
-    expect(genRes.body.data.manifest.items.length).toBeGreaterThan(0);
-
-    // 5. Read Document
-    const readRes = await request(app)
-      .post(`/api/projects/${projectId}/documents/read`)
-      .send({ docPath: 'AGENTS.md' });
-    expect(readRes.status).toBe(200);
-    expect(readRes.body.data.content).toContain('Coding Agent Guidelines');
   });
 });

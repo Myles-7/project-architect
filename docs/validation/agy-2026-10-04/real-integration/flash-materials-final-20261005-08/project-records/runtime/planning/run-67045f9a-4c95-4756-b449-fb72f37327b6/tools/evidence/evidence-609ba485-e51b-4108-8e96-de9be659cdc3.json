@@ -1,0 +1,11 @@
+{
+  "id": "evidence-609ba485-e51b-4108-8e96-de9be659cdc3",
+  "source": "https://www.w3.org/TR/input-events-2/",
+  "capturedAt": "2026-10-04T18:59:13.491Z",
+  "sha256": "02ef7510a95f486e511dc7817ef858e3eda54bfb6962c92e75df2ad7515a6f0e",
+  "scope": "适用于纯前端输入框实时反馈与防抖机制中针对 IME 输入法事件流的规范处理。",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tools\\evidence\\evidence-609ba485-e51b-4108-8e96-de9be659cdc3.json",
+  "approval": "candidate",
+  "content": "W3C Input Events Level 2 规范第 7 节（Input Event Order During Composition）明确规定：输入法合成由 compositionstart 开始；合成期间每次文本更新触发 compositionupdate，随后触发不可取消的 beforeinput 与 input 事件（inputType 为 'insertCompositionText'，data 包含当前更新字符）；合成结束由 compositionend 标识。此规范确立了在实时输入反馈场景下，应在合成会话进行期间避免将临时拼音当作最终有效输入，需待合成结束（compositionend）后触发有效文本确认展示。",
+  "conclusion": "W3C Input Events Level 2 标准明确了 IME 合成过程中 input 事件的触发时机与 inputType 规范，指出在 compositionupdate 后派发的 input 事件 inputType 为 insertCompositionText 且不可取消，直至 compositionend 结束合成会话。"
+}

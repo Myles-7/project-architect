@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1791129999032",
+  "items": [
+    {
+      "allowFreeInput": true,
+      "area": "交互体验",
+      "createdAt": "2026-10-04T16:12:46.183Z",
+      "decisionKey": "dec-clear-interaction-mode",
+      "dependsOn": [],
+      "id": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "importance": "normal",
+      "issueRef": "blk-feat-reset",
+      "options": [
+        {
+          "approach": "用户点击清空按钮后立即复位输入框与展示区，光标自动回焦输入框，不弹出任何阻断式确认框。",
+          "gain": "极速流畅，测试流转零等待零多余点击，最符合单人敏捷本地核对场景。",
+          "impact": "仅影响清空按钮点击事件的即时处理逻辑，简化状态转移。",
+          "key": "opt-instant-clear",
+          "label": "即时直接清空",
+          "reversibility": "easy",
+          "sacrifice": "如发生手误误触，当前展示与输入内容将立即消失，需重新输入。"
+        },
+        {
+          "approach": "点击清空后立即清空视图，但悬浮显示 3 秒轻量撤销条（可点击'撤销清空'恢复前次内容）。",
+          "gain": "兼顾操作效率与防误触安全性，手误时一键恢复。",
+          "impact": "增加前端临时快照暂存状态，不影响主流程数据流向。",
+          "key": "opt-undo-toast",
+          "label": "轻量即时清空带悬浮撤销（Undo Toast）",
+          "reversibility": "easy",
+          "sacrifice": "需要额外维护一个前次快照状态及 3 秒定时器清理机制，增加轻微视觉元素。"
+        },
+        {
+          "approach": "点击清空时弹出轻量原生/自定义确认对话框，用户确认后才执行清空。",
+          "gain": "误触安全性最高，绝不发生非预期的清空动作。",
+          "impact": "引入模态交互状态，影响桌面快速快捷键操作流。",
+          "key": "opt-modal-confirm",
+          "label": "模态对话框二次确认",
+          "reversibility": "moderate",
+          "sacrifice": "每次清空都需要额外点击一次，显著降低反复核对的流转效率。"
+        }
+      ],
+      "question": "在点击清空按钮时，采用何种重置交互保护机制？",
+      "reason": "清空操作会立即清除已展示核对的项目名与输入框内容。由于该原型定位于开发者快速核对，过于繁琐的弹窗会拖慢流转，但若完全无保护则在误触时需重新键入。在产品规划阶段确定此交互方式，有助于直接界定清空流程的状态机设计。",
+      "recommendation": "推荐方案 A（即时直接清空），兼顾快速本地核对的高频测试效率与低干扰体验。",
+      "recommendationReason": "本地核对工具核心诉求是极速反馈，单人操作场景下弹窗二次确认会产生阻断感；且失败保留输入机制已覆盖提交异常场景，清空后光标自动回焦即可顺畅重测。",
+      "recommendedOptionKey": "opt-instant-clear",
+      "selectionMode": "single",
+      "status": "shown",
+      "batchId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+      "basisRevision": 3,
+      "basisHash": "4d9d1a99e5ac8c5964ef73a8142ebed2668aed0df492566e9b2a5bbdeb1613cb"
+    }
+  ],
+  "updatedAt": "2026-10-04T16:06:39.032Z"
+}

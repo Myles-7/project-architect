@@ -1,0 +1,642 @@
+{
+  "conversation_id": "4455eaf7-cad3-41f0-a460-2707b0aad9ce",
+  "status": "SUCCESS",
+  "response": "{\"blockers\":[],\"clarification\":{},\"evidence\":[{\"applicability\":\"IndexedDB Schema 设计与索引约束：规范明确 Boolean 不是合法键，禁止直接在 isPinned/isFavorite 建立原生索引，改用内存过滤\",\"content\":\"W3C IndexedDB 2.0 规范第 2.4 节（Keys）明确规定合法键（valid keys）类型仅包括：Number（除 NaN）、Date（有效值）、String、Binary（ArrayBuffer 或视图）及 Array（其成员为合法键）。Boolean（布尔值 true/false）不是合法键。规范指出：'Attempting to convert other ECMAScript values to a key will fail'。因此在 IndexedDB 中不能对 boolean 属性（如 isPinned, isFavorite）直接建立原生索引或执行 where().equals(true) 查询，否则会抛出 DataError 异常。\",\"hash\":\"5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec\",\"id\":\"evidence-w3c-indexeddb-keys\",\"kind\":\"official-source\",\"location\":\"Section 2.4 Keys\",\"obtainedAt\":\"2026-10-04T18:52:59.086Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/IndexedDB-2/\"},{\"applicability\":\"Vite 静态打包部署与本地运行方式：ESM 模块受浏览器同源策略限制，禁止通过 file:// 直接双击运行，必须在 HTTP/HTTPS 环境下运行\",\"content\":\"Vite 官方构建部署文档明确指出构建产物默认输出至 dist 目录，提供 vite preview 命令启动本地轻量 HTTP 静态服务器（如 http://localhost:4173 或自定义端口）用于本地预览。现代前端构建产物采用标准 ES 模块（\\u003cscript type=\\\\\\\"module\\\\\\\"\\u003e），浏览器安全策略禁止通过 file:// 协议直接加载 ESM 模块（CORS 限制），因此应用必须运行在 HTTP/HTTPS 静态托管平台或本地 localhost Web 服务器中，不能承诺直接通过双击 index.html 依靠 file:// 协议免服务器运行。\",\"hash\":\"2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b\",\"id\":\"evidence-vite-static-deploy-http\",\"kind\":\"official-source\",\"location\":\"Testing the App Locally \\u0026 Deploying a Static Site\",\"obtainedAt\":\"2026-10-04T18:53:35.298Z\",\"outcome\":\"passed\",\"source\":\"https://vite.dev/guide/static-deploy.html\"},{\"applicability\":\"浏览器键盘事件作用域：纯 Web 单页应用无法监听系统级全局快捷键，快捷键仅在页面处于焦点状态时生效\",\"content\":\"W3C UI Events 规范规定键盘事件（KeyboardEvent）仅在当前拥有焦点的窗口与活动文档中派发。纯 Web 前端单页应用运行于标准浏览器沙箱中，缺乏操作系统层级的全局按键钩子权限，无法在浏览器失焦或处于后台常驻标签时捕获系统级全局快捷键。快捷键仅在页面获得焦点后有效，快捷访问需通过浏览器常驻固定标签页或书签实现。\",\"hash\":\"8ded5eaf4f190b13c59582d5e92b81d3585112dde963d71d65d8e5991212b918\",\"id\":\"evidence-w3c-uievents-keyboard\",\"kind\":\"official-source\",\"location\":\"Section 5 UI Event Types - Keyboard Events\",\"obtainedAt\":\"2026-10-04T18:54:03.326Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/uievents/\"},{\"applicability\":\"离线能力范围与前提条件：区分已加载页面的离线数据读写与离线脱机重新打开页面\",\"content\":\"W3C Service Workers 规范定义了网络代理与离线缓存机制，Service Worker 必须在 HTTPS 或 localhost 安全上下文中先成功完成注册、安装（Install）和激活（Activate）并预缓存资源后，才能支持完全离线状态下的页面重新加载。若项目未完整配置并验证 Service Worker 与 Web App Manifest 缓存策略，离线能力仅限于已打开并加载完成页面的离线本地数据读写与编辑，无法承诺断网环境下的首次访问或未缓存离线重开。\",\"hash\":\"5176006deeb935e66b44b53b16b8a58b3de8cda7a161f466a39623eef148a9d9\",\"id\":\"evidence-w3c-service-workers-offline\",\"kind\":\"official-source\",\"location\":\"Section 3 Application Lifecycle \\u0026 Cache\",\"obtainedAt\":\"2026-10-04T18:53:57.465Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/service-workers/\"},{\"applicability\":\"数据备份导出与导入校验契约：基于 W3C 标准 Blob 与 FileReader 实现纯客户端无后端导入导出\",\"content\":\"W3C File API 定义了客户端 Blob、File 和 FileReader 接口，支持纯前端本地生成与解析文件。配合统一的 JSON Schema v1 与 IndexedDB 原子事务，能够在纯浏览器环境中完成备份文件的导出与安全导入校验。\",\"hash\":\"975b6f12f51320b7f90af2b97e38a80358b5964bc274caafb5d126b3f3881efc\",\"id\":\"evidence-w3c-file-api\",\"kind\":\"official-source\",\"location\":\"Section 6 The Blob Interface \\u0026 Section 7 The FileReader Interface\",\"obtainedAt\":\"2026-10-04T18:53:41.082Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/FileAPI/\"},{\"applicability\":\"质量验收反馈缺陷清单与依赖闭包修正依据\",\"content\":\"自动质量验收反馈针对目标与平台边界、归档与标签操作、删除与撤销状态、编辑与并发、导入导出往返、IndexedDB/Dexie 约束、部署与离线前提、性能口径闭合、浏览器与草稿、可执行任务次序与重复验证等 10 项缺陷提出了系统性修正要求，要求保持依赖闭包一致，不伪造试验，技术实现由 AI 拟定。\",\"hash\":\"22a93a4166f03829f8d5ebf88f0022c6333162efdffced9a4d9dc004eaeab9c0\",\"id\":\"evidence-feedback-quality-review-01\",\"kind\":\"user\",\"location\":\"rawInputs:554e81ee-2cc8-4e01-b708-b71b835f7c9b\",\"obtainedAt\":\"2026-10-04T16:41:34.565Z\",\"outcome\":\"passed\",\"source\":\"input:554e81ee-2cc8-4e01-b708-b71b835f7c9b\"},{\"applicability\":\"规划阶段容器限制说明，性能及稳定性基准移交交付阶段实测\",\"content\":\"规划环境调用 environment_prepare 准备 Node/Docker 容器失败（open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified），宿主 Docker 守护进程未启动。规划环境无可用容器运行时，自动化浏览器测试不可在当前阶段伪造通过，相关性能与稳定性实测已移交交付阶段验证任务。\",\"environment\":\"planning-docker-daemon\",\"id\":\"evidence-docker-env-unavailable\",\"kind\":\"experiment\",\"location\":\"prepare-ad85c1a9-fe67-484b-90fb-3e91e8d73363.ndjson\",\"obtainedAt\":\"2026-10-04T18:53:43.000Z\",\"outcome\":\"unexecuted\",\"source\":\"experiment:docker-env-prep\"}],\"followUp\":[{\"goal\":\"在交付阶段使用真实桌面浏览器（Chrome/Edge/Firefox）实测 1,000 条便签基准下的检索响应时间（P95 \\u003c= 150ms）、冷启动 TTI（\\u003c= 1.0s）及配额满载状态保留机制\",\"kind\":\"validation\"}],\"groups\":[],\"questions\":[],\"summary\":\"# 随手灵感整理工具质量反馈可行性研究与契约分析报告\\n\\n本报告针对自动质量验收反馈（输入 `554e81ee-2cc8-4e01-b708-b71b835f7c9b`）提出的 10 项核心架构与设计缺陷进行了系统性的官方规范查证、材料边界比对及可行性风险评估。本阶段职责聚焦官方资料研究与可行性证据沉淀，`groups = []`，不替代产品决策，所有技术建议与发现作为后续蓝图修订的结构化依据。\\n\\n---\\n\\n## 一、官方规范查证与关键事实发现\\n\\n1. **IndexedDB 键类型规范与布尔索引无效性（W3C IndexedDB 2.0 §2.4）**：\\n   - 查证来源：`https://www.w3.org/TR/IndexedDB-2/`（sha256: `5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec`）。\\n   - 事实：规范明确规定合法键类型仅限于 `number`、`date`、`string`、`binary` 和 `array`。布尔值（`boolean`: `true`/`false`）**不是合法键**，规范明确指出“尝试将其他 ECMAScript 类型作为键将失败”。\\n   - 风险与结论：在 Dexie/IndexedDB 中直接对 `isPinned` 或 `isFavorite` 声明索引或调用 `.where('isPinned').equals(true)` 会触发底层 `DataError`。必须从对象仓库索引中移除布尔键，改由内存谓词过滤（或映射为 `0 | 1` 数字索引）。\\n\\n2. **浏览器键盘事件作用域（W3C UI Events §5）**：\\n   - 查证来源：`https://www.w3.org/TR/uievents/`（sha256: `8ded5eaf4f190b13c59582d5e92b81d3585112dde963d71d65d8e5991212b918`）。\\n   - 事实：键盘事件仅派发至当前获得焦点的窗口与活动文档中。纯浏览器单页应用受沙箱限制，无法监听操作系统层面的全局快捷键。\\n   - 结论：必须彻底剔除“全局快捷键/系统全局唤起”表述，仅保留页面获得焦点后的快捷键（如 `N`、`Ctrl/Cmd+Enter`），快捷入口由浏览器常驻固定标签页（Pinned Tab）或书签承担。\\n\\n3. **Vite 静态部署与协议边界（Vite Static Deploy Guide）**：\\n   - 查证来源：`https://vite.dev/guide/static-deploy.html`（sha256: `2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b`）。\\n   - 事实：Vite 产物采用标准 ES 模块（`\\u003cscript type=\\\"module\\\"\\u003e`），受浏览器 CORS 同源策略限制，无法直接双击 `index.html` 通过 `file://` 协议免服务器运行。\\n   - 结论：明确声明应用需运行于本地轻量静态 HTTP 服务器（`npm run preview` 运行于 `http://localhost:4173`）或静态托管平台（GitHub Pages 等），不可宣称支持脱离服务器双击直接打开。\\n\\n4. **Service Worker 离线缓存生命周期（W3C Service Workers §3）**：\\n   - 查证来源：`https://www.w3.org/TR/service-workers/`（sha256: `5176006deeb935e66b44b53b16b8a58b3de8cda7a161f466a39623eef148a9d9`）。\\n   - 事实：离线重新打开需要 Service Worker 注册、安装、激活并预缓存全量静态资源。\\n   - 结论：首版本未完整交付 Service Worker 缓存时，离线能力严格限定为“已打开/已取得缓存页面的脱机本地数据读写与编辑”，不承诺断网环境下的脱机重新打开。\\n\\n5. **规划执行环境限制**：\\n   - 工具结果：调用 `environment_prepare(runtime: \\\"node\\\")` 遇到 Docker 守护进程未启动（`prepare-ad85c1a9-fe67-484b-90fb-3e91e8d73363.ndjson`）。规划环境无可用容器，实验标记为 `unexecuted`，性能指标实测移交交付阶段开发验证任务，不伪造已实测事实。\\n\\n---\\n\\n## 二、十项缺陷深度分析与受影响契约调整建议\\n\\n### 1. 目标用户与平台边界\\n- **受影响块**：`block-target-user-scenarios`, `block-scope-core-boundaries`, `feature-quick-capture`, `flow-quick-capture`, `page-main-workspace`, `task-quick-capture`, `acceptance-quick-capture`。\\n- **调整建议**：聚焦个人开发者本人使用，不外扩面向群体的通用平台功能；彻底消除所有“全局唤起/全局快捷键”表述，明确为“页面获焦时的快捷键（按 N 键聚焦、Ctrl/Cmd+Enter 提交、/ 键搜索）”，并建议通过浏览器固定常驻标签页或书签达到秒级打开。\\n\\n### 2. 归档与标签操作\\n- **受影响块**：`page-main-workspace`, `feature-note-card-view`, `flow-note-card-actions`, `feature-tag-organization`, `flow-tag-organization`, `task-note-card-view`, `task-tag-organization`。\\n- **调整建议**：在归档视图（`ArchivedView`）中为每条卡片提供常规持久的【取消归档】（Unarchive）操作按钮，点击后恢复为活跃状态，解决原方案仅依赖 5 秒临时 Toast 撤销导致无法找回的问题；在移动端/触控屏幕下，侧边栏标签过滤支持直观的点击多选切换模式（多选标签 Chips 胶囊），无需依赖桌面修饰键 `Ctrl/Cmd`。\\n\\n### 3. 删除与撤销状态恢复\\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-note-card-view`, `flow-note-card-actions`, `task-foundation-and-storage`, `task-note-card-view`, `acceptance-note-card-view`。\\n- **调整建议**：\\n  - 数据模型在 `Note` 中增加 `originalStatus?: 'active' | 'archived'` 字段；\\n  - 便签移入回收区时，记录原状态至 `originalStatus`，持久化写入 `status = 'trashed'`, `trashedAt = Date.now()`；\\n  - 彻底废除“5 秒软删除倒计时结束才物理删除”与“倒计时结束才落盘”的混用逻辑；删除动作即时落盘回收区，7 天内可还原；\\n  - 从回收区执行【还原】时，精确恢复到 `originalStatus`，原打标、置顶与收藏属性无损恢复；\\n  - 超 7 天时侧边栏点亮预警点，回收区顶部常驻琥珀色横幅，彻底清空须经二次确认弹窗；刷新或重开应用时回收区暂存状态持久保持。\\n\\n### 4. 编辑保存、放弃修改与并发冲突\\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-note-detail-edit`, `flow-note-detail-edit`, `task-note-detail-edit`, `error-architecture-and-recovery`。\\n- **调整建议**：\\n  - 详情编辑弹窗明确三种退出分支：①【保存后退出】（Ctrl+S 或点击保存，持久化成功后关闭）；②【放弃修改】（存在脏修改时按 Esc 或点击外部遮罩弹出提示“确定放弃修改？”，确认后丢弃未保存内容并关闭，禁止静默自动保存）；③【继续编辑】（取消退出，留在编辑态）；\\n  - 保存遇到配额满或存储异常时，强制拦截关闭，编辑框文本 100% 保留，提供复制与重试；\\n  - 在 `Note` 实体中引入 `revision: number`（记录修订号，整型自增），与顶层 `schemaVersion`（数据协议版本）解耦；\\n  - `saveNote` 采用乐观锁并发版本检测，在多标签页同时修改时，若读取到的 revision 与数据库现存 revision 不一致，阻止静默覆盖，弹出冲突提示。\\n\\n### 5. 导入导出往返一致性与事务原子性\\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-data-portability`, `flow-data-portability`, `task-data-portability`, `acceptance-data-portability`。\\n- **调整建议**：\\n  - 统一顶层协议键为 `schemaVersion: 1`，消除 `version: 1` 与 `schemaVersion: 1` 并存冲突；导出数据契约 `BackupPayload` 包含 `{ app: 'SparkNotes', schemaVersion: 1, exportedAt: string, notesCount: number, notes: Note[] }`；\\n  - 确保导出的 JSON 备份可通过自身校验规则 100% 成功导入（Roundtrip Guarantee）；\\n  - 全量覆盖导入时，清空（`notes.clear()`, `meta.clear()`）、批量写入（`notes.bulkAdd()`）与元数据更新必须包裹在同一个 Dexie 读写事务内（`await db.transaction('rw', [db.notes, db.meta], async () =\\u003e { ... })`），中途失败由底层事务自动整体回滚，保留原数据，禁止使用易在崩溃时丢失的临时内存快照代替 ACID 事务。\\n\\n### 6. IndexedDB/Dexie 键类型与索引约束\\n- **受影响块**：`tech-core-architecture`, `tech-storage-and-search`, `data-model-core-entities`, `interface-service-contracts`, `task-foundation-and-storage`, `acceptance-foundation-and-storage`。\\n- **调整建议**：根据 W3C IndexedDB 2.0 §2.4，Boolean 不是合法索引键。从 Dexie Schema 中移除 `isPinned` 与 `isFavorite` 索引，定义为 `notes: 'id, updatedAt, createdAt, status, trashedAt, *tags'`；置顶与收藏卡片在按 `status` 查询后在前端内存中进行过滤，消除底层抛出 `DataError` 的致命隐患。\\n\\n### 7. 部署与离线前提条件\\n- **受影响块**：`deployment-and-build-specification`, `task-build-and-deploy`, `acceptance-build-and-deploy`, `block-outcomes-lightweight-experience`。\\n- **调整建议**：根据 Vite 规范剔除“免服务器双击运行”表述，明确要求运行在本地 HTTP 服务器（`npm run preview` 运行于 `http://localhost:4173`）或静态托管平台；离线能力界定为“已在浏览器中打开并加载完成的应用，在脱机断网状态下所有本地数据读写、编辑、检索与备份导出正常运行”；PWA 离线重开作为后续演进，首版不作未经验证的绝对承诺。\\n\\n### 8. 性能度量口径闭合\\n- **受影响块**：`block-outcomes-lightweight-experience`, `feature-search-filter`, `val-storage-and-search-benchmark`, `acceptance-storage-and-search-benchmark`。\\n- **调整建议**：消除矛盾阈值（\\u003c150ms、\\u003c=150ms、\\u003e250ms），统一口径：\\n  - 全文模糊检索（1,000 条便签基准，正文与标签，含 80ms 防抖）：从最后一次输入按键起至 DOM 卡片重新排版完成（`requestAnimationFrame` 回调），连续 10 次 3 字符复合查询实测 P95 响应时间 \\u003c= 150ms 视为通过（Pass）；若 \\u003e 150ms 触发降级与虚拟滚动优化；\\n  - 冷启动首屏可交互时间（TTI）：从 `navigationStart` 起至 6 块骨架屏消失且首屏便签可交互，标准桌面配置下目标 \\u003c= 1.0s；\\n  - 回收区超 7 天便签查询（`listExpiredTrashedNotes`）：100 条回收区便签下执行耗时 \\u003c= 50ms；\\n  - 所有指标明确标为“待验证目标”，在交付阶段真实浏览器中实测。\\n\\n### 9. 浏览器差异与草稿保留一致性\\n- **受影响块**：`error-architecture-and-recovery`, `page-main-workspace`, `feature-quick-capture`, `feature-note-detail-edit`。\\n- **调整建议**：明确 Safari WebKit 7 天 ITP 存储清理策略，配合 StorageManager 持久化申请与温和备份提醒进行防御；坚持 IndexedDB 为浏览器本地唯一持久化存储介质，彻底废除“降级至 LocalStorage”的冲突描述（磁盘满时 5MB LocalStorage 同样会失败）；遇到存储配额满时，草稿完整保留在 React 组件内存与文本输入框中，禁止关闭弹窗，界面浮出醒目横幅并提供复制到剪贴板与紧急文本下载按钮。\\n\\n### 10. 可执行任务依赖图与验证任务合并\\n- **受影响块**：合并 `val-browser-storage-and-search-perf` 与 `val-storage-and-search-benchmark`；校正全流程任务 `dependsOn`。\\n- **调整建议**：\\n  - 将两个重复的性能验证任务合并为唯一交付集成验证任务 `val-storage-and-search-benchmark`；\\n  - 规范块不能作为实现任务的前置依赖，建立严格可执行的任务依赖拓扑：\\n    1. `task-foundation-and-storage`（脚手架与存储驱动，无布尔索引，支持 revision 并发检测与原子导入）\\n    2. `task-quick-capture`（依赖 storage，实现输入自适应、N 键获焦与草稿保留）\\n    3. `task-note-card-view`（依赖 storage，实现双布局、归档常规恢复、7 天回收区生命周期）\\n    4. `task-tag-organization`（依赖 storage，实现标签云、触控多选与重命名事务）\\n    5. `task-search-filter`（依赖 storage，实现 80ms 防抖检索与回收区范围隔离）\\n    6. `task-note-detail-edit`（依赖 storage，实现详情阅读、保存/放弃分支与防关闭草稿保护）\\n    7. `task-data-portability`（依赖 storage，实现统一 schemaVersion: 1 的自校验导入导出与未备份追踪）\\n    8. `task-build-and-deploy`（生产构建打包，依赖上述 1~7 全部功能实现任务，确保全量模块就绪后打包）\\n    9. `val-storage-and-search-benchmark`（真实浏览器集成实测，依赖 `task-build-and-deploy`，在产物构建与本地服务启动后闭环实测）。\\n\\n---\\n\\n## 三、结论与后续步骤\\n\\n本轮研究已完成所有官方证据查证与真实性核验，沉淀了 5 项官方规范证据、1 项用户质量反馈证据与 1 项规划环境容器限制证据。相关契约调整方向清晰、依赖闭包完备，已为后续正式修订待批准变更集做好充分准备。\",\"toolAction\":\"Submitting feedback feasibility research and evidence\",\"toolSummary\":\"Complete feedback research\"}\n{\"blockers\":[],\"clarification\":null,\"evidence\":[{\"applicability\":\"IndexedDB Schema 设计与索引约束：规范明确 Boolean 不是合法键，禁止直接在 isPinned/isFavorite 建立原生索引，改用内存过滤\",\"content\":\"W3C IndexedDB 2.0 规范第 2.4 节（Keys）明确规定合法键（valid keys）类型仅包括：Number（除 NaN）、Date（有效值）、String、Binary（ArrayBuffer 或视图）及 Array（其成员为合法键）。Boolean（布尔值 true/false）不是合法键。规范指出：'Attempting to convert other ECMAScript values to a key will fail'。因此在 IndexedDB 中不能对 boolean 属性（如 isPinned, isFavorite）直接建立原生索引或执行 where().equals(true) 查询，否则会抛出 DataError 异常。\",\"hash\":\"5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec\",\"id\":\"evidence-w3c-indexeddb-keys\",\"kind\":\"official-source\",\"location\":\"Section 2.4 Keys\",\"obtainedAt\":\"2026-10-04T18:52:59.086Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/IndexedDB-2/\"},{\"applicability\":\"Vite 静态打包部署与本地运行方式：ESM 模块受浏览器同源策略限制，禁止通过 file:// 直接双击运行，必须在 HTTP/HTTPS 环境下运行\",\"content\":\"Vite 官方构建部署文档明确指出构建产物默认输出至 dist 目录，提供 vite preview 命令启动本地轻量 HTTP 静态服务器（如 http://localhost:4173 或自定义端口）用于本地预览。现代前端构建产物采用标准 ES 模块（\\u003cscript type=\\\\\\\"module\\\\\\\"\\u003e），浏览器安全策略禁止通过 file:// 协议直接加载 ESM 模块（CORS 限制），因此应用必须运行在 HTTP/HTTPS 静态托管平台或本地 localhost Web 服务器中，不能承诺直接通过双击 index.html 依靠 file:// 协议免服务器运行。\",\"hash\":\"2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b\",\"id\":\"evidence-vite-static-deploy-http\",\"kind\":\"official-source\",\"location\":\"Testing the App Locally \\u0026 Deploying a Static Site\",\"obtainedAt\":\"2026-10-04T18:53:35.298Z\",\"outcome\":\"passed\",\"source\":\"https://vite.dev/guide/static-deploy.html\"},{\"applicability\":\"浏览器键盘事件作用域：纯 Web 单页应用无法监听系统级全局快捷键，快捷键仅在页面处于焦点状态时生效\",\"content\":\"W3C UI Events 规范规定键盘事件（KeyboardEvent）仅在当前拥有焦点的窗口与活动文档中派发。纯 Web 前端单页应用运行于标准浏览器沙箱中，缺乏操作系统层级的全局按键钩子权限，无法在浏览器失焦或处于后台常驻标签时捕获系统级全局快捷键。快捷键仅在页面获得焦点后有效，快捷访问需通过浏览器常驻固定标签页或书签实现。\",\"hash\":\"8ded5eaf4f190b13c59582d5e92b81d3585112dde963d71d65d8e5991212b918\",\"id\":\"evidence-w3c-uievents-keyboard\",\"kind\":\"official-source\",\"location\":\"Section 5 UI Event Types - Keyboard Events\",\"obtainedAt\":\"2026-10-04T18:54:03.326Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/uievents/\"},{\"applicability\":\"离线能力范围与前提条件：区分已加载页面的离线数据读写与离线脱机重新打开页面\",\"content\":\"W3C Service Workers 规范定义了网络代理与离线缓存机制，Service Worker 必须在 HTTPS 或 localhost 安全上下文中先成功完成注册、安装（Install）和激活（Activate）并预缓存资源后，才能支持完全离线状态下的页面重新加载。若项目未完整配置并验证 Service Worker 与 Web App Manifest 缓存策略，离线能力仅限于已打开并加载完成页面的离线本地数据读写与编辑，无法承诺断网环境下的首次访问或未缓存离线重开。\",\"hash\":\"5176006deeb935e66b44b53b16b8a58b3de8cda7a161f466a39623eef148a9d9\",\"id\":\"evidence-w3c-service-workers-offline\",\"kind\":\"official-source\",\"location\":\"Section 3 Application Lifecycle \\u0026 Cache\",\"obtainedAt\":\"2026-10-04T18:53:57.465Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/service-workers/\"},{\"applicability\":\"数据备份导出与导入校验契约：基于 W3C 标准 Blob 与 FileReader 实现纯客户端无后端导入导出\",\"content\":\"W3C File API 定义了客户端 Blob、File 和 FileReader 接口，支持纯前端本地生成与解析文件。配合统一的 JSON Schema v1 与 IndexedDB 原子事务，能够在纯浏览器环境中完成备份文件的导出与安全导入校验。\",\"hash\":\"975b6f12f51320b7f90af2b97e38a80358b5964bc274caafb5d126b3f3881efc\",\"id\":\"evidence-w3c-file-api\",\"kind\":\"official-source\",\"location\":\"Section 6 The Blob Interface \\u0026 Section 7 The FileReader Interface\",\"obtainedAt\":\"2026-10-04T18:53:41.082Z\",\"outcome\":\"passed\",\"source\":\"https://www.w3.org/TR/FileAPI/\"},{\"applicability\":\"质量验收反馈缺陷清单与依赖闭包修正依据\",\"content\":\"自动质量验收反馈针对目标与平台边界、归档与标签操作、删除与撤销状态、编辑与并发、导入导出往返、IndexedDB/Dexie 约束、部署与离线前提、性能口径闭合、浏览器与草稿、可执行任务次序与重复验证等 10 项缺陷提出了系统性修正要求，要求保持依赖闭包一致，不伪造试验，技术实现由 AI 拟定。\",\"hash\":\"22a93a4166f03829f8d5ebf88f0022c6333162efdffced9a4d9dc004eaeab9c0\",\"id\":\"evidence-feedback-quality-review-01\",\"kind\":\"user\",\"location\":\"rawInputs:554e81ee-2cc8-4e01-b708-b71b835f7c9b\",\"obtainedAt\":\"2026-10-04T16:41:34.565Z\",\"outcome\":\"passed\",\"source\":\"input:554e81ee-2cc8-4e01-b708-b71b835f7c9b\"},{\"applicability\":\"规划阶段容器限制说明，性能及稳定性基准移交交付阶段实测\",\"content\":\"规划环境调用 environment_prepare 准备 Node/Docker 容器失败（open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified），宿主 Docker 守护进程未启动。规划环境无可用容器运行时，自动化浏览器测试不可在当前阶段伪造通过，相关性能与稳定性实测已移交交付阶段验证任务。\",\"environment\":\"planning-docker-daemon\",\"id\":\"evidence-docker-env-unavailable\",\"kind\":\"experiment\",\"location\":\"prepare-ad85c1a9-fe67-484b-90fb-3e91e8d73363.ndjson\",\"obtainedAt\":\"2026-10-04T18:53:43.000Z\",\"outcome\":\"unexecuted\",\"source\":\"experiment:docker-env-prep\"}],\"followUp\":[{\"goal\":\"在交付阶段使用真实桌面浏览器（Chrome/Edge/Firefox）实测 1,000 条便签基准下的检索响应时间（P95 \\u003c= 150ms）、冷启动 TTI（\\u003c= 1.0s）及配额满载状态保留机制\",\"kind\":\"validation\"}],\"groups\":[],\"questions\":[],\"summary\":\"# 随手灵感整理工具质量反馈可行性研究与契约分析报告\\n\\n本报告针对自动质量验收反馈（输入 `554e81ee-2cc8-4e01-b708-b71b835f7c9b`）提出的 10 项核心架构与设计缺陷进行了系统性的官方规范查证、材料边界比对及可行性风险评估。本阶段职责聚焦官方资料研究与可行性证据沉淀，`groups = []`，不替代产品决策，所有技术建议与发现作为后续蓝图修订的结构化依据。\\n\\n---\\n\\n## 一、官方规范查证与关键事实发现\\n\\n1. **IndexedDB 键类型规范与布尔索引无效性（W3C IndexedDB 2.0 §2.4）**：\\n   - 查证来源：`https://www.w3.org/TR/IndexedDB-2/`（sha256: `5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec`）。\\n   - 事实：规范明确规定合法键类型仅限于 `number`、`date`、`string`、`binary` 和 `array`。布尔值（`boolean`: `true`/`false`）**不是合法键**，规范明确指出“尝试将其他 ECMAScript 类型作为键将失败”。\\n   - 风险与结论：在 Dexie/IndexedDB 中直接对 `isPinned` 或 `isFavorite` 声明索引或调用 `.where('isPinned').equals(true)` 会触发底层 `DataError`。必须从对象仓库索引中移除布尔键，改由内存谓词过滤（或映射为 `0 | 1` 数字索引）。\\n\\n2. **浏览器键盘事件作用域（W3C UI Events §5）**：\\n   - 查证来源：`https://www.w3.org/TR/uievents/`（sha256: `8ded5eaf4f190b13c59582d5e92b81d3585112dde963d71d65d8e5991212b918`）。\\n   - 事实：键盘事件仅派发至当前获得焦点的窗口与活动文档中。纯浏览器单页应用受沙箱限制，无法监听操作系统层面的全局快捷键。\\n   - 结论：必须彻底剔除“全局快捷键/系统全局唤起”表述，仅保留页面获得焦点后的快捷键（如 `N`、`Ctrl/Cmd+Enter`），快捷入口由浏览器常驻固定标签页（Pinned Tab）或书签承担。\\n\\n3. **Vite 静态部署与协议边界（Vite Static Deploy Guide）**：\\n   - 查证来源：`https://vite.dev/guide/static-deploy.html`（sha256: `2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b`）。\\n   - 事实：Vite 产物采用标准 ES 模块（`\\u003cscript type=\\\"module\\\"\\u003e`），受浏览器 CORS 同源策略限制，无法直接双击 `index.html` 通过 `file://` 协议免服务器运行。\\n   - 结论：明确声明应用需运行于本地轻量静态 HTTP 服务器（`npm run preview` 运行于 `http://localhost:4173`）或静态托管平台（GitHub Pages 等），不可宣称支持脱离服务器双击直接打开。\\n\\n4. **Service Worker 离线缓存生命周期（W3C Service Workers §3）**：\\n   - 查证来源：`https://www.w3.org/TR/service-workers/`（sha256: `5176006deeb935e66b44b53b16b8a58b3de8cda7a161f466a39623eef148a9d9`）。\\n   - 事实：离线重新打开需要 Service Worker 注册、安装、激活并预缓存全量静态资源。\\n   - 结论：首版本未完整交付 Service Worker 缓存时，离线能力严格限定为“已打开/已取得缓存页面的脱机本地数据读写与编辑”，不承诺断网环境下的脱机重新打开。\\n\\n5. **规划执行环境限制**：\\n   - 工具结果：调用 `environment_prepare(runtime: \\\"node\\\")` 遇到 Docker 守护进程未启动（`prepare-ad85c1a9-fe67-484b-90fb-3e91e8d73363.ndjson`）。规划环境无可用容器，实验标记为 `unexecuted`，性能指标实测移交交付阶段开发验证任务，不伪造已实测事实。\\n\\n---\\n\\n## 二、十项缺陷深度分析与受影响契约调整建议\\n\\n### 1. 目标用户与平台边界\\n- **受影响块**：`block-target-user-scenarios`, `block-scope-core-boundaries`, `feature-quick-capture`, `flow-quick-capture`, `page-main-workspace`, `task-quick-capture`, `acceptance-quick-capture`。\\n- **调整建议**：聚焦个人开发者本人使用，不外扩面向群体的通用平台功能；彻底消除所有“全局唤起/全局快捷键”表述，明确为“页面获焦时的快捷键（按 N 键聚焦、Ctrl/Cmd+Enter 提交、/ 键搜索）”，并建议通过浏览器固定常驻标签页或书签达到秒级打开。\\n\\n### 2. 归档与标签操作\\n- **受影响块**：`page-main-workspace`, `feature-note-card-view`, `flow-note-card-actions`, `feature-tag-organization`, `flow-tag-organization`, `task-note-card-view`, `task-tag-organization`。\\n- **调整建议**：在归档视图（`ArchivedView`）中为每条卡片提供常规持久的【取消归档】（Unarchive）操作按钮，点击后恢复为活跃状态，解决原方案仅依赖 5 秒临时 Toast 撤销导致无法找回的问题；在移动端/触控屏幕下，侧边栏标签过滤支持直观的点击多选切换模式（多选标签 Chips 胶囊），无需依赖桌面修饰键 `Ctrl/Cmd`。\\n\\n### 3. 删除与撤销状态恢复\\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-note-card-view`, `flow-note-card-actions`, `task-foundation-and-storage`, `task-note-card-view`, `acceptance-note-card-view`。\\n- **调整建议**：\\n  - 数据模型在 `Note` 中增加 `originalStatus?: 'active' | 'archived'` 字段；\\n  - 便签移入回收区时，记录原状态至 `originalStatus`，持久化写入 `status = 'trashed'`, `trashedAt = Date.now()`；\\n  - 彻底废除“5 秒软删除倒计时结束才物理删除”与“倒计时结束才落盘”的混用逻辑；删除动作即时落盘回收区，7 天内可还原；\\n  - 从回收区执行【还原】时，精确恢复到 `originalStatus`，原打标、置顶与收藏属性无损恢复；\\n  - 超 7 天时侧边栏点亮预警点，回收区顶部常驻琥珀色横幅，彻底清空须经二次确认弹窗；刷新或重开应用时回收区暂存状态持久保持。\\n\\n### 4. 编辑保存、放弃修改与并发冲突\\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-note-detail-edit`, `flow-note-detail-edit`, `task-note-detail-edit`, `error-architecture-and-recovery`。\\n- **调整建议**：\\n  - 详情编辑弹窗明确三种退出分支：①【保存后退出】（Ctrl+S 或点击保存，持久化成功后关闭）；②【放弃修改】（存在脏修改时按 Esc 或点击外部遮罩弹出提示“确定放弃修改？”，确认后丢弃未保存内容并关闭，禁止静默自动保存）；③【继续编辑】（取消退出，留在编辑态）；\\n  - 保存遇到配额满或存储异常时，强制拦截关闭，编辑框文本 100% 保留，提供复制与重试；\\n  - 在 `Note` 实体中引入 `revision: number`（记录修订号，整型自增），与顶层 `schemaVersion`（数据协议版本）解耦；\\n  - `saveNote` 采用乐观锁并发版本检测，在多标签页同时修改时，若读取到的 revision 与数据库现存 revision 不一致，阻止静默覆盖，弹出冲突提示。\\n\\n### 5. 导入导出往返一致性与事务原子性\\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-data-portability`, `flow-data-portability`, `task-data-portability`, `acceptance-data-portability`。\\n- **调整建议**：\\n  - 统一顶层协议键为 `schemaVersion: 1`，消除 `version: 1` 与 `schemaVersion: 1` 并存冲突；导出数据契约 `BackupPayload` 包含 `{ app: 'SparkNotes', schemaVersion: 1, exportedAt: string, notesCount: number, notes: Note[] }`；\\n  - 确保导出的 JSON 备份可通过自身校验规则 100% 成功导入（Roundtrip Guarantee）；\\n  - 全量覆盖导入时，清空（`notes.clear()`, `meta.clear()`）、批量写入（`notes.bulkAdd()`）与元数据更新必须包裹在同一个 Dexie 读写事务内（`await db.transaction('rw', [db.notes, db.meta], async () =\\u003e { ... })`），中途失败由底层事务自动整体回滚，保留原数据，禁止使用易在崩溃时丢失的临时内存快照代替 ACID 事务。\\n\\n### 6. IndexedDB/Dexie 键类型与索引约束\\n- **受影响块**：`tech-core-architecture`, `tech-storage-and-search`, `data-model-core-entities`, `interface-service-contracts`, `task-foundation-and-storage`, `acceptance-foundation-and-storage`。\\n- **调整建议**：根据 W3C IndexedDB 2.0 §2.4，Boolean 不是合法索引键。从 Dexie Schema 中移除 `isPinned` 与 `isFavorite` 索引，定义为 `notes: 'id, updatedAt, createdAt, status, trashedAt, *tags'`；置顶与收藏卡片在按 `status` 查询后在前端内存中进行过滤，消除底层抛出 `DataError` 的致命隐患。\\n\\n### 7. 部署与离线前提条件\\n- **受影响块**：`deployment-and-build-specification`, `task-build-and-deploy`, `acceptance-build-and-deploy`, `block-outcomes-lightweight-experience`。\\n- **调整建议**：根据 Vite 规范剔除“免服务器双击运行”表述，明确要求运行在本地 HTTP 服务器（`npm run preview` 运行于 `http://localhost:4173`）或静态托管平台；离线能力界定为“已在浏览器中打开并加载完成的应用，在脱机断网状态下所有本地数据读写、编辑、检索与备份导出正常运行”；PWA 离线重开作为后续演进，首版不作未经验证的绝对承诺。\\n\\n### 8. 性能度量口径闭合\\n- **受影响块**：`block-outcomes-lightweight-experience`, `feature-search-filter`, `val-storage-and-search-benchmark`, `acceptance-storage-and-search-benchmark`。\\n- **调整建议**：消除矛盾阈值（\\u003c150ms、\\u003c=150ms、\\u003e250ms），统一口径：\\n  - 全文模糊检索（1,000 条便签基准，正文与标签，含 80ms 防抖）：从最后一次输入按键起至 DOM 卡片重新排版完成（`requestAnimationFrame` 回调），连续 10 次 3 字符复合查询实测 P95 响应时间 \\u003c= 150ms 视为通过（Pass）；若 \\u003e 150ms 触发降级与虚拟滚动优化；\\n  - 冷启动首屏可交互时间（TTI）：从 `navigationStart` 起至 6 块骨架屏消失且首屏便签可交互，标准桌面配置下目标 \\u003c= 1.0s；\\n  - 回收区超 7 天便签查询（`listExpiredTrashedNotes`）：100 条回收区便签下执行耗时 \\u003c= 50ms；\\n  - 所有指标明确标为“待验证目标”，在交付阶段真实浏览器中实测。\\n\\n### 9. 浏览器差异与草稿保留一致性\\n- **受影响块**：`error-architecture-and-recovery`, `page-main-workspace`, `feature-quick-capture`, `feature-note-detail-edit`。\\n- **调整建议**：明确 Safari WebKit 7 天 ITP 存储清理策略，配合 StorageManager 持久化申请与温和备份提醒进行防御；坚持 IndexedDB 为浏览器本地唯一持久化存储介质，彻底废除“降级至 LocalStorage”的冲突描述（磁盘满时 5MB LocalStorage 同样会失败）；遇到存储配额满时，草稿完整保留在 React 组件内存与文本输入框中，禁止关闭弹窗，界面浮出醒目横幅并提供复制到剪贴板与紧急文本下载按钮。\\n\\n### 10. 可执行任务依赖图与验证任务合并\\n- **受影响块**：合并 `val-browser-storage-and-search-perf` 与 `val-storage-and-search-benchmark`；校正全流程任务 `dependsOn`。\\n- **调整建议**：\\n  - 将两个重复的性能验证任务合并为唯一交付集成验证任务 `val-storage-and-search-benchmark`；\\n  - 规范块不能作为实现任务的前置依赖，建立严格可执行的任务依赖拓扑：\\n    1. `task-foundation-and-storage`（脚手架与存储驱动，无布尔索引，支持 revision 并发检测与原子导入）\\n    2. `task-quick-capture`（依赖 storage，实现输入自适应、N 键获焦与草稿保留）\\n    3. `task-note-card-view`（依赖 storage，实现双布局、归档常规恢复、7 天回收区生命周期）\\n    4. `task-tag-organization`（依赖 storage，实现标签云、触控多选与重命名事务）\\n    5. `task-search-filter`（依赖 storage，实现 80ms 防抖检索与回收区范围隔离）\\n    6. `task-note-detail-edit`（依赖 storage，实现详情阅读、保存/放弃分支与防关闭草稿保护）\\n    7. `task-data-portability`（依赖 storage，实现统一 schemaVersion: 1 的自校验导入导出与未备份追踪）\\n    8. `task-build-and-deploy`（生产构建打包，依赖上述 1~7 全部功能实现任务，确保全量模块就绪后打包）\\n    9. `val-storage-and-search-benchmark`（真实浏览器集成实测，依赖 `task-build-and-deploy`，在产物构建与本地服务启动后闭环实测）。\\n\\n---\\n\\n## 三、结论与后续步骤\\n\\n本轮研究已完成所有官方证据查证与真实性核验，沉淀了 5 项官方规范证据、1 项用户质量反馈证据与 1 项规划环境容器限制证据。相关契约调整方向清晰、依赖闭包完备，已为后续正式修订待批准变更集做好充分准备。\",\"toolAction\":\"Submitting feedback feasibility research and evidence\",\"toolSummary\":\"Complete feedback research\"}\n",
+  "duration_seconds": 191.2288047,
+  "num_turns": 1,
+  "structured_output": {
+    "blockers": [],
+    "clarification": null,
+    "evidence": [
+      {
+        "applicability": "IndexedDB Schema 设计与索引约束：规范明确 Boolean 不是合法键，禁止直接在 isPinned/isFavorite 建立原生索引，改用内存过滤",
+        "content": "W3C IndexedDB 2.0 规范第 2.4 节（Keys）明确规定合法键（valid keys）类型仅包括：Number（除 NaN）、Date（有效值）、String、Binary（ArrayBuffer 或视图）及 Array（其成员为合法键）。Boolean（布尔值 true/false）不是合法键。规范指出：'Attempting to convert other ECMAScript values to a key will fail'。因此在 IndexedDB 中不能对 boolean 属性（如 isPinned, isFavorite）直接建立原生索引或执行 where().equals(true) 查询，否则会抛出 DataError 异常。",
+        "hash": "5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec",
+        "id": "evidence-w3c-indexeddb-keys",
+        "kind": "official-source",
+        "location": "Section 2.4 Keys",
+        "obtainedAt": "2026-10-04T18:52:59.086Z",
+        "outcome": "passed",
+        "source": "https://www.w3.org/TR/IndexedDB-2/"
+      },
+      {
+        "applicability": "Vite 静态打包部署与本地运行方式：ESM 模块受浏览器同源策略限制，禁止通过 file:// 直接双击运行，必须在 HTTP/HTTPS 环境下运行",
+        "content": "Vite 官方构建部署文档明确指出构建产物默认输出至 dist 目录，提供 vite preview 命令启动本地轻量 HTTP 静态服务器（如 http://localhost:4173 或自定义端口）用于本地预览。现代前端构建产物采用标准 ES 模块（<script type=\\\"module\\\">），浏览器安全策略禁止通过 file:// 协议直接加载 ESM 模块（CORS 限制），因此应用必须运行在 HTTP/HTTPS 静态托管平台或本地 localhost Web 服务器中，不能承诺直接通过双击 index.html 依靠 file:// 协议免服务器运行。",
+        "hash": "2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b",
+        "id": "evidence-vite-static-deploy-http",
+        "kind": "official-source",
+        "location": "Testing the App Locally & Deploying a Static Site",
+        "obtainedAt": "2026-10-04T18:53:35.298Z",
+        "outcome": "passed",
+        "source": "https://vite.dev/guide/static-deploy.html"
+      },
+      {
+        "applicability": "浏览器键盘事件作用域：纯 Web 单页应用无法监听系统级全局快捷键，快捷键仅在页面处于焦点状态时生效",
+        "content": "W3C UI Events 规范规定键盘事件（KeyboardEvent）仅在当前拥有焦点的窗口与活动文档中派发。纯 Web 前端单页应用运行于标准浏览器沙箱中，缺乏操作系统层级的全局按键钩子权限，无法在浏览器失焦或处于后台常驻标签时捕获系统级全局快捷键。快捷键仅在页面获得焦点后有效，快捷访问需通过浏览器常驻固定标签页或书签实现。",
+        "hash": "8ded5eaf4f190b13c59582d5e92b81d3585112dde963d71d65d8e5991212b918",
+        "id": "evidence-w3c-uievents-keyboard",
+        "kind": "official-source",
+        "location": "Section 5 UI Event Types - Keyboard Events",
+        "obtainedAt": "2026-10-04T18:54:03.326Z",
+        "outcome": "passed",
+        "source": "https://www.w3.org/TR/uievents/"
+      },
+      {
+        "applicability": "离线能力范围与前提条件：区分已加载页面的离线数据读写与离线脱机重新打开页面",
+        "content": "W3C Service Workers 规范定义了网络代理与离线缓存机制，Service Worker 必须在 HTTPS 或 localhost 安全上下文中先成功完成注册、安装（Install）和激活（Activate）并预缓存资源后，才能支持完全离线状态下的页面重新加载。若项目未完整配置并验证 Service Worker 与 Web App Manifest 缓存策略，离线能力仅限于已打开并加载完成页面的离线本地数据读写与编辑，无法承诺断网环境下的首次访问或未缓存离线重开。",
+        "hash": "5176006deeb935e66b44b53b16b8a58b3de8cda7a161f466a39623eef148a9d9",
+        "id": "evidence-w3c-service-workers-offline",
+        "kind": "official-source",
+        "location": "Section 3 Application Lifecycle & Cache",
+        "obtainedAt": "2026-10-04T18:53:57.465Z",
+        "outcome": "passed",
+        "source": "https://www.w3.org/TR/service-workers/"
+      },
+      {
+        "applicability": "数据备份导出与导入校验契约：基于 W3C 标准 Blob 与 FileReader 实现纯客户端无后端导入导出",
+        "content": "W3C File API 定义了客户端 Blob、File 和 FileReader 接口，支持纯前端本地生成与解析文件。配合统一的 JSON Schema v1 与 IndexedDB 原子事务，能够在纯浏览器环境中完成备份文件的导出与安全导入校验。",
+        "hash": "975b6f12f51320b7f90af2b97e38a80358b5964bc274caafb5d126b3f3881efc",
+        "id": "evidence-w3c-file-api",
+        "kind": "official-source",
+        "location": "Section 6 The Blob Interface & Section 7 The FileReader Interface",
+        "obtainedAt": "2026-10-04T18:53:41.082Z",
+        "outcome": "passed",
+        "source": "https://www.w3.org/TR/FileAPI/"
+      },
+      {
+        "applicability": "质量验收反馈缺陷清单与依赖闭包修正依据",
+        "content": "自动质量验收反馈针对目标与平台边界、归档与标签操作、删除与撤销状态、编辑与并发、导入导出往返、IndexedDB/Dexie 约束、部署与离线前提、性能口径闭合、浏览器与草稿、可执行任务次序与重复验证等 10 项缺陷提出了系统性修正要求，要求保持依赖闭包一致，不伪造试验，技术实现由 AI 拟定。",
+        "hash": "22a93a4166f03829f8d5ebf88f0022c6333162efdffced9a4d9dc004eaeab9c0",
+        "id": "evidence-feedback-quality-review-01",
+        "kind": "user",
+        "location": "rawInputs:554e81ee-2cc8-4e01-b708-b71b835f7c9b",
+        "obtainedAt": "2026-10-04T16:41:34.565Z",
+        "outcome": "passed",
+        "source": "input:554e81ee-2cc8-4e01-b708-b71b835f7c9b"
+      },
+      {
+        "applicability": "规划阶段容器限制说明，性能及稳定性基准移交交付阶段实测",
+        "content": "规划环境调用 environment_prepare 准备 Node/Docker 容器失败（open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified），宿主 Docker 守护进程未启动。规划环境无可用容器运行时，自动化浏览器测试不可在当前阶段伪造通过，相关性能与稳定性实测已移交交付阶段验证任务。",
+        "environment": "planning-docker-daemon",
+        "id": "evidence-docker-env-unavailable",
+        "kind": "experiment",
+        "location": "prepare-ad85c1a9-fe67-484b-90fb-3e91e8d73363.ndjson",
+        "obtainedAt": "2026-10-04T18:53:43.000Z",
+        "outcome": "unexecuted",
+        "source": "experiment:docker-env-prep"
+      }
+    ],
+    "followUp": [
+      {
+        "goal": "在交付阶段使用真实桌面浏览器（Chrome/Edge/Firefox）实测 1,000 条便签基准下的检索响应时间（P95 <= 150ms）、冷启动 TTI（<= 1.0s）及配额满载状态保留机制",
+        "kind": "validation"
+      }
+    ],
+    "groups": [],
+    "questions": [],
+    "summary": "# 随手灵感整理工具质量反馈可行性研究与契约分析报告\n\n本报告针对自动质量验收反馈（输入 `554e81ee-2cc8-4e01-b708-b71b835f7c9b`）提出的 10 项核心架构与设计缺陷进行了系统性的官方规范查证、材料边界比对及可行性风险评估。本阶段职责聚焦官方资料研究与可行性证据沉淀，`groups = []`，不替代产品决策，所有技术建议与发现作为后续蓝图修订的结构化依据。\n\n---\n\n## 一、官方规范查证与关键事实发现\n\n1. **IndexedDB 键类型规范与布尔索引无效性（W3C IndexedDB 2.0 §2.4）**：\n   - 查证来源：`https://www.w3.org/TR/IndexedDB-2/`（sha256: `5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec`）。\n   - 事实：规范明确规定合法键类型仅限于 `number`、`date`、`string`、`binary` 和 `array`。布尔值（`boolean`: `true`/`false`）**不是合法键**，规范明确指出“尝试将其他 ECMAScript 类型作为键将失败”。\n   - 风险与结论：在 Dexie/IndexedDB 中直接对 `isPinned` 或 `isFavorite` 声明索引或调用 `.where('isPinned').equals(true)` 会触发底层 `DataError`。必须从对象仓库索引中移除布尔键，改由内存谓词过滤（或映射为 `0 | 1` 数字索引）。\n\n2. **浏览器键盘事件作用域（W3C UI Events §5）**：\n   - 查证来源：`https://www.w3.org/TR/uievents/`（sha256: `8ded5eaf4f190b13c59582d5e92b81d3585112dde963d71d65d8e5991212b918`）。\n   - 事实：键盘事件仅派发至当前获得焦点的窗口与活动文档中。纯浏览器单页应用受沙箱限制，无法监听操作系统层面的全局快捷键。\n   - 结论：必须彻底剔除“全局快捷键/系统全局唤起”表述，仅保留页面获得焦点后的快捷键（如 `N`、`Ctrl/Cmd+Enter`），快捷入口由浏览器常驻固定标签页（Pinned Tab）或书签承担。\n\n3. **Vite 静态部署与协议边界（Vite Static Deploy Guide）**：\n   - 查证来源：`https://vite.dev/guide/static-deploy.html`（sha256: `2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b`）。\n   - 事实：Vite 产物采用标准 ES 模块（`<script type=\"module\">`），受浏览器 CORS 同源策略限制，无法直接双击 `index.html` 通过 `file://` 协议免服务器运行。\n   - 结论：明确声明应用需运行于本地轻量静态 HTTP 服务器（`npm run preview` 运行于 `http://localhost:4173`）或静态托管平台（GitHub Pages 等），不可宣称支持脱离服务器双击直接打开。\n\n4. **Service Worker 离线缓存生命周期（W3C Service Workers §3）**：\n   - 查证来源：`https://www.w3.org/TR/service-workers/`（sha256: `5176006deeb935e66b44b53b16b8a58b3de8cda7a161f466a39623eef148a9d9`）。\n   - 事实：离线重新打开需要 Service Worker 注册、安装、激活并预缓存全量静态资源。\n   - 结论：首版本未完整交付 Service Worker 缓存时，离线能力严格限定为“已打开/已取得缓存页面的脱机本地数据读写与编辑”，不承诺断网环境下的脱机重新打开。\n\n5. **规划执行环境限制**：\n   - 工具结果：调用 `environment_prepare(runtime: \"node\")` 遇到 Docker 守护进程未启动（`prepare-ad85c1a9-fe67-484b-90fb-3e91e8d73363.ndjson`）。规划环境无可用容器，实验标记为 `unexecuted`，性能指标实测移交交付阶段开发验证任务，不伪造已实测事实。\n\n---\n\n## 二、十项缺陷深度分析与受影响契约调整建议\n\n### 1. 目标用户与平台边界\n- **受影响块**：`block-target-user-scenarios`, `block-scope-core-boundaries`, `feature-quick-capture`, `flow-quick-capture`, `page-main-workspace`, `task-quick-capture`, `acceptance-quick-capture`。\n- **调整建议**：聚焦个人开发者本人使用，不外扩面向群体的通用平台功能；彻底消除所有“全局唤起/全局快捷键”表述，明确为“页面获焦时的快捷键（按 N 键聚焦、Ctrl/Cmd+Enter 提交、/ 键搜索）”，并建议通过浏览器固定常驻标签页或书签达到秒级打开。\n\n### 2. 归档与标签操作\n- **受影响块**：`page-main-workspace`, `feature-note-card-view`, `flow-note-card-actions`, `feature-tag-organization`, `flow-tag-organization`, `task-note-card-view`, `task-tag-organization`。\n- **调整建议**：在归档视图（`ArchivedView`）中为每条卡片提供常规持久的【取消归档】（Unarchive）操作按钮，点击后恢复为活跃状态，解决原方案仅依赖 5 秒临时 Toast 撤销导致无法找回的问题；在移动端/触控屏幕下，侧边栏标签过滤支持直观的点击多选切换模式（多选标签 Chips 胶囊），无需依赖桌面修饰键 `Ctrl/Cmd`。\n\n### 3. 删除与撤销状态恢复\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-note-card-view`, `flow-note-card-actions`, `task-foundation-and-storage`, `task-note-card-view`, `acceptance-note-card-view`。\n- **调整建议**：\n  - 数据模型在 `Note` 中增加 `originalStatus?: 'active' | 'archived'` 字段；\n  - 便签移入回收区时，记录原状态至 `originalStatus`，持久化写入 `status = 'trashed'`, `trashedAt = Date.now()`；\n  - 彻底废除“5 秒软删除倒计时结束才物理删除”与“倒计时结束才落盘”的混用逻辑；删除动作即时落盘回收区，7 天内可还原；\n  - 从回收区执行【还原】时，精确恢复到 `originalStatus`，原打标、置顶与收藏属性无损恢复；\n  - 超 7 天时侧边栏点亮预警点，回收区顶部常驻琥珀色横幅，彻底清空须经二次确认弹窗；刷新或重开应用时回收区暂存状态持久保持。\n\n### 4. 编辑保存、放弃修改与并发冲突\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-note-detail-edit`, `flow-note-detail-edit`, `task-note-detail-edit`, `error-architecture-and-recovery`。\n- **调整建议**：\n  - 详情编辑弹窗明确三种退出分支：①【保存后退出】（Ctrl+S 或点击保存，持久化成功后关闭）；②【放弃修改】（存在脏修改时按 Esc 或点击外部遮罩弹出提示“确定放弃修改？”，确认后丢弃未保存内容并关闭，禁止静默自动保存）；③【继续编辑】（取消退出，留在编辑态）；\n  - 保存遇到配额满或存储异常时，强制拦截关闭，编辑框文本 100% 保留，提供复制与重试；\n  - 在 `Note` 实体中引入 `revision: number`（记录修订号，整型自增），与顶层 `schemaVersion`（数据协议版本）解耦；\n  - `saveNote` 采用乐观锁并发版本检测，在多标签页同时修改时，若读取到的 revision 与数据库现存 revision 不一致，阻止静默覆盖，弹出冲突提示。\n\n### 5. 导入导出往返一致性与事务原子性\n- **受影响块**：`data-model-core-entities`, `interface-service-contracts`, `feature-data-portability`, `flow-data-portability`, `task-data-portability`, `acceptance-data-portability`。\n- **调整建议**：\n  - 统一顶层协议键为 `schemaVersion: 1`，消除 `version: 1` 与 `schemaVersion: 1` 并存冲突；导出数据契约 `BackupPayload` 包含 `{ app: 'SparkNotes', schemaVersion: 1, exportedAt: string, notesCount: number, notes: Note[] }`；\n  - 确保导出的 JSON 备份可通过自身校验规则 100% 成功导入（Roundtrip Guarantee）；\n  - 全量覆盖导入时，清空（`notes.clear()`, `meta.clear()`）、批量写入（`notes.bulkAdd()`）与元数据更新必须包裹在同一个 Dexie 读写事务内（`await db.transaction('rw', [db.notes, db.meta], async () => { ... })`），中途失败由底层事务自动整体回滚，保留原数据，禁止使用易在崩溃时丢失的临时内存快照代替 ACID 事务。\n\n### 6. IndexedDB/Dexie 键类型与索引约束\n- **受影响块**：`tech-core-architecture`, `tech-storage-and-search`, `data-model-core-entities`, `interface-service-contracts`, `task-foundation-and-storage`, `acceptance-foundation-and-storage`。\n- **调整建议**：根据 W3C IndexedDB 2.0 §2.4，Boolean 不是合法索引键。从 Dexie Schema 中移除 `isPinned` 与 `isFavorite` 索引，定义为 `notes: 'id, updatedAt, createdAt, status, trashedAt, *tags'`；置顶与收藏卡片在按 `status` 查询后在前端内存中进行过滤，消除底层抛出 `DataError` 的致命隐患。\n\n### 7. 部署与离线前提条件\n- **受影响块**：`deployment-and-build-specification`, `task-build-and-deploy`, `acceptance-build-and-deploy`, `block-outcomes-lightweight-experience`。\n- **调整建议**：根据 Vite 规范剔除“免服务器双击运行”表述，明确要求运行在本地 HTTP 服务器（`npm run preview` 运行于 `http://localhost:4173`）或静态托管平台；离线能力界定为“已在浏览器中打开并加载完成的应用，在脱机断网状态下所有本地数据读写、编辑、检索与备份导出正常运行”；PWA 离线重开作为后续演进，首版不作未经验证的绝对承诺。\n\n### 8. 性能度量口径闭合\n- **受影响块**：`block-outcomes-lightweight-experience`, `feature-search-filter`, `val-storage-and-search-benchmark`, `acceptance-storage-and-search-benchmark`。\n- **调整建议**：消除矛盾阈值（<150ms、<=150ms、>250ms），统一口径：\n  - 全文模糊检索（1,000 条便签基准，正文与标签，含 80ms 防抖）：从最后一次输入按键起至 DOM 卡片重新排版完成（`requestAnimationFrame` 回调），连续 10 次 3 字符复合查询实测 P95 响应时间 <= 150ms 视为通过（Pass）；若 > 150ms 触发降级与虚拟滚动优化；\n  - 冷启动首屏可交互时间（TTI）：从 `navigationStart` 起至 6 块骨架屏消失且首屏便签可交互，标准桌面配置下目标 <= 1.0s；\n  - 回收区超 7 天便签查询（`listExpiredTrashedNotes`）：100 条回收区便签下执行耗时 <= 50ms；\n  - 所有指标明确标为“待验证目标”，在交付阶段真实浏览器中实测。\n\n### 9. 浏览器差异与草稿保留一致性\n- **受影响块**：`error-architecture-and-recovery`, `page-main-workspace`, `feature-quick-capture`, `feature-note-detail-edit`。\n- **调整建议**：明确 Safari WebKit 7 天 ITP 存储清理策略，配合 StorageManager 持久化申请与温和备份提醒进行防御；坚持 IndexedDB 为浏览器本地唯一持久化存储介质，彻底废除“降级至 LocalStorage”的冲突描述（磁盘满时 5MB LocalStorage 同样会失败）；遇到存储配额满时，草稿完整保留在 React 组件内存与文本输入框中，禁止关闭弹窗，界面浮出醒目横幅并提供复制到剪贴板与紧急文本下载按钮。\n\n### 10. 可执行任务依赖图与验证任务合并\n- **受影响块**：合并 `val-browser-storage-and-search-perf` 与 `val-storage-and-search-benchmark`；校正全流程任务 `dependsOn`。\n- **调整建议**：\n  - 将两个重复的性能验证任务合并为唯一交付集成验证任务 `val-storage-and-search-benchmark`；\n  - 规范块不能作为实现任务的前置依赖，建立严格可执行的任务依赖拓扑：\n    1. `task-foundation-and-storage`（脚手架与存储驱动，无布尔索引，支持 revision 并发检测与原子导入）\n    2. `task-quick-capture`（依赖 storage，实现输入自适应、N 键获焦与草稿保留）\n    3. `task-note-card-view`（依赖 storage，实现双布局、归档常规恢复、7 天回收区生命周期）\n    4. `task-tag-organization`（依赖 storage，实现标签云、触控多选与重命名事务）\n    5. `task-search-filter`（依赖 storage，实现 80ms 防抖检索与回收区范围隔离）\n    6. `task-note-detail-edit`（依赖 storage，实现详情阅读、保存/放弃分支与防关闭草稿保护）\n    7. `task-data-portability`（依赖 storage，实现统一 schemaVersion: 1 的自校验导入导出与未备份追踪）\n    8. `task-build-and-deploy`（生产构建打包，依赖上述 1~7 全部功能实现任务，确保全量模块就绪后打包）\n    9. `val-storage-and-search-benchmark`（真实浏览器集成实测，依赖 `task-build-and-deploy`，在产物构建与本地服务启动后闭环实测）。\n\n---\n\n## 三、结论与后续步骤\n\n本轮研究已完成所有官方证据查证与真实性核验，沉淀了 5 项官方规范证据、1 项用户质量反馈证据与 1 项规划环境容器限制证据。相关契约调整方向清晰、依赖闭包完备，已为后续正式修订待批准变更集做好充分准备。"
+  },
+  "json_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "B3 Planning task result",
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "string"
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "impact": {
+              "type": "string"
+            },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "blocks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "enum": [
+                      "product",
+                      "technical",
+                      "delivery"
+                    ]
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "target",
+                      "problem",
+                      "outcomes",
+                      "scope",
+                      "non_goals",
+                      "feature",
+                      "flow",
+                      "page",
+                      "technology",
+                      "module",
+                      "data_model",
+                      "interface",
+                      "error",
+                      "deployment",
+                      "task",
+                      "acceptance",
+                      "validation"
+                    ]
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "requirementIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "dependsOn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "task": {
+                    "type": "object",
+                    "properties": {
+                      "goal": {
+                        "type": "string"
+                      },
+                      "scope": {
+                        "type": "string"
+                      },
+                      "exclusions": {
+                        "type": "string"
+                      },
+                      "modules": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "normalBehavior": {
+                        "type": "string"
+                      },
+                      "failureBehavior": {
+                        "type": "string"
+                      },
+                      "verification": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "completionCriteria": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "assumptions": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "environment": {
+                        "type": "string"
+                      },
+                      "steps": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "passCriteria": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "evidenceRequired": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "onFailure": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "goal",
+                      "scope",
+                      "exclusions",
+                      "modules",
+                      "normalBehavior",
+                      "failureBehavior",
+                      "verification",
+                      "completionCriteria",
+                      "assumptions"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "stage",
+                  "kind",
+                  "title",
+                  "content",
+                  "requirementIds",
+                  "dependsOn",
+                  "evidenceIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "removeBlockIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "decisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "decisionKey": {
+                    "type": "string"
+                  },
+                  "area": {
+                    "type": "string"
+                  },
+                  "statement": {
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "evidenceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "replaces": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "aliases": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "decisionKey",
+                  "area",
+                  "statement",
+                  "rationale",
+                  "evidenceIds"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "status": {
+              "type": "string",
+              "const": "pending"
+            },
+            "rejectDecisionIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "id",
+            "title",
+            "impact",
+            "dependsOn",
+            "blocks",
+            "removeBlockIds",
+            "decisions",
+            "status"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "questions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "issueRef": {
+              "type": "string"
+            },
+            "importance": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "high",
+                "critical"
+              ]
+            },
+            "question": {
+              "type": "string"
+            },
+            "area": {
+              "type": "string"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "recommendation": {
+              "type": "string"
+            },
+            "recommendationReason": {
+              "type": "string"
+            },
+            "recommendedOptionKey": {
+              "type": "string"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "approach": {
+                    "type": "string"
+                  },
+                  "gain": {
+                    "type": "string"
+                  },
+                  "sacrifice": {
+                    "type": "string"
+                  },
+                  "impact": {
+                    "type": "string"
+                  },
+                  "reversibility": {
+                    "type": "string",
+                    "enum": [
+                      "easy",
+                      "moderate",
+                      "hard"
+                    ]
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "approach",
+                  "gain",
+                  "sacrifice",
+                  "impact",
+                  "reversibility"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 2,
+              "maxItems": 4
+            },
+            "allowFreeInput": {
+              "type": "boolean",
+              "const": true
+            },
+            "decisionKey": {
+              "type": "string"
+            },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "selectionMode": {
+              "type": "string",
+              "enum": [
+                "single",
+                "multiple"
+              ]
+            },
+            "reopenReason": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "const": "proposed"
+            },
+            "createdAt": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "issueRef",
+            "importance",
+            "question",
+            "reason",
+            "recommendation",
+            "recommendationReason",
+            "recommendedOptionKey",
+            "options",
+            "allowFreeInput",
+            "decisionKey",
+            "dependsOn",
+            "status",
+            "createdAt"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 3
+      },
+      "evidence": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "user",
+                "material",
+                "official-source",
+                "experiment"
+              ]
+            },
+            "content": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "obtainedAt": {
+              "type": "string"
+            },
+            "hash": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "outcome": {
+              "type": "string",
+              "enum": [
+                "unexecuted",
+                "passed",
+                "failed",
+                "not-applicable"
+              ]
+            },
+            "applicability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "content",
+            "source",
+            "obtainedAt",
+            "applicability"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "blockers": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "followUp": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "research",
+                "validation"
+              ]
+            },
+            "goal": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "goal"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "clarification": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "target": {
+                "type": "string"
+              },
+              "problem": {
+                "type": "string"
+              },
+              "outcomes": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              },
+              "constraints": {
+                "type": "string"
+              },
+              "delegated": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "target",
+              "problem",
+              "outcomes",
+              "scope",
+              "constraints",
+              "delegated"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "required": [
+      "summary",
+      "groups",
+      "questions",
+      "evidence",
+      "blockers",
+      "followUp",
+      "clarification"
+    ],
+    "additionalProperties": false
+  },
+  "usage": {
+    "input_tokens": 435904,
+    "output_tokens": 36050,
+    "thinking_tokens": 21850,
+    "cache_read_tokens": 1916598,
+    "total_tokens": 471954
+  }
+}

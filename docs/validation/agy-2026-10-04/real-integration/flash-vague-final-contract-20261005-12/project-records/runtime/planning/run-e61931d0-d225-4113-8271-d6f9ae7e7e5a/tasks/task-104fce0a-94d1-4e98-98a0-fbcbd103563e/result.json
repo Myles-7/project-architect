@@ -1,0 +1,61 @@
+{
+  "blockers": [
+    "缺口 1：IndexedDB 键类型与布尔索引冲突。受影响块：technical-storage-specification、task-storage-service、acceptance-storage-service、task-search-filter。依据：W3C Indexed Database API 2.0 规范第 2.4 节明确规定布尔值（boolean）不是合法键类型，尝试转换会直接抛出 DataError。设计中不能在 Dexie/IndexedDB 中对 isPinned/isFavorite 声明原生索引或执行 where('isPinned').equals(true)，必须统一改为内存过滤（.filter）或显式数值映射（0/1）索引，并同步 Schema 定义、查询接口及验收用例。",
+    "缺口 2：部署与安全上下文前提矛盾。受影响块：deployment-and-build-specification、task-build-and-deploy、acceptance-build-and-deploy。依据：W3C Secure Contexts 规范第 3.1 节与 Vite 官方构建规范证实，现代 ESM 单页应用在 file:// 协议下受浏览器同源策略限制无法跨源加载模块，且 Service Worker 与 navigator.storage.persist() 均强制要求 Secure Context（HTTPS 或 localhost）。原蓝图中若存在“支持直接 file:// 免服务器离线运行”的表述不成立，必须修正为基于本地 HTTP 服务器（如 vite preview、npx serve）或 HTTPS 静态托管运行。",
+    "缺口 3：数据模型与并发 CAS 控制闭合缺口。受影响块：data-model-specification、task-storage-service、acceptance-storage-service、task-quick-capture、task-note-detail。依据：多标签页并发编辑与导入覆盖防丢要求实体更新必须携带界面呈现的 expectedRevision 与打开会话的 expectedLibraryGeneration，并在单次 readwrite 事务（同时覆盖 notes 与 meta）内完成版本比较与递增写入；新建便签必须使用独立 create（add）避免误复活，删除后陈旧操作必须被拒绝。",
+    "缺口 4：七天回收期判定与状态还原一致性缺口。受影响块：feature-trash-recovery、flow-trash-recovery、task-trash-recovery、acceptance-trash-recovery。依据：根据已确认的用户需求变更，删除便签进入回收区必须保留其进入前的 previousStatus（active 或 archived），还原时精确恢复原状态而非一律转为 active；7 天到期判定以毫秒区间（>= 604,800,000ms）计算，在回收区视图常驻横幅醒目标注，用户主动确认前不执行后台暗删，重复进入回收区不得刷新删除时间戳。",
+    "缺口 5：端到端检索与冷启动性能口径及测试前提缺口。受影响块：task-search-filter、acceptance-search-filter、acceptance-quick-capture。依据：用户反馈要求统一 1000 条种子数据下含 80ms 防抖的端到端检索 P95 <= 150ms，消除区间矛盾；冷启动以导航原点至首屏可交互 <= 1.0s 为准。当前目标应用尚未开发且规划沙箱容器不可用，所有性能与真实浏览器兼容性验证属于实现后的开发期验证任务，不能声称已实测通过。",
+    "缺口 6：无痕/隐私模式探测接口能力边界。受影响块：task-storage-service、acceptance-storage-service。依据：主流现代浏览器已全面废除可用于可靠识别隐私模式的配额或 API 差异特征，detectPrivateMode() 无法实现 100% 确定性检测，必须在接口规范与任务中明确其为启发式尽力而为（best-effort）并注明能力限制，避免宣称全平台绝对有效。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "为便签存储索引模型与检索过滤契约提供官方规范约束：必须在数据架构中移除直接对 boolean 字段建立 IndexedDB 索引的定义，改用内存过滤（.filter）或显式声明 0/1 数值映射索引，并同步修订 Schema、查询接口与验收断言。",
+      "content": "W3C Indexed Database API 2.0 规范第 2.4 节（Keys）明确定义：A key has an associated type which is one of: number, date, string, binary, or array。合法 ECMAScript 类型仅包含 Number（非 NaN）、Date（有效值）、String、ArrayBuffer 以及所有项均合法的 Array；规范明确规定 Attempting to convert other ECMAScript values to a key will fail。布尔值（Boolean）非合法键类型，尝试转换将直接失败并抛出 DataError。因此在 IndexedDB/Dexie 中禁止对 isPinned/isFavorite 建立原生 boolean 索引，亦不能执行 where('isPinned').equals(true)。",
+      "hash": "5be03028657a31e2d7f2f8a7499a856f2603a106c89aa0c2d7448799f66661ec",
+      "id": "evidence-w3c-indexeddb-key-types",
+      "kind": "official-source",
+      "location": "https://www.w3.org/TR/IndexedDB-2/#key-construct",
+      "obtainedAt": "2026-10-05T11:35:38.969Z",
+      "outcome": "passed",
+      "source": "https://www.w3.org/TR/IndexedDB-2/"
+    },
+    {
+      "applicability": "为部署形态、离线策略与本地运行要求提供官方标准约束：消除 Vite 应用可直接免服务器双击 file:// 运行的不可行承诺，明确本地预览运行需启动本地 HTTP 服务器（localhost）或托管于 HTTPS，并界定已打开页面的断网离线操作与重新打开页面的缓存前提差异。",
+      "content": "W3C Secure Contexts 规范第 3.1 节（Is origin potentially trustworthy?）规定：https/wss 协议以及 127.0.0.0/8、::1/128 和 localhost 属于受信安全上下文（Potentially Trustworthy）；不透明来源（opaque origin）或普通未加密远程 HTTP 则属于 Not Trustworthy。Service Worker 与 StorageManager 等现代 Web API 严格受 Secure Context 约束；同时 Vite 生产构建产物依赖原生 ES Modules（<script type=\"module\">），浏览器安全策略禁止在 file:// 协议下跨源加载 ESM 模块，因此单页应用无法免服务器双击运行，必须通过本地 HTTP 服务（如 vite preview、npx serve）或 HTTPS 静态托管运行。",
+      "hash": "97b9b74ab1035922a34f762fe23e84760f41046ec6f428215ce07076355a0f49",
+      "id": "evidence-w3c-secure-contexts-file-localhost",
+      "kind": "official-source",
+      "location": "https://www.w3.org/TR/secure-contexts/#is-origin-trustworthy",
+      "obtainedAt": "2026-10-05T11:36:44.534Z",
+      "outcome": "passed",
+      "source": "https://www.w3.org/TR/secure-contexts/"
+    },
+    {
+      "applicability": "为数据安全边界、防丢备份策略与恢复机制提供官方标准依据：澄清 navigator.storage.persist() 真实能力边界，界定纯前端本地存储的不可控风险，确立以显式 JSON 文件导出备份与提醒为核心、IndexedDB 存储与 sessionStorage 草稿暂存为辅的可靠容灾方案。",
+      "content": "MDN StorageManager.persist() 官方文档明确指出：此 API 仅在安全上下文（HTTPS/localhost）可用，返回 Promise<boolean> 表明浏览器是否授予持久化存储权限。持久化授予完全由浏览器自主策略决定；且即使获得持久化，在用户显式清理浏览器缓存、隐私浏览会话结束或存储空间极度紧张时，本地存储仍可能被清理；Safari/WebKit 在特定无交互场景下仍执行脚本数据驱逐。因此纯前端本地应用不可向用户宣称 100% 绝对不丢数据，必须将 JSON 导出备份作为首要防丢兜底手段。",
+      "hash": "29a8f9be0765588be212957e920ba728d9d698d2d0b22f225852c5843669a87c",
+      "id": "evidence-mdn-storagemanager-persist",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist#syntax",
+      "obtainedAt": "2026-10-05T11:37:11.832Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persist"
+    },
+    {
+      "applicability": "如实记录规划阶段受控容器实验执行状态，避免将未执行的自动化试验伪造成已通过事实，所有浏览器兼容性与真实性能基准测试转入开发期验证任务追踪。",
+      "content": "受控沙箱容器环境（Docker Desktop Daemon）在宿主 Windows 命名管道（//./pipe/dockerDesktopLinuxEngine）未运行，environment_prepare 返回 status: unavailable，受控自动化代码测试与性能实测未执行。此限制属于规划环境约束，非用户项目约束。",
+      "environment": "node:24.13.0-bookworm-slim (docker daemon unavailable)",
+      "hash": "7fe263913c7b7f1d813877a8a0bf0eaf93f3a7e90b6eb30f61cdcae845457c7c",
+      "id": "evidence-experiment-prepare-docker-unavailable",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-05T11:35:43.000Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-b13ca8fb-7ecf-48dd-8028-47b3e3ec3f5e"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本次规划研究针对材料与自动质量反馈中的约束、异常场景与可行性风险进行了独立官方资料查证与可行性证据分析：\\n1. 官方规范约束查证：查证 W3C IndexedDB 2.0 规范第 2.4 节，证实 Boolean 不是合法的可索引键类型，禁止直接对 isPinned/isFavorite 建立布尔索引或执行 where.equals(true)，确立了纯内存过滤或 0/1 数值映射的唯一可行技术路线；查证 W3C Secure Contexts 规范与 Vite 部署指南，证实 ESM 模块无法直接通过 file:// 双击免服务器运行，且 Service Worker 与存储持久化强制要求 Secure Context（localhost 或 HTTPS 静态托管）。\\n2. 并发与容灾控制机制：厘清基于 expectedRevision 与会话 expectedLibraryGeneration 的单事务 CAS 比较更新机制，单次 readwrite 事务同时覆盖 notes 与 meta 表，避免导入替换后陈旧编辑会话覆盖新数据；草稿按 noteId 及代际在 sessionStorage 隔离。\\n3. 七天回收与状态还原：界定删除记录保留 previousStatus（active 或 archived），到期判定严格按 >= 7 天毫秒阈值在回收区顶部横幅醒目标记，用户确认前不自动静默物理清除，重复删除不刷新到期时间戳。\\n4. 性能与验证状态区分：统一 1000 条种子数据下含 80ms 防抖的端到端检索 P95 <= 150ms 及冷启动 <= 1.0s 指标；因当前目标程序未开发且沙箱 Docker 未就绪，所有真实端到端性能与跨浏览器测试均如实记录为 unexecuted 开发验证目标，不捏造已实测事实。所有需要调整的蓝图块已在 blockers 中精确定位并交付整合任务处理。"
+}

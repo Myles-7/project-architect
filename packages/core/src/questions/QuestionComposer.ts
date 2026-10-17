@@ -192,42 +192,42 @@ export class QuestionComposer {
 
     // 1. Semantic keyword matching
     if (/(?:avatar|room|asset|素材|装扮|形象|房间)/i.test(text)) {
-      return `建议首发内置 2-3 套精美默认形象与“${label}”素材，暂缓自由文件上传与复杂编辑器。`;
+      return `建议首发内置标准默认配置与“${label}”规范，暂缓自由文件上传与复杂自定义编辑器。`;
     }
     if (/(?:sync|action|status|动作|同步|互动|玩法|吃饭|睡觉)/i.test(text)) {
-      return `建议首发优先实现基础双人在线状态与单向高频动作广播“${label}”，暂不做复杂物理碰撞与链式互动。`;
+      return `建议首发优先实现基础状态同步与单向事件通知机制“${label}”，暂不做复杂并发冲突解决与链式交互。`;
     }
     if (/(?:movie|photo|video|storage|观影|相册|影视|视频|音乐|传输|存储|媒体)/i.test(text)) {
-      return `建议首发采用外部公共媒体源嵌入或轻量缩略图展示“${label}”，暂不自建重度流媒体转码与大文件存储。`;
+      return `建议首发采用轻量本地文件存储或标准外部对象嵌入“${label}”，暂不自建重度流媒体转码与大文件存储。`;
     }
     if (/(?:notify|remind|alert|提醒|通知|即时|响应)/i.test(text)) {
-      return `建议首发优先采用应用内轻量弹窗与声音动效提醒“${label}”，暂不做复杂的系统级后台推送。`;
+      return `建议首发优先采用应用内轻量弹窗与系统标准事件提醒“${label}”，暂不做复杂的多端推送流水线。`;
     }
     if (/(?:privacy|deploy|network|隐私|部署|网络|安全|权限)/i.test(text)) {
-      return `建议首发采用纯本地文件存储或局域网直连“${label}”，严格隔离外部公开访问。`;
+      return `建议首发采用纯本地文件持久化或局域网直连“${label}”，严格收敛网络与公开权限暴露面。`;
     }
 
     // 2. Domain specific fallbacks
     const area = AreaRegistry.normalize(gap.area || '') || gap.area;
     switch (area) {
       case 'target_user':
-        return `建议首发优先收敛“${label}”为情侣两人私密专属空间，暂不扩展为大众通用社区。`;
+        return `建议首发优先聚焦 1 类典型核心目标用户群体的“${label}”，暂缓拓展多角色复杂权限体系。`;
       case 'mvp_scope':
-        return `建议首发严格收敛“${label}”核心场景闭环，将日记、相册等衍生模块列为二期。`;
+        return `建议首发严格收敛“${label}”核心场景闭环，将边缘衍生模块列为二期演进。`;
       case 'core_features':
-        return `建议优先打磨“${label}”最高频的 1-2 个核心互动玩法，次要操作后续逐步拓展。`;
+        return `建议优先打磨“${label}”最高频的 1-2 个核心功能特性，次要操作后续逐步拓展。`;
       case 'user_flows':
-        return `建议为“${label}”设计打开即入房间的最短操作路径，省略多余的层级跳转。`;
+        return `建议为“${label}”设计最精简的主线操作闭环，省略不必要的冗余跳转与确认层级。`;
       case 'page_structure':
-        return `建议优先采用单屏沉浸主视图“${label}”，设置与辅助功能使用抽屉抽离。`;
+        return `建议优先采用清晰紧凑的主工作台视图组织“${label}”，设置与辅助功能使用抽屉抽离。`;
       case 'ux_ui_direction':
-        return `建议采用温馨像素风或柔和插画“${label}”，注重微动效与氛围感。`;
+        return `建议采用现代中性、高对比度与信息密度均衡的视觉语言“${label}”，注重响应速度与无障碍排版。`;
       case 'technical_boundary':
-        return `建议选用主流轻量前端框架配合简单单机后端“${label}”，保持架构精简。`;
+        return `建议选用主流轻量成熟的技术栈与本地优先单机方案“${label}”，保持系统架构精简健壮。`;
       case 'delivery_plan':
-        return `建议以两端能正常联通并互相看到动作作为“${label}”交付里程碑。`;
+        return `建议以核心主干流程跑通并完成自动化验收测试作为“${label}”交付里程碑。`;
       default:
-        return `建议优先选择针对“${label}”最轻量直接的方案，将衍生边缘细节延后。`;
+        return `建议优先选择针对“${label}”最轻量直接的技术方案，将衍生边缘细节延后。`;
     }
   }
 
@@ -236,40 +236,40 @@ export class QuestionComposer {
 
     // 1. Semantic keyword matching
     if (/(?:avatar|room|asset|素材|装扮|形象|房间)/i.test(text)) {
-      return '统一视觉美术基调，避免前期处理复杂的图片裁剪与多端适配成本。';
+      return '统一规范与格式基调，避免前期处理复杂的素材校验与多端适配成本。';
     }
     if (/(?:sync|action|status|动作|同步|互动|玩法|吃饭|睡觉)/i.test(text)) {
-      return '以最轻量 WebSocket 链路验证两人连接感，大幅降低网络并发状态同步与时序对齐难度。';
+      return '以轻量状态流验证核心闭环，大幅降低并发状态同步与时序对齐难度。';
     }
     if (/(?:movie|photo|video|storage|观影|相册|影视|视频|音乐|传输|存储|媒体)/i.test(text)) {
-      return '避免引入高昂的云端带宽和持久化存储成本，保持客户端轻量敏捷。';
+      return '避免引入高昂的存储运维与网络带宽成本，保持系统轻量敏捷。';
     }
     if (/(?:notify|remind|alert|提醒|通知|即时|响应)/i.test(text)) {
-      return '纯应用内提醒实现成本极低且零外部权限依赖，不打扰系统全局环境。';
+      return '应用内通知实现成本低且零外部依赖，避免打扰系统环境。';
     }
     if (/(?:privacy|deploy|network|隐私|部署|网络|安全|权限)/i.test(text)) {
-      return '保障情侣双人数据的绝对私密安全性，无需复杂的权限校验与防刷机制。';
+      return '保障核心系统与数据的本地私密安全性，无需前期引入复杂的访问控制与防刷体系。';
     }
 
     // 2. Domain specific fallbacks
     const area = AreaRegistry.normalize(gap.area || '') || gap.area;
     switch (area) {
       case 'target_user':
-        return '消除多租户隔离与公开账号体系负担，专注两人情感连接体验。';
+        return '消除多租户隔离与公开账号体系负担，专注核心业务闭环体验。';
       case 'mvp_scope':
         return '快速完成第一阶段可用闭环，避免需求蔓延导致交付拖延。';
       case 'core_features':
-        return '集中精力把核心互动做丝滑，避免多个未完成功能堆砌。';
+        return '集中精力将核心业务流做扎实，避免过早陷入边缘特性的过度设计。';
       case 'user_flows':
-        return '降低日常高频使用的打开阻力，营造即时陪伴氛围。';
+        return '降低日常高频使用的认知阻力与操作路径长度。';
       case 'page_structure':
-        return '视觉焦点始终停留在两人的虚拟小窝，空间层次分明。';
+        return '保持主界面视觉焦点专注，信息空间层次分明。';
       case 'ux_ui_direction':
-        return '轻量易绘制且富有情感温度，兼顾加载性能与视觉舒适度。';
+        return '符合工程与专业软件的使用习惯，兼顾阅读舒适度与长期可扩展性。';
       case 'technical_boundary':
-        return '极低的学习和维护门槛，便于快速迭代与本地部署。';
+        return '具有极低的学习与运维维护门槛，便于本地快速演进与持续集成验证。';
       case 'delivery_plan':
-        return '里程碑清晰客观，能最快获得可感知的正向反馈。';
+        return '交付里程碑客观可量化，能最快获得端到端闭环验证结果。';
       default:
         return '降低前期架构复杂度，留出后期灵活演进空间。';
     }

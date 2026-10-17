@@ -1,0 +1,708 @@
+Window: clearTimeout() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Window 
+
+ clearTimeout() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ Window: clearTimeout() method
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ The clearTimeout() method of the Window interface cancels a timeout previously established by calling Window.setTimeout() .
+
+ If the parameter provided does not identify a previously established action,
+this method does nothing.
+
+ In this article
+
+ Syntax 
+
+ Examples 
+
+ Notes 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ js 
+ clearTimeout(timeoutID)
+
+ Parameters 
+
+ timeoutID 
+
+ The identifier of the timeout you want to cancel. This ID was returned by the
+corresponding call to setTimeout() .
+
+ It's worth noting that the pool of IDs used by setTimeout() and setInterval() are shared, which means you can technically use clearTimeout() and clearInterval() interchangeably. However, for clarity, you should avoid doing so.
+
+ Return value 
+
+ None ( undefined ).
+
+ Examples 
+
+ Run the script below in the context of a web page and click on the page once. You'll
+see a message popping up in a second. If you click the page multiple times in
+one second, the alert only appears once.
+
+ js 
+ const alarm = {
+ remind(message) {
+ alert(message);
+ this.timeoutID = undefined;
+ },
+
+ setup() {
+ if (typeof this.timeoutID === "number") {
+ this.cancel();
+ }
+
+ this.timeoutID = setTimeout(
+ (msg) => {
+ this.remind(msg);
+ },
+ 1000,
+ "Wake up!",
+ );
+ },
+
+ cancel() {
+ clearTimeout(this.timeoutID);
+ },
+};
+window.addEventListener("click", () => alarm.setup());
+
+ Notes 
+
+ Passing an invalid ID to clearTimeout() silently does nothing; no
+exception is thrown.
+
+ Specifications 
+
+ Specification
+
+ HTML 
+# dom-cleartimeout-dev 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Window.setTimeout() 
+
+ WorkerGlobalScope.clearTimeout() 
+
+ Window.clearInterval() 
+
+ Window.cancelAnimationFrame() 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Aug 19, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ HTML DOM API 
+ Window 
+ Instance properties caches 
+ closed 
+ cookieStore 
+ crashReport 
+ credentialless 
+ crossOriginIsolated 
+ crypto 
+ customElements 
+ devicePixelRatio 
+ document 
+ documentPictureInPicture 
+ event 
+ external 
+ fence 
+ frameElement 
+ frames 
+ fullScreen 
+ history 
+ indexedDB 
+ innerHeight 
+ innerWidth 
+ isSecureContext 
+ launchQueue 
+ length 
+ localStorage 
+ location 
+ locationbar 
+ menubar 
+ mozInnerScreenX 
+ mozInnerScreenY 
+ name 
+ navigation 
+ navigator 
+ opener 
+ orientation 
+ origin 
+ originAgentCluster 
+ outerHeight 
+ outerWidth 
+ parent 
+ performance 
+ personalbar 
+ scheduler 
+ screen 
+ screenLeft 
+ screenTop 
+ screenX 
+ screenY 
+ scrollbars 
+ scrollMaxX 
+ scrollMaxY 
+ scrollX 
+ scrollY 
+ self 
+ sessionStorage 
+ sharedStorage 
+ speechSynthesis 
+ status 
+ statusbar 
+ toolbar 
+ top 
+ trustedTypes 
+ viewport 
+ visualViewport 
+ window 
+
+ Instance methods alert() 
+ atob() 
+ blur() 
+ btoa() 
+ cancelAnimationFrame() 
+ cancelIdleCallback() 
+ captureEvents() 
+ clearImmediate() 
+ clearInterval() 
+ clearTimeout() 
+ close() 
+ confirm() 
+ createImageBitmap() 
+ dump() 
+ fetch() 
+ fetchLater() 
+ find() 
+ focus() 
+ getComputedStyle() 
+ getDefaultComputedStyle() 
+ getScreenDetails() 
+ getSelection() 
+ matchMedia() 
+ moveBy() 
+ moveTo() 
+ open() 
+ postMessage() 
+ print() 
+ prompt() 
+ queryLocalFonts() 
+ queueMicrotask() 
+ releaseEvents() 
+ reportError() 
+ requestAnimationFrame() 
+ requestFileSystem() 
+ requestIdleCallback() 
+ requestResize() 
+ resizeBy() 
+ resizeTo() 
+ scroll() 
+ scrollBy() 
+ scrollByLines() 
+ scrollByPages() 
+ scrollTo() 
+ setImmediate() 
+ setInterval() 
+ setResizable() 
+ setTimeout() 
+ showDirectoryPicker() 
+ showOpenFilePicker() 
+ showSaveFilePicker() 
+ sizeToContent() 
+ stop() 
+ structuredClone() 
+ webkitConvertPointFromNodeToPage() 
+ webkitConvertPointFromPageToNode() 
+
+ Events afterprint 
+ appinstalled 
+ beforeinstallprompt 
+ beforeprint 
+ beforeunload 
+ blur 
+ devicemotion 
+ deviceorientation 
+ deviceorientationabsolute 
+ error 
+ focus 
+ gamepadconnected 
+ gamepaddisconnected 
+ hashchange 
+ languagechange 
+ load 
+ message 
+ messageerror 
+ offline 
+ online 
+ orientationchange 
+ pagehide 
+ pagereveal 
+ pageshow 
+ pageswap 
+ popstate 
+ rejectionhandled 
+ resize 
+ scrollsnapchange 
+ scrollsnapchanging 
+ storage 
+ unhandledrejection 
+ unload 
+ vrdisplayactivate 
+ vrdisplayconnect 
+ vrdisplaydeactivate 
+ vrdisplaydisconnect 
+ vrdisplaypresentchange 
+
+ Inheritance EventTarget 
+
+ Related pages for HTML DOM BeforeUnloadEvent 
+ DOMStringMap 
+ ErrorEvent 
+ HTMLAnchorElement 
+ HTMLAreaElement 
+ HTMLAudioElement 
+ HTMLBRElement 
+ HTMLBaseElement 
+ HTMLBodyElement 
+ HTMLButtonElement 
+ HTMLCanvasElement 
+ HTMLDListElement 
+ HTMLDataElement 
+ HTMLDataListElement 
+ HTMLDialogElement 
+ HTMLDivElement 
+ HTMLDocument 
+ HTMLElement 
+ HTMLEmbedElement 
+ HTMLFieldSetElement 
+ HTMLFormControlsCollection 
+ HTMLFormElement 
+ HTMLFrameSetElement 
+ HTMLGeolocationElement 
+ HTMLHRElement 
+ HTMLHeadElement 
+ HTMLHeadingElement 
+ HTMLHtmlElement 
+ HTMLIFrameElement 
+ HTMLImageElement 
+ HTMLInputElement 
+ HTMLLIElement 
+ HTMLLabelElement 
+ HTMLLegendElement 
+ HTMLLinkElement 
+ HTMLMapElement 
+ HTMLMediaElement 
+ HTMLMenuElement 
+ HTMLMetaElement 
+ HTMLMeterElement 
+ HTMLModElement 
+ HTMLOListElement 
+ HTMLObjectElement 
+ HTMLOptGroupElement 
+ HTMLOptionElement 
+ HTMLOptionsCollection 
+ HTMLOutputElement 
+ HTMLParagraphElement 
+ HTMLPictureElement 
+ HTMLPreElement 
+ HTMLProgressElement 
+ HTMLQuoteElement 
+ HTMLScriptElement 
+ HTMLSelectElement 
+ HTMLSourceElement 
+ HTMLSpanElement 
+ HTMLStyleElement 
+ HTMLTableCaptionElement 
+ HTMLTableCellElement 
+ HTMLTableColElement 
+ HTMLTableElement 
+ HTMLTableRowElement 
+ HTMLTableSectionElement 
+ HTMLTemplateElement 
+ HTMLTextAreaElement 
+ HTMLTimeElement 
+ HTMLTitleElement 
+ HTMLTrackElement 
+ HTMLUListElement 
+ HTMLUnknownElement 
+ HTMLVideoElement 
+ HashChangeEvent 
+ History 
+ ImageData 
+ Location 
+ MessageChannel 
+ MessageEvent 
+ MessagePort 
+ Navigator 
+ PageRevealEvent 
+ PageSwapEvent 
+ PageTransitionEvent 
+ Plugin 
+ PluginArray 
+ PromiseRejectionEvent 
+ RadioNodeList 
+ TimeRanges 
+ UserActivation 
+ ValidityState 
+ WorkletGlobalScope 
+
+ Guides Using microtasks in JavaScript with queueMicrotask() 
+ In depth: Microtasks and the JavaScript runtime environment 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

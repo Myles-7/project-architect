@@ -1,4 +1,3 @@
-import { join, dirname } from 'node:path';
 import { ReadinessGate } from '../readiness/ReadinessGate.js';
 import { DocumentPlanner } from './DocumentPlanner.js';
 import { DocumentRenderer } from './DocumentRenderer.js';
@@ -20,14 +19,12 @@ export interface CompileDocumentsResult {
 }
 
 export class DocumentCompiler {
-  private storage: FileStorage;
   private readinessGate: ReadinessGate;
   private planner: DocumentPlanner;
   private renderer: DocumentRenderer;
   private validator: DocumentValidator;
 
   constructor(storage: FileStorage = new FileStorage(), templatesDir?: string) {
-    this.storage = storage;
     this.readinessGate = new ReadinessGate();
     this.planner = new DocumentPlanner();
     this.renderer = new DocumentRenderer(storage, templatesDir);
@@ -35,16 +32,19 @@ export class DocumentCompiler {
   }
 
   /**
-   * Compiles and outputs the full verified Markdown development package for a project.
+   * Renders historical fixtures in memory. Persisted publication is retired.
    */
   async compile(
     projectPath: string,
     snapshot: ProjectSnapshot,
     targetRevision?: number,
-    persistFiles = true
+    persistFiles = true,
+    options?: { customRules?: string[]; customNotes?: string; isDraft?: boolean }
   ): Promise<CompileDocumentsResult> {
+    if (persistFiles) throw Object.assign(new Error('旧文档写入已停用；仅保留 persistFiles=false 的历史渲染。'), { code: ErrorCode.LEGACY_WORKFLOW_RETIRED });
+    void projectPath;
     // 1. Evaluate Readiness Gate & User Disposition via SSOT
-    this.readinessGate.validateForDocumentGeneration(snapshot);
+    this.readinessGate.validateForDocumentGeneration(snapshot, { isDraft: options?.isDraft });
     const readiness = this.readinessGate.evaluate(snapshot);
 
     const sourceRevision = targetRevision ?? snapshot.metadata.stateRevision;
@@ -65,7 +65,10 @@ export class DocumentCompiler {
 
     const now = new Date().toISOString();
     for (const item of plan.documents) {
-      const content = await this.renderer.renderDocument(item, snapshot);
+      let content = await this.renderer.renderDocument(item, snapshot, options);
+      if (options?.isDraft) {
+        content = `> [!NOTE]\n> **草案模式提示 (DRAFT SPECIFICATION)**：本项目处于初期探索草案阶段，准备度准入门禁尚未完成正式签署。\n\n${content}`;
+      }
       renderedFiles.push({ path: item.path, content });
 
       const contentHash = createHash('sha256').update(content, 'utf8').digest('hex');
@@ -125,24 +128,6 @@ export class DocumentCompiler {
       schemaVersion: 1,
       updatedAt: now,
     };
-
-    // 6. Write to project files if projectPath is an existing directory
-    if (persistFiles && projectPath && (await this.storage.exists(projectPath))) {
-      for (const doc of renderedFiles) {
-        const targetAbs = join(projectPath, doc.path);
-        const targetDir = dirname(targetAbs);
-        if (!(await this.storage.exists(targetDir))) {
-          await this.storage.ensureDir(targetDir);
-        }
-        await this.storage.writeText(targetAbs, doc.content);
-      }
-      await this.storage.writeJson(join(projectPath, 'documents.json'), manifest);
-      const manifestDir = join(projectPath, 'documents');
-      if (!(await this.storage.exists(manifestDir))) {
-        await this.storage.ensureDir(manifestDir);
-      }
-      await this.storage.writeJson(join(manifestDir, 'manifest.json'), manifest);
-    }
 
     return {
       manifest,

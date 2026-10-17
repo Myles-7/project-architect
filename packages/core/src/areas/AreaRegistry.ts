@@ -66,7 +66,12 @@ const DEFINITIONS: Record<ProjectAreaId, ProjectAreaDefinition> = {
     id: 'technical_boundary',
     title: '技术底线与运行约束',
     readinessTitle: '技术底线',
-    aliases: ['trust_safety', 'privacy_policy', 'platform_context', 'technical_constraints', 'security_boundary'],
+    aliases: [
+      'trust_safety', 'privacy_policy', 'platform_context',
+      'technical_constraints', 'security_boundary',
+      'tech_stack', 'architecture', 'database', 'storage',
+      'runtime', 'infrastructure', 'backend', 'api_design'
+    ],
     documentPaths: ['docs/TECHNICAL_GUIDE.md'],
     countsForDiscovery: true,
   },
@@ -74,7 +79,7 @@ const DEFINITIONS: Record<ProjectAreaId, ProjectAreaDefinition> = {
     id: 'delivery_plan',
     title: '交付计划与阶段里程碑',
     readinessTitle: '交付计划',
-    aliases: ['acceptance', 'success_signal', 'milestones'],
+    aliases: ['acceptance', 'success_signal', 'milestones', 'timeline', 'roadmap', 'phases'],
     documentPaths: ['docs/DEVELOPMENT_PLAN.md', 'docs/ACCEPTANCE.md'],
     countsForDiscovery: true,
   },

@@ -1,0 +1,66 @@
+{
+  "label": "flash-materials-quality-20261005-02",
+  "kind": "Read-only independent review of two successful worker results before integration; not final artifact acceptance",
+  "acceptance": "pending-quota-recovery-needs-candidate-repair",
+  "runtimeStatus": "blocked",
+  "sources": {
+    "manifestSha256": "15ea1ce9eafb3b45f4ecf167b6f9ee0c072c7dd9386b3321d15d47e1b6b2cf52",
+    "designTaskId": "task-da257bd9-dc61-4498-b122-361214bc126e",
+    "designResultSha256": "75735ec5c5cc3db63d0b0d5c3a34c290956726b8ba01d5f060959bf64df10976",
+    "researchTaskId": "task-91e2f998-3d2a-4166-ab95-17ed59071501",
+    "researchResultSha256": "a20a07bca4c490e79552482cf7295b685854fd066dbb3b9ea19fdd3d3f1acd80"
+  },
+  "scope": "Design and research have successful receipts. Integration returned three external quota errors with no successful receipt. No new quality patch, human approval, final package or target application test exists in this control. The three package directories and ZIPs are inherited round 1 artifacts.",
+  "proposedImprovements": [
+    "Design proposes a session invalidation token, immediate reset, explicit old-result-to-empty validation and five-round mean-based performance targets instead of invented measured ranges.",
+    "Design aligns Python/serve commands with port 8080, states installed runtime and npx first-acquisition requirements, and introduces current text-sink safety boundary evidence while preserving historical evidence.",
+    "Research independently identifies the prior audit/exit-code, IME, measurement, port, empty-result and security-evidence defects and records unavailable container experiments as unexecuted."
+  ],
+  "specificRemainingFindings": [
+    {
+      "id": "draft-json-decoded-audit-invalid",
+      "status": "needs-repair",
+      "blockId": "blk-deliv-val-security-xss-audit",
+      "finding": "The exact JSON-decoded first command uses an extra backslash before its quote delimiters and double-backslash regex literals. Parsing the raw payload and the exact eval/Function literals with vm.Script fails with Unterminated group. No escape normalization or shell execution was performed.",
+      "evidence": "draft-decoded-audit-syntax-probe.json"
+    },
+    {
+      "id": "dangerous-fixture-wrong-exit-expectation",
+      "status": "needs-repair",
+      "blockId": "blk-deliv-val-security-xss-audit",
+      "exactVerification": "执行 Node.js 源码扫描命令，验证其支持带空格变体（如 eval (x)、new Function (x)）并输出退出码 0",
+      "finding": "For a fixture containing declared forbidden eval/Function calls, the expected scanner failure exit is 1. A safe textContent fixture should exit 0. This verification conflates successful scanner operation with a clean source result."
+    },
+    {
+      "id": "late-input-not-invalidated",
+      "status": "needs-explicit-contract-and-real-ime-validation",
+      "blockId": "blk-tech-interface",
+      "finding": "The new token check covers late compositionend only. The input listener still schedules any event with both composition flags false, including a hypothetical late post-composition input from a cleared session. No session-origin check or reset suppression is specified for that input path. This is a contract sequence permitted by the stated listener, not an executed browser reproduction.",
+      "sequence": ["compositionstart captures old token", "clear increments activeSessionId and restores idle", "old compositionend returns due to token mismatch", "a late old non-composing input event schedules empty validation because the input listener checks only composition flags"]
+    },
+    {
+      "id": "background-token-check-not-in-scheduler",
+      "status": "needs-implementation-contract-alignment",
+      "blockId": "blk-tech-interface",
+      "finding": "The background paragraph claims a mismatched sessionToken protects delayed callbacks, but schedule(callback, delayMs) neither accepts nor captures a token and its callback contract specifies no generation check. Ordinary input does not increment activeSessionId. The textual guarantee must match actual scheduling/cancellation interfaces and observable acceptance."
+    },
+    {
+      "id": "clear-metric-still-called-rendering",
+      "status": "needs-wording-alignment",
+      "blockId": "blk-deliv-val-perf-benchmark",
+      "exactPassCriterion": "清空重置渲染耗时 5 轮均值 ≤ 50ms；",
+      "finding": "The step measures click to pre-repaint callback. That should remain a reset/dispatch response proxy, not completed visible rendering time."
+    },
+    {
+      "id": "literal-escaped-newlines",
+      "status": "needs-output-text-format-review",
+      "finding": "Fifteen proposed content fields contain literal escaped newline sequences rather than actual paragraph line breaks. Preserve their raw bytes; integration should correct the authored output formatting through a registered result rather than a harness unescape pass."
+    },
+    {
+      "id": "unchanged-environment-probe-repeated",
+      "status": "retained-efficiency-observation",
+      "finding": "Research again called environment_prepare for the already known unavailable Docker environment and returned unexecuted. This is not an application benchmark pass or evidence that the repeated unavailable-platform probe rule was fixed."
+    }
+  ],
+  "preservation": "Raw successful worker results, receipts, failed integration trajectories, actual request artifacts, startup snapshots, inherited packages, original project and frozen manifests remain unchanged. Public resume must reuse the two new successful worker receipts and all 41 inherited successes."
+}

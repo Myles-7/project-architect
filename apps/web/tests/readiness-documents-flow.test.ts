@@ -294,4 +294,60 @@ describe('Phase 5.5: Readiness Review, Approval Gate & Document Delivery Integra
     expect(docs.items[0].path).toBe('AGENTS.md');
     expect(docs.items[0].isStale).toBe(false);
   });
+
+  it('7. GET /readiness includes rich area evidence statements, score breakdown and smart recommended disposition', async () => {
+    const richReadinessView: ReadinessView = {
+      ...mockReadinessView,
+      scoreBreakdown: [
+        { label: '八大核心领域闭环 (3/8)', score: 23, type: 'base' },
+        { label: '无阻断性致命冲突', score: 40, type: 'bonus' },
+        { label: '活跃待验假设风险扣减 (1 项)', score: -1, type: 'penalty' },
+      ],
+      recommendedDisposition: 'approved-with-warnings',
+      canDirectlyApprove: true,
+      areas: [
+        {
+          areaId: 'target_user',
+          title: 'Target User',
+          isSatisfied: true,
+          statement: '面向本地音频收藏者的音乐标签管理工具',
+          evidenceStatements: ['面向本地音频收藏者的音乐标签管理工具'],
+          activeAssumptions: ['假设用户拥有本地音乐文件夹的读写权限'],
+          decisionRef: 'decision:dec-01',
+          blockingGapRefs: [],
+        },
+        {
+          areaId: 'core_features',
+          title: 'Core Features',
+          isSatisfied: false,
+          recommendedFix: '优先实现最高频的 1-2 个核心交互能力，次要操作后续版本逐步迭代。',
+          recommendedFixReason: '单点突破能够保障首发体验顺畅，减少多模块交叉耦合。',
+          blockingGapRefs: [],
+        },
+      ],
+    };
+
+    const mockFetch = vi.fn().mockImplementation(async (url: string) => {
+      if (url.endsWith('/readiness')) {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: richReadinessView,
+            stateRevision: 4,
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      throw new Error(`Unexpected URL: ${url}`);
+    });
+
+    const client = new ProjectArchitectApiClient(dummyBaseUrl, mockFetch);
+    const res = await client.getProjectReadiness('proj-offline-tagger');
+
+    expect(res.canDirectlyApprove).toBe(true);
+    expect(res.recommendedDisposition).toBe('approved-with-warnings');
+    expect(res.scoreBreakdown).toHaveLength(3);
+    expect(res.areas[0].statement).toBe('面向本地音频收藏者的音乐标签管理工具');
+    expect(res.areas[1].recommendedFix).toBeDefined();
+  });
 });

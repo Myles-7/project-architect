@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rm, access } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rm, access, rename } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import { dirname } from 'node:path';
 
 export class FileStorage {
@@ -39,7 +40,13 @@ export class FileStorage {
   async writeJson(filePath: string, data: unknown): Promise<void> {
     await this.ensureDir(dirname(filePath));
     const content = JSON.stringify(data, null, 2) + '\n';
-    await writeFile(filePath, content, 'utf8');
+    const temporary = `${filePath}.${randomUUID()}.tmp`;
+    try {
+      await writeFile(temporary, content, 'utf8');
+      await rename(temporary, filePath);
+    } finally {
+      await rm(temporary, { force: true });
+    }
   }
 
   /**
@@ -88,6 +95,19 @@ export class FileStorage {
       return await readdir(dirPath);
     } catch {
       return [];
+    }
+  }
+
+  /**
+   * Checks if a path points to a directory.
+   */
+  async isDirectory(targetPath: string): Promise<boolean> {
+    try {
+      const { stat } = await import('node:fs/promises');
+      const res = await stat(targetPath);
+      return res.isDirectory();
+    } catch {
+      return false;
     }
   }
 }

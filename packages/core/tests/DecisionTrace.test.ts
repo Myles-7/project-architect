@@ -30,7 +30,7 @@ describe('Decision trace', () => {
       questions: [{
         id: 'q-user', issueRef: 'gap:gap-user', importance: 'high', question: 'Who is the first user?',
         reason: 'The MVP depends on it.', recommendation: 'Start with one clear user group.',
-        recommendationReason: 'A narrow user makes the MVP testable.', options: [], allowFreeInput: true,
+        recommendationReason: 'A narrow user makes the MVP testable.', decisionKey:'target_user:primary', options: [{key:'independent',label:'Independent developers',approach:'Serve independent developers',impact:'Focus on individual workflows'}], allowFreeInput: true,
         status: 'shown', createdAt: '2026-08-23T00:00:00.000Z',
       }],
       autoAssumptions: [], newCandidates: [], newAssumptions: [], newConflicts: [], newRisks: [],

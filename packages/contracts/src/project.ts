@@ -29,6 +29,8 @@ export interface InputRef {
   createdAt: string;                // ISO 8601
   summary?: string;
   errorMessage?: string;
+  clientTurnId?: string;
+  contentHash?: string;
 }
 
 export interface ForkMetadata {
@@ -49,4 +51,5 @@ export interface ProjectMetadata {
   updatedAt: string;                // ISO 8601
   createdAt: string;                // ISO 8601
   forkedFrom?: ForkMetadata;
+  constraints?: string | string[];
 }

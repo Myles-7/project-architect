@@ -1,0 +1,11 @@
+{
+  "id": "evidence-9ebc4dc8-ab21-4423-9e31-816e610bb43d",
+  "source": "https://www.w3.org/TR/IndexedDB/",
+  "capturedAt": "2026-10-05T09:46:49.240Z",
+  "sha256": "0e663e092129e0464897c52879cdf916f0224ec03d2d72ebe0f7cde47469d973",
+  "scope": "technical.indexeddb_key_types",
+  "path": "D:\\Temp\\User\\pa-quality-copy-AA2hmZ\\vague\\runtime\\planning\\run-67e92d10-8a80-4fe8-881f-5ec50a9b1f5b\\tools\\evidence\\evidence-9ebc4dc8-ab21-4423-9e31-816e610bb43d.json",
+  "approval": "candidate",
+  "content": "W3C Indexed Database API 3.0: 规范明确定义合法键（Keys）的类型仅包含 number, date, string, binary, array；布尔值（Boolean）不是合法键类型，尝试将其他 ECMAScript 值转换为键将失败。因此在 IndexedDB/Dexie 中不能对 isPinned/isFavorite 等布尔字段直接建立索引或执行 where('isPinned').equals(true)。",
+  "conclusion": "IndexedDB 不支持 Boolean 作为索引键，必须采用内存过滤或映射为整数 (0/1) 索引。"
+}

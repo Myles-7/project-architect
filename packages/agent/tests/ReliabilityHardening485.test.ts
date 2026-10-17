@@ -37,16 +37,17 @@ describe('B3 Runtime & Output Gate', () => {
   it('1. Constitution & Prompt Integrity: Final Prompt includes B3 constitution and mandatory rules', async () => {
     const promptText = await promptLoader.buildPromptText('broad-pass');
 
-    expect(promptText).toContain('Project Architect Constitution — B3 Adaptive Question Sets');
+    expect(promptText).toContain('Project Architect — B3 Planning Constitution');
     expect(promptText).toContain('Capability Before Mechanism');
-    expect(promptText).toContain('Evidence and State Authority');
-    expect(promptText).toContain('Strict Conflict Classification');
-    expect(promptText).toContain('Language and Readability');
-    expect(promptText).toContain('Each option `impact`');
+    expect(promptText).toContain('Authority and autonomy');
+    expect(promptText).toContain('Evidence and review');
+    expect(promptText).toContain('clear Simplified Chinese');
+    expect(promptText).toContain('concrete approach, gain, sacrifice, impact and reversibility');
 
     // Must contain injected mandatory runtime rules
     expect(promptText).toContain('Mandatory B3 Rules');
-    expect(promptText).toContain('Single Agent Runtime: Single primary provider call per turn');
+    expect(promptText).toContain('Multiple recorded provider calls and independent review');
+    expect(promptText).not.toContain('Single primary provider call per turn');
     expect(promptText).toContain('User Authorization SSOT: Only user confirmation makes facts authoritative');
   });
 

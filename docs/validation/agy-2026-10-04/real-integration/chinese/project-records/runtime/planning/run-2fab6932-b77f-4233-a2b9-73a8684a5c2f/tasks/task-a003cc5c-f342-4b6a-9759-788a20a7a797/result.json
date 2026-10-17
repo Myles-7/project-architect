@@ -1,0 +1,174 @@
+{
+  "blockers": [],
+  "clarification": {
+    "constraints": "个人开发者独立开发、个人使用",
+    "delegated": [
+      "scope",
+      "non_goals"
+    ],
+    "outcomes": "能快速记下灵感，之后能找到并回顾它们",
+    "problem": "日常灵感零散易忘，缺少一个便捷的工具来随手捕捉和事后回顾",
+    "scope": "",
+    "target": "一个供个人使用的灵感整理小工具，帮助自己快速记录和管理随手产生的零散想法"
+  },
+  "evidence": [
+    {
+      "applicability": "确定了项目目标（灵感整理）、用户范围（个人使用）、产品定位（小工具）",
+      "content": "用户原文：我想做一个帮自己整理随手灵感的小工具。",
+      "id": "ev-001",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T12:42:17.376Z",
+      "source": "material:input:inp-01",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [
+    {
+      "allowFreeInput": true,
+      "createdAt": "2026-10-04T12:42:05.000Z",
+      "decisionKey": "platform",
+      "dependsOn": [],
+      "id": "q-001",
+      "importance": "critical",
+      "issueRef": "inp-01",
+      "options": [
+        {
+          "approach": "开发一个可在浏览器中打开的 Web 应用，桌面和手机浏览器均可用",
+          "gain": "开发最快，跨平台天然覆盖，技术生态成熟",
+          "impact": "技术栈偏前端（React/Vue + 轻量后端或纯静态），部署简单",
+          "key": "web",
+          "label": "Web 应用（浏览器访问）",
+          "reversibility": "easy",
+          "sacrifice": "离线能力有限，移动端体验不如原生 App 流畅"
+        },
+        {
+          "approach": "开发一个原生或跨平台手机应用，随身携带随时记录",
+          "gain": "随时随地打开记录，推送提醒回顾，体验最好",
+          "impact": "技术栈偏 React Native / Flutter，需要移动端开发环境",
+          "key": "mobile",
+          "label": "手机 App（iOS/Android）",
+          "reversibility": "moderate",
+          "sacrifice": "开发周期长，需处理应用商店上架或侧载，维护成本高"
+        },
+        {
+          "approach": "开发一个本地桌面应用，在电脑上使用",
+          "gain": "离线可用，本地数据完全可控，启动快",
+          "impact": "技术栈偏 Electron/Tauri，需打包分发",
+          "key": "desktop",
+          "label": "桌面应用（Windows/Mac）",
+          "reversibility": "moderate",
+          "sacrifice": "只能在电脑前使用，移动场景缺失"
+        },
+        {
+          "approach": "开发一个终端里运行的 CLI 工具，用命令快速记录",
+          "gain": "开发最简单，对技术用户最高效，可与其他工具组合",
+          "impact": "技术栈最轻量（Node/Python 脚本），几乎零部署成本",
+          "key": "cli",
+          "label": "命令行工具",
+          "reversibility": "easy",
+          "sacrifice": "非技术场景不方便，无图形界面，手机上难用"
+        }
+      ],
+      "question": "这个工具主要在什么平台上使用？",
+      "reason": "运行平台决定了整个技术栈选型和开发工作量，是最基础的架构约束，必须首先明确。",
+      "recommendation": "如果你主要在电脑前工作、用浏览器居多，Web 应用开发最快；如果灵感经常在路上冒出来，手机端更合适。",
+      "recommendationReason": "个人开发者独立开发，不同平台的开发成本差异巨大，需要根据实际使用场景做取舍。",
+      "recommendedOptionKey": "",
+      "selectionMode": "single",
+      "status": "proposed"
+    },
+    {
+      "allowFreeInput": true,
+      "createdAt": "2026-10-04T12:42:05.000Z",
+      "decisionKey": "organization",
+      "dependsOn": [],
+      "id": "q-002",
+      "importance": "high",
+      "issueRef": "inp-01",
+      "options": [
+        {
+          "approach": "所有灵感按记录时间排列，像日记/流水账一样往下滚",
+          "gain": "记录零门槛，不用想该放哪里，最快最简单",
+          "impact": "数据模型极简（时间+内容），搜索为唯一检索手段",
+          "key": "timeline",
+          "label": "按时间线堆叠",
+          "reversibility": "easy",
+          "sacrifice": "灵感多了以后很难找到特定内容，无法按主题浏览"
+        },
+        {
+          "approach": "每条灵感可以打一个或多个标签，按标签筛选浏览",
+          "gain": "灵活分类，一条灵感可属于多个主题，检索方便",
+          "impact": "数据模型需要标签字段和筛选逻辑，复杂度适中",
+          "key": "tags",
+          "label": "用标签分类",
+          "reversibility": "easy",
+          "sacrifice": "需要设计标签管理功能，记录时多一步操作"
+        },
+        {
+          "approach": "预设或自建文件夹，灵感必须放进某个文件夹",
+          "gain": "结构清晰，像传统笔记本一样直觉",
+          "impact": "数据模型需要层级结构，交互上增加导航",
+          "key": "folders",
+          "label": "用文件夹/笔记本分组",
+          "reversibility": "moderate",
+          "sacrifice": "灵感只能属于一个分类，跨主题灵感难归类，记录时需要选择放哪"
+        }
+      ],
+      "question": "你希望怎样组织和找到自己的灵感？",
+      "reason": "组织方式直接决定数据模型和核心交互设计——是简单堆叠还是需要分类检索，影响功能复杂度。",
+      "recommendation": "标签分类是灵活性和实现成本的较好平衡点，适合灵感这种难以预先归类的内容。",
+      "recommendationReason": "灵感往往跨主题，硬性分类会增加记录时的心智负担，标签更灵活；而纯时间线在灵感量大后检索困难。",
+      "recommendedOptionKey": "",
+      "selectionMode": "single",
+      "status": "proposed"
+    },
+    {
+      "allowFreeInput": true,
+      "createdAt": "2026-10-04T12:42:05.000Z",
+      "decisionKey": "storage",
+      "dependsOn": [],
+      "id": "q-003",
+      "importance": "high",
+      "issueRef": "inp-01",
+      "options": [
+        {
+          "approach": "灵感保存为本地文件，数据完全在自己机器上",
+          "gain": "零成本，零依赖，数据完全可控，可用 Git 版本管理",
+          "impact": "无需后端服务，开发和维护最简单",
+          "key": "local-file",
+          "label": "本地文件（JSON/Markdown）",
+          "reversibility": "easy",
+          "sacrifice": "不能跨设备自动同步，换电脑需手动拷贝"
+        },
+        {
+          "approach": "数据仍是文件，但通过现有云服务自动同步",
+          "gain": "多设备可用，利用现有基础设施，无需自建后端",
+          "impact": "需要集成第三方 API 或依赖系统级同步工具",
+          "key": "cloud-simple",
+          "label": "轻量云存储（如 GitHub Gist / 云盘同步）",
+          "reversibility": "easy",
+          "sacrifice": "依赖第三方服务，同步冲突需处理，有一定配置门槛"
+        },
+        {
+          "approach": "用云数据库（如 Supabase/Firebase）存储灵感数据",
+          "gain": "多设备实时同步，可扩展其他功能（搜索、AI 等）",
+          "impact": "需要后端服务或 BaaS，部署和维护工作量增大",
+          "key": "cloud-db",
+          "label": "自建云端数据库",
+          "reversibility": "moderate",
+          "sacrifice": "需要运维云服务，有持续成本，架构复杂度显著增加"
+        }
+      ],
+      "question": "灵感数据存在哪里？",
+      "reason": "数据存储方案决定了是否需要后端服务、是否能多设备同步、以及长期维护成本，需要在设计阶段确定。",
+      "recommendation": "如果只在一个设备上用，本地文件最简单；如果想多设备共享，需要云端存储。",
+      "recommendationReason": "个人工具追求简单可控，本地存储零运维成本；但如果跨设备使用是刚需，就必须引入同步机制。",
+      "recommendedOptionKey": "",
+      "selectionMode": "single",
+      "status": "proposed"
+    }
+  ],
+  "summary": "用户想做一个个人使用的\"灵感整理小工具\"，用于随手记录和管理零散灵感。输入非常简短，目标用户（自己）和核心意图（整理灵感）是明确的，但运行平台、灵感的组织方式、以及数据存储方式这三个关键维度尚未确定，需要澄清后才能进入方案设计。"
+}

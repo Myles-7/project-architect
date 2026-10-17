@@ -1,0 +1,669 @@
+Element: beforeinput event - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Element 
+
+ beforeinput 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Français 
+
+ 日本語 
+
+ 中文 (简体) 
+
+ Element: beforeinput event
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since March 2021.
+
+ See full compatibility
+
+ Learn more
+
+ The DOM beforeinput event fires when the value of an <input> or <textarea> element is about to be modified. But in contrast to the input event, it does not fire on the <select> element. The event also applies to elements with contenteditable enabled, and to any element when designMode is turned on.
+
+ This allows web apps to override text edit behavior before the browser modifies the DOM tree, and provides more control over input events to improve performance.
+
+ In the case of contenteditable and designMode , the event target is the editing host . If these properties apply to multiple elements, the editing host is the nearest ancestor element whose parent isn't editable.
+
+ Note: 
+Not every user modification results in beforeinput firing. Also the event may fire but be non-cancelable. This may happen when the modification is done by autocomplete, by accepting a correction from a spell checker, by password manager autofill, by IME , or in other ways. The details vary by browser and OS. To override the edit behavior in all situations, the code needs to handle the input event and possibly revert any modifications that were not handled by the beforeinput handler. See bugs 1673558 and 1763669 .
+
+ In this article
+
+ Syntax 
+
+ Event type 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Syntax 
+
+ Use the event name in methods like addEventListener() , or set an event handler property.
+
+ js 
+ addEventListener("beforeinput", (event) => { })
+
+onbeforeinput = (event) => { }
+
+ Event type 
+
+ An InputEvent . Inherits from UIEvent .
+
+ Examples 
+
+ Feature Detection 
+
+ The following function returns true if beforeinput , and thus getTargetRanges , is supported.
+
+ js 
+ function isBeforeInputEventAvailable() {
+ return (
+ window.InputEvent &&
+ typeof InputEvent.prototype.getTargetRanges === "function"
+ );
+}
+
+ Simple logger 
+
+ This example logs the current value of the element, immediately before replacing that value with the new one applied to the <input> element.
+
+ HTML
+
+ html 
+ <input placeholder="Enter some text" name="name" />
+<p id="values"></p>
+
+ JavaScript
+
+ js 
+ const input = document.querySelector("input");
+const log = document.getElementById("values");
+
+input.addEventListener("beforeinput", updateValue);
+
+function updateValue(e) {
+ log.textContent = e.target.value;
+}
+
+ Result
+
+ Specifications 
+
+ Specification
+
+ UI Events 
+# event-type-beforeinput 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Related event: input 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Jul 28, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ UI Events 
+ Element 
+ Instance properties activeViewTransition 
+ ariaActiveDescendantElement 
+ ariaAtomic 
+ ariaAutoComplete 
+ ariaBrailleLabel 
+ ariaBrailleRoleDescription 
+ ariaBusy 
+ ariaChecked 
+ ariaColCount 
+ ariaColIndex 
+ ariaColIndexText 
+ ariaColSpan 
+ ariaControlsElements 
+ ariaCurrent 
+ ariaDescribedByElements 
+ ariaDescription 
+ ariaDetailsElements 
+ ariaDisabled 
+ ariaErrorMessageElements 
+ ariaExpanded 
+ ariaFlowToElements 
+ ariaHasPopup 
+ ariaHidden 
+ ariaInvalid 
+ ariaKeyShortcuts 
+ ariaLabel 
+ ariaLabelledByElements 
+ ariaLevel 
+ ariaLive 
+ ariaModal 
+ ariaMultiLine 
+ ariaMultiSelectable 
+ ariaOrientation 
+ ariaOwnsElements 
+ ariaPlaceholder 
+ ariaPosInSet 
+ ariaPressed 
+ ariaReadOnly 
+ ariaRelevant 
+ ariaRequired 
+ ariaRoleDescription 
+ ariaRowCount 
+ ariaRowIndex 
+ ariaRowIndexText 
+ ariaRowSpan 
+ ariaSelected 
+ ariaSetSize 
+ ariaSort 
+ ariaValueMax 
+ ariaValueMin 
+ ariaValueNow 
+ ariaValueText 
+ assignedSlot 
+ attributes 
+ childElementCount 
+ children 
+ classList 
+ className 
+ clientHeight 
+ clientLeft 
+ clientTop 
+ clientWidth 
+ currentCSSZoom 
+ customElementRegistry 
+ elementTiming 
+ firstElementChild 
+ id 
+ innerHTML 
+ lastElementChild 
+ localName 
+ namespaceURI 
+ nextElementSibling 
+ outerHTML 
+ part 
+ prefix 
+ previousElementSibling 
+ role 
+ scrollHeight 
+ scrollLeft 
+ scrollLeftMax 
+ scrollTop 
+ scrollTopMax 
+ scrollWidth 
+ shadowRoot 
+ slot 
+ tagName 
+
+ Instance methods after() 
+ animate() 
+ append() 
+ ariaNotify() 
+ attachShadow() 
+ before() 
+ checkVisibility() 
+ closest() 
+ computedStyleMap() 
+ getAnimations() 
+ getAttribute() 
+ getAttributeNames() 
+ getAttributeNode() 
+ getAttributeNodeNS() 
+ getAttributeNS() 
+ getBoundingClientRect() 
+ getClientRects() 
+ getElementsByClassName() 
+ getElementsByTagName() 
+ getElementsByTagNameNS() 
+ getHTML() 
+ hasAttribute() 
+ hasAttributeNS() 
+ hasAttributes() 
+ hasPointerCapture() 
+ insertAdjacentElement() 
+ insertAdjacentHTML() 
+ insertAdjacentText() 
+ matches() 
+ moveBefore() 
+ prepend() 
+ pseudo() 
+ querySelector() 
+ querySelectorAll() 
+ releasePointerCapture() 
+ remove() 
+ removeAttribute() 
+ removeAttributeNode() 
+ removeAttributeNS() 
+ replaceChildren() 
+ replaceWith() 
+ requestFullscreen() 
+ requestPointerLock() 
+ scroll() 
+ scrollBy() 
+ scrollIntoView() 
+ scrollIntoViewIfNeeded() 
+ scrollTo() 
+ setAttribute() 
+ setAttributeNode() 
+ setAttributeNodeNS() 
+ setAttributeNS() 
+ setCapture() 
+ setHTML() 
+ setHTMLUnsafe() 
+ setPointerCapture() 
+ startViewTransition() 
+ toggleAttribute() 
+
+ Events afterscriptexecute 
+ animationcancel 
+ animationend 
+ animationiteration 
+ animationstart 
+ auxclick 
+ beforeinput 
+ beforematch 
+ beforescriptexecute 
+ beforexrselect 
+ blur 
+ click 
+ compositionend 
+ compositionstart 
+ compositionupdate 
+ contentvisibilityautostatechange 
+ contextmenu 
+ copy 
+ cut 
+ dblclick 
+ DOMActivate 
+ DOMMouseScroll 
+ focus 
+ focusin 
+ focusout 
+ fullscreenchange 
+ fullscreenerror 
+ gesturechange 
+ gestureend 
+ gesturestart 
+ gotpointercapture 
+ input 
+ keydown 
+ keypress 
+ keyup 
+ lostpointercapture 
+ mousedown 
+ mouseenter 
+ mouseleave 
+ mousemove 
+ mouseout 
+ mouseover 
+ mouseup 
+ mousewheel 
+ MozMousePixelScroll 
+ paste 
+ pointercancel 
+ pointerdown 
+ pointerenter 
+ pointerleave 
+ pointermove 
+ pointerout 
+ pointerover 
+ pointerrawupdate 
+ pointerup 
+ scroll 
+ scrollend 
+ scrollsnapchange 
+ scrollsnapchanging 
+ securitypolicyviolation 
+ touchcancel 
+ touchend 
+ touchmove 
+ touchstart 
+ transitioncancel 
+ transitionend 
+ transitionrun 
+ transitionstart 
+ webkitmouseforcechanged 
+ webkitmouseforcedown 
+ webkitmouseforceup 
+ webkitmouseforcewillbegin 
+ wheel 
+
+ Inheritance Node 
+ EventTarget 
+
+ Related pages for UI Events CompositionEvent 
+ FocusEvent 
+ InputEvent 
+ KeyboardEvent 
+ MutationEvent 
+ TextEvent 
+ UIEvent 
+
+ Guides Code values for keyboard events 
+ Key values for keyboard events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

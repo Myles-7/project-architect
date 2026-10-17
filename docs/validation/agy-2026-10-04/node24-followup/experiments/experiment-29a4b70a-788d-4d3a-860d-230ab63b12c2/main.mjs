@@ -1,0 +1,7 @@
+import assert from 'node:assert/strict'; import fs from 'node:fs';import os from 'node:os';import net from 'node:net';
+assert.equal(process.versions.node.split('.')[0],'24');const paths=['/workspace','/project','/var/run/docker.sock',"D:\\桌面\\项目构思\\.workspace",'/experiment/../service-config.json'];for(const path of paths)assert.equal(fs.existsSync(path),false,'host path unexpectedly accessible:'+path);
+let sourceWriteBlocked=false;try{fs.writeFileSync('/experiment/unauthorized.txt','mutation')}catch(e){sourceWriteBlocked=true}assert.equal(sourceWriteBlocked,true);
+let rootWriteBlocked=false;try{fs.writeFileSync('/unauthorized.txt','mutation')}catch(e){rootWriteBlocked=true}assert.equal(rootWriteBlocked,true);
+const interfaces=os.networkInterfaces();assert.deepEqual(Object.keys(interfaces).filter(name=>name!=='lo'),[]);
+let externalConnected=false;const networkError=await new Promise(done=>{const socket=net.createConnection({host:'1.1.1.1',port:443});socket.once('connect',()=>{externalConnected=true;socket.destroy();done('connected')});socket.once('error',e=>done(e.code));socket.setTimeout(1500,()=>{socket.destroy();done('timeout')})});assert.equal(externalConnected,false);
+await new Promise(done=>setTimeout(done,3000));console.log(JSON.stringify({runtime:'node',node:process.version,formalPathsAbsent:true,sourceWriteBlocked,rootWriteBlocked,interfaces,networkError,status:'assertions-passed'}));

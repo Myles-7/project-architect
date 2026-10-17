@@ -251,6 +251,7 @@ export const QuestionWizard: React.FC<QuestionWizardProps> = ({
         <QuestionCard
           key={currentQuestion.id}
           question={currentQuestion}
+          projectId={projectId}
           onAnswerRecord={handleAnswerRecordWrapped}
           onAnswerAndDiscover={handleAnswerAndDiscoverWrapped}
           onAnswerAsAssumption={handleAnswerAsAssumptionWrapped}

@@ -1,3 +1,9 @@
+> 2026-10-04 重构：冲突项以 docs/blueprint/13_PLANNING_WORKBENCH.md 为准。旧单 Agent/单调用、通用兜底题、百分比准备度、短时强制超时规则已撤销。自由文本先保存，结构化答案或变更包批准才成为正式事实。以下保留旧设计背景。
+
+正式规划接口见 [Planning API](../../api/PLANNING_API.md)，实现位于 `apps/server/src/planning/PlanningRoutes.ts`。新输入未经审阅、任务产物外改及开发包外改分别返回 `UNREVIEWED_INPUT`、`RESULT_MODIFIED`、`PACKAGE_MODIFIED`，不能绕过审批或恢复校验。
+
+旧历史回滚写入口 `POST /api/projects/:id/rollback` 已退休，在生产、Mock 与注入 orchestrator 模式均于读取项目或执行恢复前返回 HTTP 410 / `LEGACY_WORKFLOW_RETIRED`，不产生状态变更。历史读取、回收站目录恢复、两阶段 Commit 崩溃恢复和 PlanningRun 恢复继续保留。
+
 # Project Architect V1：Local API 契约设计
 
 > **文档状态**：历史设计蓝图 (Historical Blueprint)  

@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 import type { DiscoveryResult } from '@project-architect/contracts';
+import { renderHistoricalDocuments } from '../fixtures/historical-documents.js';
 
-describe('Document Compiler E2E — AI Knowledge Base (Medium Dynamic Project)', () => {
+describe('Historical Document Renderer — AI Knowledge Base (Medium Dynamic Project)', () => {
   let tempBaseDir: string;
   let storage: FileStorage;
   let stateEngine: ProjectStateEngine;
@@ -34,6 +35,11 @@ describe('Document Compiler E2E — AI Knowledge Base (Medium Dynamic Project)',
       projectTags: ['Desktop App', 'AI Product', 'Knowledge Base'],
     });
 
+    const initialIdea = s0.decisions.items.find((decision) => decision.statement === 'Local-first personal second brain with local and cloud model embedding support');
+    expect(initialIdea?.status).toBe('candidate');
+    const confirmedInitial = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, s0.metadata.stateRevision);
+    expect(confirmedInitial.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
+
     const mockOutput: DiscoveryResult = {
       confirmed: ['AI Knowledge Base', 'Local-first personal second brain'],
       candidates: ['Vector semantic search'],
@@ -49,7 +55,7 @@ describe('Document Compiler E2E — AI Knowledge Base (Medium Dynamic Project)',
 
     // Turn 1
     await orchestrator.runDiscoveryTurn(projectPath, {
-      expectedRevision: s0.metadata.stateRevision,
+      expectedRevision: confirmedInitial.metadata.stateRevision,
       userMessage: 'Target user is knowledge workers. MVP scope is markdown ingestion, hybrid search, and local vector index.',
     });
 
@@ -87,26 +93,29 @@ describe('Document Compiler E2E — AI Knowledge Base (Medium Dynamic Project)',
       'confirmed'
     );
 
-    // Compile Documents
-    const compileResult = await orchestrator.compileDocuments(projectPath);
+    // Render the historical fixture without publication
+    const compileResult = await renderHistoricalDocuments(projectPath, storage);
+    expect(compileResult.filesAfter).toEqual(compileResult.filesBefore);
+    expect(compileResult.manifest.sourceRevision).toBe(compileResult.snapshot.metadata.stateRevision);
+    expect(new Set(compileResult.renderedFiles.map(file => file.content)).size).toBe(compileResult.renderedFiles.length);
 
     expect(compileResult.readiness.ready).toBe(true);
     expect(compileResult.manifest.items.length).toBe(10); // 8 core + AI_SPEC.md + DESKTOP_SPEC.md
 
     // Verify TECHNICAL_GUIDE.md and specs/AI_SPEC.md are generated
-    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
-    const aiSpecContent = await storage.readText(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'));
+    expect(compileResult.has('docs/TECHNICAL_GUIDE.md')).toBe(true);
+    expect(compileResult.has('docs/specs/AI_SPEC.md')).toBe(true);
+    expect(compileResult.has('docs/specs/DESKTOP_SPEC.md')).toBe(true);
+    const aiSpecContent = compileResult.content('docs/specs/AI_SPEC.md');
     expect(aiSpecContent).toContain('AI & Intelligence Specification');
 
     // Verify AGENTS.md locked decisions
-    const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));
+    const agentsContent = compileResult.content('AGENTS.md');
     expect(agentsContent).toContain('100% Local data ownership');
     expect(agentsContent).toContain('dual embedding options');
 
     // Verify PRODUCT.md
-    const productContent = await storage.readText(join(projectPath, 'docs', 'PRODUCT.md'));
+    const productContent = compileResult.content('docs/PRODUCT.md');
     expect(productContent.toLowerCase()).toContain('dual embedding options');
   });
 });

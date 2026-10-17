@@ -1,0 +1,709 @@
+Window：clearTimeout() 方法 - Web API | MDN 
+
+ 跳转到主要内容 
+
+ 跳转到搜索 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ 切换侧边栏
+
+ 面向开发者的 Web 技术 
+
+ Web API 
+
+ Window 
+
+ Window：clearTimeout() 方法 
+
+ 主题 
+
+ 跟随系统
+
+ 浅色
+
+ 深色
+
+ 中文 (简体) 
+
+ 记住语言 
+
+ 了解更多 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ 此页面由社区从英文翻译而来。 了解更多并加入 MDN Web Docs 社区。 
+
+ View in English 
+
+ Always switch to English 
+
+ Window：clearTimeout() 方法
+
+ 基线
+
+ 广泛可用
+
+ 自 2015年7月 起，此特性已在主流浏览器中得到支持，可在大多数设备和浏览器版本中正常使用。
+
+ 查看完整兼容性
+
+ 了解更多
+
+ Window 接口的 clearTimeout() 方法取消先前通过调用 Window.setTimeout() 建立的超时任务。
+
+ 如果参数未标识之前创建的操作，则此方法不执行任何动作。
+
+ 本文内容
+
+ 语法 
+
+ 示例 
+
+ 备注 
+
+ 规范 
+
+ 浏览器兼容性 
+
+ 参见 
+
+ 语法 
+
+ js 
+ clearTimeout(timeoutID)
+
+ 参数 
+
+ timeoutID 
+
+ 你要取消定时器的标识符。该 ID 由相应的 setTimeout() 调用返回。
+
+ 值得注意的是， setTimeout() 和 setInterval() 共享同一个 ID 池，意味着在技术上可以混用 clearTimeout() 和 clearInterval() 。但是，为了清楚起见，你应该避免这样做。
+
+ 返回值 
+
+ 无（ undefined ）。
+
+ 示例 
+
+ 在一个网页中运行如下脚本，并且点击一次页面。一秒钟后你会看见一条弹出的信息。如果你在一秒内不停点击页面，警报框将不再出现。
+
+ js 
+ const alarm = {
+ remind(aMessage) {
+ alert(aMessage);
+ this.timeoutID = undefined;
+ },
+
+ setup() {
+ if (typeof this.timeoutID === "number") {
+ this.cancel();
+ }
+
+ this.timeoutID = setTimeout(
+ (msg) => {
+ this.remind(msg);
+ },
+ 1000,
+ "醒醒！",
+ );
+ },
+
+ cancel() {
+ clearTimeout(this.timeoutID);
+ },
+};
+window.addEventListener("click", () => alarm.setup());
+
+ 备注 
+
+ 传入一个无效的 ID 给 clearTimeout() 不会有任何影响；也不会抛出异常。
+
+ 规范 
+
+ 规范
+
+ HTML 
+# dom-cleartimeout-dev 
+
+ 浏览器兼容性 
+
+ 启用 JavaScript 以查看此浏览器兼容性表。 
+
+ 参见 
+
+ Window.setTimeout() 
+
+ WorkerGlobalScope.clearTimeout() 
+
+ Window.clearInterval() 
+
+ Window.cancelAnimationFrame() 
+
+ 帮助改进 MDN
+
+ 此页面对您有帮助吗？
+
+ 是
+
+ 否
+
+ 了解如何参与贡献 
+ 此页面最后更新于 2024年10月8日 ，由 MDN 贡献者 更新。
+
+ 在 GitHub 上查看此页面 • 报告此内容的问题 
+
+ 筛选侧边栏 
+
+ 清除筛选输入 
+
+ HTML DOM API 
+ Window 
+ 实例属性 caches 
+ closed 
+ cookieStore 
+ crashReport 
+ credentialless 
+ crossOriginIsolated 
+ crypto 
+ customElements 
+ devicePixelRatio 
+ document 
+ documentPictureInPicture 
+ event 
+ external 
+ fence 
+ frameElement 
+ frames 
+ fullScreen 
+ history 
+ indexedDB 
+ innerHeight 
+ innerWidth 
+ isSecureContext 
+ launchQueue 
+ length 
+ localStorage 
+ location 
+ locationbar 
+ menubar 
+ mozInnerScreenX 
+ mozInnerScreenY 
+ name 
+ navigation 
+ navigator 
+ opener 
+ orientation 
+ origin 
+ originAgentCluster 
+ outerHeight 
+ outerWidth 
+ parent 
+ performance 
+ personalbar 
+ scheduler 
+ screen 
+ screenLeft 
+ screenTop 
+ screenX 
+ screenY 
+ scrollbars 
+ scrollMaxX 
+ scrollMaxY 
+ scrollX 
+ scrollY 
+ self 
+ sessionStorage 
+ sharedStorage 
+ speechSynthesis 
+ status 
+ statusbar 
+ toolbar 
+ top 
+ trustedTypes 
+ viewport 
+ visualViewport 
+ window 
+
+ 实例方法 alert() 
+ atob() 
+ blur() 
+ btoa() 
+ cancelAnimationFrame() 
+ cancelIdleCallback() 
+ captureEvents() 
+ clearImmediate() 
+ clearInterval() 
+ clearTimeout() 
+ close() 
+ confirm() 
+ createImageBitmap() 
+ dump() 
+ fetch() 
+ fetchLater() 
+ find() 
+ focus() 
+ getComputedStyle() 
+ getDefaultComputedStyle() 
+ getScreenDetails() 
+ getSelection() 
+ matchMedia() 
+ moveBy() 
+ moveTo() 
+ open() 
+ postMessage() 
+ print() 
+ prompt() 
+ queryLocalFonts() 
+ queueMicrotask() 
+ releaseEvents() 
+ reportError() 
+ requestAnimationFrame() 
+ requestFileSystem() 
+ requestIdleCallback() 
+ requestResize() 
+ resizeBy() 
+ resizeTo() 
+ scroll() 
+ scrollBy() 
+ scrollByLines() 
+ scrollByPages() 
+ scrollTo() 
+ setImmediate() 
+ setInterval() 
+ setResizable() 
+ setTimeout() 
+ showDirectoryPicker() 
+ showOpenFilePicker() 
+ showSaveFilePicker() 
+ sizeToContent() 
+ stop() 
+ structuredClone() 
+ webkitConvertPointFromNodeToPage() 
+ webkitConvertPointFromPageToNode() 
+
+ 事件 afterprint 
+ appinstalled 
+ beforeinstallprompt 
+ beforeprint 
+ beforeunload 
+ blur 
+ devicemotion 
+ deviceorientation 
+ deviceorientationabsolute 
+ error 
+ focus 
+ gamepadconnected 
+ gamepaddisconnected 
+ hashchange 
+ languagechange 
+ load 
+ message 
+ messageerror 
+ offline 
+ online 
+ orientationchange 
+ pagehide 
+ pagereveal 
+ pageshow 
+ pageswap 
+ popstate 
+ rejectionhandled 
+ resize 
+ scrollsnapchange 
+ scrollsnapchanging 
+ storage 
+ unhandledrejection 
+ unload 
+ vrdisplayactivate 
+ vrdisplayconnect 
+ vrdisplaydeactivate 
+ vrdisplaydisconnect 
+ vrdisplaypresentchange 
+
+ 继承 EventTarget 
+
+ HTML DOM 的相关页面 BeforeUnloadEvent 
+ DOMStringMap 
+ ErrorEvent 
+ HTMLAnchorElement 
+ HTMLAreaElement 
+ HTMLAudioElement 
+ HTMLBRElement 
+ HTMLBaseElement 
+ HTMLBodyElement 
+ HTMLButtonElement 
+ HTMLCanvasElement 
+ HTMLDListElement 
+ HTMLDataElement 
+ HTMLDataListElement 
+ HTMLDialogElement 
+ HTMLDivElement 
+ HTMLDocument 
+ HTMLElement 
+ HTMLEmbedElement 
+ HTMLFieldSetElement 
+ HTMLFormControlsCollection 
+ HTMLFormElement 
+ HTMLFrameSetElement 
+ HTMLGeolocationElement 
+ HTMLHRElement 
+ HTMLHeadElement 
+ HTMLHeadingElement 
+ HTMLHtmlElement 
+ HTMLIFrameElement 
+ HTMLImageElement 
+ HTMLInputElement 
+ HTMLLIElement 
+ HTMLLabelElement 
+ HTMLLegendElement 
+ HTMLLinkElement 
+ HTMLMapElement 
+ HTMLMediaElement 
+ HTMLMenuElement 
+ HTMLMetaElement 
+ HTMLMeterElement 
+ HTMLModElement 
+ HTMLOListElement 
+ HTMLObjectElement 
+ HTMLOptGroupElement 
+ HTMLOptionElement 
+ HTMLOptionsCollection 
+ HTMLOutputElement 
+ HTMLParagraphElement 
+ HTMLPictureElement 
+ HTMLPreElement 
+ HTMLProgressElement 
+ HTMLQuoteElement 
+ HTMLScriptElement 
+ HTMLSelectElement 
+ HTMLSourceElement 
+ HTMLSpanElement 
+ HTMLStyleElement 
+ HTMLTableCaptionElement 
+ HTMLTableCellElement 
+ HTMLTableColElement 
+ HTMLTableElement 
+ HTMLTableRowElement 
+ HTMLTableSectionElement 
+ HTMLTemplateElement 
+ HTMLTextAreaElement 
+ HTMLTimeElement 
+ HTMLTitleElement 
+ HTMLTrackElement 
+ HTMLUListElement 
+ HTMLUnknownElement 
+ HTMLVideoElement 
+ HashChangeEvent 
+ History 
+ ImageData 
+ Location 
+ MessageChannel 
+ MessageEvent 
+ MessagePort 
+ Navigator 
+ PageRevealEvent 
+ PageSwapEvent 
+ PageTransitionEvent 
+ Plugin 
+ PluginArray 
+ PromiseRejectionEvent 
+ RadioNodeList 
+ TimeRanges 
+ UserActivation 
+ ValidityState 
+ WorkletGlobalScope 
+
+ 指南 在 JavaScript 中通过 queueMicrotask() 使用微任务 
+ 深入：微任务与 Javascript 运行时环境 
+
+ 构建更美好互联网的蓝图。
+
+ MDN 
+
+ 关于
+
+ 博客
+
+ Mozilla 招聘
+
+ 与我们合作投放广告
+
+ MDN Plus
+
+ 产品帮助
+
+ 参与贡献 
+
+ MDN 社区
+
+ 社区资源
+
+ 写作指南
+
+ MDN Discord
+
+ MDN GitHub 主页
+
+ 开发者 
+
+ Web 技术
+
+ 学习 Web 开发
+
+ 指南
+
+ 教程
+
+ 术语表
+
+ Hacks 博客
+
+ 网站隐私声明 
+
+ 遥测设置 
+
+ 法律声明 
+
+ 社区参与准则 
+
+ 本内容的部分版权归 mozilla.org 贡献者所有，©1998–2026。内容依据 知识共享许可协议 提供。

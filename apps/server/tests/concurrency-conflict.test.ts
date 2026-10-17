@@ -79,8 +79,9 @@ describe('V1 Concurrency & Race Condition Integrity Tests', () => {
     const confirmedDecisions = getRes.body.data.snapshot.decisions.items.filter(
       (d: any) => d.status === 'confirmed'
     );
-    // Exactly 1 was added by winning request + 1 initial from project creation = 2
-    expect(confirmedDecisions.length).toBe(2);
+    // Only the winning explicit edit is confirmed; the initial free idea stays candidate.
+    expect(confirmedDecisions.length).toBe(1);
+    expect(getRes.body.data.snapshot.decisions.items.filter((d:any)=>d.status==='candidate')).toHaveLength(1);
   });
 
   it('P0: concurrent input uploads on same base revision must yield 1 success (200) and 1 conflict (409)', async () => {

@@ -1,0 +1,140 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "完成任务拆分规划：基于最新待批准草案与全部质量评审反馈，将触及模型输出上限的父任务合理拆分为9个职责清晰、独占负责、依赖单向无环的子工作项。完整覆盖全部44个待批准实体块与移除标记块（包含历史removeBlockId），彻底消除原分组间的循环依赖；确立了产品基座、存储驱动、业务特性流与构建验证交付的清晰DAG执行序，确保后续各子任务能够独立输出并全面闭合痛点恢复、CAS并发控制、7天回收期规则、真实宿主unexecuted标记等确定性与评审问题。",
+  "workItems": [
+    {
+      "blockIds": [
+        "block-target-user-scenarios",
+        "block-problem-fragmented-ideas",
+        "block-outcomes-lightweight-experience",
+        "block-non-goals-exclusions",
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "dependsOn": [],
+      "goal": "修订产品目标定位、4个核心痛点闭环、成效度量与主工作区页面设计规范。闭合痛点4缺失缺口（恢复‘无序堆积导致灵感沉没与查找困难’痛点及回顾检索价值依据）；闭合非目标界定与快捷键统一缺口（明确界定不做复杂树形文件夹/无限层级嵌套与不做重量级WYSIWYG排版编辑器，全字段提交统一为Ctrl/Cmd+Enter，消除回车直接保存）；统一度量冷启动（以navigationStart/时间原点0起算TTI<=1.0s，非骨架屏消失起算）；规范主工作区五大功能区、7天回收区常驻横幅、离线状态与错误草稿暂存界面表现。",
+      "id": "work-product-foundation"
+    },
+    {
+      "blockIds": [
+        "tech-core-architecture",
+        "module-system-decomposition",
+        "tech-storage-and-search",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery",
+        "task-foundation-and-storage",
+        "acceptance-foundation-and-storage",
+        "val-browser-storage-and-search-perf"
+      ],
+      "dependsOn": [
+        "work-product-foundation"
+      ],
+      "goal": "修订技术架构基座、Dexie存储驱动与并发控制模型。消除依赖冲突（彻底解除tech-and-storage对业务特性组的逆向依赖）；依据W3C IndexedDB规范消除Boolean索引（isPinned与isFavorite在客户端内存排序过滤）；闭合接口定义与元数据完整性缺口（补齐requestPersistence、isPersisted、detectPrivateMode、checkBackupReminderNeeded契约，定义AppMeta与单调递增libraryGeneration）；saveNote强制必填expectedRevision并在单原子readwrite事务CAS（get→比较→put）中执行，对新创建与编辑更新严格分离（独立createNote动作，禁止upsert隐式复活已删除便签）；detectPrivateMode诚实界定为启发式尽力探测与unverified状态，明确现代浏览器反指纹限制；实现RETENTION_MS=604,800,000ms（>=边界）回收区超期判定、本地时钟回拨防御、重复删除幂等与全量覆盖单原子事务回滚保障；会话草稿双重隔离暂存（spark_draft_${libraryGeneration}_${noteId}）与配额超限保护；保持移除旧重复验证任务val-browser-storage-and-search-perf。",
+      "id": "work-tech-and-storage"
+    },
+    {
+      "blockIds": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "task-quick-capture",
+        "acceptance-quick-capture"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage"
+      ],
+      "goal": "修订秒级随手灵感极速捕获功能、交互流程、开发任务与验收标准。统一全字段提交保存快捷键为Ctrl/Cmd+Enter（消除纯回车直接保存，消除换行误触提交）；页面处于激活焦点状态下按字母键N瞬时平滑滚动并聚焦；正文#标签智能提取与去重规则；对接底层独立createNote方法分配全新UUID与revision=1，禁止upsert复活已删除便签；空输入300ms抖动动画拦截；配额超限或写入失败时文字100%原位保留不关闭卡片，按spark_draft_${libraryGeneration}_new_draft暂存sessionStorage并提供草稿复制与导出。",
+      "id": "work-quick-capture"
+    },
+    {
+      "blockIds": [
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "task-note-card-view",
+        "acceptance-note-card-view"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage"
+      ],
+      "goal": "修订便签卡片流展示、生命周期流转、回收区7天保留与常驻清空功能、交互流、开发任务与验收标准。补齐独立交互流程块flow-note-card-actions与feature-note-card-view验收场景；落实归档视图每张卡片常驻【取消归档】恢复入口；闭合回收区7天到期判定规则（RETENTION_MS=604,800,000ms，>=边界），跨到期停留自动标注待清理但严禁暗删；提供顶部常驻琥珀色提示横幅，经二次确认弹窗后物理删除，取消不写；重复删除幂等保护（绝不重置previousStatus与trashedAt）；还原精准按previousStatus恢复；并发竞争禁止复活已物理删除便签。",
+      "id": "work-feed-and-lifecycle"
+    },
+    {
+      "blockIds": [
+        "feature-tag-organization",
+        "flow-tag-organization",
+        "task-tag-organization",
+        "acceptance-tag-organization"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage"
+      ],
+      "goal": "修订多维灵活标签聚合、交集筛选与全局重命名功能、交互流、开发任务与验收标准。侧边栏标签聚合严格排除回收区便签，防止垃圾便签污染标签池；支持桌面Ctrl/Cmd多选与移动触控端常驻‘多选模式’开关单手点选，实现多标签交集（AND）组合过滤；标签全局原子重命名与单事务失败回滚保护。",
+      "id": "work-tag-organization"
+    },
+    {
+      "blockIds": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "task-search-filter",
+        "acceptance-search-filter"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage"
+      ],
+      "goal": "修订即时全文模糊检索引擎、关键词高亮功能、交互流程、开发任务与验收标准。补齐独立交互流程块flow-search-filter；落实80ms防抖全文检索与正则特殊字符安全转义；严格实施检索作用域隔离（常规视图严格排除回收区便签，回收区视图仅在回收区内部检索）；性能口径统一闭合为1000条固定种子数据下从实际按键输入起算至DOM渲染完成P95<=150ms（明确为待验证目标）；支持快捷键/聚焦与Escape快速清空。",
+      "id": "work-search-filter"
+    },
+    {
+      "blockIds": [
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "task-note-detail-edit",
+        "acceptance-note-detail-edit"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage"
+      ],
+      "goal": "修订便签详情模态展示与Markdown实时编辑功能、交互流、开发任务与验收标准。补齐独立交互流程块flow-note-detail-edit；Markdown解析消毒与代码块一键复制；严格禁止所有关闭动作一律静默自动保存，提供明确的【保存并退出】、【放弃修改】（二次确认拦截）与【继续编辑】；回收区便签只读保护；保存时严格执行expectedRevision与libraryGeneration代际并发版本冲突校验，提供强制覆盖、放弃加载最新与另存为新便签消解分支；配额超限草稿隔离暂存sessionStorage。",
+      "id": "work-detail-and-edit"
+    },
+    {
+      "blockIds": [
+        "feature-data-portability",
+        "flow-data-portability",
+        "task-data-portability",
+        "acceptance-data-portability"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage"
+      ],
+      "goal": "修订本地数据资产备份导出、导入恢复与温和防丢提醒功能、交互流程、开发任务与验收标准。补齐feature-data-portability验收场景；BackupPayload完整列明元数据字段（appMeta, backupTracker, libraryGeneration, tags, notes）与多维严格类型校验规则；默认导出包含回收区便签（保留status='trashed'与trashedAt）并提供排除复选框；全量覆盖导入在单原子事务中执行，失败整体回滚不留半库，成功后单调自增libraryGeneration使旧编辑会话失效；提供独立的【导出当前未保存草稿】动作并在界面挂载；sessionStorage按spark_draft_${libraryGeneration}_${noteId}隔离并诚实说明标签页关闭后无法恢复的平台限制；累计超20条变更或超7天未备份温和提醒。",
+      "id": "work-data-portability"
+    },
+    {
+      "blockIds": [
+        "deployment-and-build-specification",
+        "task-build-and-deploy",
+        "acceptance-build-and-deploy",
+        "val-storage-and-search-benchmark",
+        "acceptance-storage-and-search-benchmark"
+      ],
+      "dependsOn": [
+        "work-tech-and-storage",
+        "work-quick-capture",
+        "work-feed-and-lifecycle",
+        "work-tag-organization",
+        "work-search-filter",
+        "work-detail-and-edit",
+        "work-data-portability"
+      ],
+      "goal": "修订构建打包、部署规范与真实宿主基准验证交付任务。落实跨模块构建依赖协同：task-build-and-deploy严格建立在所有7项业务实现任务（task-foundation-and-storage, task-quick-capture, task-note-card-view, task-tag-organization, task-search-filter, task-note-detail-edit, task-data-portability）完成之后执行；明确标准安全上下文（HTTPS或localhost）运行前提与不支持file://协议；首版保障已打开页面100%离线可用，不作未验证SW脱机冷重启绝对保证；验证任务状态诚实化：因Docker不可用（unavailable）且目标应用尚未编写，真实宿主性能基准（冷启动TTI<=1.0s，检索P95<=150ms）、Safari 17+跨端兼容性及隐私模式实测如实标为unexecuted，详述测试步骤、失败影响与修订路径，绝不冒充已实测通过。",
+      "id": "work-build-deploy-and-benchmark"
+    }
+  ]
+}

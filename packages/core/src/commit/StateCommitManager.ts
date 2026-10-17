@@ -1,10 +1,14 @@
 import { join, resolve } from 'node:path';
+import { realpathSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { FileStorage } from '../storage/FileStorage.js';
 import type { ProjectMetadata } from '@project-architect/contracts';
 
 export interface RevisionFileEntry {
   filename: string;
   sizeBytes: number;
+  sha256?: string;
 }
 
 export interface RevisionManifest {
@@ -38,11 +42,16 @@ export interface CandidateFiles {
   readiness?: unknown;
   manifest?: unknown;
   documents?: unknown;
+  planning?: unknown;
+  blueprint?: unknown;
+  changesets?: unknown;
 }
 
+const projectCommitLocks = new Map<string, Promise<void>>();
+const commitLockOwners = new AsyncLocalStorage<Set<string>>();
 export class StateCommitManager {
   private storage: FileStorage;
-  private projectLocks: Map<string, Promise<void>> = new Map();
+  private projectLocks = projectCommitLocks;
   private maxRetainedRevisions: number;
 
   constructor(
@@ -81,7 +90,14 @@ export class StateCommitManager {
    * Serializes per-project commits using an async mutex.
    */
   async withProjectLock<T>(projectPath: string, fn: () => Promise<T>): Promise<T> {
-    const key = resolve(projectPath);
+    let rawPath = resolve(projectPath);
+    try {
+      rawPath = (realpathSync as any).native ? (realpathSync as any).native(rawPath) : realpathSync(rawPath);
+    } catch {
+      // 容错处理：若路径尚不存在或权限受限，保持 resolve 原状
+    }
+    const key = process.platform === 'win32' ? rawPath.toLowerCase() : rawPath;
+    if(commitLockOwners.getStore()?.has(key))return fn();
     while (this.projectLocks.has(key)) {
       await this.projectLocks.get(key);
     }
@@ -91,7 +107,7 @@ export class StateCommitManager {
     });
     this.projectLocks.set(key, lockPromise);
     try {
-      return await fn();
+      return await commitLockOwners.run(new Set([...(commitLockOwners.getStore()??[]),key]),fn);
     } finally {
       this.projectLocks.delete(key);
       resolveLock();
@@ -254,6 +270,7 @@ export class StateCommitManager {
           writtenFileEntries.push({
             filename,
             sizeBytes: Buffer.byteLength(serialized, 'utf8'),
+            sha256: createHash('sha256').update(serialized).digest('hex'),
           });
         }
       };
@@ -276,6 +293,9 @@ export class StateCommitManager {
         'questions.json',
         'readiness.json',
         'documents.json',
+        'planning.json',
+        'blueprint.json',
+        'changesets.json',
       ];
 
       for (const file of stateFiles) {
@@ -376,12 +396,14 @@ export class StateCommitManager {
       }
 
       for (const entry of manifest.files) {
+        if (!['metadata.json','overview.json','decisions.json','assumptions.json','gaps.json','risks.json','questions.json','readiness.json','documents.json','planning.json','blueprint.json','changesets.json'].includes(entry.filename)) return false;
         const filePath = join(revDir, entry.filename);
         if (!(await this.storage.exists(filePath))) {
           return false;
         }
         // Verify JSON parseability
         await this.storage.readJson(filePath);
+        if (entry.sha256 && createHash('sha256').update(await this.storage.readText(filePath)).digest('hex') !== entry.sha256) return false;
       }
 
       return true;
@@ -422,7 +444,11 @@ export class StateCommitManager {
     const stateDir = join(projectPath, 'state');
     const projectJsonPath = join(projectPath, 'project.json');
 
-    const files = await this.storage.listFiles(revDir);
+    const manifest = await this.storage.readJson<RevisionManifest>(join(revDir,'manifest.json'));
+    const files = manifest.files.map(entry => entry.filename);
+    for (const file of ['planning.json','blueprint.json','changesets.json']) {
+      if (!files.includes(file)) await this.storage.remove(join(stateDir,file));
+    }
     for (const file of files) {
       if (file === 'manifest.json') continue;
       if (file === 'metadata.json') {

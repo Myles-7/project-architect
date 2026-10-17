@@ -152,7 +152,11 @@ export class ReadinessGate {
     }
   }
 
-  canGenerateDocuments(snapshot: ProjectSnapshot): GateDecisionResult {
+  canGenerateDocuments(snapshot: ProjectSnapshot, options?: { isDraft?: boolean }): GateDecisionResult {
+    if (options?.isDraft) {
+      return { allowed: true };
+    }
+
     const currentReadiness = snapshot.readiness?.current;
     const disposition = currentReadiness?.userDisposition || 'pending';
     const stage = snapshot.metadata.stage;
@@ -219,8 +223,8 @@ export class ReadinessGate {
     return { allowed: true };
   }
 
-  validateForDocumentGeneration(snapshot: ProjectSnapshot): void {
-    const result = this.canGenerateDocuments(snapshot);
+  validateForDocumentGeneration(snapshot: ProjectSnapshot, options?: { isDraft?: boolean }): void {
+    const result = this.canGenerateDocuments(snapshot, options);
     if (!result.allowed) {
       const err: any = new Error(result.reason || 'Document compilation gate check failed.');
       err.code = ErrorCode.READINESS_NOT_APPROVED;

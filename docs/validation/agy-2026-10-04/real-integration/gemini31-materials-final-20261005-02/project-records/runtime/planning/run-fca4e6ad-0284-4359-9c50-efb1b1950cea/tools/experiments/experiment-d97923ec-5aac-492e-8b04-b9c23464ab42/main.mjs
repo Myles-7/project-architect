@@ -1,0 +1,1 @@
+const fs = require('fs'); console.log(fs.readFileSync('task.json', 'utf8').substring(0, 1000));

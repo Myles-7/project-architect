@@ -1,0 +1,573 @@
+CacheStorage - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ CacheStorage 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Русский 
+
+ 中文 (简体) 
+
+ CacheStorage
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since April 2018.
+
+ See full compatibility
+
+ Learn more
+
+ Secure context: This feature is available only in secure contexts (HTTPS), in some or all supporting browsers .
+
+ Note: This feature is available in Web Workers .
+
+ The CacheStorage interface represents the storage for Cache objects.
+
+ The interface:
+
+ Provides a master directory of all the named caches that can be accessed by a ServiceWorker or other type of worker or window scope (you're not limited to only using it with service workers).
+
+ Maintains a mapping of string names to corresponding Cache objects.
+
+ Use CacheStorage.open() to obtain a Cache instance.
+
+ Use CacheStorage.match() to check if a given Request is a key in any of the Cache objects that the CacheStorage object tracks.
+
+ You can access CacheStorage through the Window.caches property in windows or through the WorkerGlobalScope.caches property in workers.
+
+ Note: 
+ CacheStorage always rejects with a SecurityError on untrusted origins (i.e., those that aren't using HTTPS, although this definition will likely become more complex in the future.) When testing on Firefox, you can get around this by checking the Enable Service Workers over HTTP (when toolbox is open) option in the Firefox DevTools options/gear menu. Furthermore, because CacheStorage requires file-system access, it may be unavailable in private mode in Firefox.
+
+ Note: 
+ CacheStorage.match() is a convenience method. Equivalent functionality to match a cache entry can be implemented by returning an array of cache names from CacheStorage.keys() , opening each cache with CacheStorage.open() , and matching the one you want with Cache.match() .
+
+ In this article
+
+ Instance methods 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Instance methods 
+
+ CacheStorage.match() 
+
+ Checks if a given Request is a key in any of the Cache objects that the CacheStorage object tracks, and returns a Promise that resolves to that match.
+
+ CacheStorage.has() 
+
+ Returns a Promise that resolves to true if a Cache object matching the cacheName exists.
+
+ CacheStorage.open() 
+
+ Returns a Promise that resolves to the Cache object matching the cacheName (a new cache is created if it doesn't already exist.)
+
+ CacheStorage.delete() 
+
+ Finds the Cache object matching the cacheName , and if found, deletes the Cache object and returns a Promise that resolves to true . If no Cache object is found, it resolves to false .
+
+ CacheStorage.keys() 
+
+ Returns a Promise that will resolve with an array containing strings corresponding to all of the named Cache objects tracked by the CacheStorage . Use this method to iterate over a list of all the Cache objects.
+
+ Examples 
+
+ This code snippet is from the MDN simple service worker example (see simple service worker running live .)
+This service worker script waits for an install event to fire, then runs waitUntil to handle the install process for the app. This consists of calling CacheStorage.open to create a new cache, then using Cache.addAll to add a series of assets to it.
+
+ In the second code block, we wait for a FetchEvent to fire. We construct a custom response like so:
+
+ Check whether a match for the request is found in the CacheStorage. If so, serve that.
+
+ If not, fetch the request from the network, then also open the cache created in the first block and add a clone of the request to it using Cache.put ( cache.put(event.request, response.clone()) .)
+
+ If this fails (e.g., because the network is down), return a fallback response.
+
+ Finally, return whatever the custom response ended up being equal to, using FetchEvent.respondWith .
+
+ js 
+ self.addEventListener("install", (event) => {
+ event.waitUntil(
+ caches
+ .open("v1")
+ .then((cache) =>
+ cache.addAll([
+ "/",
+ "/index.html",
+ "/style.css",
+ "/app.js",
+ "/image-list.js",
+ "/star-wars-logo.jpg",
+ "/gallery/bountyHunters.jpg",
+ "/gallery/myLittleVader.jpg",
+ "/gallery/snowTroopers.jpg",
+ ]),
+ ),
+ );
+});
+
+self.addEventListener("fetch", (event) => {
+ event.respondWith(
+ caches.match(event.request).then((response) => {
+ // caches.match() always resolves
+ // but in case of success response will have value
+ if (response !== undefined) {
+ return response;
+ }
+ return fetch(event.request)
+ .then((response) => {
+ // response may be used only once
+ // we need to save clone to put one copy in cache
+ // and serve second one
+ let responseClone = response.clone();
+
+ caches
+ .open("v1")
+ .then((cache) => cache.put(event.request, responseClone));
+ return response;
+ })
+ .catch(() => caches.match("/gallery/myLittleVader.jpg"));
+ }),
+ );
+});
+
+ This snippet shows how the API can be used outside of a service worker context, and uses the await operator for much more readable code.
+
+ js 
+ // Try to get data from the cache, but fall back to fetching it live.
+async function getData() {
+ const cacheVersion = 1;
+ const cacheName = `myapp-${cacheVersion}`;
+ const url = "https://jsonplaceholder.typicode.com/todos/1";
+ let cachedData = await getCachedData(cacheName, url);
+
+ if (cachedData) {
+ console.log("Retrieved cached data");
+ return cachedData;
+ }
+
+ console.log("Fetching fresh data");
+
+ const cacheStorage = await caches.open(cacheName);
+ await cacheStorage.add(url);
+ cachedData = await getCachedData(cacheName, url);
+ await deleteOldCaches(cacheName);
+
+ return cachedData;
+}
+
+// Get data from the cache.
+async function getCachedData(cacheName, url) {
+ const cacheStorage = await caches.open(cacheName);
+ const cachedResponse = await cacheStorage.match(url);
+
+ if (!cachedResponse || !cachedResponse.ok) {
+ return false;
+ }
+
+ return await cachedResponse.json();
+}
+
+// Delete any old caches to respect user's disk space.
+async function deleteOldCaches(currentCache) {
+ const keys = await caches.keys();
+
+ for (const key of keys) {
+ const isOurCache = key.startsWith("myapp-");
+ if (currentCache === key || !isOurCache) {
+ continue;
+ }
+ caches.delete(key);
+ }
+}
+
+try {
+ const data = await getData();
+ console.log({ data });
+} catch (error) {
+ console.error({ error });
+}
+
+ Specifications 
+
+ Specification
+
+ Service Workers Nightly 
+# cachestorage-interface 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Using Service Workers 
+
+ Cache 
+
+ Window.caches and WorkerGlobalScope.caches 
+
+ Private Browsing / Incognito modes 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Jun 24, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Service Worker API 
+ CacheStorage 
+ Instance methods delete() 
+ has() 
+ keys() 
+ match() 
+ open() 
+
+ Related pages for Service Workers API Cache 
+ Client 
+ Clients 
+ ExtendableEvent 
+ ExtendableMessageEvent 
+ FetchEvent 
+ InstallEvent 
+ NavigationPreloadManager 
+ Navigator .serviceWorker 
+ ServiceWorker 
+ ServiceWorkerContainer 
+ ServiceWorkerGlobalScope 
+ ServiceWorkerRegistration 
+ Window .caches 
+ WindowClient 
+ WorkerGlobalScope .caches 
+ WorkerNavigator .serviceWorker 
+
+ Guides Using Service Workers 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

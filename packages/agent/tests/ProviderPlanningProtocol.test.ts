@@ -1,0 +1,50 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { AntigravityCliProvider } from '../src/provider/AntigravityCliProvider.js';
+import { resolve, join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { mkdtemp, readFile, rm, access } from 'node:fs/promises';
+import { preparePlanningWorkspace } from '../src/tools/PlanningToolsMcpServer.js';
+const schemaPath = resolve('experiments/agent-benchmark/schemas/b3-discovery.schema.json');
+const mockScript = resolve(__dirname, 'MockAgy.mjs');
+const provider = (limit = 65536) => new AntigravityCliProvider(process.execPath, limit, [mockScript]);
+const request = { requestId: 'semantic', task: 'discovery-turn' as const, prompt: 'hello', contextText: 'context', schemaPath, timeoutMs: 5000 };
+let directories: string[] = [];
+afterEach(async () => { delete process.env.MOCK_AGY_MODE; delete process.env.MOCK_CHILD_PID; delete process.env.AGY_TIMEOUT_MS; await Promise.all(directories.map(path => rm(path, { recursive: true, force: true }))); directories = []; });
+const directory = async () => { const value = await mkdtemp(join(tmpdir(), 'pa-provider-semantic-')); directories.push(value); return value; };
+describe('AGY headless semantic protocol', () => {
+  it('advertises batch context reads and both continuation cursors in the actual CLI input', async () => {
+    process.env.MOCK_AGY_MODE = 'prompt_echo';
+    const result = await provider().complete<any>({ ...request, task: 'planning-task', cwd: await directory() });
+    expect(result.status).toBe('success');
+    const prompt = result.structuredOutput.receivedPrompt;
+    const declaration = prompt.match(/planning_context: (.*)/)?.[1];
+    expect(declaration).toContain('"scan"');
+    expect(declaration).toContain('characterOffset?:integer');
+    expect(declaration).toContain('requiredOnly?:boolean');
+    expect(prompt).toContain('offset=nextOffset and characterOffset=nextCharacterOffset');
+    expect(prompt).toContain('requiredOnly=true');
+    expect(prompt).toContain('Missing reads block finish');
+  });
+  it('rejects a terminal success that bypassed complete context reads in an actual registered review workspace', async () => {
+    const cwd = await directory();
+    await preparePlanningWorkspace({ materialRoots: [], materials: [], experimentRoot: join(cwd, 'experiments'), evidenceRoot: join(cwd, 'evidence') }, cwd);
+    const result = await provider().complete({ ...request, task: 'planning-task', cwd, contextText: JSON.stringify({ constraints: '保持', rawInputs: [{ raw: '不可截断' }], workerResults: { draft: { groups: [], blockers: [] } } }) });
+    expect(result.status).toBe('failed'); expect(result.structuredOutput).toBeNull(); expect(result.stderr).toContain('INCOMPLETE_REVIEW_CONTEXT');
+    const config = JSON.parse(await readFile(join(cwd, '.agents', 'planning-tools.json'), 'utf8'));
+    expect(await readFile(config.contextAccess.sourcePath, 'utf8')).toContain('不可截断');
+  });
+  it('preserves the actual service failure rather than masking it as an incomplete review read', async () => {
+    const cwd = await directory(); process.env.MOCK_AGY_MODE = 'failed_terminal';
+    await preparePlanningWorkspace({ materialRoots: [], materials: [], experimentRoot: join(cwd, 'experiments'), evidenceRoot: join(cwd, 'evidence') }, cwd);
+    const result = await provider().complete({ ...request, task: 'planning-task', cwd, contextText: JSON.stringify({ workerResults: { draft: { groups: [] } } }) });
+    expect(result.status).toBe('failed'); expect(result.stderr).toContain('Terminal result'); expect(result.stderr).not.toContain('INCOMPLETE_REVIEW_CONTEXT');
+  });
+  it.each(['text_json', 'intermediate_only', 'failed_terminal', 'permission', 'duplicate', 'unsupported_flags'])('rejects %s without natural-language recovery or another invocation', async mode => { process.env.MOCK_AGY_MODE = mode; const result = await provider().complete(request); expect(result.status).toBe('failed'); expect(result.structuredOutput).toBeNull(); });
+  it.each(['legacy', 'legacy_pretty'])('retains terminal-only %s JSON compatibility', async mode => { process.env.MOCK_AGY_MODE = mode; const result = await provider().complete<any>(request); expect(result.status).toBe('success'); expect(result.structuredOutput.confirmed).toContain('No Shell Injection'); });
+  it.each(['legacy','legacy_pretty'])('never accepts %s historical envelopes as production planning output',async mode=>{process.env.MOCK_AGY_MODE=mode;const result=await provider().complete({...request,task:'planning-task',cwd:await directory()});expect(result.status).toBe('failed');expect(result.structuredOutput).toBeNull();expect(result.stderr).toContain('terminal result event');});
+  it('logs large event streams without imposing a total stream buffer gate', async () => { process.env.MOCK_AGY_MODE = 'long_stream'; const logPath = join(await directory(), 'stream.ndjson'); const result = await provider(1024).complete({ ...request, logPath }); expect(result.status).toBe('success'); const log = await readFile(logPath, 'utf8'); expect(log.length).toBeGreaterThan(100000); expect(log).toContain('"stream":"exit"'); });
+  it('transmits model, effort and cwd and explicitly disables duration gates for planning', async () => { process.env.AGY_TIMEOUT_MS = '1'; const cwd = await directory(); const result = await provider().complete<any>({ ...request, task: 'planning-task', timeoutMs: undefined, cwd, model: 'gemini-3.1-pro-high', reasoningEffort: 'high' }); expect(result.status).toBe('success'); expect(result.structuredOutput.args).toContain('gemini-3.1-pro-high'); expect(result.structuredOutput.args).toContain('high'); expect(result.structuredOutput.cwd).toBe(cwd); expect(result.structuredOutput.args).toContain('pa-planning-worker'); });
+  it('does not silently downgrade an unavailable requested model', async () => { const result = await provider().complete({ ...request, task: 'planning-task', cwd: await directory(), model: 'missing-model' }); expect(result.status).toBe('failed'); expect(result.stderr).toContain('MODEL_UNAVAILABLE'); });
+  it('rejects native unregistered subagent tools', async () => { process.env.MOCK_AGY_MODE = 'unsafe_tools'; const result = await provider().complete({ ...request, task: 'planning-task', cwd: await directory() }); expect(result.status).toBe('failed'); expect(result.stderr).toContain('UNCONTROLLED_TOOLS'); });
+  it('cancels the child process tree', async () => { process.env.MOCK_AGY_MODE = 'tree'; const childPidPath = join(await directory(), 'child.pid'); process.env.MOCK_CHILD_PID = childPidPath; const controller = new AbortController(); const resultPromise = provider().complete({ ...request, abortSignal: controller.signal }); for (let i = 0; i < 30; i++) { try { await access(childPidPath); break; } catch { await new Promise(done => setTimeout(done, 25)); } } const childPid = Number(await readFile(childPidPath, 'utf8')); controller.abort(); expect((await resultPromise).status).toBe('cancelled'); expect(() => process.kill(childPid, 0)).toThrow(); });
+});

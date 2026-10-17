@@ -1,0 +1,44 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "清空操作中输入节点物理替换（Element.replaceWith）的浏览器标准支持与异常类型依据：证实其在现代桌面浏览器中广泛支持（Baseline: Widely available），在插入非法层级时抛出 HierarchyRequestError，支撑清空事务的两阶段替换与回滚异常捕获机制。",
+      "content": "Element: replaceWith() method - Web APIs | MDN: The Element.replaceWith() method replaces this Element in the children list of its parent with a set of Node objects or strings. Baseline: Widely available (across browsers since April 2018). Throws HierarchyRequestError DOMException when the node cannot be inserted at the specified point in the hierarchy.",
+      "hash": "b1e88b35313510cf7c5e5695a09ec18d2153016d0c0189ae451d3dd7206626a5",
+      "id": "evidence-mdn-element-replacewith",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith",
+      "obtainedAt": "2026-10-05T05:45:02.470Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+    },
+    {
+      "applicability": "本地 file:// 协议免构建零服务双击运行规范依据：证实经典脚本搭配 defer 属性可保证按文档顺序异步加载并在解析完成后执行，消除了 ES Module 在 file:// 协议下的跨域错误（CORS error），支撑自包含无依赖本地双击运行可行性。",
+      "content": "<script> HTML script element - HTML | MDN: Scripts with the defer attribute will execute in the order in which they appear in the document. This attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse. Baseline: Widely available.",
+      "hash": "9d007132ed56128161f5165a5cb44fef8f0a0bf465d3268a53c22546531ed2bc",
+      "id": "evidence-mdn-script-defer-classic",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script",
+      "obtainedAt": "2026-10-05T05:45:51.768Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script"
+    },
+    {
+      "applicability": "记录当前规划环境 Docker 引擎未运行的客观约束，说明端到端受控容器测试在规划阶段未执行，须留待后续开发与交付阶段在具备真实浏览器的宿主环境中执行端到端验证。规划工具限制不作为用户项目约束。",
+      "content": "在当前规划环境尝试为 Node 受控试验准备执行环境（runtime: node），返回 status: unavailable。原因：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; The system cannot find the file specified。因此规划期无法在当前受控 Docker 环境中运行自动化实验。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop unavailable on host)",
+      "id": "evidence-env-docker-unavailable-run-a675bad2",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-quality-copy-70XBDp\\materials\\runtime\\planning\\run-a675bad2-82b9-4f18-96e2-d89fe9517872\\tools\\experiments\\prepare-f2acbf45-5294-4f18-ab14-0d502f0f5228.ndjson",
+      "obtainedAt": "2026-10-05T13:44:50+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-f2acbf45-5294-4f18-ab14-0d502f0f5228"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本任务针对项目材料（input:inp-01 与 fixture.png）及最新批准基线，独立分析了约束条件、异常使用场景与可行性风险，并提供官方标准研究与受控环境依据：\n\n1. 材料约束与范围界定：\n- 严格限定为纯前端单页面应用（SPA），桌面优先，单人单机使用，零服务端、零数据库/持久化、零用户登录鉴权、零协同与支付，状态完全于客户端内存维护。\n- 原图 fixture.png（SHA256: 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0）经原生像素查看核实，白底上方为示例文字 'Q7M4-8261'，下方为蓝色矩形与橙色圆形；明确示例文字仅作参考而非业务需求。用户已批准选定单清空按钮与 300ms 防抖实时反馈排布（彻底删除确认按钮，色块映射为顶部大字展示、居中输入框、右下橙色圆形清空按钮）。\n- 部署模式 A 支持双击 index.html 直接运行（file:// 协议纯离线）；模式 B 支持本地轻量静态 HTTP 服务器托管（固定端口 8080，如 python -m http.server 8080 或 npx serve . --listen 8080，明确 npx 首次需要联网）。\n\n2. 异常使用场景与交互契约分析：\n- 空值与纯空格输入：用户输入空字符串或纯空格时，展示区清除旧结果并恢复初始占位，输入框下方给出醒目就地错误提示，输入框保持可编辑，且严格保留用户原样输入的空白字符（遵循“失败时保留输入”原则）。\n- 恶意代码与特殊字符安全注入：用户输入 HTML/脚本标签或特殊字符时，通过 Node.textContent 纯文本绑定回显，不调用 HTML 解析器，避免脚本执行。明确 textContent 仅限定于展示节点文本绑定安全，不外推为杜绝整应用 DOM XSS 的绝对证明。\n- IME 输入法会话并发与迟到事件边界：输入法组字（composition）期间点击清空，必须立即清空视图并作废当前 IME 会话；来自已作废会话的迟到 compositionend 或尾随 input 事件不得重写 DOM 或伪造空值错误。新键入/新组合输入可正常启动新的 300ms 防抖调度。\n- 清空状态事务（Reset Transaction）与原子回滚：清空操作定义为具备快照捕获、内存预制、替换执行、呈现/焦点复位与原子提交的两阶段状态事务。若任意阶段抛错触发原子回滚（物理回插原节点并彻底移除新挂载节点，维持单一输入框合法 DOM 拓扑，无多余 ID 残留），原闭包契约与代际保持自洽，对 empty/whitespace/nonempty 原草稿无差别重新调度防抖，保证用户可继续编辑重试。严重回滚失败在独立只读 textarea 容器中原样提供全文供手动复制，提示诚实且绝不刷新页面。\n\n3. 官方研究与可行性风险发现：\n- 官方标准查证：通过 research_read 查证 MDN 官方文档 Element.replaceWith()（hash: b1e88b35313510cf7c5e5695a09ec18d2153016d0c0189ae451d3dd7206626a5）与 <script defer>（hash: 9d007132ed56128161f5165a5cb44fef8f0a0bf465d3268a53c22546531ed2bc），确证节点物理替换与经典脚本延迟加载为现代桌面浏览器广泛支持的基准特性（Baseline: Widely available），技术可行性完全成立。\n- 规划环境受控试验限制：受控试验环境探测显示宿主机 Docker Desktop 守护进程未启动（status: unavailable），受控容器环境未就绪。实事求是记录 outcome 为 unexecuted，此为当前规划工具环境限制，非用户项目约束。原生浏览器/真实 IME 重定向与辅助技术验收留待后续开发与交付阶段在目标环境中执行。\n\n4. 受影响契约与建议：\n- 契约权威性以公共接口签名、状态所有权及两阶段提交/回滚后置条件为准，内部 JavaScript 降级为非执行参考示意。\n- 建议保持现有已批准决策及 30 块稳定结构，开发实施时严格落实两阶段提交、属性完整克隆与错误恢复兜底。全项契约自洽，无需要用户裁决的阻塞项。",
+  "workItems": []
+}

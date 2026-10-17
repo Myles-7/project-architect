@@ -1,0 +1,60 @@
+{
+  "blockers": [
+    "【R4-B1 原生 IME 重定向保证失效】：受影响块 blk-deliv-val-standalone-runtime。依据 input:5cc495c6-96a8-4442-8f77-668749156b46。blk-deliv-val-standalone-runtime.task.failureBehavior 声称若旧原生 compositionend 被浏览器重定向派发至新活跃节点，generation guard 会将其拒绝丢弃，该技术推断不成立（对新节点派发时 currentTarget === activeInputNode 且 bornGeneration === inputGeneration 均匹配）。缺口：须彻底删除该不成立的绝对拦截保证与“极其罕见”无依据频率判断，保持各块投影一致；合成隔离保证严格限定于旧节点/旧闭包拦截；原生 IME 会话终结、重定向行为、真机焦点与屏幕阅读器无障碍在当前规划期如实标为 unexecuted，留待开发阶段真机实测（记录 Chrome/Edge/Firefox/Safari 浏览器版本、OS、IME 及事件日志）；若出现重定向或新会话被误终结，先修订清空策略及回归，不捏造原生 token 或全浏览器竞态杜绝保证。",
+    "【R4-B2 伪代码未定义引用与未实现公开接口】：受影响块 blk-tech-interface（及关联实现任务 blk-deliv-task-input-workflow、blk-deliv-task-reset-workflow、blk-deliv-task-error-handling）。依据 input:5cc495c6-96a8-4442-8f77-668749156b46。blk-tech-interface 的 JavaScript 伪代码块中直接使用了 FeedbackBanner、displayElement、errorContainer，但均无声明、初始化或显式参数注入，在执行防抖到期回调与异常 catch 时将直接抛出 ReferenceError；且 InputController 模块说明中声称的 getInputText/setInputText 在伪代码中未实现。缺口：伪代码契约必须闭合自洽，明确实际 DOM 引用装配、AppController 初始化流转与 FeedbackBanner 方法签名（showInputError, clearInputError, showGlobalError）；每个使用的变量均须显式定义或参数注入；移除未使用的公开接口 getInputText/setInputText 或补充其与代际草稿的一致性定义；明确伪代码为开发规范契约，不能作为目标应用已实测的依据。",
+    "【R4-B3 节点物理替换白名单导致持久配置与无障碍属性丢失】：受影响块 blk-feat-reset、blk-flow-reset、blk-page-main-layout、blk-tech-data-model、blk-tech-interface、blk-deliv-task-reset-workflow、blk-acc-reset、blk-deliv-acc-full-e2e。依据 input:5cc495c6-96a8-4442-8f77-668749156b46。当前 replaceInputNode 伪代码仅白名单复制了 id, name, className, placeholder, aria-label，导致 aria-describedby、aria-required、tabindex、style、data-test 等持久属性被直接丢弃，与正文及验收规范中“全部持久 DOM 属性与无障碍配置保留”的承诺冲突。缺口：伪代码与规范正文必须升级为明确安全的持久配置复制策略，覆盖 label 关联（id, name）、ARIA（aria-label, aria-describedby, aria-required 等）、键盘导航（tabindex）、内联样式与类名（style, className）、测试属性（data-*）五类配置；单独重置 value = ''、trustedDraft = ''、瞬态 aria-invalid 与错误高亮，重新绑定新代际闭包监听与 focus()；验收标准中补充对这五类配置前后的一致性断言；实际布局与屏幕阅读器无障碍在真机环境待实测（保持 unexecuted）。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "适用于定位并修复最新自动质量反馈指出的 R4-B1（原生 IME 重定向保证失效）、R4-B2（伪代码未定义引用导致 ReferenceError 与未实现方法）、R4-B3（节点替换持久配置与无障碍属性丢失）三项阻塞性契约缺口。",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。仅修订 flash-materials-final-20261004-01 的最新已批准 source32 / quality-reviewed-r4；原项目仍未开发。本轮三项阻塞来自真实导出内容的静态/合成复核。保留30个稳定块ID、29条基线历史证据完整对象、其余已正确的300ms输入/即时单按钮清空/手动删空/原文保留/失败恢复/textContent/defer-IIFE/端口8080/安装前提/十文件/全部DAG边和五轮均值<=50ms调度代理指标。只改关联内容及字段，不重新设计无关功能，不运行不可用Docker。\\n\\nR4-B1：blk-deliv-val-standalone-runtime.task.failureBehavior声称旧原生compositionend若重定向到新节点，generation guard会拒绝，这不成立。对新节点派发时currentTarget、active node、bornGeneration、连接检查全部匹配。删除该保证和“极其罕见”的无依据频率判断，所有投影保持一致。合成隔离保证限于旧节点/旧闭包；原生会话终结、重定向、真实焦点/辅助技术保持unexecuted。开发验证须记录Chrome/Edge/Firefox与Safari适用版本、操作系统、IME、原始事件日志；出现重定向/新会话被结束先修订清空策略及回归，不自造原生token、永久隔离、自动通过或全部浏览器竞态保证。\\n\\nR4-B2：blk-tech-interface完整JavaScript fence没有FeedbackBanner、displayElement、errorContainer的声明/注入/具体装配，正常timer及catch都会ReferenceError；模块方法列表getInputText/setInputText与实际返回API也不符。请明确实际DOM引用、AppController初始化顺序、FeedbackBanner具体方法签名及呈现/清除错误规则；每个使用的变量均定义或通过显式参数注入。可以采用小的初始化工厂并引用安全textContent renderer；完整伪代码应内部自洽，可以仅用明确浏览器DOM/定时器依赖装配。getInputText/setInputText若不是必要公开能力可从方法列表移除，或真正定义其与accepted draft/generation/定时器的一致性，不能只声明未实现。保留已有正确node闭包、capturedDraft、schedulerEpoch、stale callback拒绝及300ms逻辑。该代码是开发规范，合成核验不能称目标应用真实实现已测试。\\n\\nR4-B3：replaceInputNode仅复制id/name/class/placeholder/aria-label，但flow/acceptance要求全部持久DOM属性与无障碍配置保留，实际丢aria-describedby/aria-required/tabindex/style/data-test。采用明确安全的持久配置复制/clone策略，覆盖label关联、ARIA、tabindex、style及data属性；单独重置value/trustedDraft、瞬态aria-invalid和错误状态、重绑闭包监听与明确焦点行为。保留原属性保留验收，不能删掉要求迎合旧代码。给出这五类配置前后精确断言；实际布局、屏幕阅读器与原生焦点仍待实测。同步相关flow/page/data/interface/error/task全部字段/validation/acceptance；避免正文属性全保留而伪代码仍白名单。",
+      "hash": "991428df6aead6a79d3904d2da85c872e518b086fd63033d964ddf96588537b2",
+      "id": "evidence-08ed3ce1-b2d0-4af7-9ec4-5ec11f0355cd",
+      "kind": "user",
+      "obtainedAt": "2026-10-05T00:20:59.820Z",
+      "source": "input:5cc495c6-96a8-4442-8f77-668749156b46"
+    },
+    {
+      "applicability": "用户原始需求、功能范围界定与非目标约束依据",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T16:08:03.059Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "参考截图视觉元素与空间结构映射依据",
+      "content": "fixture.png 真实像素呈现白底背景，上方居中偏左为黑色无衬线文本“Q7M4-8261”，下方左侧为蓝色矩形色块，下方右侧为橙色圆形色块。布局结构对应为：顶部/上方结果展示区域，底部/下方左侧为主操作区域（确认按钮），底部/下方右侧为辅助操作区域（清空按钮）。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+      "kind": "material",
+      "location": "D:\\\\Temp\\\\User\\\\pa-quality-copy-hvYzoh\\\\materials\\\\inputs\\\\inp-1791129999124\\\\fixture.png",
+      "obtainedAt": "2026-10-04T16:08:06.988Z",
+      "outcome": "passed",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "记录当前规划环境受控试验容器不可用状态（Docker 守护进程未启动），确认规划期无法执行自动化容器测试，多浏览器真实 IME 兼容性与性能基准实测须如实标记为 unexecuted 并由个人开发者在真机环境中执行。",
+      "content": "environment_prepare (node) failed to connect to docker API at npipe:////./pipe/dockerDesktopLinuxEngine. Container execution is unavailable.",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop Linux Engine)",
+      "id": "evidence-exp-docker-env-unavailable-r4",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-quality-copy-hvYzoh\\\\materials\\\\runtime\\\\planning\\\\run-5385470e-f751-4ebb-a405-62174dc63145\\\\tools\\\\experiments\\\\prepare-a28f0c43-4808-4937-9b2c-aa54c1c3434b.ndjson",
+      "obtainedAt": "2026-10-05T08:20:39+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-a28f0c43-4808-4937-9b2c-aa54c1c3434b"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "由登记整合任务依据 input:5cc495c6-96a8-4442-8f77-668749156b46 统一修订 blk-deliv-val-standalone-runtime、blk-tech-interface 及节点替换相关 8 个关联块，闭合 R4-B1、R4-B2、R4-B3 契约缺口并提交自动质量验收审阅",
+      "kind": "validation"
+    }
+  ],
+  "groups": [],
+  "questions": [],
+  "summary": "本轮基于最新自动质量验收反馈 input:5cc495c6-96a8-4442-8f77-668749156b46（R4）进行了材料研读与可行性分析，已确认三项关键阻塞及受影响契约：1. R4-B1（原生 IME 重定向失效）：blk-deliv-val-standalone-runtime 中声称‘旧原生 compositionend 若重定向到新节点 generation guard 会拒绝’在技术上不成立，必须删除该绝对保证与‘极其罕见’无依据主观词，合成隔离保证严格限于旧节点闭包拦截，原生重定向、焦点与无障碍实测保持 unexecuted 并记录真机日志；2. R4-B2（伪代码未定义引用导致 ReferenceError）：blk-tech-interface 伪代码中缺失 FeedbackBanner、displayElement、errorContainer 声明与装配，且声称的 getInputText/setInputText 未实现，须通过参数显式注入或初始化装配保证内部自洽，并移除冗余未实现接口；3. R4-B3（节点替换持久配置丢失）：replaceInputNode 仅白名单复制 5 项属性，丢失了 aria-describedby、aria-required、tabindex、style、data-*，与全部持久 DOM 属性保留契约矛盾，须升级为安全的持久属性复制策略，单独重置 value/trustedDraft 与瞬态错误状态，并在验收中补充五类属性前后断言。所有结论均为建议，具体蓝图修订交由登记整合任务处理。"
+}

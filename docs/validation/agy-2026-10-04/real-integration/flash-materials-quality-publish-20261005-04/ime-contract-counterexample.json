@@ -1,0 +1,32 @@
+{
+  "label": "flash-materials-quality-publish-20261005-04",
+  "packageSuffix": "quality-reviewed-r2",
+  "checkedAt": "2026-10-04T22:57:00.879Z",
+  "kind": "Exact exported interface handler execution in synthetic VM; counterexample allowed by written contract, not target application or native IME browser reproduction",
+  "blockId": "blk-tech-interface",
+  "snapshotSha256": "9c712cede38ff5dfec3a636a2c42f22e9020aeca69ba64fbd4ea4a2d55d1afc5",
+  "handlers": [
+    "inputElement.addEventListener('compositionstart', () => { isComposing = true; currentSessionToken = ++activeSessionId; DebounceScheduler.cancel(); });",
+    "inputElement.addEventListener('compositionend', () => { isComposing = false; if (currentSessionToken !== activeSessionId) return; DebounceScheduler.schedule(handleDebouncedValidateAndDisplay, 300); });",
+    "inputElement.addEventListener('input', (e) => { if (!isComposing && !e.isComposing) DebounceScheduler.schedule(handleDebouncedValidateAndDisplay, 300); });"
+  ],
+  "observations": [
+    {
+      "sequence": "compositionstart -> clear -> old compositionend",
+      "pending": 0,
+      "pass": true
+    },
+    {
+      "sequence": "same sequence -> input event while value is empty",
+      "error": "empty",
+      "pass": false
+    },
+    {
+      "sequence": "same sequence -> DOM carries old composition text -> noncomposing input",
+      "display": "old-composition",
+      "pass": false
+    }
+  ],
+  "status": "needs-contract-repair",
+  "nativeBrowserVerification": "unexecuted"
+}

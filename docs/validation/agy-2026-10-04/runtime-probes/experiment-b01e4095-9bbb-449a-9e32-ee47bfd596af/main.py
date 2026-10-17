@@ -1,0 +1,1 @@
+print("isolated-python-runtime")

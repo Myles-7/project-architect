@@ -1,0 +1,11 @@
+{
+  "id": "evidence-7ec331d7-1d2e-415d-abc5-fecbed731559",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout",
+  "capturedAt": "2026-10-04T22:06:26.229Z",
+  "sha256": "e14b5c904d76b6a6cb51750bd87563fb038c39c0be23b444b2891ebc4861f503",
+  "scope": "300ms 防抖调度与交互响应延迟契约",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-e7a309b3-95fb-462f-82b1-222e72e31a5e\\tools\\evidence\\evidence-7ec331d7-1d2e-415d-abc5-fecbed731559.json",
+  "approval": "candidate",
+  "content": "MDN 官方文档 Window: setTimeout() 指出：Late timeouts: The timeout can also fire later than expected if the page (or the OS/browser) is busy with other tasks... Currently-executing code must complete before functions on the queue are executed... 且浏览器对非活动标签页存在最低超时节流限制（如 Chrome/Firefox 节流至 1 秒或 1 分钟）。因此 300ms 防抖等待是触发阈值，无法作为所有浏览器绝对精确 300ms 到期执行的实测保证。",
+  "conclusion": "浏览器 setTimeout 受主线程排队、嵌套节流与后台标签页限制，不能保证绝对精确 300ms 执行。"
+}

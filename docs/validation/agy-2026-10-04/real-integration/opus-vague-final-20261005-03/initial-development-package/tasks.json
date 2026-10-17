@@ -1,0 +1,548 @@
+{
+  "schemaVersion": 1,
+  "revision": 17,
+  "blueprintHash": "4d7dcf295e11c188d49f91f29fcf74571f2f7b64784572d0b63310b67003d4cd",
+  "tasks": [
+    {
+      "id": "val-browser-storage-and-search-perf",
+      "title": "宿主浏览器端持久化容量与全文检索性能实测验证任务",
+      "kind": "validation",
+      "requirementIds": [
+        "block-outcomes-lightweight-experience",
+        "feature-search-filter",
+        "feature-data-portability"
+      ],
+      "dependsOn": [
+        "tech-storage-and-search",
+        "interface-service-contracts"
+      ],
+      "assumptions": [
+        "测试机器硬件不低于常规个人电脑基准（4核 CPU，8GB 内存）",
+        "浏览器运行于标准安全上下文（localhost 或 HTTPS）"
+      ],
+      "completionCriteria": [
+        "在 1,000 条便签基准下，10 次搜索的平均响应时间小于 150ms（含 80ms 防抖）",
+        "页面冷启动至首屏卡片交互时间 TTI 实测小于 1.0 秒",
+        "模拟存储配额满载时，快速捕获输入框与详情编辑弹窗文本保留率达到 100%",
+        "StorageManager.persist() 授权流及超20条变更/超7天防丢提醒触发判定实测符合预期"
+      ],
+      "environment": "主流桌面 PC（Windows 11 / macOS 14 / Ubuntu 22.04），Chrome 120+ / Edge 120+ / Firefox 122+ 真实浏览器环境",
+      "evidenceRequired": [
+        "Chrome DevTools Performance 性能面板记录分析文件",
+        "控制台自动化基准测试脚本运行耗时日志截图与数据文本",
+        "全量 JSON 导出与覆盖导入前后数据 MD5 一致性核对报告"
+      ],
+      "exclusions": "排除服务端性能测试（无后端架构），排除网络往返延迟（纯本地离线持久化）",
+      "failureBehavior": "若实测检索响应时间超过 250ms，触发长列表虚拟滚动（Virtual Scroll）优化与前缀索引重构；若配额异常未捕获，加固存储事务失败监听并降级使用 LocalStorage 草稿应急保护；若持久化权限被拒，降级为温和防丢提醒加强模式",
+      "goal": "在真实宿主浏览器中实测验证 IndexedDB (Dexie.js) 本地持久化稳定性、StorageManager.persist() 持久化申请行为、1,000 条便签基准下的全文模糊检索端到端延迟（含 80ms 防抖）及存储配额满载告警与状态保留机制。",
+      "modules": [
+        "StorageService",
+        "SearchEngine",
+        "BackupManager",
+        "WorkspaceUI"
+      ],
+      "normalBehavior": "批量注入 1,000 条便签耗时 < 800ms；键入检索词后，包含 80ms 防抖整体端到端 UI 渲染完成延迟稳定在 150ms 以内；全量导出 1,000 条便签生成的 JSON/Markdown 文件校验无损耗；首屏冷启动 TTI < 1.0s；StorageManager.persist() 在支持环境成功返回 true。",
+      "onFailure": "若性能未达标，将检索算法升级为基于内存倒排索引或 Trie 树索引，并引入分页虚拟滚动；若配额异常处理失败，补齐跨标签页存储状态同步与本地草稿自动暂存机制。",
+      "passCriteria": [
+        "10 次复合关键词搜索平均端到端延迟 <= 150ms",
+        "批量写入 1,000 条数据无丢损，导出并重新导入后条目数与字段校验一致性达 100%",
+        "配额超限异常注入时，输入框及编辑弹窗内文本 100% 完整保留未丢失",
+        "StorageManager 持久化与防丢提醒触发无未捕获异常"
+      ],
+      "scope": "覆盖 Chrome、Edge、Firefox 真实浏览器；利用测试脚本自动批量注入 1,000 条便签样本集（涵盖单行、多行、代码块、丰富标签）；执行全文检索、动态高亮、JSON/Markdown 导出与导入合并全链路性能及稳定性检验；验证持久化申请与防丢提醒阈值逻辑。",
+      "steps": [
+        "1. 运行构建命令并在真实 Chrome 浏览器中启动本地预览页面",
+        "2. 在浏览器控制台执行基准数据灌入脚本，批量生成 1,000 条混合格式便签并写入 IndexedDB",
+        "3. 开启 Performance 性能分析，输入 10 组包含中文、英文、符号及 #标签 的查询词，记录从击键到界面渲染完成的时间差",
+        "4. 触发全量 JSON 与 Markdown 导出，检验生成文件哈希与便签结构，随后执行增量合并导入比对一致性",
+        "5. 模拟存储配额满状态，执行便签提交，验证错误横幅展示与输入框内容保留情况",
+        "6. 检验 StorageManager.persist() 调用与超20条变更温和防丢状态点点亮逻辑"
+      ],
+      "verification": [
+        "使用 Chrome DevTools Performance 面板测量键盘事件至重新排版完成的真实时间戳",
+        "调用 StorageManager.estimate() 与 StorageManager.persist() 校验配额估算与持久化授权拦截流程",
+        "通过测试脚本核对导入导出便签集合的双向深度相等（Deep Equal）"
+      ]
+    },
+    {
+      "id": "task-foundation-and-storage",
+      "title": "工程基座搭建与 Dexie 存储驱动封装实现任务",
+      "kind": "task",
+      "requirementIds": [
+        "tech-core-architecture",
+        "data-model-core-entities",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "tech-core-architecture",
+        "data-model-core-entities",
+        "interface-service-contracts"
+      ],
+      "assumptions": [
+        "运行环境为具备标准 IndexedDB 2.0+ 与 StorageManager API 的现代浏览器",
+        "应用运行于标准安全上下文（HTTPS 或 localhost）"
+      ],
+      "completionCriteria": [
+        "StorageService 基础 CRUD 及多值索引检索单元测试通过率 100%",
+        "TypeScript 严格编译无报错，无隐式 any",
+        "浏览器 DevTools 可见 SparkNotesDB 实例与完整索引定义"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不包含具体的页面 UI 渲染与样式，不包含外部备份文件解析算法",
+      "failureBehavior": "当存储超限时抛出结构化受控异常 StorageQuotaExceededError，不破坏既有数据；当事务中断时自动执行 IndexedDB Rollback，保持数据原子性",
+      "goal": "完成 React 19 + TypeScript 5.x + Vite 工程搭建，实现基于 Dexie.js 的强类型客户端持久化存储服务及 StorageManager 配额与持久化模式探测。",
+      "modules": [
+        "StorageService",
+        "SparkNotesDB"
+      ],
+      "normalBehavior": "应用冷启动时自动建立 IndexedDB 数据库连接；调用 CRUD 接口读写响应毫秒级；配额与持久化状态准确查询并持久化至 meta 仓库。",
+      "onFailure": "若存储初始化失败，降级抛出受控错误，UI 层捕获并展示错误横幅，提示用户检查浏览器隐私配置或清理磁盘空间",
+      "passCriteria": [
+        "数据库初始化、多值索引查询与事务回滚单元测试全部通过"
+      ],
+      "scope": "项目脚手架配置、Dexie.js Schema 定义与数据库初始化、IStorageService 接口全部 CRUD 方法实现、配额查询与持久化申请封装、受控异常体系定义。",
+      "steps": [
+        "1. 初始化 Vite 项目与 TypeScript 严格配置，安装 Dexie.js 依赖",
+        "2. 编写 SparkNotesDB 强类型声明与版本迁移 Schema",
+        "3. 实现 StorageService 接口 CRUD 与事务包装，补齐 StorageManager 配额与持久化封装",
+        "4. 使用 Vitest 与 fake-indexeddb 编写自动化单元测试验证核心逻辑"
+      ],
+      "verification": [
+        "使用 fake-indexeddb 执行 StorageService 单元测试，覆盖 CRUD、复合条件筛选及批量标签更新",
+        "测试配额满载抛错与事务回滚拦截逻辑",
+        "验证 StorageManager.persisted() 与 persist() 授权调用分支处理"
+      ]
+    },
+    {
+      "id": "task-quick-capture",
+      "title": "快速捕获组件与标签即时提取开发任务",
+      "kind": "task",
+      "requirementIds": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "feature-quick-capture",
+        "flow-quick-capture"
+      ],
+      "assumptions": [
+        "用户具备常规键盘与点击输入环境",
+        "浏览器支持标准 DOM Focus 与 Input 事件"
+      ],
+      "completionCriteria": [
+        "快速捕获交互、快捷键提交与标签提取单元测试通过率 100%",
+        "输入内容为空时抖动拦截率 100%",
+        "存储满载注入测试中文本保留在文本域中不被清空，输入域不关闭不重置"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不包含便签长文的详情模态阅读，不包含卡片拖拽排版",
+      "failureBehavior": "提交遇配额满或写入异常时，输入框内容与标签完整保留在文本域中，卡片不关闭，弹出错误横幅与立即备份入口，按钮恢复可点击状态供重试",
+      "goal": "实现单页应用顶部的随手灵感极速捕获功能，完成输入自适应、快捷提交、智能标签提取及存储写入失败状态保留。",
+      "modules": [
+        "QuickCaptureCard",
+        "NoteService",
+        "StorageService"
+      ],
+      "normalBehavior": "打开页面或按 N 键自动聚焦输入框；输入多行平滑撑开；按 Ctrl/Cmd+Enter 瞬间提取正文与 #标签，生成实体并持久化，输入框清空复位，列表头部插入新卡片，未备份计数 +1。",
+      "onFailure": "若输入组件初始化异常，降级显示静态文本框，保证用户至少可录入并复制草稿内容",
+      "passCriteria": [
+        "快捷键提交正常入库并清空输入框",
+        "标签正则解析中英文无损耗提取",
+        "配额满载时输入框文本完整保留且出现重试入口"
+      ],
+      "scope": "QuickCaptureCard 组件开发、键盘事件监听（N 键与 Ctrl/Cmd+Enter）、正文标签提取算法、空输入校验与轻微抖动、写入 StorageService 及未备份计数器联动。",
+      "steps": [
+        "1. 编写标签提取实用函数 extractTagsFromText 与单元测试用例",
+        "2. 开发 QuickCaptureCard 组件，实现自适应高度 TextArea 与快捷键绑定",
+        "3. 对接 StorageService.saveNote 与变更计数器递增逻辑",
+        "4. 实现配额满受控异常捕获与输入内容不重置的状态保留分支"
+      ],
+      "verification": [
+        "单元测试验证 #标签 正则提取算法准确性（中英文、数字、非法字符过滤）",
+        "组件测试验证快捷键提交与空内容拦截抖动",
+        "注入存储失败模拟，验证输入框文本不被清空且错误横幅正确渲染"
+      ]
+    },
+    {
+      "id": "task-note-card-view",
+      "title": "便签卡片流与生命周期状态流转开发任务",
+      "kind": "task",
+      "requirementIds": [
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "feature-note-card-view",
+        "flow-note-card-actions"
+      ],
+      "assumptions": [
+        "客户端计时器机制（setTimeout / clearTimeout）正常工作"
+      ],
+      "completionCriteria": [
+        "便签双布局切换、置顶排序与收藏过滤测试通过率 100%",
+        "软删除 5 秒防误触撤销全链路（撤销/超时提交/写入异常回滚）验证全部通过",
+        "在主流分辨率下卡片流自适应排版无横向溢出滚动条"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不包含卡片内的 Markdown 重型排版渲染（由模态弹窗承载），不包含多用户协作光标",
+      "failureBehavior": "状态持久化失败时立即回滚界面状态至点击前，并弹出轻量错误提示；软删除持久化异常时卡片自动恢复显示，确保数据保留在活跃列表中不丢失",
+      "goal": "交付便签流的双布局展现、置顶区分隔、加星收藏、归档流转及带 5 秒撤销保护的软删除交互能力。",
+      "modules": [
+        "NoteFeed",
+        "NoteCard",
+        "NoteService",
+        "WorkspaceUI"
+      ],
+      "normalBehavior": "便签按置顶在先、时间在后排版；点击图钉即时置顶；点击星标收藏；点击归档移出主视图；点击删除弹出 5 秒撤销通知，撤销立即恢复，超时持久化软删除。",
+      "onFailure": "若列表渲染出现未捕获异常，利用 React 错误边界（ErrorBoundary）隔离卡片列表，展示重试刷新按钮，不导致全局白屏",
+      "passCriteria": [
+        "双视图切换与状态记忆正常生效",
+        "置顶与收藏状态即时持久化更新",
+        "软删除 5 秒撤销机制在撤销与超时各分支下准确执行且无数据遗失"
+      ],
+      "scope": "NoteFeed 与 NoteCard 组件实现、双视图切换逻辑、置顶与收藏状态即时持久化、软删除回收池与 5 秒撤销倒计时 Toast、失败回滚机制。",
+      "steps": [
+        "1. 开发 NoteCard 与 NoteFeed 组件，实现 Responsive CSS Grid 与 Compact List 布局",
+        "2. 封装置顶、收藏、归档状态切换处理函数与 Dexie 更新调用",
+        "3. 实现带 5 秒撤销倒计时的 UndoToast 机制与暂存池管理",
+        "4. 编写组件与单元测试覆盖撤销、超时确认与持久化失败恢复逻辑"
+      ],
+      "verification": [
+        "组件交互测试验证置顶排序及置顶区域隔离渲染",
+        "测试 5 秒撤销倒计时各分支（撤销成功/超时确认/写入失败恢复）",
+        "测试双视图（Grid/Compact）切换偏好持久化"
+      ]
+    },
+    {
+      "id": "task-tag-organization",
+      "title": "多维标签聚合、交集筛选与全局重命名开发任务",
+      "kind": "task",
+      "requirementIds": [
+        "feature-tag-organization",
+        "flow-tag-organization",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "feature-tag-organization",
+        "flow-tag-organization"
+      ],
+      "assumptions": [
+        "便签的 tags 属性为规范的字符串数组，无重复项"
+      ],
+      "completionCriteria": [
+        "标签聚合统计与交集筛选单元测试通过率 100%",
+        "标签全局重命名原子性与事务回滚验证通过率 100%",
+        "标签增删时侧边栏统计数毫秒级响应更新"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不设计树状多层级文件夹与无限嵌套标签（遵循已确认的扁平多维组织模型）",
+      "failureBehavior": "标签重命名或批量合并事务失败时，底层事务自动回滚，便签保持原标签不变，界面提示错误并恢复原状，关联数据无损",
+      "goal": "实现侧边栏标签聚合云、多标签单选/交集过滤及事务级全局标签批量重命名与异常回滚机制。",
+      "modules": [
+        "TagRail",
+        "NoteService",
+        "StorageService"
+      ],
+      "normalBehavior": "侧边栏实时汇总所有标签及对应便签数；点击单标签过滤列表；Ctrl+点击多标签呈现交集匹配；重命名标签时事务批量更新关联便签并在 UI 实时反映。",
+      "onFailure": "若标签聚合计算出现异常，降级显示基础标签列表，不影响主便签流的常规浏览与输入",
+      "passCriteria": [
+        "标签多值索引单键与交集过滤准确无误",
+        "事务级批量重命名在正常及中断回滚分支均通过验证"
+      ],
+      "scope": "TagRail 组件开发、标签全局聚合与排序、单标签过滤与 Ctrl 多标签交集算法、标签重命名事务逻辑、同名标签合并二次确认与异常回滚。",
+      "steps": [
+        "1. 编写 TagRail 组件与标签统计派生计算逻辑",
+        "2. 实现单选与多选交集组合过滤状态管理",
+        "3. 编写 StorageService.batchUpdateTags 事务更新与异常回滚代码",
+        "4. 编写自动化测试覆盖标签聚合、交集筛选与重命名回滚场景"
+      ],
+      "verification": [
+        "单元测试验证多标签交集（AND）逻辑运算准确性",
+        "测试 Dexie 事务中 batchUpdateTags 的原子性与回滚机制",
+        "测试同名标签合并交互流程"
+      ]
+    },
+    {
+      "id": "task-search-filter",
+      "title": "全文模糊检索引擎与关键词高亮开发任务",
+      "kind": "task",
+      "requirementIds": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "feature-search-filter",
+        "flow-search-filter"
+      ],
+      "assumptions": [
+        "待检索便签常驻内存状态镜像，内存规模受控在浏览器常规限制内"
+      ],
+      "completionCriteria": [
+        "模糊匹配与关键词高亮算法单元测试通过率 100%",
+        "连续正则特殊符号搜索输入零崩溃验证通过",
+        "Esc 清除与 / 键聚焦全链路交互测试通过"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不引入重量级服务端检索引擎（如 Elasticsearch），纯前端轻量内存匹配",
+      "failureBehavior": "输入超长特殊字符或非法正则表达式时自动安全转义，页面零崩溃；无匹配结果时展示清晰占位引导与一键清空按钮",
+      "goal": "实现顶部全局即时全文模糊检索与关键词动态高亮功能，提供 80ms 轻度防抖、快捷键唤醒/退出及空状态友好指引。",
+      "modules": [
+        "SearchBar",
+        "SearchEngine",
+        "WorkspaceUI"
+      ],
+      "normalBehavior": "输入检索词后经 80ms 防抖即时过滤卡片流；正文命中词高亮显现；按 / 快速聚焦并全选；按 Esc 立即清空并恢复原列表；支持与侧边栏视图/标签条件叠加过滤。",
+      "onFailure": "若高亮渲染逻辑异常，降级显示原始纯文本正文，不中断列表检索结果的展示",
+      "passCriteria": [
+        "80ms 防抖后精确响应过滤并高亮关键字",
+        "特殊字符安全转义无运行时报错"
+      ],
+      "scope": "SearchBar 顶部组件开发、SearchEngine 模糊匹配与分词算法实现、关键词高亮安全 HTML 生成、Esc 与 / 快捷键绑定、空状态占位处理。",
+      "steps": [
+        "1. 编写 SearchEngine 模块的分词比对与安全正则高亮函数",
+        "2. 开发 SearchBar 组件，挂载 80ms 防抖定时器与快捷键监听（/ 与 Esc）",
+        "3. 在 NoteCard 中集成高亮富文本安全渲染逻辑",
+        "4. 编写单元测试验证关键词匹配、多条件叠加与特殊符号转义"
+      ],
+      "verification": [
+        "单元测试覆盖各类中英文、标点、连续特殊符号的搜索转义与匹配",
+        "测试防抖延迟与 UI 刷新频率",
+        "测试高亮渲染输出防 XSS 注入"
+      ]
+    },
+    {
+      "id": "task-note-detail-edit",
+      "title": "详情模态弹窗与 Markdown 编辑器开发任务",
+      "kind": "task",
+      "requirementIds": [
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "feature-note-detail-edit",
+        "flow-note-detail-edit"
+      ],
+      "assumptions": [
+        "浏览器宿主环境支持基本的 DOM 模态对话框事件与剪贴板接口"
+      ],
+      "completionCriteria": [
+        "Markdown 安全解析排版与 DOMPurify 白名单过滤测试通过率 100%",
+        "任务清单复选框交互与正文持久化更新通过验证",
+        "保存失败场景下弹窗防关闭与草稿保留完整在文本域中"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不集成重型富文本 WYSIWYG 排版画板或复杂表格公式协同编辑",
+      "failureBehavior": "编辑保存发生存储异常时，弹窗绝对不关闭，编辑文本完整保留在编辑域中，界面呈现错误提示并保留重试按钮；剪贴板受阻时降级为 execCommand 提示手动复制",
+      "goal": "交付便签详情阅读与实时编辑模态弹窗，集成轻量 Markdown 安全排版、代码块语法高亮、剪贴板一键复制及失败防丢草稿保护。",
+      "modules": [
+        "NoteDetailModal",
+        "MarkdownRenderer",
+        "NoteService",
+        "WorkspaceUI"
+      ],
+      "normalBehavior": "点击卡片平滑弹出详情弹窗；展示排版整洁的 Markdown 与高亮代码；点击代码复制写入剪贴板；点击任务清单翻转勾选状态并保存；切入编辑模式修改后按 Ctrl+S 瞬间保存退出。",
+      "onFailure": "若 Markdown 解析发生解析错误，回退为纯文本等宽排版展示，保障正文完全可读可编辑",
+      "passCriteria": [
+        "GFM 任务项勾选即时保存更新",
+        "DOMPurify 成功拦截 XSS 恶意脚本注入",
+        "保存失败时弹窗拦截关闭且草稿内容保留在文本域中"
+      ],
+      "scope": "NoteDetailModal 组件开发、MarkdownRenderer 安全管道实现、Prism.js 高亮集成、代码一键复制与权限降级、Todo 复选框状态翻转、编辑与自动保存拦截机制。",
+      "steps": [
+        "1. 封装 MarkdownRenderer 模块，集成 marked 与 DOMPurify 白名单配置",
+        "2. 开发 NoteDetailModal 组件，实现阅读与编辑模式切换及 Ctrl+S 快捷键",
+        "3. 接入 Prism.js 语法着色与代码块右上角一键复制逻辑",
+        "4. 实现任务清单复选框交互与持久化保存失败的草稿保留分支"
+      ],
+      "verification": [
+        "使用 DOMPurify 白名单防 XSS 注入测试（测试脚本注入、非法属性攻击）",
+        "测试 Todo Checkbox 点击翻转及正文持久化更新",
+        "测试剪贴板权限受阻时的降级机制",
+        "模拟存储满载测试编辑草稿保留与弹窗防关闭拦截"
+      ]
+    },
+    {
+      "id": "task-data-portability",
+      "title": "数据备份导出、智能合并恢复与防丢提醒开发任务",
+      "kind": "task",
+      "requirementIds": [
+        "feature-data-portability",
+        "flow-data-portability",
+        "interface-service-contracts",
+        "error-architecture-and-recovery"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "feature-data-portability",
+        "flow-data-portability"
+      ],
+      "assumptions": [
+        "浏览器支持 W3C Blob, File 与 URL.createObjectURL API"
+      ],
+      "completionCriteria": [
+        "JSON Schema v1 导出与强校验单元测试通过率 100%",
+        "智能增量合并比对算法验证通过率 100%",
+        "未备份计数自增与超阈值状态点亮逻辑测试全部通过"
+      ],
+      "environment": "Chrome / Edge / Firefox 桌面浏览器环境，Node 18+ 开发构建环境",
+      "exclusions": "不搭建远程云端中心化存储同步，保持纯客户端离线数据自主掌控",
+      "failureBehavior": "导入损坏文件时强行拦截报错，不写入任何脏数据；导入中断事务自动回滚还原；导出受阻时保持面板并展示重试提示，数据完整保留在本地存储中",
+      "goal": "实现全量本地数据的 JSON/Markdown 规范导出、外部备份强校验与智能增量合并导入、超20条或超7天温和防丢提醒及无痕模式感知。",
+      "modules": [
+        "BackupManager",
+        "DataManagementModal",
+        "StorageService",
+        "WorkspaceUI"
+      ],
+      "normalBehavior": "点击导出即刻生成标准 JSON 文件并触发下载，未备份计数归零，提醒点熄灭；导入合法备份文件时展示合并/覆盖选项，增量合并按时间戳更新，视图无刷新热更新；变更达20条或超7天时侧边栏点亮温和提示点。",
+      "onFailure": "若文件下载接口受安全策略阻断，提供备用方案在文本区域直接生成格式化 JSON 字符串供用户手动复制保存",
+      "passCriteria": [
+        "导出的 JSON 文件符合 Schema v1 规范",
+        "畸形与缺字段备份文件被 100% 拦截无脏写入",
+        "导入增量合并后条目数与更新时间戳严格一致"
+      ],
+      "scope": "BackupManager 服务与 DataManagementModal 开发、Blob/FileReader 纯前端文件处理、JSON Schema 格式校验器、增量合并与全量覆盖事务、未备份变更追踪与侧边栏提醒点、无痕浏览模式探测。",
+      "steps": [
+        "1. 编写 BackupManager 模块，实现 JSON Schema 校验与增量合并比对算法",
+        "2. 实现基于 Blob 与动态 <a> 标签的纯客户端下载触发逻辑",
+        "3. 开发 DataManagementModal 面板与拖拽上传组件",
+        "4. 接入未备份变更追踪器与侧边栏状态点亮/复位逻辑，补齐单元测试"
+      ],
+      "verification": [
+        "单元测试验证合法及各类畸形/缺字段 JSON 备份文件的校验拦截",
+        "测试智能增量合并比对算法（新增插入、旧版更新、冲突保留较新版）",
+        "测试变更计数递增与导出后复位清零",
+        "测试无痕模式检测逻辑"
+      ]
+    },
+    {
+      "id": "val-storage-and-search-benchmark",
+      "title": "真实宿主浏览器端存储基准与全文检索性能交付验证任务",
+      "kind": "validation",
+      "requirementIds": [
+        "block-outcomes-lightweight-experience",
+        "feature-search-filter",
+        "feature-data-portability",
+        "val-browser-storage-and-search-perf"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "task-search-filter",
+        "task-data-portability"
+      ],
+      "assumptions": [
+        "测试宿主机器为常规 PC（4核 CPU，8GB 内存以上）",
+        "测试浏览器为最新稳定版 Chrome / Edge / Firefox"
+      ],
+      "completionCriteria": [
+        "1,000 条便签基准下，10 次搜索的平均响应时间小于 150ms（含 80ms 防抖）",
+        "页面冷启动至首屏卡片交互时间 TTI 实测小于 1.0 秒",
+        "模拟存储配额满载时，快速捕获输入框与详情编辑弹窗文本保留在输入区未被清空，弹窗维持开启",
+        "StorageManager.persist() 授权流及超20条变更/超7天防丢提醒触发判定实测符合预期"
+      ],
+      "environment": "主流桌面 PC（Windows 11 / macOS / Ubuntu），Chrome 120+ / Edge 120+ / Firefox 122+ 真实浏览器，标准安全上下文（localhost 或 HTTPS）",
+      "evidenceRequired": [
+        "Chrome DevTools 性能录制与度量数据报告",
+        "自动化测试脚本控制台输出耗时日志",
+        "备份导入导出双向核对校验数据"
+      ],
+      "exclusions": "排除服务端性能测试（无后端架构），排除网络往返延迟（纯本地离线持久化）",
+      "failureBehavior": "若实测检索响应时间超过 250ms，触发长列表虚拟滚动（Virtual Scroll）优化与前缀索引重构；若配额异常未捕获，加固存储事务失败监听；若持久化权限被拒，降级为温和防丢提醒加强模式",
+      "goal": "在真实浏览器环境中实测验证 1,000 条便签规模下的全文检索端到端响应时间、首屏冷启动 TTI、StorageManager 持久化申请与存储配额满载时的状态保留机制。",
+      "modules": [
+        "StorageService",
+        "SearchEngine",
+        "BackupManager",
+        "WorkspaceUI"
+      ],
+      "normalBehavior": "批量灌入 1,000 条便签耗时 < 800ms；全文检索端到端（含防抖与 DOM 重绘）平均延迟 < 150ms；首屏卡片可交互 TTI < 1.0s；导出后重新导入数据一致性 100%；StorageManager.persist() 授权流正常执行。",
+      "onFailure": "若实测检索响应时间超过 150ms 但在 250ms 内，分析渲染瓶颈并引入 React.memo 与 useDeferredValue；若超过 250ms，重构为倒排索引并加入虚拟滚动；若配额异常捕获失败，修订 StorageService 异常拦截器。",
+      "passCriteria": [
+        "10 次复合关键词搜索平均端到端延迟 <= 150ms",
+        "批量写入 1,000 条数据无丢损，导出并重新导入后条目数与字段校验一致性达 100%",
+        "配额超限异常注入时，输入框及编辑弹窗内文本完整保留在输入区域未被清空，弹窗维持开启",
+        "StorageManager 持久化与防丢提醒触发无未捕获异常"
+      ],
+      "scope": "覆盖 Chrome、Edge、Firefox 真实浏览器；利用测试脚本自动批量注入 1,000 条便签样本集（涵盖单行、多行、代码块、丰富标签）；执行全文检索、动态高亮、JSON/Markdown 导出与导入合并全链路性能及稳定性检验；验证持久化申请与防丢提醒阈值逻辑。",
+      "steps": [
+        "1. 执行 npm run build 并通过本地静态服务器启动应用",
+        "2. 在控制台运行自动化测试脚本注入 1,000 条多样化测试便签并验证写入完成",
+        "3. 开启 Performance 性能记录，连续执行 10 组包含中文、英文、标签的搜索，记录总耗时",
+        "4. 测量页面强制刷新后的首次内容绘制（FCP）与可交互时间（TTI）",
+        "5. 触发全量 JSON 导出并计算 SHA256，清空后全量导入比对数据哈希与实体一致性",
+        "6. 模拟存储配额打满，在快速捕获与编辑弹窗中键入文本并提交，验证文本保留在输入区与错误提示展示",
+        "7. 测试累积 20 条变更后侧边栏防丢提示点的激活与复位"
+      ],
+      "verification": [
+        "使用 Chrome DevTools Performance 面板测量键盘事件至重新排版完成的真实时间戳",
+        "调用 StorageManager.estimate() 与 StorageManager.persist() 校验配额估算与持久化授权拦截流程",
+        "通过测试脚本核对导入导出便签集合的双向深度相等（Deep Equal）"
+      ]
+    },
+    {
+      "id": "task-build-and-deploy",
+      "title": "静态构建打包与本地离线部署任务",
+      "kind": "task",
+      "requirementIds": [
+        "deployment-and-build-specification",
+        "tech-core-architecture"
+      ],
+      "dependsOn": [
+        "task-foundation-and-storage",
+        "task-quick-capture",
+        "task-note-card-view",
+        "task-data-portability"
+      ],
+      "assumptions": [
+        "构建环境具备 Node.js 18+ 与 npm / pnpm"
+      ],
+      "completionCriteria": [
+        "生产构建 0 错误 0 告警顺利通过",
+        "输出产物完全可在纯静态 HTTP 服务器下独立运行",
+        "首屏资源在无缓存本地加载耗时 < 300ms"
+      ],
+      "environment": "Node.js 18+ 构建环境，本地轻量静态 HTTP 服务器或静态托管平台",
+      "exclusions": "不包含服务端 Dockerfile 编写与后端运维编排（坚持纯前端单页架构）",
+      "failureBehavior": "构建若遇到 TypeScript 类型错误或未解析依赖时，构建命令立即阻断并输出明确错误行号，不输出半成品损坏产物",
+      "goal": "完成 Vite 生产构建优化与打包配置，输出纯静态无后端依赖产物包，支持本地即开即用与免服务器静态托管部署。",
+      "modules": [
+        "ViteBuildConfig",
+        "DeploymentScripts"
+      ],
+      "normalBehavior": "执行 npm run build 极速完成打包；输出 dist/ 静态目录；资源引用使用相对路径；使用 npm run preview 或静态服务器启动后应用完整可用且无离线报错。",
+      "onFailure": "若打包产物体积超标，启用 rollup-plugin-visualizer 分析大依赖，执行按需导入与动态引入优化",
+      "passCriteria": [
+        "npm run build 成功退出且输出 dist 目录",
+        "打包产物无硬编码绝对路径引用",
+        "全量 gzip 压缩总体积 <= 150KB"
+      ],
+      "scope": "vite.config.ts 构建优化配置、生产打包产物验证、本地预览脚本配置、单页静态路由与静态资源相对路径测试。",
+      "steps": [
+        "1. 优化 vite.config.ts 构建配置，设置 base: './' 与 rollupOptions 分包策略",
+        "2. 执行 npm run build 验证构建产物与 exit code",
+        "3. 使用 gzip 测量压缩产物体积并核验是否低于 150KB",
+        "4. 执行 npm run preview 并在脱机断网状态下检验静态加载表现"
+      ],
+      "verification": [
+        "执行 npm run build 检查构建产物与 exit code",
+        "检查 dist/ 目录产物体积报告（确保 gzip 压缩后总体积 < 150KB）",
+        "使用本地静态服务加载产物验证功能完整性与控制台零报错"
+      ]
+    }
+  ]
+}

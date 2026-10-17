@@ -1,242 +1,51 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  History,
-  Compass,
-  Sparkles,
-  CheckCircle2,
-  Lock,
-  Unlock,
-  Edit3,
-  Paperclip,
-  ShieldCheck,
-  FileText,
-  AlertTriangle,
-  HelpCircle,
-  RefreshCw,
-  User,
-  Bot,
-  Cpu,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { PlanningHistoryView } from '@project-architect/contracts';
 import { useProjectSession } from '../../state/ProjectSessionContext.js';
-import { EmptyState } from '../../components/common/EmptyState.js';
-import { CardSkeleton } from '../../components/common/LoadingSkeleton.js';
-import type { TimelineView as TimelineViewModel, TimelineEvent } from '@project-architect/contracts';
+import { stageLabels, runStatusLabels } from '../planning/planningPresentation.js';
+import { HistoricalDocumentsView } from '../documents/HistoricalDocumentsView.js';
 
-export const TimelineView: React.FC = () => {
+const changeStatus = { pending: '待审阅', 'partially-approved': '部分批准', approved: '已批准', rejected: '已拒绝', stale: '依据已变化' } as const;
+
+export function TimelineView() {
   const { state, apiClient } = useProjectSession();
-  const { activeProjectId, stateRevision } = state;
-
-  const [timeline, setTimeline] = useState<TimelineViewModel | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const fetchTimeline = useCallback(async () => {
-    if (!activeProjectId) return;
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const data = await apiClient.getProjectTimeline(activeProjectId);
-      setTimeline(data);
-    } catch (err: any) {
-      if (err.name === 'AbortError') return;
-      console.error('Failed to fetch timeline:', err);
-      setErrorMsg(err.message || '加载项目演进时间线失败');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [activeProjectId, apiClient]);
-
+  const [view, setView] = useState<PlanningHistoryView | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
+  const [showDocuments, setShowDocuments] = useState(false);
   useEffect(() => {
-    fetchTimeline();
-  }, [fetchTimeline, stateRevision]);
-
-  const getEventIcon = (kind: TimelineEvent['kind']) => {
-    switch (kind) {
-      case 'project_created':
-        return <Compass className="w-4 h-4 text-orange-500" />;
-      case 'discovery_turn':
-        return <Sparkles className="w-4 h-4 text-orange-500" />;
-      case 'decision_confirmed':
-        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-      case 'decision_locked':
-        return <Lock className="w-4 h-4 text-zinc-500" />;
-      case 'decision_unlocked':
-        return <Unlock className="w-4 h-4 text-amber-500" />;
-      case 'overview_edited':
-        return <Edit3 className="w-4 h-4 text-blue-500" />;
-      case 'question_answered':
-        return <HelpCircle className="w-4 h-4 text-purple-500" />;
-      case 'input_added':
-        return <Paperclip className="w-4 h-4 text-indigo-500" />;
-      case 'readiness_reviewed':
-      case 'readiness_dispositioned':
-        return <ShieldCheck className="w-4 h-4 text-emerald-500" />;
-      case 'documents_compiled':
-        return <FileText className="w-4 h-4 text-emerald-600" />;
-      case 'provider_failed':
-        return <AlertTriangle className="w-4 h-4 text-red-500" />;
-      default:
-        return <History className="w-4 h-4 text-zinc-400" />;
-    }
-  };
-
-  const getActorBadge = (actor: TimelineEvent['actor']) => {
-    switch (actor) {
-      case 'user':
-        return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-200 dark:border-emerald-800">
-            <User className="w-2.5 h-2.5" />
-            <span>用户操作</span>
-          </span>
-        );
-      case 'agent':
-        return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/80 px-1.5 py-0.2 rounded border border-orange-200 dark:border-orange-800">
-            <Bot className="w-2.5 h-2.5" />
-            <span>AI 推演</span>
-          </span>
-        );
-      case 'system':
-      default:
-        return (
-          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-200 dark:border-zinc-700">
-            <Cpu className="w-2.5 h-2.5" />
-            <span>系统内核</span>
-          </span>
-        );
-    }
-  };
-
-  if (!activeProjectId) {
-    return (
-      <EmptyState
-        icon={Compass}
-        title="未载入项目"
-        description="请在首页新建或打开已有项目以查看时间线。"
-        className="py-16"
-      />
-    );
-  }
-
-  return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
-      {/* Top Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-            <History className="w-4 h-4 text-orange-500" />
-            <span>项目演进时间线</span>
-            {timeline && (
-              <span className="text-xs font-normal text-zinc-400">
-                ({timeline.totalEvents} 个事实事件)
-              </span>
-            )}
-          </h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            由决策轨迹、输入材料与版本快照实时派生的活动时间流
-          </p>
-        </div>
-
-        <button
-          onClick={fetchTimeline}
-          disabled={isLoading}
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-          title="刷新时间线"
-        >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-        </button>
-      </div>
-
-      {/* Loading Skeleton */}
-      {isLoading && !timeline && (
-        <div className="space-y-3">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      )}
-
-      {/* Error Banner */}
-      {errorMsg && (
-        <div className="p-4 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 text-xs text-red-900 dark:text-red-200 flex items-center justify-between">
-          <span>{errorMsg}</span>
-          <button
-            onClick={fetchTimeline}
-            className="px-2.5 py-1 bg-red-600 text-white rounded-lg text-[11px] font-medium hover:bg-red-700 transition-colors cursor-pointer"
-          >
-            重试
-          </button>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && timeline && timeline.events.length === 0 && (
-        <EmptyState
-          icon={History}
-          title="暂无活动事件"
-          description="当你在对话中确立决策或上传材料后，系统将按时间顺序实时记录事件流。"
-          className="py-16"
-        />
-      )}
-
-      {/* Timeline Stream */}
-      {timeline && timeline.events.length > 0 && (
-        <div className="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800 space-y-6">
-          {timeline.events.map((evt) => (
-            <div key={evt.id} className="relative group">
-              {/* Timeline Bullet Node */}
-              <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-white dark:bg-[#0C0D0F] border-2 border-orange-500 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-              </div>
-
-              {/* Event Card */}
-              <div className="p-4 rounded-2xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs space-y-2 transition-all">
-                {/* Event Card Top Bar */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 shrink-0">
-                      {getEventIcon(evt.kind)}
-                    </div>
-                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                      {evt.title}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    {getActorBadge(evt.actor)}
-                    <span className="font-mono text-[10px] text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.2 rounded">
-                      rev.{evt.sourceStateRevision}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Event Summary */}
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                  {evt.summary}
-                </p>
-
-                {/* Related Refs & Timestamp Footer */}
-                <div className="flex items-center justify-between pt-1.5 border-t border-zinc-100 dark:border-zinc-800/80 text-[10px]">
-                  <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-                    {evt.relatedRefs &&
-                      evt.relatedRefs.map((ref) => (
-                        <span
-                          key={ref}
-                          className="font-mono px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
-                        >
-                          {ref}
-                        </span>
-                      ))}
-                  </div>
-                  <span className="font-mono text-zinc-400 shrink-0 ml-2">
-                    {new Date(evt.occurredAt || evt.timestamp || '').toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+    const controller = new AbortController(); setView(null); setError(null);
+    void apiClient.getPlanningHistory(state.activeProjectId!, controller.signal).then(next => { if (!controller.signal.aborted) setView(next); }).catch(failure => { if (!controller.signal.aborted) setError(failure.message || '无法读取历史'); });
+    return () => controller.abort();
+  }, [state.activeProjectId, apiClient, reload]);
+  const snapshot = view?.snapshot;
+  return <div className="workspace-secondary-page planning-history">
+    <header className="planning-section-heading"><div><p className="planning-eyebrow">PROJECT HISTORY</p><h1>每次构思，都有来处</h1><p className="planning-muted">查看规划运行、方案审批和原始输入。</p></div><button className="planning-button" onClick={() => setReload(count => count + 1)}>刷新记录</button></header>
+    {error && <p className="planning-error" role="alert">{error}</p>}
+    {!view && !error && <p role="status">正在读取项目记录…</p>}
+    {view && <>
+      <section className="planning-history-section" aria-label="方案审批历史"><h2>方案与审批</h2>
+        {!view.state.changeSets.length && <p className="planning-muted">生成第一份草案后，会在这里保存其分组和审批来源。</p>}
+        {[...view.state.changeSets].reverse().map(changeSet => <details key={changeSet.id} className="planning-history-entry">
+          <summary><span><strong className="planning-history-title">{stageLabels[changeSet.stage]} · {new Date(changeSet.createdAt).toLocaleString()}</strong><span className="planning-history-preview">{changeSet.summary}</span></span><span className="planning-badge">{changeStatus[changeSet.status]}</span></summary>
+          <p className="whitespace-pre-wrap">{changeSet.summary}</p>
+          <p className="planning-muted">{new Date(changeSet.createdAt).toLocaleString()} · 依据版本 {changeSet.basis.revision}</p>
+          <dl className="planning-task-spec"><dt>来源运行</dt><dd>{changeSet.runId}</dd><dt>审批记录</dt><dd>{!changeSet.approvals.length ? '尚无批准记录' : changeSet.approvals.map(approval => <p key={approval.operationId}>版本 {approval.revision} · {new Date(approval.at).toLocaleString()} · {approval.groupIds.map(id => changeSet.groups.find(group => group.id === id)?.title || id).join('、')}<small className="block planning-muted">操作 {approval.operationId}</small></p>)}</dd></dl>
+          {changeSet.groups.map(group => <details key={group.id}><summary>{group.title} · {group.status === 'approved' ? '已批准' : group.status === 'rejected' ? '已拒绝' : '待审阅'}</summary><p>{group.impact}</p><p className="planning-muted">{group.blocks.length} 个方案区块 · {group.decisions.length} 条决定建议 · {group.removeBlockIds.length} 个移除项</p></details>)}
+        </details>)}
+      </section>
+      <section className="planning-history-section" aria-label="规划运行历史"><h2>AI 工作记录</h2>
+        {view.runtime.reasons.map((reason, index) => <p key={index} className="planning-notice">{reason}</p>)}
+        {!view.runs.length && view.runtime.availability === 'available' && <p className="planning-muted">目前还没有规划运行。</p>}
+        {view.runs.map(run => <details key={run.runId} className="planning-history-entry"><summary><span>{run.stage ? stageLabels[run.stage] : '未知阶段'}</span><span className="planning-badge">{run.effectiveStatus === 'interrupted' ? '重启后中断' : run.effectiveStatus === 'unknown' ? '记录未知' : runStatusLabels[run.effectiveStatus]}</span></summary>
+          <p className="planning-muted">运行 {run.runId} · 依据{run.basisStatus === 'current' ? '有效' : run.basisStatus === 'stale' ? '已变化' : '未知'}</p>
+          {run.reasons.map((reason, index) => <p key={index}>{reason}</p>)}
+          <p className="planning-muted">任务与调用回执可在诊断中查看。</p>
+        </details>)}
+      </section>
+      {!!view.state.inputs.length && <section className="planning-history-section" aria-label="原始输入历史"><h2>你提供的原文</h2>{[...view.state.inputs].reverse().map(input => <details key={input.id} className="planning-history-entry"><summary>{input.raw.slice(0, 90)}{input.raw.length > 90 ? '…' : ''}</summary><p className="planning-muted">{new Date(input.createdAt).toLocaleString()} · {input.kind === 'delegation' ? '委托' : input.kind === 'uncertainty' ? '暂缓' : input.kind === 'feedback' ? '反馈' : '原始输入'}</p><p className="whitespace-pre-wrap">{input.raw}</p>{input.questionId && <p className="planning-muted">关联问题 {input.questionId}</p>}</details>)}</section>}
+      {!!snapshot?.documents?.items.length && <details className="planning-history-section" onToggle={event => setShowDocuments(event.currentTarget.open)}><summary>旧版文档 · {snapshot.documents.items.length} 份</summary>{showDocuments && <HistoricalDocumentsView documents={snapshot.documents.items} />}</details>}
+      {!!snapshot?.decisions.items.length && <details className="planning-history-section"><summary>决定原始记录 · {snapshot.decisions.items.length} 条</summary><p className="planning-muted">这些记录包含历史版本和候选；当前正式方案以工作台中的已批准蓝图为准。</p>{snapshot.decisions.items.map(decision => <article key={decision.id} className="planning-history-entry"><p>{decision.statement}</p><small className="planning-muted">{decision.status} · {decision.decisionKey || '历史记录未关联决策键'} · {new Date(decision.updatedAt).toLocaleString()}</small></article>)}</details>}
+      {snapshot?.readiness.current && <details className="planning-history-section"><summary>旧版准备度记录</summary><p className="planning-muted">仅保留历史读取。当前方案按三个设计阶段和变更包审批，不使用旧准备度分数作为交付条件。</p><p>{snapshot.readiness.current.status} · 来源版本 {snapshot.readiness.current.basisRevision}</p></details>}
+    </>}
+  </div>;
+}

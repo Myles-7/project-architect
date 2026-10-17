@@ -42,9 +42,10 @@ describe('Reliability Suite 4: Agent Runtime & B3 Contract Integrity', () => {
 
   it('1. Prompt Integrity: Final prompt includes B3 Constitution and mandatory runtime rules', async () => {
     const prompt = await promptLoader.buildPromptText('broad-pass');
-    expect(prompt).toContain('Project Architect Constitution — B3 Adaptive Question Sets');
+    expect(prompt).toContain('Project Architect — B3 Planning Constitution');
     expect(prompt).toContain('Capability Before Mechanism');
-    expect(prompt).toContain('Strict Conflict Classification');
+    expect(prompt).toContain('Evidence and review');
+    expect(prompt).toContain('Multiple recorded provider calls and independent review');
     expect(prompt).toContain('Mandatory B3 Rules');
   });
 

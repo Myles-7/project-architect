@@ -1,0 +1,21 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "R4 自动质量验收反馈依据：纠正原生事件重定向无依据保证、补齐伪代码变量定义与组装、落实输入框五类持久属性复制与瞬态重置",
+      "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。仅修订 flash-materials-final-20261004-01 的最新已批准 source32 / quality-reviewed-r4；原项目仍未开发。本轮三项阻塞来自真实导出内容的静态/合成复核。保留30个稳定块ID、29条基线历史证据完整对象、其余已正确的300ms输入/即时单按钮清空/手动删空/原文保留/失败恢复/textContent/defer-IIFE/端口8080/安装前提/十文件/全部DAG边和五轮均值<=50ms调度代理指标。只改关联内容及字段，不重新设计无关功能，不运行不可用Docker。\n\nR4-B1：blk-deliv-val-standalone-runtime.task.failureBehavior声称旧原生compositionend若重定向到新节点，generation guard会拒绝，这不成立。对新节点派发时currentTarget、active node、bornGeneration、连接检查全部匹配。删除该保证和“极其罕见”的无依据频率判断，所有投影保持一致。合成隔离保证限于旧节点/旧闭包；原生会话终结、重定向、真实焦点/辅助技术保持unexecuted。开发验证须记录Chrome/Edge/Firefox与Safari适用版本、操作系统、IME、原始事件日志；出现重定向/新会话被结束先修订清空策略及回归，不自造原生token、永久隔离、自动通过或全部浏览器竞态保证。\n\nR4-B2：blk-tech-interface完整JavaScript fence没有FeedbackBanner、displayElement、errorContainer的声明/注入/具体装配，正常timer及catch都会ReferenceError；模块方法列表getInputText/setInputText与实际返回API也不符。请明确实际DOM引用、AppController初始化顺序、FeedbackBanner具体方法签名及呈现/清除错误规则；每个使用的变量均定义或通过显式参数注入。可以采用小的初始化工厂并引用安全textContent renderer；完整伪代码应内部自洽，可以仅用明确浏览器DOM/定时器依赖装配。getInputText/setInputText若不是必要公开能力可从方法列表移除，或真正定义其与accepted draft/generation/定时器的一致性，不能只声明未实现。保留已有正确node闭包、capturedDraft、schedulerEpoch、stale callback拒绝及300ms逻辑。该代码是开发规范，合成核验不能称目标应用真实实现已测试。\n\nR4-B3：replaceInputNode仅复制id/name/class/placeholder/aria-label，但flow/acceptance要求全部持久DOM属性与无障碍配置保留，实际丢aria-describedby/aria-required/tabindex/style/data-test。采用明确安全的持久配置复制/clone策略，覆盖label关联、ARIA、tabindex、style及data属性；单独重置value/trustedDraft、瞬态aria-invalid和错误状态、重绑闭包监听与明确焦点行为。保留原属性保留验收，不能删掉要求迎合旧代码。给出这五类配置前后精确断言；实际布局、屏幕阅读器与原生焦点仍待实测。同步相关flow/page/data/interface/error/task全部字段/validation/acceptance；避免正文属性全保留而伪代码仍白名单。\n\n独立review核对三项与其余正确内容保留，普通细节由AI决定，生成待批准修订包。经公开Core脚本审批/新compiler导出仅自动验收，真人审阅pending。保留旧收据、旧产物与原证据；新证据另登记，不用相同ID覆写旧记录。",
+      "hash": "d6b41906e732983af973864801e3783ec129ff0309ac3bcbdbb839aa03567244",
+      "id": "evidence-17569c8c-1012-4071-8ebe-936b5fe286db",
+      "kind": "user",
+      "location": "input:5cc495c6-96a8-4442-8f77-668749156b46",
+      "obtainedAt": "2026-10-05T00:22:12.095Z",
+      "outcome": "not-applicable",
+      "source": "input:5cc495c6-96a8-4442-8f77-668749156b46"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本规划阶段独立评审对最新候选草案与反馈证据进行了完整交叉核验。核验结论如下：\n1. 反馈问题逐项闭合核对：\n   - R4-B1（原生事件重定向与未验证边界）：草案在 blk-deliv-val-standalone-runtime 及相关实现描述中彻底删除了“旧原生 compositionend 重定向到新节点时代际守卫能拦截”的无效断言及“极其罕见”等无依据主观词，明确合成事件隔离保证严格限定于脱离 DOM 的旧节点与旧闭包内部；针对操作系统原生 IME 会话终结、事件派发重定向及真实辅助技术行为，如实保持 unexecuted 待验证状态，并明确了各平台真机测试及日志记录规范。\n   - R4-B2（伪代码变量定义、装配与接口签名自洽）：草案在 blk-tech-interface 中补齐了 FeedbackBanner、displayElement、errorContainer 的显式声明与组装规则，解决了此前伪代码存在的运行时未定义引用隐患；模块公开接口与实现签名一致，完整保留了节点闭包、草稿快照、调度纪元与 300ms 防抖流转的核心自洽契约。\n   - R4-B3（replaceInputNode 持久属性复制与瞬态重置）：草案在 blk-feat-reset、blk-flow-reset、blk-tech-module、blk-tech-interface 及对应交付任务与验收标准中，全面落实了持久属性安全复制策略，完整覆盖 label 关联、ARIA 属性、tabindex、style 及 data 属性五类配置，并在重置时单独清空输入框文本、重置瞬态错误与 aria-invalid 状态，重新绑定新节点闭包并恢复焦点，断言边界精确完整。\n2. 基础边界与既有正确设计完整性：\n   - 产品范围严格限定为面向个人开发者的本地单页面原型核对工具，桌面优先，无服务端业务、无数据库持久化、无登录与无协作支付，所有状态客户端纯内存运行；\n   - 视觉排布忠实映射参考图 fixture.png（SHA256: 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0），图内“Q7M4-8261”仅作视觉层级参考，未固化为业务约束；确认按钮及其专属逻辑已彻底移除；\n   - 交互规范落实 300ms 输入防抖实时展示、空值彻底清除旧结果并就地提示、纯空格原文保留、失败与异常保留既有输入草稿；\n   - 技术规范采用原生 HTML5/CSS3 与原生 JS（经典脚本 defer 搭配 IIFE 闭包），Node.textContent 纯文本输出与安全边界限定清晰；支持 file:// 本地直接双击与固定 8080 端口轻量静态托管双模式，离线前提说明准确；\n   - 性能指标严格限定为可见前台下的 5 轮均值唯一闭合边界，采用重绘前调度等代理指标，不冒充物理像素绘制完成；\n   - 依赖 DAG 闭合，4 个实现任务、1 个打包任务与 3 个集成验证任务顺序正确，无冗余重复任务。\n综上，最新候选草案已完全解决前期所有质量反馈问题，无新增阻塞，评审结论为合格通过（blockers=[]）。"
+}

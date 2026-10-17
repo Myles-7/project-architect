@@ -1,0 +1,10 @@
+{
+  "id": "evidence-6b4dc027-7e19-4dd7-a55f-f7558268e11f",
+  "source": "https://www.w3.org/TR/IndexedDB-2/#key-construct",
+  "capturedAt": "2026-10-04T21:33:58.312Z",
+  "sha256": "d625c862f02780ae1245d25694f3c99014e4c9c920eb550d486912ad0dd0304d",
+  "scope": "IndexedDB valid key types specification",
+  "path": "D:\\Temp\\User\\pa-real-integration-EYMmL3\\vague\\runtime\\planning\\run-3a9bf179-44bd-4b09-8bb8-f20e644ac10d\\tools\\evidence\\evidence-6b4dc027-7e19-4dd7-a55f-f7558268e11f.json",
+  "approval": "candidate",
+  "content": "W3C IndexedDB 2.0 规范明确规定有效键（Valid Key）仅支持 Number、Date、String、Binary (ArrayBuffer/TypedArray) 以及包含有效键的 Array。Boolean（布尔值 true/false）不是有效 IndexedDB 键，在索引与键范围查询中直接对布尔字段建立索引或 where 查询会抛出 DataError。因此在 Dexie/IndexedDB 模式定义中移除 isPinned 与 isFavorite 的布尔索引，采用状态索引结合内存过滤（Collection.filter / Array.filter）执行收藏与置顶筛选。"
+}

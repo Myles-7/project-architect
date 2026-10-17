@@ -1,0 +1,523 @@
+Event: preventDefault() method - Web APIs | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Web APIs 
+
+ Event 
+
+ preventDefault() 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ 正體中文 (繁體) 
+
+ Event: preventDefault() method
+
+ Baseline
+
+ Widely available
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ See full compatibility
+
+ Learn more
+
+ Note: This feature is available in Web Workers .
+
+ The preventDefault() method of the Event interface tells the user agent that the event is being explicitly handled, so its default action, such as page scrolling, link navigation, or pasting text, should not be taken.
+
+ The event continues to propagate as usual,
+unless one of its event listeners calls
+ stopPropagation() 
+or stopImmediatePropagation() ,
+either of which terminates propagation at once.
+
+ As noted below, calling preventDefault() for a
+non-cancelable event, such as one dispatched via
+ EventTarget.dispatchEvent() , without specifying
+ cancelable: true has no effect.
+
+ If a passive listener calls preventDefault() , nothing will happen and a console warning may be generated.
+
+ Note: 
+Look for better alternatives than using preventDefault() to block default actions. For example, you can use the disabled or readonly attribute on a form control to prevent it from being interacted with, use HTML constraint validation to reject invalid input, or use the overflow property to prevent scrolling.
+
+ In this article
+
+ Syntax 
+
+ Examples 
+
+ Notes 
+
+ Specifications 
+
+ Browser compatibility 
+
+ Syntax 
+
+ js 
+ preventDefault()
+
+ Parameters 
+
+ None.
+
+ Return value 
+
+ None ( undefined ).
+
+ Examples 
+
+ Blocking default click handling 
+
+ Toggling a checkbox is the default action of clicking on a checkbox. This example
+demonstrates how to prevent that from happening:
+
+ JavaScript
+
+ js 
+ const checkbox = document.querySelector("#id-checkbox");
+
+checkbox.addEventListener("click", checkboxClick);
+
+function checkboxClick(event) {
+ const warn = "preventDefault() won't let you check this!\n";
+ document.getElementById("output-box").innerText += warn;
+ event.preventDefault();
+}
+
+ HTML
+
+ html 
+ <p>Please click on the checkbox control.</p>
+
+<form>
+ <label for="id-checkbox">Checkbox:</label>
+ <input type="checkbox" id="id-checkbox" />
+</form>
+
+<div id="output-box"></div>
+
+ Result
+
+ Notes 
+
+ Calling preventDefault() during any stage of event flow cancels the event,
+meaning that any default action normally taken by the implementation as a result of the
+event will not occur.
+
+ You can use Event.cancelable to check if the event is cancelable.
+Calling preventDefault() for a non-cancelable event has no effect.
+
+ Specifications 
+
+ Specification
+
+ DOM 
+# ref-for-dom-event-preventdefault③ 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Sep 18, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Document Object Model (DOM) 
+ Event 
+ Constructor Event() 
+
+ Instance properties bubbles 
+ cancelable 
+ cancelBubble 
+ composed 
+ currentTarget 
+ defaultPrevented 
+ eventPhase 
+ explicitOriginalTarget 
+ isTrusted 
+ originalTarget 
+ returnValue 
+ srcElement 
+ target 
+ timeStamp 
+ type 
+
+ Instance methods composedPath() 
+ initEvent() 
+ preventDefault() 
+ stopImmediatePropagation() 
+ stopPropagation() 
+
+ Related pages for DOM AbortController 
+ AbortSignal 
+ AbstractRange 
+ Attr 
+ CDATASection 
+ CharacterData 
+ Comment 
+ CustomEvent 
+ DOMError 
+ DOMException 
+ DOMImplementation 
+ DOMParser 
+ DOMTokenList 
+ Document 
+ DocumentFragment 
+ DocumentType 
+ Element 
+ EventTarget 
+ HTMLCollection 
+ MutationObserver 
+ MutationRecord 
+ NamedNodeMap 
+ Node 
+ NodeIterator 
+ NodeList 
+ ProcessingInstruction 
+ QuotaExceededError 
+ Range 
+ ShadowRoot 
+ StaticRange 
+ Text 
+ TreeWalker 
+ XMLDocument 
+ XPathEvaluator 
+ XPathExpression 
+ XPathResult 
+ XSLTProcessor 
+
+ Guides Anatomy of the DOM 
+ Attribute reflection 
+ Selection and traversal on the DOM tree 
+ Building and updating the DOM tree 
+ Working with events 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

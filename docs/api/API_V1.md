@@ -1,5 +1,9 @@
 # Project Architect V1 — API 接口规范 (API Contract V1)
 
+> 2026-10-04：正式规划、结构化答题、审批、运行恢复与开发包接口以 [PLANNING_API.md](PLANNING_API.md) 为准。以下保留项目/材料/历史 API 及旧接口背景；生产 discovery 写接口已停用，自由回答不再自动确认，旧准备度不能批准新蓝图。
+
+旧历史回滚写入口 `POST /api/projects/:id/rollback` 已退休：所有运行模式（包括 Mock 与注入 orchestrator）统一返回 HTTP 410、`LEGACY_WORKFLOW_RETIRED` 和 `recoverable: false`。请求在项目读取、崩溃恢复和目标 revision 处理前拒绝，不接受重试或过期确认来恢复状态，不产生新 revision。`GET /api/projects/:id/timeline` 与历史文件继续保留；回收站完整目录 `/restore`、两阶段 Commit 崩溃恢复和 PlanningRun 恢复不受影响。
+
 > **文档状态**：已冻结 (Phase 4.9.1 Contract Freeze)  
 > **适用对象**：Frontend (Web/Desktop) 与 Local Backend Server 交互的唯一官方权威契约。  
 > **实现依据**：`packages/contracts/src/api.ts` 与 `apps/server/src/server.ts`。  
@@ -43,7 +47,7 @@ export interface ApiErrorPayload {
 | **`400 Bad Request`** | `STATE_VALIDATION_FAILED`<br>`INVALID_TYPED_REF`<br>`INPUT_TOO_LARGE`<br>`INPUT_UNSUPPORTED`<br>`INPUT_EXTRACTION_FAILED` | 请求体格式错误、缺少必填字段、字段类型不符、上传文件超限（>20MB 或 >10个）、不支持的文件扩展名或 TypedRef 格式非法。 |
 | **`403 Forbidden`** | `STATE_VALIDATION_FAILED` | 跨域安全拦截（CORS blocked）：请求来源非合法本地回环或 VSCode Webview。 |
 | **`404 Not Found`** | `PROJECT_NOT_FOUND` | 指定的 `projectId` 不存在或未注册于工作区。 |
-| **`409 Conflict`** | `STATE_REVISION_CONFLICT` | 乐观并发冲突：请求携带的 `expectedRevision` 落后或超前于服务端当前版本。前端需拉取最新快照后提示用户重试。 |
+| **`409 Conflict`** | `STATE_REVISION_CONFLICT`<br>`DIFF_DETECTED` | 乐观并发冲突（`expectedRevision` 不匹配），或重新编译时检测到磁盘已有文档存在人工修改且未指定 `forceOverwrite: true`。前端应展示 Diff 并提示用户。 |
 | **`422 Unprocessable`** | `READINESS_NOT_APPROVED`<br>`DECISION_LOCKED` | 业务门禁拦截：未获用户 `approved` 授权试图生成文档，或试图直接修改已处于 `locked` 状态的决策。 |
 | **`502 Bad Gateway`** | `PROVIDER_PROCESS_FAILED`<br>`PROVIDER_NOT_AVAILABLE`<br>`STRUCTURED_OUTPUT_MISSING`<br>`SCHEMA_VALIDATION_FAILED` | AI 推理 Provider 进程异常退出、CLI 不存在、输出缺失结构化 JSON 或 Schema 校验失败。 |
 | **`504 Gateway Timeout`** | `PROVIDER_TIMEOUT` | AI 推理 Provider 执行超时（默认 >90s）。 |
@@ -461,12 +465,15 @@ export interface ApiErrorPayload {
   ```
 
 #### 3. 编译生成开发文档包 `POST /api/projects/:id/documents/generate`
-- **用途**：将已获用户批准的项目规范编译生成 9 篇核心 Markdown 文档（`AGENTS.md`, `docs/PROJECT.md` 等）。
+- **用途**：将已获用户批准的项目规范编译生成 8 篇规范核心 Markdown 文档及可选的领域专有规范（AI_SPEC、DESKTOP_SPEC 等），清单落盘至 `documents/manifest.json`。
 - **门禁拦截**：若项目未处于 `approved` 阶段，或存在未确认的 Critical Conflict，立即返回 `422 Unprocessable` (`READINESS_NOT_APPROVED`)。
+- **Diff Guard 差异拦截**：若磁盘上已有同名文档且包含手动修改，默认（`forceOverwrite !== true`）将拦截写入并返回 `409 Conflict` (`DIFF_DETECTED`) 及详细的 Unified Diff 对比。
+- **自动备份保障**：当传递 `forceOverwrite: true` 时，系统在覆写前会自动将受影响文件完整备份至 `.backup/documents-<timestamp>/`，并在响应中返回 `backupPath`。
 - **Request Body** (`GenerateDocumentsRequest`):
   ```json
   {
-    "expectedRevision": 14
+    "expectedRevision": 14,
+    "forceOverwrite": false // 可选：若为 true 则在存在手动编辑时自动备份并执行覆盖
   }
   ```
 - **Response** (`ApiResponse<GenerateDocumentsResponse>`):
@@ -474,23 +481,58 @@ export interface ApiErrorPayload {
   {
     "success": true,
     "data": {
+      "backupPath": ".backup/documents-2026-08-23T10-05-00-000Z", // 仅在触发覆盖备份时返回
       "manifest": {
-        "generatedAt": "2026-08-23T10:05:00.000Z",
+        "id": "manifest-proj-audio-tagger-14",
+        "projectId": "proj-audio-tagger",
         "sourceRevision": 14,
-        "items": [
-          { "type": "agents", "path": "AGENTS.md", "title": "Coding Agent Guidelines" },
-          { "type": "project", "path": "docs/PROJECT.md", "title": "Project Charter" },
-          { "type": "product", "path": "docs/PRODUCT.md", "title": "Product Specification" },
-          { "type": "architecture", "path": "docs/ARCHITECTURE.md", "title": "System Architecture" },
-          { "type": "state_model", "path": "docs/STATE_MODEL.md", "title": "State & Data Model" },
-          { "type": "workflow", "path": "docs/WORKFLOW.md", "title": "Core Workflows" },
-          { "type": "agent_guidelines", "path": "docs/AGENT_RULES.md", "title": "Agent Execution Rules" },
-          { "type": "verification", "path": "docs/VERIFICATION.md", "title": "Verification & Test Plan" },
-          { "type": "checklist", "path": "docs/CHECKLIST.md", "title": "Implementation Checklist" }
-        ]
+        "readinessReviewId": "review-14",
+        "readinessBasisRevision": 14,
+        "generatedAt": "2026-08-23T10:05:00.000Z",
+        "documents": [
+          { "type": "agents", "path": "AGENTS.md", "title": "AGENTS.md", "status": "generated" },
+          { "type": "project", "path": "docs/PROJECT.md", "title": "PROJECT.md", "status": "generated" },
+          { "type": "product", "path": "docs/PRODUCT.md", "title": "PRODUCT.md", "status": "generated" },
+          { "type": "user-flow", "path": "docs/USER_FLOWS.md", "title": "USER_FLOWS.md", "status": "generated" },
+          { "type": "ux-ui", "path": "docs/UX_UI_SPEC.md", "title": "UX_UI_SPEC.md", "status": "generated" },
+          { "type": "technical-guide", "path": "docs/TECHNICAL_GUIDE.md", "title": "TECHNICAL_GUIDE.md", "status": "generated" },
+          { "type": "development-plan", "path": "docs/DEVELOPMENT_PLAN.md", "title": "DEVELOPMENT_PLAN.md", "status": "generated" },
+          { "type": "acceptance", "path": "docs/ACCEPTANCE.md", "title": "ACCEPTANCE.md", "status": "generated" },
+          { "type": "desktop-spec", "path": "docs/specs/DESKTOP_SPEC.md", "title": "DESKTOP_SPEC.md", "status": "generated" }
+        ],
+        "warnings": [],
+        "sourceCoverage": {
+          "confirmed": 12,
+          "locked": 4,
+          "assumptions": 1,
+          "generatedStructure": 48
+        }
       }
     },
     "stateRevision": 15
+  }
+  ```
+- **Diff 拦截错误响应示例** (HTTP 409):
+  ```json
+  {
+    "success": false,
+    "error": {
+      "code": "DIFF_DETECTED",
+      "message": "检测到磁盘上现有文档存在手动修改，已暂停直接覆盖。请确认差异或选择强制覆盖备份。",
+      "recoverable": true,
+      "details": {
+        "diffs": [
+          {
+            "document": "AGENTS.md",
+            "path": "AGENTS.md",
+            "hasDiff": true,
+            "unifiedDiff": "--- AGENTS.md (disk)\n+++ AGENTS.md (new)\n@@ -1,5 +1,5 @@\n-# Custom Title\n+# Auto Generated Title",
+            "diskContent": "...",
+            "newContent": "..."
+          }
+        ]
+      }
+    }
   }
   ```
 

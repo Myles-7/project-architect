@@ -97,4 +97,24 @@ describe('AntigravityCliProvider Hardening Tests (Phase 4.8.1)', () => {
     expect(result.structuredOutput).toBeNull();
     expect(result.stderr).toContain('JSON parse error');
   });
+
+  it('5. Stream-JSON Stdin mode transmits long architecture context (> 35,000 chars) without Win32 command line truncation', async () => {
+    process.env.MOCK_AGY_MODE = 'default';
+    const provider = createProvider();
+    const largeContext = 'A'.repeat(40_000);
+
+    const result = await provider.complete<any>({
+      requestId: 'req-large-context-test',
+      task: 'discovery-turn',
+      mode: 'broad-pass',
+      prompt: 'Large Context Test',
+      schemaPath,
+      contextText: largeContext,
+      timeoutMs: 5000,
+    });
+
+    expect(result.status).toBe('success');
+    expect(result.structuredSuccess).toBe(true);
+    expect(result.structuredOutput?.confirmed).toContain('No Shell Injection');
+  });
 });

@@ -1,0 +1,11 @@
+{
+  "id": "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+  "source": "input:b4da0333-c07a-45a2-b87f-9aeb6453cc95",
+  "capturedAt": "2026-10-04T22:26:25.313Z",
+  "sha256": "9037d21be7838160972a03ffdca49815167e42c589c8ca372f558df46692b784",
+  "scope": "安全证据适用边界修订：限定 textContent 为单一文本节点安全渲染，取代历史过宽推断",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\tools\\evidence\\evidence-dab40954-74e0-4d24-bb31-1064f5dd626f.json",
+  "approval": "candidate",
+  "content": "澄清历史安全证据适用边界：MDN 关于 Node.textContent 的规范证实 textContent 将内容作为纯文本节点插入 DOM，不调用 HTML 解析器，因此项目名展示区域可防止 HTML/脚本标签被解析执行。但此机制仅保证特定节点文本绑定的安全性，不能外推为全系统或整个单页面从根本上杜绝所有 DOM 型 XSS。全应用安全依赖无危险 API 调用（如 innerHTML/eval）、无未受信任 URL 导航、静态源码词法检查与端到端动态 Payload 注入验收共同保障。",
+  "conclusion": "用户项目名进入指定 textContent 文本节点时不被解析为 HTML/脚本，但不作为全应用 DOM XSS 的绝对证明。整应用安全仍取决于其他写入点、脚本/URL 使用、实际源码审计及动态验收。"
+}

@@ -1,0 +1,1162 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "用户提出的实时反馈输入与删除确认按钮需求变更原文证据，作为 feedback 阶段设计变更组的根本依据。",
+      "content": "模拟用户需求变更：确认按钮改为实时反馈：输入每次变化后等待300毫秒自动展示项目名，清空立即取消待展示任务并清掉结果；空值仍提示。删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收，保留无关块稳定 ID。此原文不是直接批准。",
+      "hash": "62c4629f93646cb40a052290d9aedbddc4637a5ab929d3f4f8fded5c19e04feb",
+      "id": "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+      "kind": "user",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564.json",
+      "obtainedAt": "2026-10-04T16:29:05.113Z",
+      "source": "input:b33f1cd7-dee5-49e5-ab04-da05e30564c5"
+    },
+    {
+      "applicability": "用于实现输入每次变化后等待300毫秒自动展示项目名的防抖定时器控制。",
+      "content": "The setTimeout() method of the Window interface sets a timer which executes a function or specified piece of code once the timer expires. Syntax: setTimeout(func, delay). func is executed after delay milliseconds.",
+      "hash": "e05d53596ebb56f13d18a0b46d631c3bdbec3d1a668c981198fb7ae8afdf05ab",
+      "id": "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+      "kind": "official-source",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\research-e05d53596ebb56f13d18a0b46d631c3bdbec3d1a668c981198fb7ae8afdf05ab.txt",
+      "obtainedAt": "2026-10-04T16:37:17.559Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout"
+    },
+    {
+      "applicability": "用于在清空操作或连续输入时立即取消未触发的300毫秒待展示防抖任务，杜绝异步竞争与幽灵渲染。",
+      "content": "The clearTimeout() method of the Window interface cancels a timeout previously established by calling Window.setTimeout(). If the parameter provided does not identify a previously established action, this method does nothing.",
+      "hash": "fe177385084b93d6360509f329d325111f5b0a031287e139eb3f07d29a26a25b",
+      "id": "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+      "kind": "official-source",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\research-fe177385084b93d6360509f329d325111f5b0a031287e139eb3f07d29a26a25b.txt",
+      "obtainedAt": "2026-10-04T16:37:53.859Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/clearTimeout"
+    },
+    {
+      "applicability": "用于监听用户在输入框中的每一次按键与内容变更，作为300毫秒防抖实时反馈的触发源。",
+      "content": "The input event fires when the value of an <input>, <select>, or <textarea> element has been changed as a direct result of a user action. For text controls, the input event is fired as the user edits the value.",
+      "hash": "81bdd71f05050b2533a9e88c2b42ae54708159cf4eae875bd2d76fb50a9523bb",
+      "id": "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a",
+      "kind": "official-source",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\evidence\\\\research-81bdd71f05050b2533a9e88c2b42ae54708159cf4eae875bd2d76fb50a9523bb.txt",
+      "obtainedAt": "2026-10-04T16:38:03.028Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/input_event"
+    },
+    {
+      "applicability": "记录当前规划环境宿主机未运行 Docker 守护进程，无法执行受控容器实验，真实防抖交互与性能耗时验证完整编排为桌面浏览器前置验证任务。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "node:24.13.0-bookworm-slim (Docker unavailable)",
+      "hash": "2ce2a6b4c57ac2a3e6f5f8ba59f1b5c7846d26196355762c7f3964088b3f1b7c",
+      "id": "evidence-ddc041e1-0b49-4ed7-be90-8b675c88a69d",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\\\tools\\\\experiments\\\\prepare-97727c2c-3059-4100-8ac9-b0ddb95c4601.ndjson",
+      "obtainedAt": "2026-10-05T00:38:10+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-97727c2c-3059-4100-8ac9-b0ddb95c4601"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "1. 实时核对成效：输入任意非空项目名后，等待 300 毫秒防抖即时自动在顶部展示区高对比呈现该名称，无需任何确认按钮点击。\n2. 健壮防错与空值反馈：输入空值或全空白字符在 300 毫秒防抖超时后产生明确就地错误警示，不破坏界面状态，异常或校验失败时严格保留已有输入文本。\n3. 安全渲染成效：任意包含 HTML 或特殊字符的项目名均作为纯文本安全回显，无脚本注入与执行风险。\n4. 性能目标（待技术与交付阶段验证）：在桌面现代主流浏览器（Chrome/Edge/Firefox 最新版）、1 条项目名文本（1~200 字符）条件下，本地页面冷启动渲染时间目标≤300ms；实时输入防抖响应延迟目标为 300ms 防抖等待 + DOM 更新渲染 ≤350ms（测量起止：从最后一次 input 事件触发到防抖定时器执行并完成 DOM textContent 赋值与首帧重绘，验证方法：在开发与交付阶段通过浏览器 Performance API / DevTools 实测）。",
+          "dependsOn": [
+            "blk-prod-problem"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-prod-outcomes",
+          "kind": "outcomes",
+          "requirementIds": [],
+          "stage": "product",
+          "title": "预期产品成效与衡量目标"
+        },
+        {
+          "content": "本产品严格限定为纯前端单页面应用。包含：\n1. 单个文本输入框（用于输入项目名，实时监听字符变化，完全移除确认按钮及回车提交专属逻辑）；\n2. 实时反馈与 300 毫秒防抖展示控制器（输入变化 300ms 后自动触发非空校验、XSS 安全过滤与大字展示）；\n3. 顶部高对比项目名展示区域（支持纯文本安全渲染与超长文本自动换行）；\n4. 清空重置按钮（一键复位界面状态、立即取消正在进行的 300ms 防抖展示任务并自动回焦输入框）；\n5. 就地错误警示展示与异常保留输入机制；\n6. 极简白底单页面布局（基于 fixture.png 映射白底、展示区与右下方清空按钮，确认按钮已移除）。",
+          "dependsOn": [
+            "blk-prod-outcomes"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-mdn-textcontent-xss-safety"
+          ],
+          "id": "blk-prod-scope",
+          "kind": "scope",
+          "requirementIds": [],
+          "stage": "product",
+          "title": "产品功能与边界范围"
+        },
+        {
+          "content": "支持在桌面端输入框中录入项目名文本，实时监听输入变化并自动防抖展示，彻底移除确认按钮及其交互逻辑：\n- 实时防抖展示状态：用户每次键入或变更输入内容，系统重置并启动 300 毫秒定时器。若 300 毫秒内无新输入且内容为有效非空字符串，顶部展示区即时切换为该文本（通过 Node.textContent 安全渲染），自动清除先前错误提示，输入框保持现有文字供微调。\n- 空值状态：输入被清空或输入全空白字符时，若超过 300 毫秒仍为空，阻断展示区更新（展示区保持占位符或先前内容），并在输入框下方就地显示红色提示‘项目名不能为空，请输入有效字符’，且不抹除用户已输入的空格等字符。\n- 异常保护状态：若执行过程发生未知运行时错误，立即捕获异常并显示轻量错误提示条，严格保护输入框现有文本，不重置页面，允许用户修复或重试。\n- 初始/离线状态：首次打开展示区显示灰色占位文字‘【等待输入核对】’，完全支持纯离线本地加载运行。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-feat-input-display",
+          "kind": "feature",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "product",
+          "title": "功能特性：项目名实时输入、300ms防抖展示与失败保留输入"
+        },
+        {
+          "content": "1. 用户光标聚焦在文本输入框并输入或粘贴字符。\n2. 输入框捕获 input 事件（若处于输入法合成状态 compositionstart 则暂停防抖，在 compositionend 后启动）。\n3. 系统检查并清除前序未决的防抖定时器（clearTimeout(timerId)）。\n4. 系统启动一个 300 毫秒的新定时器（setTimeout(..., 300)）：\n   - 定时器到期后提取输入框当前文本并执行 trim() 去空白校验：\n     * 分支 A（空值或纯空白字符）：在输入框正下方挂载红色错误提示节点 '项目名不能为空，请输入有效字符'，输入框边框变红并保持焦点，展示区恢复或保持占位提示，输入框内已有空格或字符完全保留；\n     * 分支 B（有效非空字符）：移除可能存在的旧错误提示节点与高亮，通过 Node.textContent 将内容赋值至顶部大字展示区，输入框保持原文本便于用户微调。\n5. 异常防护：若 DOM 渲染或执行抛出异常，捕获该异常并在界面顶部以警示条显示，输入框文本完好保留供用户恢复。",
+          "dependsOn": [
+            "blk-feat-input-display"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-flow-input-display",
+          "kind": "flow",
+          "requirementIds": [
+            "blk-feat-input-display"
+          ],
+          "stage": "product",
+          "title": "交互流程：实时输入监听、300ms防抖流转与安全展示"
+        },
+        {
+          "content": "实现单页面内的项目名实时输入监听、300ms 防抖定时器调度、客户端非空校验逻辑、基于 Node.textContent 的安全大字渲染以及异常保留输入机制，彻底删除确认按钮。",
+          "dependsOn": [
+            "blk-flow-input-display"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-task-input-display",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-input-display"
+          ],
+          "stage": "product",
+          "task": {
+            "assumptions": [
+              "运行于现代桌面浏览器（支持标准 input 事件与 DOM 定时器 API）",
+              "单人单机本地交互，无网络延迟与服务端竞争"
+            ],
+            "completionCriteria": [
+              "完全移除确认按钮及其 DOM 节点与点击事件",
+              "输入有效文本后停顿 300ms 自动在展示区呈现高对比大字",
+              "空值或纯空白输入在 300ms 后就地显示红色警示且输入字符保留",
+              "任意 HTML/特殊字符作为纯文本安全回显杜绝 XSS",
+              "异常发生时页面不白屏，草稿文本严格保留"
+            ],
+            "exclusions": "不包含任何确认按钮或提交按键监听，不连接后端 API，不进行网络请求，不使用 innerHTML",
+            "failureBehavior": "若 300 毫秒超时后输入为空或全空白字符，在输入框下方挂载红色提示 '项目名不能为空，请输入有效字符'，焦点保留在输入框内，不抹除已有输入字符；若渲染脚本发生意外异常，捕获错误并在界面展示轻量警报条，输入框文本原样保留，页面不崩溃不重载",
+            "goal": "完成单页面内项目名输入框实时监听、300ms 防抖定时器调度器与顶部大字展示区的双向联动，移除确认按钮及其专属逻辑，落实空值防抖警示、XSS 防护及输入保留机制",
+            "modules": [
+              "InputComponent",
+              "DebounceScheduler",
+              "DisplayComponent",
+              "Validator"
+            ],
+            "normalBehavior": "用户在输入框键入字符时触发 input 事件，DebounceScheduler 重置并在 300 毫秒后执行回调，经 Validator 校验为有效非空文本后，调用 Node.textContent 安全更新顶部展示区大字文本，隐藏旧有错误提示，输入框保持当前文本",
+            "scope": "纯客户端 DOM 状态管理、input 事件监听、300ms 防抖定时器生命周期、Node.textContent 安全回显、错误提示挂载与异常输入保留",
+            "verification": [
+              "在桌面浏览器加载单页面，键入项目名后停止操作 300ms，验证顶部大字展示区自动呈现该文本且输入框内容完好保留",
+              "高频快速连续敲击键盘，验证定时器每次重置，仅在最后一次敲击停顿 300ms 后触发一次更新",
+              "输入包含 HTML 标签或特殊字符（如 '<script>alert(1)</script>'），验证 300ms 后展示区忠实作为纯文本回显，无弹窗且无 DOM 注入",
+              "清空输入框或仅输入空格，停顿 300ms，验证展示区不显示为项目名，输入框下方出现红色明确警示，且输入框内已有空格完好保留",
+              "验证界面中完全不存在任何确认按钮"
+            ]
+          },
+          "title": "开发任务：输入实时监听、300ms防抖与安全展示区联动实现"
+        },
+        {
+          "content": "Scenario 1: 实时输入 300ms 防抖自动核对展示\nGiven 页面已在本地桌面浏览器加载就绪且界面无确认按钮\nWhen 用户在输入框中连续键入 'AiRDUO-Project-01' 并停止按键 300 毫秒\nThen 页面顶部展示区在 300 毫秒到期后立即自动显示 'AiRDUO-Project-01'，字体醒目高对比，输入框保留 'AiRDUO-Project-01'，页面无错误提示。\n\nScenario 2: 连续按键防抖抑制\nGiven 用户正在输入框快速输入字符\nWhen 每次按键间隔均小于 300 毫秒（例如每 100ms 键入一个字符）\nThen 期间展示区不发生频繁跳变，仅在用户停止输入满 300 毫秒后执行单次更新展示。\n\nScenario 3: 特殊字符实时防抖安全渲染防 XSS\nGiven 页面处于就绪状态\nWhen 用户在输入框输入 '<script>alert(\"XSS\")</script>' 并等待 300 毫秒\nThen 顶部展示区将其原样作为纯文本渲染回显，不弹出任何警告框，无脚本执行。\n\nScenario 4: 空值与纯空格输入防抖阻断校验\nGiven 用户在输入框中清空全部字符或仅输入若干连续空格并停顿 300 毫秒\nWhen 300 毫秒防抖计时到期\nThen 顶部展示区保持占位提示不更新，输入框下方出现红色可见提示 '项目名不能为空，请输入有效字符'，输入框原有空格完好保留，光标保持在输入框内。\n\nScenario 5: 确认按钮专属逻辑移除\nGiven 页面处于任何状态\nWhen 检查页面 DOM 树与用户界面\nThen 页面内不存在任何确认按钮（Confirm Button），在输入框内按 Enter 键也不会触发页面刷新或表单提交。",
+          "dependsOn": [
+            "blk-task-input-display"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-acc-input-display",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-input-display"
+          ],
+          "stage": "product",
+          "title": "验收标准：实时输入、300ms防抖与输入保留 Given-When-Then"
+        },
+        {
+          "content": "本地单页面原型核对视图（Single Page View），依据用户反馈与 fixture.png 映射调整：\n1. 视觉底色：纯白底色（#FFFFFF）清爽背景，无多余装饰纹理；\n2. 顶部展示区域：映射 fixture.png 上方“Q7M4-8261”视觉层级与相对空间位置，作为核对结果大字展示区（初始显示灰色占位文字，300ms 防抖完成后以高对比黑色大字显示，支持 break-word 换行防撑破）；\n3. 输入表单区域：在桌面端位于顶部展示区下方居中排布，提供单行文本输入框，实时监听用户输入；\n4. 确认按钮彻底移除：依据反馈要求，删除原映射 fixture.png 下方左侧蓝色矩形的【确认】按钮及其相关 DOM 节点与样式；\n5. 底部辅助操作控件：映射 fixture.png 下方右侧橙色圆形色块，呈现为橙色实心圆形外观的【清空】操作按钮；\n6. 状态覆盖：涵盖就绪初始态（占位灰字）、输入防抖等待态（300ms 倒计时）、正常展示态（大字黑色显示）、错误提示态（红字就地显示）、异常防护态（顶部横幅警示）与纯离线本地加载态。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "id": "blk-page-main-layout",
+          "kind": "page",
+          "requirementIds": [
+            "blk-prod-scope"
+          ],
+          "stage": "product",
+          "title": "页面职责与单按钮极简空间结构映射"
+        },
+        {
+          "content": "技术栈选型严格遵守已批准的纯前端单页面边界约束，采用纯原生 HTML5、CSS3 与现代原生 JavaScript（ES2022+ 标准）：\n1. 标记层（HTML5）：采用标准语义化标签（<main>, <section>, <input>, <button>），移除确认按钮与表单提交包裹，通过 WAI-ARIA 属性（如 aria-live=\"polite\"）辅助就地错误提示展示；\n2. 表现层（CSS3）：采用 CSS Flexbox 弹性布局规范，通过现代 CSS 自定义属性管理主题色（保留清空按钮底色 #FF5500，移除确认按钮样式），配置全局盒模型 box-sizing: border-box 与文本折行规则 word-break: break-all，实现忠实还原白底与高对比度排布；\n3. 交互与控制层（ES2022+）：采用纯原生现代 JavaScript（ESM 规范结构），使用原生 DOM API（Document.querySelector, Node.textContent, HTMLElement.focus）、原生 input 事件监听以及标准 DOM 定时器 API（Window.setTimeout, Window.clearTimeout），零外部第三方运行时或防抖库依赖，完全支持离线本地直接运行；\n4. DOM 安全输出：全面采用 W3C/WHATWG 标准 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML，且 setTimeout 仅传入安全函数引用而非字符串，杜绝脚本注入与动态执行漏洞；\n5. 运行环境兼容：兼容主流现代桌面浏览器（Chrome ≥ 100, Edge ≥ 100, Firefox ≥ 100, Safari ≥ 15），零需转译即可原生执行。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-htmlinputelement",
+            "evidence-mdn-css-flexbox",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-tech-stack",
+          "kind": "technology",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "technical",
+          "title": "技术栈选型与防抖定时器运行规范"
+        },
+        {
+          "content": "前端采用低耦合、高内聚的模块化架构，彻底移除确认按钮及专属监听，划分为核心协调控制器与 5 个专用功能模块：\n1. AppController（核心应用协调器）：应用生命周期管理入口，负责 DOM 树加载就绪检查（DOMContentLoaded）、模块装配与挂载、全局未捕获异常监听（window.addEventListener('error')），协调实时输入与清空流转；\n2. InputController（输入与实时监听控制器）：封装 <input type=\"text\"> 的交互监听，监听 input 输入事件，处理输入法合成事件（compositionstart / compositionend），提供 getInputText()、setInputText(val) 与 focusInput() 接口；\n3. DebounceScheduler（300ms防抖调度器）：专职管理 300 毫秒防抖定时器（timerId: number | null），提供 schedule(callback, delay=300) 与 cancel() 接口，负责重置定时器与取消待执行任务；\n4. ValidatorModule（规则校验器）：无状态纯函数校验模块，提取输入字符串并执行 trim() 去除首尾空白字符，返回结构化校验判定对象 { isValid: boolean, errorMessage: string | null }；\n5. DisplayRenderer（安全大字展示渲染器）：负责顶部结果展示区的视图更新，严格强制使用 Node.textContent 进行文本注入，绝不使用 innerHTML，彻底阻断任何 HTML/Script 脚本注入，并处理初始占位状态与换行防撑破样式；\n6. ResetController（清空复位与回焦控制器）：响应底部右侧清空按钮点击，立即调用 DebounceScheduler.cancel() 取消待展示任务，协调调用 InputController 清空文本、DisplayRenderer 复位为占位符、FeedbackBanner 移除错误节点，并调用 input.focus() 自动恢复焦点；\n7. FeedbackBanner（错误提示与容错横幅组件）：管理输入框下方就地红色错误提示节点（aria-live=\"polite\"）以及全局意外异常警告横幅的挂载、呈现与清理。",
+          "dependsOn": [
+            "blk-tech-stack",
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-tech-module",
+          "kind": "module",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "前端系统架构与防抖调度核心模块划分"
+        },
+        {
+          "content": "客户端运行时采用单向流动的纯内存数据模型，不使用任何本地持久化存储（如 LocalStorage、IndexedDB），确保单次测试独立且不污染后续测试：\n1. 校验判定结构体（ValidationResult）：\n   - isValid: boolean（是否通过非空规则校验）；\n   - errorMessage: string | null（校验未通过时的就地展示提示文案，例如 '项目名不能为空，请输入有效字符'；校验通过为 null）。\n2. 全局运行时状态模型（AppState）：\n   - projectName: string | null（当前已确认并在顶部大字展示的项目名，初始态为 null）；\n   - inputDraft: string（输入框当前正在键入的草稿文本，初始态为空字符串 ''）；\n   - status: 'idle' | 'debouncing' | 'displayed' | 'error'（界面所处交互生命周期状态）；\n   - debounceTimerId: number | null（当前正在排队的 300ms 防抖定时器标识符，无排队任务时为 null）；\n   - validationError: string | null（当前挂载在输入框下方的错误信息，无错误时为 null）；\n   - placeholderText: string（顶部展示区在初始或清空态下的灰字占位符，常量定义为 '【等待输入核对】'）。\n3. 状态转换路径：\n   - [初始态 idle]：projectName=null, inputDraft='', debounceTimerId=null, validationError=null -> 展示区呈现灰字占位符；\n   - [输入按键]：触发 input -> status='debouncing', inputDraft=当前值, debounceTimerId 被更新为新定时器，旧定时器被取消；\n   - [防抖到期-有效]：300ms 计时结束，ValidatorModule 校验通过 -> status='displayed', projectName=inputDraft, debounceTimerId=null, validationError=null -> 展示区呈现黑色大字，inputDraft 保留；\n   - [防抖到期-空值]：300ms 计时结束，ValidatorModule 校验失败 -> status='error', validationError='项目名不能为空，请输入有效字符', debounceTimerId=null, projectName 保持原样或复位，inputDraft 保持原样；\n   - [一键清空]：触发重置 -> 调用 clearTimeout(debounceTimerId) 取消排队任务 -> 复位至 [初始态 idle]，所有字段归位，焦点重新绑定至输入框。",
+          "dependsOn": [
+            "blk-tech-module"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-tech-data-model",
+          "kind": "data_model",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "客户端运行时数据模型与防抖状态结构规范"
+        },
+        {
+          "content": "各模块间通过明确的函数签名与原生事件契约进行交互解耦，彻底移除确认按钮相关接口：\n1. DebounceScheduler 接口契约：\n   - schedule(callback: () => void, delayMs: number = 300): void\n     处理：若已存在 timerId，先调用 window.clearTimeout(timerId)；然后调用 timerId = window.setTimeout(callback, delayMs)；\n   - cancel(): void\n     处理：若 timerId 存在，调用 window.clearTimeout(timerId) 并将 timerId 重置为 null。\n2. InputController 接口契约：\n   - bindInput(onInputChange: (value: string) => void): void\n     处理：监听 inputElement 的 input 事件以及 compositionstart/compositionend 事件，在非输入法合成态下触发 onInputChange；\n   - getValue(): string / setValue(val: string): void / focus(): void。\n3. ValidatorModule 接口契约：\n   - validate(rawInput: string): { isValid: boolean, errorMessage: string | null }\n     处理：执行 rawInput.trim()，若长度为 0 则返回 { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' }，否则返回 { isValid: true, errorMessage: null }。\n4. DisplayRenderer 接口契约：\n   - renderProjectName(targetElement: HTMLElement, text: string): void\n     处理：调用 targetElement.textContent = text，应用黑色加粗高对比度样式；\n   - renderPlaceholder(targetElement: HTMLElement, placeholder: string): void\n     处理：调用 targetElement.textContent = placeholder，应用灰色占位展示样式。\n5. FeedbackBanner 接口契约：\n   - showInputError(inputElement: HTMLElement, containerElement: HTMLElement, errorMsg: string): void\n   - clearInputError(inputElement: HTMLElement, containerElement: HTMLElement): void\n   - showRuntimeAlert(alertMsg: string): void。\n6. 事件流契约：\n   - inputElement 派发 input 事件 -> InputController 调用 DebounceScheduler.schedule() -> 300ms 后执行校验与展示渲染；\n   - resetButton 点击事件 -> 调用 ResetController.handleReset() -> 内部第一步显式调用 DebounceScheduler.cancel()，随后清空视图并回焦输入框。",
+          "dependsOn": [
+            "blk-tech-data-model"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-mdn-htmlinputelement",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-tech-interface",
+          "kind": "interface",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "防抖调度契约与模块调用接口规范"
+        },
+        {
+          "content": "建立全面的客户端异常捕获与容错恢复机制，重点落实“失败时保留输入”与“防抖竞态防护”：\n1. E01 防抖校验失败（输入空值或纯空白字符）：\n   - 场景：用户键入后删除全部文本或仅键入若干空格，停顿 300 毫秒；\n   - 拦截行为：DebounceScheduler 触发后，ValidatorModule 判定 isValid 为 false，阻断展示区内容更新；\n   - 呈现行为：调用 FeedbackBanner.showInputError 在输入框正下方挂载可见的红色警示文本“项目名不能为空，请输入有效字符”，输入框边框变红并保持高亮；\n   - 保留与恢复：输入框内的既有字符（包括用户已输入的空格等文本）严格原样保留，光标保持在输入框内部，绝不执行清空操作；用户补充输入有效字符后，300ms 防抖自动移除错误提示并更新展示区；\n2. E02 清空操作与未决防抖任务的竞态防护（Race Condition Prevention）：\n   - 场景：用户刚键入文本（如在 100ms 时），立即点击清空按钮；\n   - 防护行为：ResetController 执行时强制第一时间调用 DebounceScheduler.cancel()（clearTimeout），确保 300ms 定时器被立即注销，彻底杜绝清空后因定时器到期引发的“幽灵展示”覆盖；\n3. E03 意外 DOM 异常与运行时错误（Runtime Exception）：\n   - 场景：浏览器极端环境、DOM 节点获取失败或定时器回调抛出未捕获 Error；\n   - 拦截行为：在防抖回调与 handleReset 外层封装严格的 try...catch 保护；\n   - 呈现行为：捕获异常并在页面顶部通过 FeedbackBanner.showRuntimeAlert 展示轻量警示条“操作执行遇到意外异常，已为您保留当前输入内容”，控制台输出完整堆栈；\n   - 保留与恢复：发生任何异常时，绝不重载或重定向页面，不抹除 inputElement.value 中的任何既有文本，输入框保持可编辑状态供用户微调；\n4. E04 极端超长文本输入防撑破（Overflow Protection）：\n   - 场景：实时输入数千至上万字符的超长字符串；\n   - 防护行为：展示区与输入框统一样式设置 overflow-wrap: anywhere; word-break: break-all; max-width: 100%，确保长字符串在容器内自动换行折行，杜绝撑破页面布局。",
+          "dependsOn": [
+            "blk-tech-interface"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-tech-error",
+          "kind": "error",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-prod-outcomes"
+          ],
+          "stage": "technical",
+          "title": "错误分类、防抖竞态防护与输入保留恢复策略"
+        },
+        {
+          "content": "部署与运行方案面向个人开发者的本地无门槛极简运行场景设计：\n1. 目标运行环境版本要求：\n   - 操作系统：Windows 10/11、macOS 12+ 或主流 Linux 桌面环境；\n   - 目标浏览器：现代主流桌面浏览器最新稳定版（Google Chrome ≥ 100, Microsoft Edge ≥ 100, Mozilla Firefox ≥ 100, Apple Safari ≥ 15）；\n   - 硬件要求：标准桌面设备，支持 1024×768 及以上分辨率显示器、鼠标与键盘；\n2. 静态部署与启动模式：\n   - 模式 A（零安装直接双击运行）：直接通过文件资源管理器双击 index.html（file:// 协议加载），无须启动任何 HTTP 服务；\n   - 模式 B（轻量本地服务器托管）：通过本地已有轻量静态服务运行，例如在项目根目录执行 npx serve . 或 python -m http.server 8080，访问 http://localhost:8080；\n3. 静态产物组织结构：\n   ```\n   ├── index.html        # 单页面主入口，包含输入框、大字展示区与清空按钮（无确认按钮）\n   ├── styles.css        # 视觉样式表，纯白底色、高对比大字与清空按钮样式\n   ├── app.js            # 模块化纯原生 JavaScript 脚本（AppController、InputController、DebounceScheduler 等）\n   └── README.md         # 本地启动、操作说明与实时防抖验证指南\n   ```\n4. 无后端/无云服务声明：\n   本产品不包含任何服务端后端程序、不调用任何云端 API、不进行任何跨域网络请求，完全自主运行在用户本地浏览器沙箱中。",
+          "dependsOn": [
+            "blk-tech-stack"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-htmlinputelement"
+          ],
+          "id": "blk-tech-deployment",
+          "kind": "deployment",
+          "requirementIds": [
+            "blk-prod-target",
+            "blk-prod-scope"
+          ],
+          "stage": "technical",
+          "title": "运行环境版本要求与单按钮静态部署规范"
+        },
+        {
+          "content": "全面实现纯前端单页面的 DOM 构建、实时输入监听绑定、300ms 防抖调度、Node.textContent 安全展示、清空复位与防抖取消竞态保护实现，彻底移除确认按钮。",
+          "dependsOn": [
+            "blk-tech-module",
+            "blk-tech-interface",
+            "blk-tech-error"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-mdn-htmlinputelement",
+            "evidence-mdn-document-queryselector",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-tech-task-impl",
+          "kind": "task",
+          "requirementIds": [
+            "blk-task-input-display",
+            "blk-task-reset"
+          ],
+          "stage": "technical",
+          "task": {
+            "assumptions": [
+              "页面运行于现代桌面浏览器，完全支持 ES6+、标准 DOM API 与 CSS Flexbox 规范",
+              "用户单人单机操作，使用标准桌面键盘与鼠标进行本地原型核对交互"
+            ],
+            "completionCriteria": [
+              "index.html 中确认按钮彻底移除",
+              "实时输入 300ms 防抖展示逻辑健全",
+              "清空立即取消防抖定时器并清空结果",
+              "空值防抖警示与异常保留输入机制生效",
+              "主流现代桌面浏览器双击原生可用"
+            ],
+            "exclusions": "不引入前端重型框架或打包器，不引入第三方防抖库，不保留任何确认按钮或 Enter 提交逻辑",
+            "failureBehavior": "若输入为空或空白字符，防抖到期后挂载红色就地错误提示，不抹除输入字符；若渲染发生意外异常，顶层 try-catch 捕获并在顶部呈现告警横幅，输入框草稿完好保留供用户微调",
+            "goal": "完成纯前端单页面的 DOM 重构、输入实时监听绑定、300ms 防抖调度器、Node.textContent 安全展示、清空复位与防抖取消竞态保护实现，彻底移除确认按钮",
+            "modules": [
+              "AppController",
+              "InputController",
+              "DebounceScheduler",
+              "ValidatorModule",
+              "DisplayRenderer",
+              "ResetController",
+              "FeedbackBanner"
+            ],
+            "normalBehavior": "用户在输入框键入字符，InputController 捕获 input 事件，调用 DebounceScheduler.schedule(..., 300)；300 毫秒后若无新输入，执行校验并通过 Node.textContent 更新展示区，输入框完好保留当前草稿；用户点击清空按钮时，立即 cancel() 防抖定时器，清空输入框与展示区，自动回焦输入框",
+            "scope": "单页面静态 HTML/CSS/JS 编写，移除确认按钮 DOM 与样式，实现 input 事件监听、DebounceScheduler、DisplayRenderer、Validator 与 ResetController 逻辑装配",
+            "verification": [
+              "在 Chrome/Edge/Firefox 中加载 index.html，输入字符停顿 300ms 后核验展示区自动大字呈现且输入框内容保留",
+              "输入 HTML 标签验证 300ms 后纯文本安全回显无 XSS",
+              "输入空格停顿 300ms 验证红色错误就地显示且空格完好保留",
+              "在 100ms 快速点击清空按钮，验证待展示定时器被成功取消，展示区不出现幽灵文字",
+              "检查源码与页面，确认完全无确认按钮 DOM 节点与点击事件"
+            ]
+          },
+          "title": "技术开发任务：纯前端实时防抖架构与单按钮容错实现"
+        },
+        {
+          "content": "建立本地运行性能与交互体验基准的实测验证流程，实测冷启动时间与实时输入防抖响应延迟指标。",
+          "dependsOn": [
+            "blk-tech-task-impl"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-ddc041e1-0b49-4ed7-be90-8b675c88a69d"
+          ],
+          "id": "blk-tech-val-performance",
+          "kind": "validation",
+          "requirementIds": [
+            "blk-prod-outcomes"
+          ],
+          "stage": "technical",
+          "task": {
+            "assumptions": [
+              "测试环境为标准现代桌面 PC，运行现代主流浏览器最新稳定版本，测试文本为 1~200 字符"
+            ],
+            "completionCriteria": [
+              "完成本地冷启动耗时与实时防抖响应延迟的实测验证并记录基准数据",
+              "各项指标达到设计衡量目标"
+            ],
+            "environment": "主流桌面现代浏览器（Chrome 100+ / Edge 100+ / Firefox 100+），本地文件系统或轻量静态 HTTP 服务器托管环境",
+            "evidenceRequired": [
+              "浏览器控制台输出的 Performance API 耗时日志及 DevTools Performance 面板 Trace 记录"
+            ],
+            "exclusions": "不进行网络传输压测，不进行复杂服务端延迟模拟",
+            "failureBehavior": "若防抖延迟波动过大（>350ms）或高频键入造成主线程卡顿，分析是否有强制同步布局或高频 DOM 操作，优化事件监听后复测",
+            "goal": "验证实时防抖单页面的本地冷启动渲染时间（目标≤300ms）及输入防抖自动展示延迟（目标为 300ms 设定防抖延迟 + DOM 更新重绘 ≤350ms）",
+            "modules": [
+              "AppController",
+              "DebounceScheduler",
+              "DisplayRenderer",
+              "InputController"
+            ],
+            "normalBehavior": "页面加载从 navigationStart 到 DOMContentLoaded 控制在 300ms 以内；键入最后一个字符后，防抖定时器在 300ms 时触发回调，随后在 50ms 内完成 DOM textContent 赋值与 requestAnimationFrame 重绘，总耗时控制在 350ms 以内",
+            "onFailure": "若防抖调度耗时异常，审查 DebounceScheduler 定时器逻辑，移除重复 DOM 查询，缓存节点引用后重测。",
+            "passCriteria": [
+              "冷启动渲染耗时 ≤ 300ms",
+              "输入防抖展示总耗时（t1 - t0）实测目标 ≤ 350ms（含 300ms 防抖等待）",
+              "高频键入期间无冗余 DOM 重排，主线程无长任务（Long Task > 50ms）"
+            ],
+            "scope": "使用浏览器原生 Performance Navigation Timing 与 Performance.now() API 对首屏加载冷启动、高频按键防抖抑制与定时器触发耗时进行打点测量",
+            "steps": [
+              "1. 打开桌面 Chrome/Edge 浏览器无痕窗口加载 index.html；",
+              "2. 读取 navigation timing 计算首屏冷启动耗时；",
+              "3. 在 input 监听中注入测试打点：记录最后一次 input 事件触发时间戳 t0；",
+              "4. 在定时器回调更新 textContent 并在 requestAnimationFrame 中打点 t1，计算 t1 - t0 作为防抖展示总延迟；",
+              "5. 连续键入 5 次测试项目名，记录平均耗时与最大延迟；",
+              "6. 快速键入 10 个字符（间隔 50ms），验证中间 9 次输入均未触发 DOM 渲染。"
+            ],
+            "verification": [
+              "查验 Performance 面板导出的 JSON 记录，核验 DOMContentLoaded 耗时是否 ≤ 300ms",
+              "核查控制台打印的防抖展示总耗时是否 ≤ 350ms，高频输入是否严格只触发一次最终渲染"
+            ]
+          },
+          "title": "技术验证任务：本地冷启动与实时防抖延迟基准验证"
+        },
+        {
+          "content": "交付产物严格遵循零服务器、零构建工具链依赖的极简静态标准，目录结构由 4 个同级核心文件组成：\n1. index.html：标准语义化单页面 DOM 骨架，通过 <meta charset=\"UTF-8\"> 与 <meta name=\"viewport\"> 声明规范，外链 styles.css，通过 <script defer src=\"app.js\"></script> 延迟加载逻辑；DOM 树包含顶部大字展示区、居中项目名输入框与底部右侧橙色圆形清空按钮，完全移除确认按钮 DOM 节点，完全支持离线本地加载；\n2. styles.css：样式实现纯白背景（#FFFFFF）、顶部居中大字展示容器（加粗高对比、break-all 自动折行）、居中输入框样式与底部右侧橙色辅助操作圆形按钮（#FF5500），包含就地红色错误提示（#E53E3E）与焦点高亮状态，不包含确认按钮样式；\n3. app.js：纯原生现代 JavaScript（ES2022+）编写，采用闭包作用域封装 AppController、InputController、DebounceScheduler、ValidatorModule、DisplayRenderer、ResetController 与 FeedbackBanner，监听 input 事件与 300ms 防抖定时器，全面采用 Node.textContent 进行安全回显，杜绝 innerHTML；\n4. README.md：极简操作指南，详细记录本地文件管理器直接双击运行模式（file:// 协议）与本地轻量 HTTP 服务器启动模式，说明实时防抖输入与清空取消防抖的验证操作。",
+          "dependsOn": [
+            "blk-tech-deployment"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0"
+          ],
+          "id": "blk-deliv-spec-deployment",
+          "kind": "deployment",
+          "requirementIds": [
+            "blk-tech-deployment",
+            "blk-prod-scope"
+          ],
+          "stage": "delivery",
+          "title": "交付产物文件组织与实时防抖单按钮规范"
+        },
+        {
+          "content": "装配移除确认按钮后的纯静态单页面产物并编写完整自述验证指南，确保个人开发者解压后直接双击运行即可体验 300ms 实时防抖反馈。",
+          "dependsOn": [
+            "blk-deliv-spec-deployment"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0"
+          ],
+          "id": "blk-deliv-task-package",
+          "kind": "task",
+          "requirementIds": [
+            "blk-deliv-spec-deployment"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "用户在现代桌面操作系统下获取交付目录，已安装现代主流桌面浏览器"
+            ],
+            "completionCriteria": [
+              "所有交付文件就绪且相对路径关联正确，无确认按钮冗余代码",
+              "支持本地无依赖直接双击运行与轻量服务器启动双模式",
+              "README.md 包含详细的实时防抖输入与清空操作说明"
+            ],
+            "exclusions": "不引入 npm 构建工具链，不引入第三方字库或远程图标",
+            "failureBehavior": "若文件缺失或相对路径错误导致资源 404，在 README.md 明确提示目录同级约束，并在 app.js 中加入 DOMContentLoaded 状态断言检查",
+            "goal": "装配移除确认按钮后的纯静态单页面产物并编写完整自述验证指南，确保个人开发者解压后直接双击运行即可体验 300ms 实时防抖反馈",
+            "modules": [
+              "Packaging",
+              "Documentation"
+            ],
+            "normalBehavior": "文件树结构清晰，所有路径均使用相对路径引用；在本地直接双击 index.html 即可在默认桌面浏览器中正常呈现界面，输入文本 300ms 后自动呈现大字结果",
+            "scope": "交付包文件结构组织、无外部 CDN 依赖检查、HTML/CSS/JS 静态关联校验与文档编写",
+            "verification": [
+              "检查交付目录下包含 index.html、styles.css、app.js 与 README.md 四个核心文件且均在同一级目录",
+              "检查 HTML 与 JS 中彻底无确认按钮相关引用与远程脚本依赖",
+              "通过双击 index.html（file:// 协议）与静态服务器（http:// 协议）两种方式分别打开页面，确认实时输入防抖正常生效"
+            ]
+          },
+          "title": "交付任务：实时防抖静态产物装配与交付包就绪"
+        },
+        {
+          "content": "Scenario 1: 本地文件系统直接双击启动 (file:// 协议)\nGiven 开发者将交付文件 index.html, styles.css, app.js, README.md 置于本地同一目录\nWhen 在文件资源管理器中双击 index.html\nThen 现代桌面浏览器成功打开页面，地址栏显示 file:// 协议，页面呈现白底背景、顶部灰字占位提示、输入框及底部右侧橙色圆形清空按钮（无确认按钮），控制台无任何 CORS 错误或资源加载失败报错。\n\nScenario 2: 纯离线断网自包含验证\nGiven 宿主设备处于完全断开互联网连接的纯离线环境\nWhen 重新加载本地 index.html\nThen 页面布局完整渲染，实时输入 300ms 防抖展示与清空逻辑正常运行，无任何远程资源超时或请求挂起。\n\nScenario 3: 本地轻量静态 HTTP 服务器托管启动\nGiven 在交付目录执行 `python -m http.server 8080` 或 `npx serve .`\nWhen 浏览器访问 `http://localhost:8080`\nThen 页面与 file:// 协议下行为完全一致，实时防抖与清空交互响应完全一致。",
+          "dependsOn": [
+            "blk-deliv-task-package"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0"
+          ],
+          "id": "blk-deliv-acc-package",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-deliv-spec-deployment"
+          ],
+          "stage": "delivery",
+          "title": "验收标准：交付包自包含性与实时防抖双启动模式 Given-When-Then"
+        },
+        {
+          "content": "实现单页面 CSS Flexbox 布局，精准还原白底外观、顶部大字展示区、居中输入表单以及底部右侧橙圆形清空按钮排布，彻底移除确认按钮样式。",
+          "dependsOn": [
+            "blk-page-main-layout",
+            "blk-tech-stack"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-css-flexbox"
+          ],
+          "id": "blk-deliv-task-layout-styling",
+          "kind": "task",
+          "requirementIds": [
+            "blk-page-main-layout",
+            "blk-tech-stack"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "用户在桌面显示器下查看页面，浏览器支持标准 CSS Flexbox 与 CSS 自定义属性"
+            ],
+            "completionCriteria": [
+              "完成 HTML DOM 与 styles.css 的完整样式编写",
+              "确认按钮彻底从 HTML 与 CSS 中清除",
+              "视觉元素忠实对应白底、展示区、输入框与清空按钮映射",
+              "多分辨率下无布局撑破，长文本自动换行折行"
+            ],
+            "exclusions": "不引入复杂动画库或 CSS 预处理器，不保留蓝色矩形确认按钮的任何 CSS 规则",
+            "failureBehavior": "若视口宽度极窄，通过备用系统无衬线字体栈与 auto-wrap 规则自适应换行，确保文本不截断不溢出",
+            "goal": "实现单页面 CSS Flexbox 布局，精准还原白底外观、顶部大字展示区、居中输入表单以及底部右侧橙圆形清空按钮排布，彻底移除确认按钮样式",
+            "modules": [
+              "DisplayRenderer",
+              "Styles"
+            ],
+            "normalBehavior": "页面背景为纯白（#FFFFFF），顶部大字展示区字体加粗高对比度（字号≥32px），中部输入表单宽度适中居中排布，底部右侧呈现橙色实心正圆形【清空】按钮（底色 #FF5500），操作动线直观明晰，无确认按钮",
+            "scope": "HTML 语义化节点结构编写与 CSS 样式表实现，包含桌面端响应式居中容器、输入框高亮、清空按钮外观与换行防溢出控制",
+            "verification": [
+              "在 1920×1080、1440×900 与 1024×768 分辨率下查验页面渲染，确认各控件排布合理，页面中不存在确认按钮",
+              "检查顶部展示区在长文本下是否正常折行（word-break: break-all; overflow-wrap: anywhere）",
+              "检查橙色清空按钮的外观、背景色及 hover/active 视觉反馈"
+            ]
+          },
+          "title": "交付任务：单按钮视觉布局结构还原与控件空间排布实现"
+        },
+        {
+          "content": "实现输入框 input 实时事件监听、300ms 防抖调度、Node.textContent 安全展示及输入草稿完好保留逻辑，彻底删除确认按钮专属逻辑。",
+          "dependsOn": [
+            "blk-deliv-task-layout-styling",
+            "blk-tech-module",
+            "blk-tech-interface"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "id": "blk-deliv-task-input-workflow",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-tech-module",
+            "blk-tech-interface"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "浏览器事件循环正常，支持标准 input 事件与 DOM 定时器"
+            ],
+            "completionCriteria": [
+              "实时 input 监听与 300ms 防抖调度工作流稳定可靠",
+              "顶部大字通过 Node.textContent 安全渲染，杜绝 XSS 注入",
+              "确认按钮及其专属逻辑完全删除",
+              "展示更新后输入框内容完好保留"
+            ],
+            "exclusions": "不使用 innerHTML，不使用 eval 字符串形式的 setTimeout，不保留任何确认按钮点击事件或表单提交事件",
+            "failureBehavior": "若输入含恶意标签或特殊字符（如 <script>、<img>），经 textContent 转化为纯字符回显，不解析为 DOM 节点；若输入为空或空格，300ms 后触发就地错误提示，不抹除输入文本",
+            "goal": "实现输入框 input 实时事件监听、300ms 防抖调度、Node.textContent 安全展示及输入草稿完好保留逻辑，彻底删除确认按钮专属逻辑",
+            "modules": [
+              "InputController",
+              "DebounceScheduler",
+              "DisplayRenderer",
+              "ValidatorModule"
+            ],
+            "normalBehavior": "用户在输入框键入有效项目名，InputController 捕获 input 事件并触发 DebounceScheduler 启动 300 毫秒计时器；计时到期后校验通过，调用 displayElement.textContent 安全赋值，顶部即时高对比呈现该项目名，旧错误提示自动消失，输入框完好保留当前文本供后续微调",
+            "scope": "InputController、DebounceScheduler 与 DisplayRenderer 编码实现，输入监听、防抖调度、输入法合成防误触与 DOM 纯文本安全赋值",
+            "verification": [
+              "在输入框输入常规项目名 'Project-Alpha-01' 停顿 300ms，核对顶部大字即时显示且输入框文本保留",
+              "在输入框输入 '<img src=x onerror=alert(1)>' 等待 300ms，核对展示区原样输出标签字符串，无控制台告警或弹窗执行",
+              "在中文输入法状态下输入拼音，核对在候选词确定前不频繁触发防抖更新",
+              "连续快速按键，核对每次按键重置 300ms 倒计时，仅在最后一次停顿 300ms 后执行一次展示"
+            ]
+          },
+          "title": "交付任务：项目名实时输入、300ms防抖调度与安全纯文本展示交付"
+        },
+        {
+          "content": "落实“失败时保留输入”核心决策与空值校验提示机制，提供端到端健壮容错，在防抖触发校验或异常时严格杜绝抹除用户输入。",
+          "dependsOn": [
+            "blk-deliv-task-input-workflow",
+            "blk-tech-error"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-deliv-task-error-handling",
+          "kind": "task",
+          "requirementIds": [
+            "blk-tech-error",
+            "blk-tech-interface"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "用户在核对过程中可能反复进行空值测试或编辑微调"
+            ],
+            "completionCriteria": [
+              "空值或空白字符在 300ms 防抖到期后产生明确就地可见提示",
+              "严格遵守 dec-failure-preserve-input，任何失败场景绝不抹除用户输入内容",
+              "具备全局异常拦截与友好提示，页面绝不崩溃白屏"
+            ],
+            "exclusions": "不进行异步网络校验，不在校验失败或异常时清空输入框内容",
+            "failureBehavior": "若在防抖执行或 DOM 操作中发生意外未捕获异常，顶层 try-catch 拦截并在顶部弹出告警横幅 '系统遇到异常，已为您保留当前输入'，绝不执行重载或清空输入框 value，确保开发者输入不丢失，允许用户继续修改",
+            "goal": "实现防抖触发后的非空校验拦截、就地错误警示挂载，以及发生错误或异常时严格保留用户既有输入的容错机制",
+            "modules": [
+              "ValidatorModule",
+              "FeedbackBanner",
+              "DebounceScheduler",
+              "AppController"
+            ],
+            "normalBehavior": "当输入为空字符串或全为空白字符（如空格、制表符）且停顿满 300ms 时，防抖定时器执行校验并拦截，在输入框下方动态挂载 <div class=\"error-tip\" aria-live=\"polite\">项目名不能为空，请输入有效字符</div>，输入框边框高亮红色，输入框内现存字符完全保留不被抹除，光标停留在输入框内；当用户补充键入有效字符并等待 300ms 时，自动移除错误提示并更新展示区",
+            "scope": "ValidatorModule 规则校验、FeedbackBanner 挂载与销毁、DebounceScheduler 防抖容错、全局 window.onerror 兜底防护及输入框状态锁定控制",
+            "verification": [
+              "输入空字符串停顿 300ms，核对输入框下方出现红色明确提示，展示区不刷新，且输入框焦点保留",
+              "输入 '   '（纯空格）停顿 300ms，核对出现红色提示，且输入框内的空格完好保留未被清空",
+              "人为模拟 JS 运行时报错，核对错误横幅正常浮现，输入框文本原样保留可继续编辑"
+            ]
+          },
+          "title": "交付任务：防抖校验失败拦截、就地提示与异常保留输入容错交付"
+        },
+        {
+          "content": "Scenario 1: 标准项目名实时防抖输入核对全流程\nGiven 页面处于初始待命状态，展示区显示灰色占位文字 '【等待输入核对】'，界面无确认按钮\nWhen 用户在输入框键入 'Project-Beta-2026' 并停止按键 300 毫秒\nThen 300 毫秒计时到期后，顶部展示区大字呈现 'Project-Beta-2026'，字体为加粗高对比度样式，输入框内保留 'Project-Beta-2026'，页面无任何错误警示。\n\nScenario 2: 纯空格输入防抖拦截与输入保留\nGiven 开发者在输入框中输入了三个半角空格 '   ' 并停止按键 300 毫秒\nWhen 300 毫秒防抖计时到期\nThen 顶部展示区保持原有内容不变，输入框下方即时呈现红色警示文字 '项目名不能为空，请输入有效字符'，输入框边框变为红色高亮，且输入框内的三个半角空格完好保留，光标保持在输入框内。\n\nScenario 3: 补充有效输入后错误自动恢复\nGiven 界面正处于 Scenario 2 的错误提示状态\nWhen 开发者在输入框原有空格后继续键入 'New-Project' 并停顿 300 毫秒\nThen 300 毫秒到期后，红色错误警示节点立即从 DOM 树中移除，输入框边框恢复正常，展示区即时更新呈现 '   New-Project'，输入框保留当前完整输入。\n\nScenario 4: 输入过程立即清空与取消待展示任务\nGiven 开发者在输入框输入 'Pending-Project'，在 150 毫秒内立即点击橙色圆形清空按钮\nThen 正在排队的 300 毫秒待展示任务被立即注销（clearTimeout），展示区重置为灰字占位符，输入框内容清空，300 毫秒后展示区绝不发生幽灵展示，光标自动重新聚焦在输入框内。\n\nScenario 5: 空白状态下重复清空幂等性\nGiven 页面处于干净待命状态\nWhen 用户连续点击 3 次清空按钮\nThen 页面无任何异常报错，展示区保持占位文字，输入框持续保持聚焦状态。",
+          "dependsOn": [
+            "blk-deliv-task-input-workflow",
+            "blk-deliv-task-reset-workflow",
+            "blk-deliv-task-error-handling"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-deliv-acc-full-e2e",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-feat-reset",
+            "blk-tech-error"
+          ],
+          "stage": "delivery",
+          "title": "端到端集成验收规范：实时防抖核心交互与输入保留 Given-When-Then"
+        },
+        {
+          "content": "Scenario 1: XSS 攻击向量纯文本安全转义与防抖回显\nGiven 页面处于就绪状态\nWhen 用户在输入框输入 `<script>window.__xss_flag = true; alert('XSS');</script><svg onload=alert(1)>` 并停顿 300 毫秒\nThen 300 毫秒到期后，顶部展示区将上述字符完整作为纯文本安全显示，控制台 window.__xss_flag 值为 undefined，页面不弹出任何系统警报框，DOM 树中展示区子节点仅包含纯 Text 节点，无 HTML 元素被创建。\n\nScenario 2: 极端高频输入防抖性能与排版防护\nGiven 用户以极高速度连续键入或粘贴包含 1000 个连续英文字符的超长项目名（按键间隔 < 50ms）\nWhen 连续键入过程中及最终停顿 300 毫秒\nThen 连续键入期间主线程流畅无卡顿，展示区不跳闪；停顿 300 毫秒后单次更新，展示区受 word-break: break-all 与 overflow-wrap: anywhere 约束自动折行，主容器不被撑破，无横向滚动条。\n\nScenario 3: 特殊实体字符原样保留回显\nGiven 用户输入包含 HTML 预留实体的项目名 `&amp; <test> \"quotes\" 'single'` 并等待 300 毫秒\nThen 展示区忠实显示 `&amp; <test> \"quotes\" 'single'` 原文，不发生双重转义或截断。\n\nScenario 4: 运行时错误保护与草稿不丢失\nGiven 开发者在输入框中录入了重要的待核对项目名草稿\nWhen 触发意外 DOM 操作异常或脚本错误\nThen 界面顶部呈现全局轻量容错通知，输入框中的草稿文字完好保留，页面不重载不刷新，开发者可直接复制或继续微调该文本。",
+          "dependsOn": [
+            "blk-deliv-task-input-workflow",
+            "blk-deliv-task-error-handling"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-deliv-acc-security-edge",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-tech-error",
+            "blk-prod-outcomes"
+          ],
+          "stage": "delivery",
+          "title": "端到端安全防范与实时极端边界验收规范 Given-When-Then"
+        },
+        {
+          "content": "实测在标准桌面操作系统环境下双击直接运行（file:// 协议）与跨浏览器无报错兼容性，验证零门槛免环境运行能力。",
+          "dependsOn": [
+            "blk-deliv-task-package",
+            "blk-deliv-spec-deployment"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-deliv-val-standalone-runtime",
+          "kind": "validation",
+          "requirementIds": [
+            "blk-deliv-spec-deployment",
+            "blk-tech-deployment"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "测试宿主机安装有至少一款现代主流桌面浏览器（版本 ≥ 100）"
+            ],
+            "completionCriteria": [
+              "三款主流浏览器在 file:// 协议下冷加载均零控制台报错",
+              "离线状态下全部实时输入防抖核对与清空逻辑功能完整",
+              "记录各浏览器实测结果到交付验证报告中"
+            ],
+            "environment": "现代桌面操作系统（Windows 10/11 或 macOS 或 Ubuntu Desktop），安装 Chrome 100+、Edge 100+、Firefox 100+，本地文件系统（file:// 协议）",
+            "evidenceRequired": [
+              "Chrome/Edge/Firefox 三款浏览器在 file:// 协议下的 Console 截图与实时交互动作录屏或用例记录表"
+            ],
+            "exclusions": "不测试已被淘汰的 IE 浏览器及非标准移动端内置 WebView",
+            "failureBehavior": "若某款浏览器在 file:// 下报安全限制或脚本未执行，检查 script 标签属性，使用原生自包含 defer 脚本加载模式并重新测试验证",
+            "goal": "实测验证实时防抖单页面产物在无需任何 HTTP 服务支持下直接本地双击（file://）成功加载与交互，并跨现代主流桌面浏览器兼容",
+            "modules": [
+              "AppController",
+              "DebounceScheduler",
+              "Packaging"
+            ],
+            "normalBehavior": "直接双击 index.html，浏览器在 file:// 协议下瞬时加载页面，无 CORS 限制或模块加载错误，实时输入 300ms 后自动大字展示，清空即时取消定时器并回焦，完全无确认按钮",
+            "onFailure": "若发现特定浏览器抛出 SecurityError 或脚本错误，排查定时器与 DOM API 调用兼容性，修复后重新执行步骤 1-7 直至全部通过。",
+            "passCriteria": [
+              "各浏览器 Console 面板 0 报错、0 警告；",
+              "输入 300ms 实时防抖展示、空值提示、即时清空取消任务及回焦功能在三大主流浏览器中表现一致；",
+              "离线状态下完全无功能降级。"
+            ],
+            "scope": "在 Chrome、Edge、Firefox 桌面最新版下分别测试 file:// 协议本地双击加载、DOM 解析、300ms 实时防抖脚本执行与清空回焦行为",
+            "steps": [
+              "1. 将交付产物目录（包含 index.html, styles.css, app.js）拷贝至本地桌面测试路径；",
+              "2. 断开当前设备外网连接，确保测试处于纯离线状态；",
+              "3. 鼠标右键 index.html 分别使用 Google Chrome、Microsoft Edge 和 Mozilla Firefox 打开；",
+              "4. 按 F12 打开浏览器开发者工具 Console 面板，核查是否有任何脚本错误、CORS 告警或资源未找到提示；",
+              "5. 分别在三款浏览器中输入 'StandAlone-Test-01' 并停顿 300 毫秒，核对展示区自动呈现结果并检查输入保留状态；",
+              "6. 在输入新字符后 100ms 内点击清空按钮，核对即时复位、防抖定时器取消及光标自动回焦；",
+              "7. 将各项测试截图与控制台状态记录归档至交付报告。"
+            ],
+            "verification": [
+              "在本地文件系统中直接双击 index.html，查验 DevTools Console 是否有报错",
+              "在 Chrome、Edge 与 Firefox 分别执行实时输入与清空操作，查验交互行为一致性",
+              "断开网络连接后重新双击 index.html，验证页面离线独立可用"
+            ]
+          },
+          "title": "交付前置验证任务：本地双击直接运行与多浏览器实时防抖实测"
+        },
+        {
+          "content": "实测首屏渲染时间（目标≤300ms）与实时输入防抖展示延迟（目标≤350ms，含 300ms 防抖等待）指标，建立精确测量基准。",
+          "dependsOn": [
+            "blk-tech-val-performance",
+            "blk-deliv-val-standalone-runtime"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-ddc041e1-0b49-4ed7-be90-8b675c88a69d",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-deliv-val-perf-benchmark",
+          "kind": "validation",
+          "requirementIds": [
+            "blk-prod-outcomes",
+            "blk-tech-val-performance"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "运行在主流性能配置的桌面计算机（如 4 核以上 CPU，8GB 以上内存）"
+            ],
+            "completionCriteria": [
+              "实测数据完整，冷启动耗时 ≤ 300ms，防抖展示耗时 ≤ 350ms",
+              "无阻塞主线程的长任务（Long Task）",
+              "形成完整的性能实测归档记录"
+            ],
+            "environment": "桌面 PC（现代 x86_64 或 Apple Silicon 架构），Chrome 最新稳定版无痕模式，禁用所有第三方浏览器扩展",
+            "evidenceRequired": [
+              "Chrome DevTools Performance 跟踪导出的 JSON 记录与控制台打印的 5 轮耗时数据日志"
+            ],
+            "exclusions": "不测量网络传输延时（测试在本地文件或本地回环服务下进行）",
+            "failureBehavior": "若实测超出阈值，分析是否有强制同步布局或高频无用重绘，精简 DOM 操作后复测",
+            "goal": "实测验证轻量纯原生单页面的首屏冷启动耗时≤300ms、输入防抖自动展示延迟≤350ms（含 300ms 防抖等待）的性能设计目标",
+            "modules": [
+              "AppController",
+              "DebounceScheduler",
+              "DisplayRenderer",
+              "InputController"
+            ],
+            "normalBehavior": "打开页面时，从 navigationStart 到 domContentLoaded 耗时实测在 50~150ms 之间（符合 300ms 目标）；键入字符后，从最后一次 input 事件到微任务执行完毕及 requestAnimationFrame 渲染帧完成，总耗时控制在 300~330ms 之间（符合 ≤350ms 目标）",
+            "onFailure": "若某项指标超时，审查 styles.css 选择器复杂度，检查 app.js 中是否存在未清理的定时器或频繁 DOM 查询，优化后重新测试。",
+            "passCriteria": [
+              "冷启动渲染耗时平均值 ≤ 300ms；",
+              "输入实时防抖展示耗时平均值 ≤ 350ms（含 300ms 防抖设定延时），清空重置渲染耗时平均值 ≤ 50ms；",
+              "测试过程中主线程无卡顿。"
+            ],
+            "scope": "使用浏览器标准 Performance Navigation Timing API 与 Performance.now() 进行冷启动与实时防抖渲染的精确毫秒级打点测量",
+            "steps": [
+              "1. 启动 Chrome 无痕模式并加载交付的 index.html；",
+              "2. 在 Console 执行 navigation timing 记录冷启动耗时；",
+              "3. 注入测试探针：在 input 事件中记录 `const t0 = performance.now()`；在定时器触发后的 `requestAnimationFrame(() => console.log('防抖展示延迟:', performance.now() - t0))` 打印总耗时；",
+              "4. 录入 50 字符项目名，测量停顿后的展示延迟，重复 5 次取平均值；",
+              "5. 点击清空按钮，测量清空重置与定时器取消耗时，重复 5 次取平均值；",
+              "6. 汇总冷启动与防抖展示延迟数据，比对是否符合 ≤300ms 与 ≤350ms 指标。"
+            ],
+            "verification": [
+              "在 Chrome DevTools Performance 面板录制 3 次冷加载 Trace，查验 DOMContentLoaded 均值是否 ≤ 300ms",
+              "在控制台注入性能测量脚本，连续执行 10 次输入防抖展示与 10 次清空操作，统计平均耗时与最大耗时是否达标",
+              "输出包含设备配置、测试数据规模与测量起止记录的性能实测数据表"
+            ]
+          },
+          "title": "交付前置验证任务：首屏冷启动与实时防抖响应性能基准实测"
+        },
+        {
+          "content": "对交付产物进行代码级纯文本渲染安全性与无外部依赖静态审计，杜绝 innerHTML 等注入点，审查防抖定时器传参安全性，并确认确认按钮专属逻辑已彻底清除。",
+          "dependsOn": [
+            "blk-deliv-task-package",
+            "blk-deliv-task-input-workflow"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830"
+          ],
+          "id": "blk-deliv-val-security-xss-audit",
+          "kind": "validation",
+          "requirementIds": [
+            "blk-tech-stack",
+            "blk-deliv-spec-deployment"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "遵循 W3C/WHATWG DOM 标准规范"
+            ],
+            "completionCriteria": [
+              "代码静态审查 0 处不安全 DOM API 调用",
+              "全部 10 项 XSS Payload 测试均被安全转义为纯文本回显",
+              "形成安全审计测试清单并归档"
+            ],
+            "environment": "桌面现代主流浏览器，安全审计检查工具或原生文本搜索",
+            "evidenceRequired": [
+              "静态代码扫描日志与 10 组 Payload 动态测试的 DOM 节点类型查验证明"
+            ],
+            "exclusions": "不进行服务端 SQL 注入等不适用单页面的外部渗透测试",
+            "failureBehavior": "若静态审查发现任何隐式 HTML 解析或危险 API，一律替换为安全标准 DOM API（如 createElement + textContent），重构后复测",
+            "goal": "通过静态代码审查与动态渗透注入用例，确保交付产物杜绝 innerHTML 等危险 DOM 写入，确保纯原生标准合规，杜绝确认按钮残留代码与 setTimeout 字符串注入",
+            "modules": [
+              "DisplayRenderer",
+              "DebounceScheduler",
+              "ValidatorModule"
+            ],
+            "normalBehavior": "源码中完全不存在 innerHTML、outerHTML、document.write、eval、new Function 等危险调用；setTimeout 仅接收函数引用，绝不接收代码字符串；所有输入回显均走 textContent；10 种 XSS Payload 在 300ms 防抖后均纯文本原样回显，无弹窗、无网络外发、无 DOM 元素生成",
+            "onFailure": "若发现任何潜在注入风险点，立刻追溯代码赋值路径，强制改写为 textContent 纯文本绑定，重新执行全量安全用例。",
+            "passCriteria": [
+              "代码中危险 API 出现次数为 0；",
+              "所有 Payload 在 300ms 防抖后均安全显示为纯文本字符串，无任何代码执行行为；",
+              "无未经声明的外部网络依赖，无确认按钮残留代码。"
+            ],
+            "scope": "审查 index.html、styles.css、app.js 源码全文，动态注入 10 种典型 XSS Payload 验证实时防抖下的无害化",
+            "steps": [
+              "1. 全局搜索 app.js 正则匹配 `innerHTML|outerHTML|document\\\\.write|eval\\\\(|new Function`，确认匹配结果为 0 项；",
+              "2. 检索 setTimeout 调用，确认参数为函数引用，杜绝 `setTimeout('string', ...)` 形式的注入漏洞；",
+              "3. 检查 index.html 确认无任何确认按钮 DOM 节点残留；",
+              "4. 构造 10 组典型跨站脚本 Payload，逐一录入输入框并在 300ms 防抖后检查 DOM 树中展示区子节点是否仅为纯 TextNode；",
+              "5. 检查控制台网络面板与 Console，确认无异常网络外发和异常脚本执行报错。"
+            ],
+            "verification": [
+              "全局搜索 app.js，确认 innerHTML、outerHTML、document.write、eval 出现次数为 0",
+              "分别将 `<script>alert(1)</script>` 等填入输入框，验证 300ms 后展示区为纯文本无弹窗",
+              "检查 index.html 确认无内联 script 逻辑与无外部远程第三方 JS/CSS 链接"
+            ]
+          },
+          "title": "交付前置验证任务：XSS 安全审计与实时防抖代码静态规范性检查"
+        }
+      ],
+      "decisions": [
+        {
+          "area": "交互体验",
+          "decisionKey": "dec-realtime-debounce-feedback",
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-bb172f0f-5057-4d72-b16b-9c6f68a6a830",
+            "evidence-c8b59aca-ba2c-4be7-b075-b3de3ad6cf0a"
+          ],
+          "rationale": "严格贯彻用户反馈原文‘确认按钮改为实时反馈：输入每次变化后等待300毫秒自动展示项目名，清空立即取消待展示任务并清掉结果；空值仍提示。删除确认按钮及其专属逻辑’。300ms 防抖既能消除冗余点击操作、提升核对敏捷性，又能避免每次敲击高频触发 DOM 重排重绘。",
+          "statement": "废除显式确认按钮及 Enter 回车提交机制，输入框采用基于 input 事件与 window.setTimeout 的 300 毫秒防抖实时反馈架构：用户每次按键或内容变化后等待 300 毫秒无新输入时自动触发校验与大字展示；若输入为空或全空白字符，则在防抖后触发红色就地警示且保留输入字符。"
+        },
+        {
+          "area": "视觉与布局结构",
+          "decisionKey": "dec-visual-layout-single-button",
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "rationale": "用户反馈明确指示‘删除确认按钮及其专属逻辑，更新相关流程、页面、接口、任务和验收’。在界面上去除确认按钮，使单页面保持极简清爽的即时流转界面，清空按钮仍保留在右下方提供即时重置。",
+          "replaces": [
+            "dec-72513e55-a5a7-44e1-90ad-087b5927447e"
+          ],
+          "statement": "在遵守 fixture.png 纯白背景、顶部大字展示区与居中输入框排布的基础上，彻底移除底部左侧蓝色确认按钮（对应原图蓝色矩形色块被移除），仅保留底部右侧橙色圆形清空按钮（对应原图橙色圆形色块）。"
+        }
+      ],
+      "dependsOn": [],
+      "id": "group-realtime-input-feedback",
+      "impact": "依据模拟用户反馈原文，将项目名输入从原有的‘点击确认按钮/Enter提交’模式重构为‘输入每次变化后等待300毫秒防抖自动展示’，删除确认按钮及其 DOM 节点、样式与专属事件绑定逻辑；保留空值就地错误警示与异常保留输入机制；全面更新产品、技术与交付阶段的流程、页面结构、接口、开发任务与端到端验收用例。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "输入实时反馈与300ms防抖展示改造（含确认按钮及专属逻辑移除）"
+    },
+    {
+      "blocks": [
+        {
+          "content": "提供一键清空与重置功能，帮助用户在完成一轮项目名核对后快速复位界面，并与 300ms 实时防抖任务严格联动：\n- 正常交互：依据用户已确认决策（即时直接清空），用户点击底部右侧橙色圆形清空按钮后，系统立即执行复位，不弹出阻断式确认弹窗。系统在第一时间主动取消正在进行的 300 毫秒待展示防抖任务（clearTimeout），顶部展示区立即复位为初始占位提示（如‘【等待输入核对】’），输入框内容清空，任何正在显示的校验报错信息被移除，光标自动重新聚焦在输入框内（.focus()），方便立即开始新一轮输入。误触代价说明：误触将立即清空当前内容并取消待展示任务，需重新输入。\n- 容错与恢复：清空操作不依赖外部环境，纯客户端内存重置；若清空过程抛出异常，捕获错误并保留现有视图，控制台输出日志并提示用户手动刷新，不发生页面白屏。\n- 幂等性：在空页面状态或正在进行防抖倒计时状态下点击清空，均具备确定性复位表现，无任何副作用或报错。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-feat-reset",
+          "kind": "feature",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "product",
+          "title": "功能特性：一键清空、防抖任务即时取消与状态复位"
+        },
+        {
+          "content": "1. 用户点击底部右侧橙色圆形清空按钮（对应 fixture.png 下方右侧橙色圆形色块位置）。\n2. 系统执行即时直接复位（不弹出阻断确认框）：\n   a. 第一步：立即调用 DebounceScheduler.cancel()（底层执行 window.clearTimeout(timerId)），注销任何未决的 300 毫秒待展示任务，重置定时器句柄为 null；\n   b. 第二步：将当前输入框 value 设为空字符串（''）；\n   c. 第三步：将顶部展示区 textContent 重置为预设占位文字（'【等待输入核对】'），恢复灰色占位样式；\n   d. 第四步：隐藏或移除所有可见的校验错误 DOM 节点，重置边框高亮样式；\n   e. 第五步：触发 inputElement.focus() 将焦点重置到输入框，等待新一轮输入。\n3. 流程结束，界面完全恢复初始就绪态，300 毫秒后不会产生任何延迟渲染。",
+          "dependsOn": [
+            "blk-feat-reset"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-flow-reset",
+          "kind": "flow",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "title": "交互流程：清空重置与防抖任务取消流转"
+        },
+        {
+          "content": "实现清空按钮的事件绑定、待展示防抖任务即时注销、各组件状态统一重置以及光标自动回焦机制。",
+          "dependsOn": [
+            "blk-flow-reset"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-task-reset",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "task": {
+            "assumptions": [
+              "所有组件状态均为纯客户端内存受控状态，无异步数据竞争"
+            ],
+            "completionCriteria": [
+              "点击清空立即注销待展示任务，展示区与输入框彻底复位",
+              "光标准确自动回焦至输入框",
+              "前次操作遗留的错误警示彻底清除",
+              "具备异常捕获保护，异常时不发生页面崩溃"
+            ],
+            "exclusions": "不弹出二次确认阻断框，不重载网页，不清除控制台调试日志",
+            "failureBehavior": "若清空或回焦逻辑抛出未捕获异常，捕获该错误并保留当前视图，向控制台输出错误日志并弹出友好错误提示 '重置失败，请重试'，绝不导致页面崩溃或白屏",
+            "goal": "实现清空按钮的事件绑定、待展示防抖任务即时注销、全局视图状态统一重置以及光标自动回焦机制",
+            "modules": [
+              "ResetController",
+              "DebounceScheduler",
+              "StateManager"
+            ],
+            "normalBehavior": "点击底部右侧橙色清空按钮后，立即调用 DebounceScheduler.cancel() 注销正在排队的 300ms 防抖定时器，将输入框 value 设为空字符串，顶部展示区恢复为灰色占位文本 '【等待输入核对】'，隐藏并移除所有现存的校验错误提示，同时调用 inputElement.focus() 自动将光标聚焦回输入框",
+            "scope": "清空按钮事件监听、DebounceScheduler 定时器取消、输入框与展示区复位逻辑、错误状态清理与回焦机制",
+            "verification": [
+              "在键入字符后 100ms（防抖倒计时中）点击清空按钮，验证 300ms 后展示区保持占位文本，不发生幽灵渲染",
+              "在已展示有效项目名且有遗留空值警告的状态下点击清空按钮，验证无弹窗阻断、展示区即时恢复占位文字且警告提示彻底消除",
+              "验证点击清空后输入框内容为空，且键盘光标自动聚焦在输入框内可直接键入",
+              "验证连续多次点击清空按钮表现稳定，无运行时报错"
+            ]
+          },
+          "title": "开发任务：一键清空、防抖任务注销与组件回焦控制"
+        },
+        {
+          "content": "Scenario 1: 输入防抖倒计时中点击清空（取消待展示任务）\nGiven 用户在输入框键入了 'Project-Cancel-Test'\nWhen 在第 100 毫秒（300ms 防抖倒计时未到期前）用户点击橙色圆形清空按钮\nThen 系统立即取消（clearTimeout）该待展示定时任务，输入框文本被清空，展示区保持为灰色占位文字 '【等待输入核对】'；在 300 毫秒时间窗口过后，展示区依然保持占位状态，绝不呈现 'Project-Cancel-Test'，光标自动聚焦在输入框内。\n\nScenario 2: 已展示状态下的即时清空复位与回焦\nGiven 顶部展示区正在展示 'Project-Test'，输入框包含 'Project-Test'，界面无错误\nWhen 用户点击底部右侧橙色清空按钮\nThen 页面不弹出任何二次确认框，顶部展示区立即恢复为灰色占位文本 '【等待输入核对】'，输入框文本变为空字符串，输入光标自动聚焦在输入框内。\n\nScenario 3: 清除历史错误提示\nGiven 页面因前次操作正在显示 '项目名不能为空，请输入有效字符' 红色警告\nWhen 用户点击清空按钮\nThen 红色警告提示立刻从 DOM 移除，输入框错误高亮取消，页面恢复至干净初始态。\n\nScenario 4: 空页面重复点击清空幂等性\nGiven 页面处于初始空白状态\nWhen 用户连续多次点击清空按钮\nThen 页面无任何异常抛出，展示区保持占位提示，输入框保持聚焦。",
+          "dependsOn": [
+            "blk-task-reset"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-acc-reset",
+          "kind": "acceptance",
+          "requirementIds": [
+            "blk-feat-reset"
+          ],
+          "stage": "product",
+          "title": "验收标准：清空重置与防抖任务取消 Given-When-Then"
+        },
+        {
+          "content": "落实用户已确认的“即时直接清空”决策与防抖取消联动，点击清空按钮立即注销待展示任务、复位状态并回焦输入框，无二次确认阻断。",
+          "dependsOn": [
+            "blk-deliv-task-layout-styling",
+            "blk-tech-module",
+            "blk-tech-interface"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc"
+          ],
+          "id": "blk-deliv-task-reset-workflow",
+          "kind": "task",
+          "requirementIds": [
+            "blk-feat-reset",
+            "blk-tech-module",
+            "blk-tech-interface"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "用户接受误触清空需重新输入的代价（已在决策中确认）"
+            ],
+            "completionCriteria": [
+              "严格遵守 dec-clear-interaction-mode 与 dec-reset-cancel-debounced-task，无二次确认阻断",
+              "点击清空立即销毁未决防抖定时器并清空结果",
+              "一键同步复位输入框、展示区与错误提示",
+              "光标准确自动回焦至输入框"
+            ],
+            "exclusions": "不弹出 window.confirm 或任何阻塞式模态弹窗，不刷新浏览器页面",
+            "failureBehavior": "若执行重置逻辑时捕获到异常，保留当前页面状态，在控制台打印排查日志并在界面呈现温和提示，页面不崩溃不跳转，用户可手动清空或刷新",
+            "goal": "实现底部右侧橙色圆形清空按钮的即时复位逻辑、300ms 待展示任务即时销毁与光标自动回焦交付",
+            "modules": [
+              "ResetController",
+              "DebounceScheduler",
+              "InputController",
+              "DisplayRenderer",
+              "FeedbackBanner"
+            ],
+            "normalBehavior": "用户点击橙色圆形清空按钮，系统立即调用 DebounceScheduler.cancel() 取消排队定时器，清空输入框文本（value = ''），将顶部展示区重置为灰字占位符 '【等待输入核对】'，移除输入框错误高亮和错误提示节点，并立即执行 inputElement.focus() 使光标恢复至输入框内，等待下一轮核对",
+            "scope": "ResetController 编码实现，DebounceScheduler.cancel() 调用、输入框 value 清空、展示区恢复占位文本、历史错误清除与 inputElement.focus() 调用",
+            "verification": [
+              "在输入后 100ms 点击清空，验证防抖定时器被清除，300ms 后展示区不出现文字",
+              "在已有输入内容和展示结果的状态下点击清空，验证无阻断弹窗，页面各区域瞬间恢复初始待命态",
+              "验证点击清空后，无需手动用鼠标再次点击输入框即可直接通过键盘键入新文本（自动回焦生效）",
+              "连续快速点击 5 次清空按钮，验证无 JavaScript 报错，保持稳定幂等性"
+            ]
+          },
+          "title": "交付任务：一键即时清空、防抖任务销毁与焦点自动恢复交付"
+        }
+      ],
+      "decisions": [
+        {
+          "area": "交互体验",
+          "decisionKey": "dec-reset-cancel-debounced-task",
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-c62fb97c-029b-4315-b49e-94b63805c1bc",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f"
+          ],
+          "rationale": "用户反馈原文明确指示‘清空立即取消待展示任务并清掉结果’。在实时防抖架构下，用户输入后 300ms 内点击清空属于典型并发边界，必须显式销毁未到期的定时器以确保页面状态彻底回到干净初始态。",
+          "statement": "清空操作在执行即时复位（无确认弹窗）的同时，必须在第一优先级同步调用 window.clearTimeout 销毁当前未决的 300 毫秒防抖待展示定时器，并清空展示区为初始占位符，杜绝清空后发生异步幽灵展示覆盖。"
+        }
+      ],
+      "dependsOn": [
+        "group-realtime-input-feedback"
+      ],
+      "id": "group-reset-cancel-debouncing",
+      "impact": "强化一键清空机制，使其在即时重置输入框与展示区的同时，能够显式取消（clearTimeout）正在排队的 300 毫秒待展示防抖任务，杜绝清空后的幽灵渲染或延迟覆盖，并自动回焦输入框。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "清空操作即时取消待展示防抖任务与状态复位强化"
+    }
+  ],
+  "questions": [],
+  "summary": "依据用户反馈原文，将项目名输入机制全面改造为‘输入每次变化后等待 300 毫秒防抖自动展示’，彻底移除确认按钮及其专属 DOM/样式与事件逻辑；清空按钮点击立即注销待展示任务（clearTimeout）并清空结果与输入框，自动回焦输入框；空值在 300ms 防抖后依然就地显示红色警示并严格保留用户输入。全量受影响的产品、技术与交付阶段块及验收用例已同步更新，保持稳定 ID 与依赖闭包。"
+}

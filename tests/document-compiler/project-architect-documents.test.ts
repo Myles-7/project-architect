@@ -5,8 +5,9 @@ import { join } from 'node:path';
 import { ProjectStateEngine, FileStorage } from '@project-architect/core';
 import { AIOrchestrator, MockAIProvider } from '@project-architect/agent';
 import type { DiscoveryResult } from '@project-architect/contracts';
+import { renderHistoricalDocuments } from '../fixtures/historical-documents.js';
 
-describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Project)', () => {
+describe('Historical Document Renderer — Project Architect (Complex Self-Hosting Project)', () => {
   let tempBaseDir: string;
   let storage: FileStorage;
   let stateEngine: ProjectStateEngine;
@@ -34,6 +35,11 @@ describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Proj
       projectTags: ['Desktop App', 'AI Product', 'Developer Tool', 'Security'],
     });
 
+    const initialIdea = s0.decisions.items.find((decision) => decision.statement === 'AI project architecture workbench helping users define software ideas before AI coding');
+    expect(initialIdea?.status).toBe('candidate');
+    const confirmedInitial = await stateEngine.confirmDecision(projectPath, `decision:${initialIdea!.id}`, s0.metadata.stateRevision);
+    expect(confirmedInitial.decisions.items.find((decision) => decision.id === initialIdea!.id)?.confirmedBy).toBe('user');
+
     const mockOutput: DiscoveryResult = {
       confirmed: ['Project Architect', 'AI project architecture workbench'],
       candidates: ['Visual diagram generator'],
@@ -49,7 +55,7 @@ describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Proj
 
     // Turn 1
     await orchestrator.runDiscoveryTurn(projectPath, {
-      expectedRevision: s0.metadata.stateRevision,
+      expectedRevision: confirmedInitial.metadata.stateRevision,
       userMessage: 'Target user is software engineers and AI coders. MVP scope is Discovery Engine, State Store, and Document Compiler.',
     });
 
@@ -87,33 +93,36 @@ describe('Document Compiler E2E — Project Architect (Complex Self-Hosting Proj
       'confirmed'
     );
 
-    // Compile Documents
-    const compileResult = await orchestrator.compileDocuments(projectPath);
+    // Render the historical fixture without publication
+    const compileResult = await renderHistoricalDocuments(projectPath, storage);
+    expect(compileResult.filesAfter).toEqual(compileResult.filesBefore);
+    expect(compileResult.manifest.sourceRevision).toBe(compileResult.snapshot.metadata.stateRevision);
+    expect(new Set(compileResult.renderedFiles.map(file => file.content)).size).toBe(compileResult.renderedFiles.length);
 
     expect(compileResult.readiness.ready).toBe(true);
     // Includes 8 core + AI_SPEC.md + DESKTOP_SPEC.md + SECURITY_SPEC.md = 11 documents
     expect(compileResult.manifest.items.length).toBe(11);
 
-    // Verify all files on disk
-    expect(await storage.exists(join(projectPath, 'AGENTS.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'PROJECT.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'PRODUCT.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'USER_FLOWS.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'UX_UI_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'TECHNICAL_GUIDE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'DEVELOPMENT_PLAN.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'ACCEPTANCE.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'AI_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'DESKTOP_SPEC.md'))).toBe(true);
-    expect(await storage.exists(join(projectPath, 'docs', 'specs', 'SECURITY_SPEC.md'))).toBe(true);
+    // Verify the complete historical document set rendered in memory
+    expect(compileResult.has('AGENTS.md')).toBe(true);
+    expect(compileResult.has('docs/PROJECT.md')).toBe(true);
+    expect(compileResult.has('docs/PRODUCT.md')).toBe(true);
+    expect(compileResult.has('docs/USER_FLOWS.md')).toBe(true);
+    expect(compileResult.has('docs/UX_UI_SPEC.md')).toBe(true);
+    expect(compileResult.has('docs/TECHNICAL_GUIDE.md')).toBe(true);
+    expect(compileResult.has('docs/DEVELOPMENT_PLAN.md')).toBe(true);
+    expect(compileResult.has('docs/ACCEPTANCE.md')).toBe(true);
+    expect(compileResult.has('docs/specs/AI_SPEC.md')).toBe(true);
+    expect(compileResult.has('docs/specs/DESKTOP_SPEC.md')).toBe(true);
+    expect(compileResult.has('docs/specs/SECURITY_SPEC.md')).toBe(true);
 
     // Verify AGENTS.md locked decisions
-    const agentsContent = await storage.readText(join(projectPath, 'AGENTS.md'));
+    const agentsContent = compileResult.content('AGENTS.md');
     expect(agentsContent).toContain('Single Provider Call per turn, No external database');
     expect(agentsContent).toContain('Local file persistence in JSON format');
 
     // Verify ACCEPTANCE.md
-    const acceptanceContent = await storage.readText(join(projectPath, 'docs', 'ACCEPTANCE.md'));
+    const acceptanceContent = compileResult.content('docs/ACCEPTANCE.md');
     expect(acceptanceContent).toContain('Definition of Done (DoD)');
   });
 });

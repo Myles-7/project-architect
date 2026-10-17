@@ -1,0 +1,296 @@
+{
+  "blockers": [],
+  "clarification": {
+    "constraints": "纯前端零后端、零数据库、无登录支付；支持本地双击运行（file:// 协议）与本地轻量 HTTP 静态托管（固定端口 8080）；项目名大字展示区严格使用 Node.textContent 属性纯文本绑定，杜绝 HTML 解析注入；不作超出当前证据的绝对全应用安全承诺。",
+    "delegated": [
+      "按钮文案与排版样式细节",
+      "就地错误提示样式与显示位置",
+      "内部函数组织与 Coding Agent 具体实现细节",
+      "输入法拼音合成事件守卫与代际闭包实现细节",
+      "清空两阶段事务与原子回滚机制",
+      "严重 DOM 异常回滚失败下的独立只读 textarea 草稿安全复制兜底交互"
+    ],
+    "outcomes": "实现输入 300ms 防抖实时反馈的大字核对展示、单橙色圆形清空按钮的强两阶段状态事务与拓扑回滚，支持双启动模式与纯离线运行，五轮均值重绘前调度代理指标严格满足 <=50ms。",
+    "problem": "开发者在本地快速核对项目名输入反馈时，需要极简零配置运行、输入即所得的实时反馈；同时需保障空值警示、清空操作原子性，并在异常时严格保留原始输入，杜绝竞态冲突与数据丢失。",
+    "scope": "纯前端单页面应用，包含顶部大字展示区、居中项目名输入框、底部单个橙色圆形清空按钮、就地非空警示容器与异常通知横幅；无服务端、无数据库、无用户登录与无协作支付。",
+    "target": "使用 Coding Agent 且略懂技术的个人开发者，用于本地高频、敏捷的单页面项目名输入核对原型。"
+  },
+  "evidence": [
+    {
+      "applicability": "查证 Node.insertBefore 标准规范，证实其在现代浏览器全平台普遍支持（Baseline: Widely available since 2015），支持在清空回滚或 DOM 异常恢复时，将原输入节点准确插回原父节点及 nextSibling 位置，保障唯一输入框与 DOM 拓扑原子恢复。",
+      "content": "Node: insertBefore() method - Web APIs | MDN: The insertBefore() method of the Node interface inserts a node before a reference node as a child of a specified parent node. If referenceNode is null, newNode is inserted at the end of node's child nodes. If the given node already exists in the document, it is moved from its current position. Baseline: Widely available (since July 2015).",
+      "hash": "40443693726f17fc6165ec49ebfcad45f9f8f4566d5df1e54bf20505b0e3b03c",
+      "id": "evidence-7302929b-2e70-4bf1-874e-8bd1e3a3dd54",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore",
+      "obtainedAt": "2026-10-05T07:20:03.955Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/insertBefore"
+    },
+    {
+      "applicability": "查证 HTMLTextAreaElement.readOnly 属性规范，证实其支持在用户不可修改的同时仍可点击和选中（unlike disabled），支撑在严重回插失败等极端回滚异常时，采用只读 textarea 呈现已捕获的用户草稿全文，允许用户点击并手动选中复制，且纯文本 value 赋值杜绝 HTML 注入，无需剪贴板权限或外部存储。",
+      "content": "HTMLTextAreaElement: readOnly property - Web APIs | MDN: The readOnly property of the HTMLTextAreaElement interface indicates that the user cannot modify the value of the control. Unlike the disabled attribute, the readonly attribute does not prevent the user from clicking or selecting in the control. Baseline: Widely available (since July 2015).",
+      "hash": "5bf8e5f908da5de79a5cdbfd201716d7b658fc6cb055df51e0ef3b8d57805616",
+      "id": "evidence-8d52b774-8940-4f2b-892a-fa5b471b2b5e",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement/readOnly",
+      "obtainedAt": "2026-10-05T07:20:18.343Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement/readOnly"
+    },
+    {
+      "applicability": "查证 Element.compositionend 标准事件规范，证实其在输入法会话完成或取消时触发（如中文拼音输入），并提供 generated characters（event.data）。在清空重置时需结合节点闭包与代际隔离，防止旧会话的迟到 compositionend 污染新输入或触发伪空值校验。",
+      "content": "Element: compositionend event - Web APIs | MDN: The compositionend event is fired when a text composition system such as an input method editor completes or cancels the current composition session (e.g., after entering a Chinese character via Pinyin IME). Baseline: Widely available (since July 2015).",
+      "hash": "b1aa74664ab9c0fb7825c8eed5eeb6938d1bd3d089f3d90dab2799d63e883f0b",
+      "id": "evidence-4078273b-7521-4409-97fc-977c6f5cc584",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event",
+      "obtainedAt": "2026-10-05T07:20:38.163Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionend_event"
+    },
+    {
+      "applicability": "证实 InputEvent.isComposing 为只读布尔属性，指示 input 事件是否发生在 compositionstart 与 compositionend 之间；在 300ms 自动展示逻辑中用于过滤拼音组合输入中的临时拼音字符，仅在非组合态或 compositionend 提交后才调度防抖展示。",
+      "content": "InputEvent: isComposing property - Web APIs | MDN: The InputEvent.isComposing read-only property returns a boolean value indicating if the event is fired after compositionstart and before compositionend. Baseline: Widely available.",
+      "hash": "af251c720670831d8e156382da9b0edd949bd9cf4fab910a9d0109ceceda3447",
+      "id": "evidence-f4fc9e4f-e93d-4ac7-bcf5-bca207707149",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/InputEvent/isComposing",
+      "obtainedAt": "2026-10-05T07:20:48.988Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/InputEvent/isComposing"
+    },
+    {
+      "applicability": "记录当前规划环境缺少 Docker 守护进程支持的客观事实，表明受控端到端容器测试在规划阶段无法执行（状态为 unexecuted）；此属于规划工具环境限制而非用户项目约束，真实浏览器和原生 IME 验证须作为后续开发任务在宿主环境中落地。",
+      "content": "在当前规划环境尝试为 Node 受控试验准备执行环境（runtime: node），返回 status: unavailable。原因：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified。因此规划期受控 Docker 试验未执行。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop unavailable on host)",
+      "id": "evidence-env-docker-unavailable-run-ea72daa3",
+      "kind": "experiment",
+      "location": "D:\\\\Temp\\\\User\\\\pa-quality-copy-mJswsX\\\\materials\\\\runtime\\\\planning\\\\run-ea72daa3-862d-4c9d-b406-d2b4272c1c68\\\\tools\\\\experiments\\\\prepare-408beb49-1beb-4874-a3e1-7740d5259497.ndjson",
+      "obtainedAt": "2026-10-05T15:19:49+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-408beb49-1beb-4874-a3e1-7740d5259497"
+    },
+    {
+      "applicability": "作为视觉布局映射、色块来源与产品范围界定的材料事实依据，核对布局元素映射，防止将示例内容误当业务需求。",
+      "content": "通过 material_index、material_image 及原生 view_file 工具对 D:\\Temp\\User\\pa-quality-copy-mJswsX\\materials\\inputs\\inp-1791129999124\\fixture.png 进行实际像素查看。图像为纯白背景，上方居中展示黑色文字“Q7M4-8261”；下方左侧为一个蓝色水平长方形色块，下方右侧为一个橙色实心圆形色块。依据用户输入规范，截图仅作为布局与视觉色块参考，原图中的文字“Q7M4-8261”为图像测试数据，不自动转换为固定业务需求。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-input-fixture-png-inspection",
+      "kind": "material",
+      "location": "D:\\Temp\\User\\pa-quality-copy-mJswsX\\materials\\inputs\\inp-1791129999124\\fixture.png",
+      "obtainedAt": "2026-10-05T15:17:12+08:00",
+      "outcome": "not-applicable",
+      "source": "material:input:inp-1791129999124"
+    }
+  ],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "技术栈严格遵守纯前端单页面边界约束，采用纯原生 HTML5、CSS3 与现代原生 JavaScript（标准经典脚本搭配 defer 属性加载与严格模式闭包隔离）：\n1. 标记层（HTML5）：标准语义化单页面结构（<main>, <section>, <input>, <button>），彻底移除确认按钮节点，通过 WAI-ARIA 属性（aria-live=\"polite\"）辅助就地错误提示展示；\n2. 表现层（CSS3）：CSS Flexbox 弹性布局规范，彻底移除原确认按钮样式，保留白底背景（#FFFFFF）、顶部居中大字展示容器（高对比、word-break: break-all 折行防溢出）与底部橙色圆形清空按钮样式（#FF5500）；\n3. 脚本组织与执行（JavaScript）：通过 <script defer src=\"app.js\"></script> 加载自包含脚本，app.js 内部采用严格模式与立即执行函数表达式（IIFE）实现各模块封装与解耦；经典脚本搭配 defer 属性在本地双击（file:// 协议）下无 ES Module 的 CORS 跨域限制，零依赖直接运行，同时完全兼容本地轻量 HTTP 静态托管；\n4. DOM 安全输出与适用边界声明：全面采用 W3C/WHATWG 标准 Node.textContent 属性进行纯文本绑定，严禁使用 innerHTML，确保用户输入仅以文本节点形式插入展示区 DOM，恶意标签原样纯文本回显；依据证据 evidence-dab40954-74e0-4d24-bb31-1064f5dd626f，明确该机制仅保证项目名文本节点不被浏览器解析为 HTML/脚本，不外推为全系统杜绝所有 DOM XSS 的绝对证明；全应用安全由禁用危险 API 静态审查与动态 Payload 验收共同保障；\n5. 平台支持目标：面向 Chrome ≥ 100, Edge ≥ 100, Firefox ≥ 100, Safari ≥ 15 等主流现代桌面浏览器，零转译零构建直接执行。",
+          "dependsOn": [
+            "blk-prod-scope"
+          ],
+          "evidenceIds": [
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0",
+            "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+            "evidence-mdn-xss-definition-boundary"
+          ],
+          "id": "blk-tech-stack",
+          "kind": "technology",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-prod-outcomes"
+          ],
+          "stage": "technical",
+          "title": "技术栈选型与运行规范（经典脚本 defer、端口规范与安全边界限定）"
+        },
+        {
+          "content": "运行环境支持要求、双启动模式、固定 8080 端口契约与离线运行边界规范，面向个人开发者的本地无门槛极简运行场景设计：\n1. 目标运行环境与支持范围：\n   - 操作系统：Windows 10/11、macOS 12+ 或主流 Linux 桌面环境；\n   - 浏览器支持目标：现代主流桌面浏览器最新稳定版（Google Chrome ≥ 100, Microsoft Edge ≥ 100, Mozilla Firefox ≥ 100, Apple Safari ≥ 15）；Windows 宿主机下对 Chrome、Edge 与 Firefox 执行本地直接双击与托管实测；Safari 浏览器在开发阶段进行跨平台语法审查，真机实测标明需要 macOS 真实环境的前提，当前规划期容器不可用不冒充已实测；\n   - 硬件要求：标准桌面设备，支持 1024×768 及以上分辨率显示器、鼠标与键盘；\n2. 双启动模式与端口契约：\n   - 模式 A（本地文件直接双击运行）：直接通过文件管理器双击 index.html（file:// 协议加载），无 CORS 跨域拦截，零依赖零服务即开即用，为 100% 自包含纯离线打开模式；\n   - 模式 B（本地轻量静态 HTTP 服务托管）：统一绑定固定端口 8080 并访问 http://localhost:8080，命令与地址严格一致：\n     * 方案 B1：python -m http.server 8080（前提：宿主机已安装 Python 3 环境）；\n     * 方案 B2：npx serve . --listen 8080（前提：宿主机已安装 Node.js/npm 环境；明确工具首次执行需联网拉取 serve 包，若未预先缓存则非无前提离线启动）；\n3. 离线能力与缓存边界声明：\n   - 本交付产物为纯静态自包含文件（index.html, styles.css, app.js, README.md），不依赖任何 CDN 或远程外部网络资源；\n   - 模式 A 在本地磁盘存在交付文件前提下完全支持纯离线打开与运行；\n   - 在已打开的页面中断开网络，所有 300ms 防抖实时核对、清空复位与错误提示逻辑均在客户端内存中正常工作；\n   - 边界明确：本产品未配置 Service Worker 等离线缓存清单，在模式 B 下若服务进程停止且无浏览器强缓存，断网后无法重新向本地服务拉取页面资源，不作尚未实现的离线应用缓存承诺；\n4. 静态产物同级目录组织：\n   ├── index.html        # 单页面主入口，语义化 DOM 骨架与 defer 脚本引入\n   ├── styles.css        # 视觉样式表，纯白底与单清空按钮排布\n   ├── app.js            # 现代原生 JavaScript，IIFE 命名空间模块封装\n   └── README.md         # 本地双模式启动、固定 8080 端口与离线前提指南。",
+          "dependsOn": [
+            "blk-tech-stack"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0",
+            "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+            "evidence-python-http-server-port-official"
+          ],
+          "id": "blk-tech-deployment",
+          "kind": "deployment",
+          "requirementIds": [
+            "blk-prod-target",
+            "blk-prod-scope"
+          ],
+          "stage": "technical",
+          "title": "运行环境支持要求、双启动模式、端口契约与离线边界规范"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "grp-tech-runtime-deployment",
+      "impact": "定义纯原生经典脚本加载、无构建零依赖运行规范、固定 8080 端口契约与自包含离线边界，确保在现代浏览器中即开即用。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "技术栈与部署规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "在客户端内存运行时维护状态结构，通过代际计数、调度纪元、持久属性复制与事务快照保证单输入框拓扑保真与失败原子回滚：\n1. 全局运行时状态模型（GlobalRuntimeState）：\n   - activeInputNode: HTMLInputElement | null，指向当前处于 DOM 树中的唯一活跃输入节点；\n   - inputGeneration: number，全局单调递增的节点代际计数器，初始为 1；仅在清空事务完全成功提交时递增；\n   - schedulerEpoch: number，全局单调递增的防抖调度纪元，初始为 0；在每次新建防抖调度、主动取消或回滚时单调自增；\n   - isInitialized: boolean，标记应用初始化完成状态。\n2. 节点闭包私有模型（NodeClosurePrivateState）：\n   - node: HTMLInputElement，闭包捕获的专属输入节点引用；\n   - bornGeneration: number，节点绑定时捕获的代际快照，不可变；\n   - isComposing: boolean，私有中文输入法拼音合成状态；\n   - trustedDraft: string，闭包内当前已验证接受的最新草稿。\n3. 防抖调度任务模型（DebounceTaskModel）：\n   - taskEpoch: number，任务被 schedule 时的纪元快照；\n   - targetNode: HTMLInputElement，目标节点引用；\n   - targetGeneration: number，目标节点诞生代际；\n   - draftSnapshot: string，捕获的原始草稿快照（保留空格与换行，涵盖非空、空字符串与纯空格）；\n   - timerId: number | null，window.setTimeout 返回的句柄；\n   - delayMs: number，固定为 300ms。\n4. 清空状态事务快照模型（ResetTransactionSnapshot，解决 R6-B1 与 R6-B2）：\n   - activeInputNode: HTMLInputElement，清空发起前的原输入节点；\n   - inputGeneration: number，清空发起前的原代际；\n   - schedulerEpoch: number，清空发起前的原纪元；\n   - hadPendingTimer: boolean，标记清空瞬间是否存在正在排队的防抖任务；\n   - pendingTimerId: number | null，原定时器句柄；\n   - draft: string，清空发起前的原始草稿快照，涵盖非空、空字符串 '' 与纯空格 '   '；\n   - displayContent: string，顶部展示区原文本；\n   - errorContent: string | null，原就地错误文本；\n   - isErrorVisible: boolean，原错误提示容器显示状态；\n   - hadErrorClass: boolean，原输入节点是否包含 error 类名；\n   - hadAriaInvalid: boolean，原输入节点是否设置 aria-invalid=\"true\"；\n   - parentNode: Node | null，原输入节点的父 DOM 容器；\n   - nextSibling: Node | null，原输入节点的后相邻兄弟节点；\n   - mountedReplacementNode: HTMLInputElement | null，记录实际挂入 DOM 树的 replacement 节点引用；回滚时若非空且仍在文档树中，作为必须清理移除的目标节点，确保 DOM 树中有且仅有单一原节点；\n   - phase: 'pre-replace' | 'replaced' | 'committed' | 'rolled-back'，事务流转阶段标记。\n5. 五类持久配置清单模型（PersistentAttributesModel）：\n   - id 与 name（label 关联键）；\n   - 全部持久 ARIA 属性（aria-label, aria-describedby, aria-required 等）；\n   - tabindex（键盘焦点访问序列）；\n   - class 与 style（视觉尺寸与定位样式）；\n   - data-* 自定义数据属性（如 data-test）。\n6. 严重失败只读复制兜底模型（SevereFailureFallbackModel）：\n   - readonlyDraft: string，保留换行与空格的原始文本；\n   - isFallbackVisible: boolean，兜底区域挂载显示标记；\n   - containerType: 'textarea'，声明为只读多行文本域，支持全选复制，杜绝 HTML 解析注入风险。",
+          "dependsOn": [
+            "blk-tech-stack"
+          ],
+          "evidenceIds": [
+            "evidence-a8866f76-4ae6-466b-8fab-a69b806b7336",
+            "evidence-fc126627-6e55-40e5-8be5-388ef378a21b",
+            "evidence-e10045cb-3170-4cb6-9c56-de754c9c69da",
+            "evidence-37699c07-e70f-4d97-b809-4d68ad503428",
+            "evidence-7fc79de9-07c0-43c1-b09d-641f14530819",
+            "evidence-6b1b2275-ff1a-4b49-bb31-827dd7eb8f8e",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db",
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9"
+          ],
+          "id": "blk-tech-data-model",
+          "kind": "data_model",
+          "requirementIds": [
+            "blk-feat-input-display",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "客户端运行时数据模型与状态结构规范（代际纪元、五类持久配置、挂载替换记录与事务快照模型）"
+        },
+        {
+          "content": "错误分类定义、展示复位策略、清空状态事务原子回滚与严重失败只读复制兜底策略：\n1. 错误分类与容错行为矩阵：\n   - E01（空值与纯空白输入拦截）：用户在输入框中输入空字符串或纯空格（包括删空既有文本）且停止 300ms 时，触发空值拦截；展示区已显示的旧项目名立即被清除并复位为初始占位提示“【等待输入核对】”，在输入框下方呈现红色警示“项目名不能为空，请输入有效字符”，输入框边框高亮变红并保持焦点；输入框内既有文本（包括输入的空格字符）原样完好保留；\n   - E02（恶意注入字符与转义防护）：用户录入任何 HTML 实体或脚本标签，均严格通过 Node.textContent 作为纯文本节点解析回显，杜绝 HTML 解析与脚本执行，恶意代码字符原样纯文本安全呈现，不产生阻断性报错；\n   - E03（清空状态事务异常与原子回滚，R6-B1 与 R6-B2 核心修复）：清空过程被视为强状态事务；若在准备阶段、物理替换阶段或替换后呈现/错误清理/焦点阶段抛错，catch 块立即执行原子回滚：\n     * 针对已挂入 DOM 的 replacement 节点进行显式物理清理，通过 replaceChild 原位回插原节点并彻底移除新节点，确保页面输入框数量严格为 1，杜绝双输入框与同 ID 冲突缺陷（R6-B1）；\n     * 还原 activeInputNode 指针与 inputGeneration 代际计数；\n     * 单调自增调度纪元（schedulerEpoch++）使清空前后的旧在途定时器无害作废；\n     * 针对快照中的原始草稿 snapshot.draft 无差别重新调度 300ms 防抖校验（涵盖非空、空字符串 '' 与纯空格 '   '），严禁用 trim().length > 0 条件跳过校验任务，确保删空或空格草稿在回滚后 300ms 忠实清除旧展示并展示非空警示，空格原文保留，杜绝旧项目名持久残留缺陷（R6-B2）；\n     * 界面顶部浮现友好通知横幅，原节点保持聚焦且用户可继续修改或重试清空；\n   - E04（严重回滚失败只读草稿复制兜底）：若在回滚回插原节点过程中再次发生严重 DOMException 导致回滚中断：\n     * 建立诚实失败状态：不声称“已完整恢复”，坚决禁止调用 window.location.reload() 刷新页面，不把空输入当作已恢复；\n     * 系统在页面顶部通知横幅中就地展开独立只读草稿容器（readonly textarea），原样呈现原始 draft 文本（逐字符保留换行与前后空格），允许用户手动选中复制取回文本；提示明确说明主编辑器暂时受限，草稿已安全就地保留；\n   - E05（未知运行时异步异常防护）：全局未捕获异常被 window.onerror / unhandledrejection 拦截，界面顶部呈现轻量通知横幅，输入框与展示区既有内容严格保留，页面不重载。\n2. 清空状态事务原子回滚与恢复不变式（Invariants）：\n   - 不变式 1（输入框唯一性与 DOM 拓扑自洽）：无论事务成功提交还是回滚恢复，页面文档树中有且仅有一个具有 id=\"project-name-input\" 的 HTMLInputElement，0 孤儿节点，0 属性丢失；\n   - 不变式 2（代际闭包自洽）：回滚后 activeInputNode.bornGeneration === inputGeneration 恒成立，用户键入新字符能立即正常流转 300ms 防抖；\n   - 不变式 3（原始草稿不丢失且校验完整）：回滚后原输入草稿完整还原；若此前有排队任务，无论是空值、纯空格还是有效项目名，均在 300ms 后忠实执行原规则校验；\n   - 不变式 4（旧闭包与旧定时器完全作废）：自增 schedulerEpoch 确保旧定时器回调到期直接丢弃，旧节点闭包守卫拦截所有迟到事件。",
+          "dependsOn": [
+            "blk-tech-data-model",
+            "blk-tech-interface"
+          ],
+          "evidenceIds": [
+            "evidence-a8866f76-4ae6-466b-8fab-a69b806b7336",
+            "evidence-fc126627-6e55-40e5-8be5-388ef378a21b",
+            "evidence-e10045cb-3170-4cb6-9c56-de754c9c69da",
+            "evidence-37699c07-e70f-4d97-b809-4d68ad503428",
+            "evidence-7fc79de9-07c0-43c1-b09d-641f14530819",
+            "evidence-6b1b2275-ff1a-4b49-bb31-827dd7eb8f8e",
+            "evidence-17569c8c-1012-4071-8ebe-936b5fe286db",
+            "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+            "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+            "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9"
+          ],
+          "id": "blk-tech-error",
+          "kind": "error",
+          "requirementIds": [
+            "blk-feat-reset",
+            "blk-feat-input-display"
+          ],
+          "stage": "technical",
+          "title": "错误分类、旧结果清除机制、清空状态事务原子回滚与只读草稿复制兜底策略"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "grp-tech-runtime-deployment"
+      ],
+      "id": "grp-tech-state-error",
+      "impact": "定义内存状态代际与调度纪元快照模型，规范空值错误拦截、强两阶段清空状态事务与原子拓扑回滚，保障输入框拓扑唯一性与数据不丢失。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "运行时数据模型与状态错误规范"
+    },
+    {
+      "blocks": [
+        {
+          "content": "系统划分为高内聚、低耦合的纯前端原生模块，完全在客户端内存运行时运行，严格与正式状态事务顺序和全量公共 API 契约保持一致：\n1. DisplayRenderer（展示渲染模块）：\n   - 职责：专门管理顶部项目名大字展示区；\n   - API 契约：\n     * renderProjectName(element: HTMLElement, text: string): void\n       - 入参：展示区容器 DOM 元素 element，待展示项目名文本 text；\n       - 返回类型：void；\n       - 正常后置条件：严格使用 Node.textContent 将 text 安全赋值到展示区文本节点，以高对比黑色大字呈现，彻底杜绝 HTML 解析与脚本执行；\n       - 失败后置条件：若 element 为空或非有效 DOM 节点，抛出 TypeError 并由上层调用方捕获，绝不静默忽略；\n       - 调用方职责：由防抖调度完成后的回调函数调用。\n     * renderPlaceholder(element: HTMLElement, placeholderText: string = '【等待输入核对】'): void\n       - 入参：展示区容器 DOM 元素 element，占位提示文本 placeholderText（默认“【等待输入核对】”）；\n       - 返回类型：void；\n       - 正常后置条件：使用 Node.textContent 将 element 复位为灰色占位提示文本，清除一切旧项目名大字；\n       - 失败后置条件：若 element 无效抛出 TypeError；\n       - 调用方职责：由应用初始化流程、空值/纯空格校验失败拦截处理、或清空事务 handleReset 调用。\n2. InputController（输入管理与代际闭包绑定模块）：\n   - 职责：维护当前处于 DOM 树中的唯一活跃输入框节点 activeInputNode，为输入框节点绑定捕获专属代际的私有监听闭包；\n   - API 契约：\n     * bindInputNode(node: HTMLInputElement, generation: number): void\n       - 入参：目标输入框 DOM 元素 node，该节点所属的单调递增代际编号 generation；\n       - 返回类型：void；\n       - 正常后置条件：为 node 绑定 input、compositionstart、compositionend 等事件监听，在闭包内私有捕获 node 引用、bornGeneration = generation、isComposing = false 与 trustedDraft = node.value；闭包前置四重守卫核验（event.currentTarget === node && node === activeInputNode && bornGeneration === inputGeneration && document.body.contains(node)），仅核验通过的合法活跃事件才允许更新 trustedDraft 并触发防抖调度；\n       - 失败后置条件：若 node 为空或 generation 非正整数，抛出 TypeError 并中止绑定；\n       - 调用方职责：由 AppController.init 针对首个初始输入节点调用，或由 ResetController.handleReset 针对内存预制的新输入框 newNode 调用。\n     * focusInput(): void\n       - 入参：无；\n       - 返回类型：void；\n       - 正常后置条件：若 activeInputNode 存在且挂载于 DOM 树，调用 activeInputNode.focus() 确保光标准确移入活跃输入框；\n       - 失败后置条件：若 activeInputNode 不存在或已脱离文档树，安全忽略并不抛出未捕获异常；\n       - 调用方职责：由初始化流程、清空成功提交后、或回滚恢复原节点后调用。\n3. DebounceScheduler（纪元防抖调度模块）：\n   - 职责：管理 300ms 计时器生命周期，采用单调递增的 schedulerEpoch 纪元快照机制与原始草稿快照防护；\n   - API 契约：\n     * schedule(draftSnapshot: string, targetNode: HTMLInputElement, targetGeneration: number, callback: Function, delayMs: number = 300): void\n       - 入参：草稿快照字符串 draftSnapshot（原样捕获包括空格），目标节点 targetNode，目标节点代际 targetGeneration，防抖回调函数 callback，防抖延迟毫秒 delayMs（默认 300ms）；\n       - 返回类型：void；\n       - 正常后置条件：自增或记录当前 schedulerEpoch 纪元快照，通过 window.setTimeout 启动 300ms 定时器；定时器到期唤醒时核验 taskEpoch === schedulerEpoch && targetGeneration === inputGeneration && targetNode === activeInputNode，守卫全部满足后将 draftSnapshot 传入 callback 执行；\n       - 失败后置条件：若目标失配或纪元过期，回调被直接丢弃，不执行任何视图更新；\n       - 调用方职责：由输入框 input 事件监听闭包、或清空回滚时的原始草稿无差别重调度流程调用。\n     * cancel(): void\n       - 入参：无；\n       - 返回类型：void；\n       - 正常后置条件：清除当前活跃定时器（clearTimeout），并将 schedulerEpoch 单调自增（schedulerEpoch++），使事件队列中所有在途的旧定时器宏任务即使唤醒也因纪元失配而安全失效；\n       - 失败后置条件：无；即使无活跃定时器调用亦安全幂等；\n       - 调用方职责：由清空状态事务 handleReset 在准备物理替换前调用，或回滚流程作废旧任务时调用。\n     * hasPending(): boolean\n       - 入参：无；\n       - 返回类型：boolean；\n       - 正常后置条件：返回当前客户端内存中是否存在排队等待执行的有效防抖计时器（pendingTimerId !== null 且纪元有效）；\n       - 失败后置条件：无；\n       - 调用方职责：由 ResetController.captureSnapshot 用于检测清空发起瞬间是否存在在途防抖任务。\n4. ResetController（清空状态事务控制器模块）：\n   - 职责：协调清空重置全流程，实现强两阶段状态事务（Two-Phase Commit）、五类持久属性保真复制与失败原子拓扑回滚；\n   - API 契约：\n     * handleReset(): void\n       - 入参：无；\n       - 返回类型：void；\n       - 正常后置条件：严格执行两阶段状态事务：\n         1. 快照阶段：调用 captureSnapshot() 完整记录包含 activeInputNode、inputGeneration、schedulerEpoch、hadPendingTimer、draft（涵盖 empty/whitespace/nonempty）、展示与错误内容及 DOM 位置的恢复快照；\n         2. 准备阶段（try 保护）：计算 nextGeneration = inputGeneration + 1；在内存创建全新 input 节点 newNode；安全复制 5 类持久属性（label 关联 id/name、全部 ARIA 属性、tabindex、class/style、data-*），显式过滤 value 与瞬态 aria-invalid；为 newNode 调用 InputController.bindInputNode(newNode, nextGeneration)；\n         3. 替换与复位阶段：调用 DebounceScheduler.cancel() 取消防抖；执行 oldNode.replaceWith(newNode) 物理节点替换并记录 mountedReplacementNode = newNode；调用 DisplayRenderer.renderPlaceholder 复位展示区为占位符；调用 FeedbackBanner.clearInputError 清除错误；调用 newNode.focus() 获取焦点；\n         4. 原子提交点（Commit Point）：上述步骤全部成功后，正式原子提交：更新 activeInputNode = newNode，inputGeneration = nextGeneration；至此清空事务圆满完成，旧节点迟到事件被入口守卫拦截丢弃；\n       - 失败后置条件：若准备、替换过程、呈现复位、错误清理或焦点恢复任意阶段抛出异常，catch 块立即捕获并调用 rollback(snapshot, error, mountedReplacementNode)，确保代际不提前递增（保持原 generation G），原节点与 DOM 单输入框拓扑保真；\n       - 调用方职责：由 resetButton 的 click 事件监听器调用。\n     * captureSnapshot(): ResetTransactionSnapshot\n       - 入参：无；\n       - 返回类型：ResetTransactionSnapshot；\n       - 正常后置条件：捕获并返回包含当前 activeInputNode、inputGeneration、schedulerEpoch、hadPendingTimer（通过 hasPending() 判定）、draft（activeInputNode.value 原文）、displayContent、errorContent、isErrorVisible、hadErrorClass、hadAriaInvalid、parentNode 及 nextSibling 位置引用的不可变数据快照；\n       - 失败后置条件：若 activeInputNode 不存在抛出 Error 并被 handleReset catch 捕获；\n       - 调用方职责：由 handleReset 第一优先级调用。\n     * rollback(snapshot: ResetTransactionSnapshot, error: Error, replacementNode?: HTMLInputElement): void\n       - 入参：恢复快照 snapshot，捕获的异常对象 error，可能已挂载的新节点 replacementNode；\n       - 返回类型：void；\n       - 正常后置条件：执行原子拓扑回滚：\n         1. 显式识别 replacementNode：若 replacementNode 存在且已挂入 DOM（replacementNode.parentNode），执行 replacementNode.parentNode.replaceChild(snapshot.activeInputNode, replacementNode) 并彻底移除 replacementNode，或者 replacementNode.remove() 并在原 parentNode/nextSibling 插回 snapshot.activeInputNode，严格断言 DOM 树中单一合法输入框（querySelectorAll('input').length === 1，0 重复 ID）；\n         2. 状态与代际还原：activeInputNode 重新指向 snapshot.activeInputNode，全局 inputGeneration 严格保持为 snapshot.inputGeneration（绝不提前递增），调度纪元单调自增（schedulerEpoch++）彻底废弃旧任务；\n         3. 草稿与错误还原：还原 oldNode.value = snapshot.draft；若此前有错误则恢复 error 类与 aria-invalid，恢复 displayContent 与错误容器显隐；\n         4. 原始草稿无差别重调度：若 snapshot.hadPendingTimer 为 true，无条件针对 snapshot.draft 重新调度 300ms 防抖任务（无论非空、空字符串 '' 还是纯空格 '   '，严禁用 trim 过滤跳过）；\n         5. 回焦与友好横幅：调用 snapshot.activeInputNode.focus()，弹出 FeedbackBanner.showGlobalError('清空操作遇到异常，已为您完整恢复当前输入与核对状态')；原闭包 bornGeneration 与 inputGeneration 自洽，用户可继续输入、手动删空或重试清空；\n       - 失败后置条件：若回插原节点过程中再次发生严重 DOM 异常，catch 拦截严重错误并进入严重兜底：严禁刷新页面（禁止 window.location.reload()），调用 FeedbackBanner.showSevereFallbackDraft(snapshot.draft, severeFallbackContainer) 在只读 textarea 容器中逐字符原样呈现原始草稿供用户手动复制；\n       - 调用方职责：由 handleReset 的 catch 块调用。\n5. ValidatorModule（非空与字符校验模块）：\n   - 职责：针对传入的草稿快照进行纯函数非空校验；\n   - API 契约：\n     * validate(draft: string): { isValid: boolean, errorMessage: string | null }\n       - 入参：草稿快照字符串 draft；\n       - 返回类型：校验结果对象 { isValid: boolean, errorMessage: string | null }；\n       - 正常后置条件：若 draft.trim().length === 0（涵盖 null、空字符串 '' 与纯空格字符串），返回 { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' }；若去除首尾空白后包含有效非空字符，返回 { isValid: true, errorMessage: null }；\n       - 失败后置条件：若 draft 类型非 string，进行防御性转换或判定为非法，绝不抛出阻断性未捕获异常；\n       - 调用方职责：由防抖计时器到期后的 handleDebouncedValidateAndDisplay 流程调用。\n6. FeedbackBanner（错误警示与异常横幅模块）：\n   - 职责：集中管理输入框就地校验错误挂载、全局运行异常通知横幅、以及严重失败只读草稿复制兜底容器呈现；\n   - API 契约：\n     * showInputError(inputNode: HTMLInputElement, container: HTMLElement, message: string): void\n       - 入参：目标输入框 inputNode，错误提示容器 container，错误提示文案 message；\n       - 返回类型：void；\n       - 正常后置条件：使用 Node.textContent 将 message 安全写入 container 并设置其 display 展现；为 inputNode 添加 'error' 类名并设置 aria-invalid=\"true\"；\n       - 失败后置条件：若 DOM 容器不存在，抛出 TypeError 或在控制台记录可见错误；\n       - 调用方职责：由空值/纯空格校验失败拦截分支调用。\n     * clearInputError(inputNode: HTMLInputElement, container: HTMLElement): void\n       - 入参：目标输入框 inputNode，错误提示容器 container；\n       - 返回类型：void；\n       - 正常后置条件：将 container 的 textContent 清空并设置 display 为 none 隐藏；移除 inputNode 上的 'error' 类名与 aria-invalid 属性；\n       - 失败后置条件：无；\n       - 调用方职责：由输入校验通过分支、清空成功提交流程、或初始化流程调用。\n     * showGlobalError(message: string): void\n       - 入参：全局警示消息 message；\n       - 返回类型：void；\n       - 正常后置条件：在页面顶部 error-banner-container 挂载轻量通知横幅，安全呈现纯文本警示，保留页面其余内容，不执行页面重载；\n       - 失败后置条件：若横幅容器不存在，在 body 顶部动态创建挂载节点呈现；\n       - 调用方职责：由清空异常回滚处理、或 window.onerror 全局异常拦截调用。\n     * showSevereFallbackDraft(draftText: string, container: HTMLElement): void\n       - 入参：原始草稿文本 draftText，兜底宿主容器 container（通常为顶部 error-banner-container）；\n       - 返回类型：void；\n       - 正常后置条件：在 container 内安全挂载一个独立只读多行文本域（readonly textarea），将 draftText 原样逐字符赋值给 textarea.value（完整保留换行与所有前后/重复空格），设置 textarea.readOnly = true 与 tabindex=\"0\"，提示文案明确说明“清空与回滚操作遇到严重异常，主编辑器暂时受限，已为您在下方安全保留草稿，请手动选中复制取回”，杜绝 window.location.reload() 刷新，保障输入数据 0 丢失；\n       - 失败后置条件：若 container 为空，尝试在 document.body 就地挂载；若挂载完全失败在控制台输出 draftText；\n       - 调用方职责：由 ResetController.rollback 的严重失败 catch 块调用。\n7. AppController（全局装配与启动协调模块）：\n   - 职责：页面主控制器，负责在 DOMContentLoaded 时获取实际 DOM 引用，完成各模块依赖注入与事件初始化装配；\n   - API 契约：\n     * init(elements: { displayElement: HTMLElement, initialInputNode: HTMLInputElement, errorContainer: HTMLElement, resetButton: HTMLElement, severeFallbackContainer?: HTMLElement }): void\n       - 入参：包含页面核心交互元素的对象 elements（displayElement 大字展示区，initialInputNode 初始输入框，errorContainer 就地错误容器，resetButton 清空按钮，以及可选的 severeFallbackContainer 独立只读草稿兜底容器）；\n       - 返回类型：void；\n       - 前置条件：页面 DOMContentLoaded 触发，四个核心 DOM 元素（displayElement, initialInputNode, errorContainer, resetButton）已就绪并成功由 querySelector/getElementById 获取到真实非空节点引用；\n       - 正常后置条件：\n         1. 运行时状态初始化：设置全局 activeInputNode = elements.initialInputNode，inputGeneration = 1，schedulerEpoch = 0，isInitialized = true；\n         2. 首个节点闭包绑定：调用 InputController.bindInputNode(elements.initialInputNode, 1) 为初始输入框绑定捕获代际 1 的专属 input/composition 事件闭包；\n         3. 清空按钮事件注册：为 elements.resetButton 绑定单一 click 事件监听器指向 ResetController.handleReset，确保清空按钮全局仅一次注册监听，不产生重复绑定；\n         4. 视觉与提示初态就绪：调用 DisplayRenderer.renderPlaceholder(elements.displayElement, '【等待输入核对】') 初始化展示区为占位符；调用 FeedbackBanner.clearInputError(elements.initialInputNode, elements.errorContainer) 确保错误提示容器初始隐藏且输入框无错误类；\n         5. 焦点与兜底容器就绪：调用 InputController.focusInput() 将光标聚焦到初始输入框；若显式提供了 elements.severeFallbackContainer 则保存引用，若未提供则约定在页面顶部 error-banner-container 内部预留就地挂载点，确保严重回滚兜底随时可用；\n       - 失败后置条件：若 elements 为空或任一核心依赖（displayElement, initialInputNode, errorContainer, resetButton）为 null/undefined，抛出明确 ReferenceError 并在控制台输出可见错误日志，中断启动流转，不进入可用就绪态，不绑定不完整事件，不清空既有输入，不报告假成功；\n       - 调用方职责：由 index.html 引入的经典 defer 主脚本在 DOMContentLoaded 时显式调用一次，全局禁止重复调用。",
+          "dependsOn": [
+            "blk-tech-stack",
+            "blk-tech-data-model"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-7302929b-2e70-4bf1-874e-8bd1e3a3dd54",
+            "evidence-8d52b774-8940-4f2b-892a-fa5b471b2b5e",
+            "evidence-4078273b-7521-4409-97fc-977c6f5cc584",
+            "evidence-f4fc9e4f-e93d-4ac7-bcf5-bca207707149",
+            "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0",
+            "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+            "evidence-python-http-server-port-official"
+          ],
+          "id": "blk-tech-module",
+          "kind": "module",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "前端系统架构与核心功能模块划分（输入节点闭包绑定与快照调度器）"
+        },
+        {
+          "content": "组件事件契约、公共模块调用接口与两阶段状态转换规范。明确本块内部 JavaScript 均为“非执行示意，非CodingAgent直接复制的参考实现”；规划规范的权威定义是接口方法签名、状态所有权、前置守卫与成功提交/失败回滚的后置条件：\n1. 模块接口签名与契约清单（完整保持 16 项公共 API，逐项规范入参、返回类型、后置条件与调用方职责）：\n   - InputController:\n     * bindInputNode(node: HTMLInputElement, generation: number): void\n       - 入参：node: HTMLInputElement（目标输入框元素），generation: number（该节点所属代际）；\n       - 返回类型：void；\n       - 正常后置条件：为 node 绑定 input 与 composition 事件，闭包内私有捕获 node 引用、bornGeneration = generation 与 trustedDraft；执行四重守卫核验（event.currentTarget === node && node === activeInputNode && bornGeneration === inputGeneration && document.body.contains(node)）；\n       - 失败后置条件：若 node 为空或 generation 非正整数，抛出 TypeError 中止绑定；\n       - 调用方职责：由 AppController.init 针对首节点调用，或由 ResetController.handleReset 针对预制 newNode 调用。\n     * focusInput(): void\n       - 入参：无；\n       - 返回类型：void；\n       - 正常后置条件：若 activeInputNode 存在且挂载于 DOM 树，调用 activeInputNode.focus() 回焦输入框；\n       - 失败后置条件：若 activeInputNode 脱离文档树或不存在，安全忽略不抛错；\n       - 调用方职责：由初始化、清空成功提交或回滚恢复原节点后调用。\n   - DebounceScheduler:\n     * schedule(draftSnapshot: string, targetNode: HTMLInputElement, targetGeneration: number, callback: Function, delayMs: number = 300): void\n       - 入参：draftSnapshot: string（原始草稿快照），targetNode: HTMLInputElement（目标节点），targetGeneration: number（目标代际），callback: Function（防抖到期回调），delayMs: number = 300（延迟毫秒，默认 300ms）；\n       - 返回类型：void；\n       - 正常后置条件：记录 schedulerEpoch 纪元快照并启动 300ms 定时器；到期核验 taskEpoch === schedulerEpoch && targetGeneration === inputGeneration && targetNode === activeInputNode 通过后执行回调；\n       - 失败后置条件：若守卫失配，回调被直接丢弃；\n       - 调用方职责：由输入监听闭包或清空回滚草稿无差别重调度流程调用。\n     * cancel(): void\n       - 入参：无；\n       - 返回类型：void；\n       - 正常后置条件：清除活跃定时器（clearTimeout），自增 schedulerEpoch（schedulerEpoch++）使在途回调失效；\n       - 失败后置条件：无（幂等安全）；\n       - 调用方职责：由 ResetController.handleReset 在替换前调用，或回滚作废旧任务时调用。\n     * hasPending(): boolean\n       - 入参：无；\n       - 返回类型：boolean；\n       - 正常后置条件：返回内存中是否存在排队中的有效防抖任务（pendingTimerId !== null 且纪元有效）；\n       - 失败后置条件：无；\n       - 调用方职责：由 ResetController.captureSnapshot 检测发起清空瞬间是否存在在途任务。\n   - ResetController:\n     * handleReset(): void\n       - 入参：无；\n       - 返回类型：void；\n       - 正常后置条件：执行强两阶段清空状态事务（快照捕获 -> 内存预制新节点并复制 5 类持久属性 -> 取消防抖 -> replaceWith 物理替换并记录 mountedReplacementNode -> 占位呈现与错误清理 -> focus 聚焦 -> 原子提交更新 activeInputNode 与递增代际 inputGeneration++）；\n       - 失败后置条件：若准备、替换中或替换后任意阶段抛错，catch 立即触发 rollback(snapshot, error, mountedReplacementNode)，代际不提前递增（保持原代际 G）；\n       - 调用方职责：由 resetButton 的 click 事件监听器调用。\n     * captureSnapshot(): ResetTransactionSnapshot\n       - 入参：无；\n       - 返回类型：ResetTransactionSnapshot；\n       - 正常后置条件：捕获包含 activeInputNode、inputGeneration、schedulerEpoch、hadPendingTimer（通过 hasPending() 判定）、draft（涵盖 empty/whitespace/nonempty）、displayContent、errorContent、DOM 树 parentNode 与 nextSibling 的恢复快照；\n       - 失败后置条件：若 activeInputNode 不存在抛出 Error 并被 handleReset catch 捕获；\n       - 调用方职责：由 handleReset 第一优先级调用。\n     * rollback(snapshot: ResetTransactionSnapshot, error: Error, replacementNode?: HTMLInputElement): void\n       - 入参：snapshot: ResetTransactionSnapshot（恢复快照），error: Error（异常对象），replacementNode?: HTMLInputElement（可能已挂载的新节点）；\n       - 返回类型：void；\n       - 正常后置条件：执行原子拓扑回滚：显式识别 replacement 节点，若已挂入文档树则物理回插原节点并彻底移除 replacementNode，断言 DOM 树中只有 1 个 input 且 ID 唯一；还原 activeInputNode 与代际（保持原 G）；自增 schedulerEpoch；若 snapshot.hadPendingTimer 为真，无差别按 snapshot.draft 重新调度防抖；回焦原节点并提示；\n       - 失败后置条件：若回插严重失败进入严重兜底：严禁刷新页面（禁止 reload），在只读 textarea 容器中展开原始草稿供手动复制；\n       - 调用方职责：由 handleReset 的 catch 块调用。\n   - DisplayRenderer:\n     * renderProjectName(element: HTMLElement, text: string): void\n       - 入参：element: HTMLElement（展示区容器），text: string（项目名文本）；\n       - 返回类型：void；\n       - 正常后置条件：使用 Node.textContent 纯文本绑定安全更新大字，杜绝 HTML 解析与脚本执行；\n       - 失败后置条件：若 element 无效抛出 TypeError；\n       - 调用方职责：由防抖调度完成后的回调函数调用。\n     * renderPlaceholder(element: HTMLElement, placeholderText: string = '【等待输入核对】'): void\n       - 入参：element: HTMLElement（展示区容器），placeholderText: string（占位文本，默认“【等待输入核对】”）；\n       - 返回类型：void；\n       - 正常后置条件：使用 Node.textContent 复位展示区为灰色占位文本；\n       - 失败后置条件：若 element 无效抛出 TypeError；\n       - 调用方职责：由初始化流程、空值校验拦截或清空事务调用。\n   - FeedbackBanner:\n     * showInputError(inputNode: HTMLInputElement, container: HTMLElement, message: string): void\n       - 入参：inputNode: HTMLInputElement（目标输入框），container: HTMLElement（错误容器），message: string（错误提示文案）；\n       - 返回类型：void；\n       - 正常后置条件：Node.textContent 写入 message 并显示 container，为 inputNode 挂载 error 类名与 aria-invalid=\"true\"；\n       - 失败后置条件：若 container 不存在抛出 TypeError；\n       - 调用方职责：由空值/纯空格校验失败拦截分支调用。\n     * clearInputError(inputNode: HTMLInputElement, container: HTMLElement): void\n       - 入参：inputNode: HTMLInputElement（目标输入框），container: HTMLElement（错误容器）；\n       - 返回类型：void；\n       - 正常后置条件：清空 container 文本并隐藏，移除 inputNode 的 error 类名与 aria-invalid 属性；\n       - 失败后置条件：无；\n       - 调用方职责：由校验通过、清空成功或初始化流程调用。\n     * showGlobalError(message: string): void\n       - 入参：message: string（全局通知文案）；\n       - 返回类型：void；\n       - 正常后置条件：在页面顶部 error-banner-container 挂载轻量通知横幅，安全呈现纯文本警示，不刷新页面；\n       - 失败后置条件：若容器缺失在 body 顶部动态挂载呈现；\n       - 调用方职责：由清空异常回滚处理或 window.onerror 调用。\n     * showSevereFallbackDraft(draftText: string, container: HTMLElement): void\n       - 入参：draftText: string（原始草稿文本），container: HTMLElement（兜底宿主容器）；\n       - 返回类型：void；\n       - 正常后置条件：在 container 内挂载独立只读多行文本域（readonly textarea），原样逐字符呈现 draftText（完整保留换行与空格），说明“主编辑器受限，已为您保留草稿，请手动选中复制”，杜绝 window.location.reload()；\n       - 失败后置条件：若挂载失败在控制台输出草稿文本；\n       - 调用方职责：由 ResetController.rollback 严重失败分支调用。\n   - ValidatorModule:\n     * validate(draft: string): { isValid: boolean, errorMessage: string | null }\n       - 入参：draft: string（草稿快照文本）；\n       - 返回类型：{ isValid: boolean, errorMessage: string | null }；\n       - 正常后置条件：若 draft.trim().length === 0（涵盖 null、空字符串与纯空格），返回 { isValid: false, errorMessage: '项目名不能为空，请输入有效字符' }；非空返回 { isValid: true, errorMessage: null }；\n       - 失败后置条件：若类型非 string 进行防御性判定，不抛出未捕获异常；\n       - 调用方职责：由防抖计时器到期后的 handleDebouncedValidateAndDisplay 流程调用。\n   - AppController:\n     * init(elements: { displayElement: HTMLElement, initialInputNode: HTMLInputElement, errorContainer: HTMLElement, resetButton: HTMLElement, severeFallbackContainer?: HTMLElement }): void\n       - 入参：包含 displayElement, initialInputNode, errorContainer, resetButton 及可选 severeFallbackContainer 的依赖对象；\n       - 返回类型：void；\n       - 前置条件：页面 DOMContentLoaded 触发，四个核心 DOM 元素成功获取非空引用；\n       - 正常后置条件：设置 activeInputNode = initialInputNode，inputGeneration = 1，schedulerEpoch = 0，isInitialized = true；调用 InputController.bindInputNode 为初始节点绑定代际 1 闭包；为 resetButton 注册单一 handleReset 点击事件；DisplayRenderer.renderPlaceholder 初始化展示区；FeedbackBanner.clearInputError 初始化错误提示；initialInputNode 获取焦点；若未显式提供 severeFallbackContainer 则在页面顶部 error-banner-container 内部预留就地挂载点；\n       - 失败后置条件：若依赖缺失抛出 ReferenceError 并在控制台可见报错，中断流转，不进入就绪态，不绑定不完整事件，不清空既有输入，不报告假成功；\n       - 调用方职责：由主入口经典 defer 脚本在 DOMContentLoaded 时显式调用一次，禁止重复调用。\n2. 清空状态事务状态转换与后置条件（非执行示意，供设计推导参考）：\n   [Ready: oldNode in DOM, generation=G, epoch=E]\n         |\n         v (click reset -> captureSnapshot: oldNode, G, E, hadTimer, draft, DOM position)\n   [Snapshot Captured: draft, timerState, parentNode, nextSibling]\n         |\n         v (create newNode, copy 5 persistent attrs, bind newNode with nextGeneration=G+1)\n   [Replacement Ready in Memory]\n         |\n         +---> (if throw before replace) ---> [Rollback Phase A: oldNode unchanged, G unchanged, E++, re-schedule draft if hadTimer, banner]\n         |\n         v (oldNode.replaceWith(newNode))\n   [Replaced in DOM: mountedReplacementNode = newNode]\n         |\n         +---> (if throw during/after replace) ---> [Rollback Phase B: remove newNode, insert oldNode back, DOM input count=1, G unchanged, E++, re-schedule draft if hadTimer, banner]\n         |\n         v (renderPlaceholder, clearInputError, newNode.focus)\n   [View & Focus Reset Ready]\n         |\n         v (Atomic Commit Point)\n   [Committed: activeInputNode = newNode, inputGeneration = G+1, old events safely rejected by guard]\n3. 伪代码参考示意（非执行示意，说明 R7-B1/R7-B2 架构契约与回滚机制）：\n```javascript\n// 非执行示意，非CodingAgent直接复制的参考实现；正式规范权威为接口方法签名、状态所有权与验收用例\nconst AppController = {\n  init(elements) {\n    if (!elements || !elements.displayElement || !elements.initialInputNode || !elements.errorContainer || !elements.resetButton) {\n      throw new ReferenceError('AppController.init: 缺少必要的核心 DOM 依赖');\n    }\n    activeInputNode = elements.initialInputNode;\n    inputGeneration = 1;\n    schedulerEpoch = 0;\n    InputController.bindInputNode(activeInputNode, inputGeneration);\n    elements.resetButton.addEventListener('click', () => ResetController.handleReset());\n    DisplayRenderer.renderPlaceholder(elements.displayElement, '【等待输入核对】');\n    FeedbackBanner.clearInputError(activeInputNode, elements.errorContainer);\n    InputController.focusInput();\n  }\n};\n\nconst ResetController = {\n  handleReset() {\n    const snapshot = this.captureSnapshot();\n    let mountedReplacementNode = null;\n    try {\n      const nextGeneration = snapshot.inputGeneration + 1;\n      const newNode = document.createElement('input');\n      // 安全复制 5 类持久属性并重置瞬态状态...\n      InputController.bindInputNode(newNode, nextGeneration);\n      DebounceScheduler.cancel();\n      snapshot.activeInputNode.replaceWith(newNode);\n      mountedReplacementNode = newNode;\n      DisplayRenderer.renderPlaceholder(displayElement, '【等待输入核对】');\n      FeedbackBanner.clearInputError(newNode, errorContainer);\n      newNode.focus();\n      // 原子提交点：全部成功后才递增代际与更新活跃节点引用\n      activeInputNode = newNode;\n      inputGeneration = nextGeneration;\n    } catch (err) {\n      this.rollback(snapshot, err, mountedReplacementNode);\n    }\n  },\n  rollback(snapshot, err, replacementNode) {\n    try {\n      // 显式清理已挂载的 replacement 节点，消除双输入框缺陷\n      if (replacementNode && replacementNode.parentNode) {\n        replacementNode.parentNode.replaceChild(snapshot.activeInputNode, replacementNode);\n      } else if (!document.body.contains(snapshot.activeInputNode) && snapshot.parentNode) {\n        snapshot.parentNode.insertBefore(snapshot.activeInputNode, snapshot.nextSibling);\n      }\n      activeInputNode = snapshot.activeInputNode;\n      inputGeneration = snapshot.inputGeneration; // 保持原代际 G\n      schedulerEpoch++; // 废弃旧在途定时器\n      activeInputNode.value = snapshot.draft;\n      if (snapshot.hadPendingTimer) {\n        DebounceScheduler.schedule(snapshot.draft, activeInputNode, inputGeneration, handleDebouncedValidateAndDisplay, 300);\n      }\n      FeedbackBanner.showGlobalError('清空操作遇到异常，已为您完整恢复当前输入与核对状态');\n      activeInputNode.focus();\n    } catch (severeErr) {\n      FeedbackBanner.showSevereFallbackDraft(snapshot.draft, document.getElementById('error-banner-container'));\n    }\n  }\n};\n```",
+          "dependsOn": [
+            "blk-tech-module"
+          ],
+          "evidenceIds": [
+            "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+            "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+            "evidence-74f4c803-7cb5-46e3-ae9e-5b1e604f8661",
+            "evidence-a0f1fa29-01f6-499d-9cf9-fb1bc6551b8c",
+            "evidence-e10045cb-3170-4cb6-9c56-de754c9c69da",
+            "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+            "evidence-320443a6-461c-4976-9039-908598ac05f0",
+            "evidence-7302929b-2e70-4bf1-874e-8bd1e3a3dd54",
+            "evidence-8d52b774-8940-4f2b-892a-fa5b471b2b5e",
+            "evidence-4078273b-7521-4409-97fc-977c6f5cc584",
+            "evidence-f4fc9e4f-e93d-4ac7-bcf5-bca207707149",
+            "evidence-2e3eb825-9ec5-4d0f-8c38-8c17757ee90a",
+            "evidence-0e86b093-6db5-4fc6-b25c-097561879c94",
+            "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+            "evidence-python-http-server-port-official",
+            "evidence-mdn-textcontent-xss-safety",
+            "evidence-mdn-node-textcontent-official",
+            "evidence-mdn-xss-definition-boundary"
+          ],
+          "id": "blk-tech-interface",
+          "kind": "interface",
+          "requirementIds": [
+            "blk-prod-scope",
+            "blk-feat-reset"
+          ],
+          "stage": "technical",
+          "title": "组件事件契约与模块调用接口规范（节点代际守卫、清空状态事务与非执行参考示意）"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "grp-tech-state-error"
+      ],
+      "id": "grp-tech-modules-interface",
+      "impact": "规范 7 大原生模块划分与 16 项公共 API，界定清空状态事务两阶段执行顺序与显式初始化依赖装配，明确内部 JavaScript 为非执行参考示意。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "模块架构划分与公共接口契约规范"
+    }
+  ],
+  "questions": [],
+  "summary": "本阶段已完成 technical 技术规划的全局校对与完整变更包交付，重点解决当前阻塞 issue（INVALID_CHANGESET: 变更组依赖不存在）：\n1. 修复变更组依赖拓扑（解决 currentIssue）：原草案在变更组的 dependsOn 数组中错误填入了块 ID（如 blk-prod-scope、blk-tech-stack 等），导致校验引擎报“变更组依赖不存在”。本次全面修正组级依赖：\n   - grp-tech-runtime-deployment（技术栈与部署规范组）：无前置组依赖，dependsOn 修正为空数组 []；\n   - grp-tech-state-error（运行时数据模型与状态错误规范组）：依赖基础技术规范组，dependsOn 修正为 [\"grp-tech-runtime-deployment\"]；\n   - grp-tech-modules-interface（模块架构与接口规范组）：依赖状态与错误规范组，dependsOn 修正为 [\"grp-tech-state-error\"]。\n   所有变更组依赖严格指向当前存在的变更组 ID，拓扑关系清晰自洽。\n2. 保持并交付 6 个必需技术候选块全覆盖（requiredBlockIds: [\"blk-tech-stack\", \"blk-tech-deployment\", \"blk-tech-data-model\", \"blk-tech-error\", \"blk-tech-module\", \"blk-tech-interface\"]）：\n   - blk-tech-stack：原生 HTML5/CSS3/现代 JavaScript（标准经典脚本搭配 defer 与严格模式 IIFE 命名空间封装），严格使用 Node.textContent 纯文本绑定，界定防 XSS 适用边界；\n   - blk-tech-deployment：本地无依赖双击运行（file:// 纯离线）与本地轻量 HTTP 静态托管（固定端口 8080，明确 python -m http.server 8080 与 npx serve . --listen 8080 端口契约与首次安装联网前提）；\n   - blk-tech-data-model：客户端内存状态架构，包含节点单调代际 inputGeneration、调度纪元 schedulerEpoch、事务恢复快照 ResetTransactionSnapshot（记录 mountedReplacementNode 与阶段标记）及 5 类持久属性清单模型；\n   - blk-tech-error：错误分类矩阵（E01~E05），清空状态事务原子回滚机制（显式清理 replacement 节点、恢复单输入框拓扑、代际保持原值不提前递增、空值与纯空格原始草稿无差别重调度），以及严重回插失败时的只读 textarea 全文逐字符复制安全兜底策略；\n   - blk-tech-module：划分 7 大原生模块（DisplayRenderer, InputController, DebounceScheduler, ResetController, ValidatorModule, FeedbackBanner, AppController），完整保留 16 项公共 API 契约与 AppController.init 显式依赖注入契约；消除 handleReset 顺序冲突，规定先快照、预制新节点并复制属性、取消旧定时器、执行替换，全部成功后原子提交才递增 inputGeneration；\n   - blk-tech-interface：详尽规范 16 项公共方法入参、返回类型、前置守卫与后置条件；明确内部 JavaScript 为“非执行示意，非CodingAgent直接复制的参考实现”，消除实现代码与正文契约偏差。\n3. 真实官方查证与实验边界保留：关联 MDN 官方文档（Node.insertBefore, HTMLTextAreaElement.readOnly, Element.compositionend, InputEvent.isComposing, Node.textContent 等）与真实 fixture.png 像素核验记录；诚实记录 Docker 试验在当前规划期不可用（unexecuted），将真机 IME、多浏览器实测与性能基准留待后续开发验证。\n所有变更分为 3 个待批准组，状态均为 pending，无新增用户选择题，变更包完整、自洽、可供审批。",
+  "workItems": []
+}

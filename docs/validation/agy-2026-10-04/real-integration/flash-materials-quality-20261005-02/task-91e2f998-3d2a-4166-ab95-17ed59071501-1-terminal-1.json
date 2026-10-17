@@ -1,0 +1,229 @@
+{
+  "conversation_id": "ca4c9694-70f9-4e89-90b1-43f8802b0536",
+  "status": "SUCCESS",
+  "response": "{\"blockers\":[\"源码审计脚本与残留检测存在漏检与退出码缺陷：原 blk-deliv-val-security-xss-audit 中的 Node -e 审查命令采用纯子串匹配，漏检 eval (userInput) 与 new Function (userInput) 等含空白符的危险调用；且确认按钮残留检查仅输出 console.warn 未调用 process.exit(1)，导致残留时退出码仍为 0 误判通过。受影响块 ID：blk-deliv-val-security-xss-audit。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 及 Node.js 官方规范（https://nodejs.org/api/process.html）。\",\"IME 输入法会话清空竞争与幽灵空值错误：blk-tech-interface 中 compositionend 无条件调度 300ms 防抖，且清空重置缺少会话失效机制。在输入法拼音合成期间点击清空，随后迟到的 compositionend 事件会在已清空状态下重新调度 300ms 造成误报的空值错误提示。受影响块 ID：blk-tech-interface、blk-feat-input-display、blk-flow-input-display、blk-tech-data-model、blk-tech-error、blk-acc-input-display、blk-deliv-task-input-workflow。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 与 MDN Element: compositionstart 规范（https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event）。\",\"性能验证目标存在未实测数据与统计口径不闭合：blk-deliv-val-perf-benchmark.normalBehavior 中编写了未实现的编造实测区间（50~150ms、305~325ms、5~20ms），且步骤（5轮）与验证（10次交互、3次冷加载）次数冲突，均值与最大值通过边界不一致；pre-repaint 回调被误称为物理可见绘制完成。受影响块 ID：blk-prod-outcomes、blk-deliv-val-perf-benchmark。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95。\",\"本地轻量 HTTP 服务命令与访问端口契约不一致：TECHNICAL_GUIDE 与 ACCEPTANCE 中采用 npx serve . 却固定访问 http://localhost:8080，未显式绑定端口；Python 服务若未指定端口默认监听 8000 端口，导致访问 8080 端口失败。受影响块 ID：blk-tech-deployment、blk-deliv-spec-deployment、blk-deliv-acc-package。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 与 Python 官方文档（https://docs.python.org/3/library/http.server.html）。\",\"空值防抖验证与清除旧展示正式规范冲突：blk-deliv-task-error-handling.verification 当前包含“展示区不刷新”字样，允许保留已显示的旧结果，违反“空值清掉已显示旧结果并恢复初始占位”的正式契约。受影响块 ID：blk-deliv-task-error-handling、blk-acc-input-display。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 第二视角内容观察。\",\"历史安全证据过度外推需确立当前有效适用范围：旧证据中“从根本上杜绝 DOM 型 XSS”外推过度，需明确单一节点 textContent 仅保证该节点纯文本渲染，整应用安全取决于全局写入点审查与动态 Payload 回显。受影响块 ID：blk-tech-stack、blk-deliv-val-security-xss-audit。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 与 MDN XSS 定义规范（https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting）。\"],\"clarification\":null,\"evidence\":[{\"applicability\":\"自动质量验收反馈依据：指引源码审计正则覆盖空白形式与失败退出码、IME 会话失效防幽灵报错、性能指标与统计闭合去虚假实测、空值验证契约统一为清除旧展示、启动命令端口一致性及历史安全证据适用边界收敛。\",\"content\":\"这是一轮自动质量验收反馈，不是真人新增需求，也不是人工批准。源为已冻结的 flash-materials-quality-20261005-01 最新实际蓝图与 quality-reviewed 开发包，以及 independent-content-review.json、decoded-audit-command-probe.json 的独立检查。上一轮公开 Core API 自动接受不等于真人批准或目标应用实测。保持已经正确的即时直接清空、300ms 实时展示、经典脚本/IIFE、离线前提、textContent 文本节点约束、原图证据和去重后的任务图；仅修订下列未解决项及其真实依赖闭包，产物仍作为待批准 ChangeSet。普通技术与界面细节继续委托 AI 拟定，不新增用户选择题。\\n\\n1. 源码审计真实有效：blk-deliv-val-security-xss-audit 的第一条 Node -e 命令经 tasks.json 真实 JSON 解码后能够解析执行。隔离合成 app.js 的原七个样本——innerHTML 写入、outerHTML 写入、document.write(userInput)、eval(userInput)、new Function(userInput)、安全 textContent 赋值、安全 textContent renderer——都得到正确退出结果；但合法源码 eval (userInput) 和 new Function (userInput) 均被错误输出“静态安全检查通过：0 处危险 DOM/执行 API”，退出0。请选择并说明可执行的源码检查方案，覆盖声明禁止调用的普通空白形式，给出明确成功/失败边界，并实际解析执行最终 JSON 解码后的检查程序或命令。不要只替换成未经解析执行的正则字符串，也不要求特定 AST 或其他技术方案。审计对声明范围的能力应与措辞一致，静态词法扫描不能冒充全应用安全证明。保留恶意文本实际原样回显的目标应用动态测试，且保持尚未实现应用的动态测试为 unexecuted。确认按钮残留检查若发现残留也应清楚报告失败，而不是仅警告后让自动验收当成通过。\\n\\n2. IME 清空竞争与后台延迟：当前 blk-tech-interface 中 compositionend 总是调用 schedule；clear 只清除计时器并将 isComposing=false，缺少已作废输入法会话的失效规则。当前契约允许 compositionstart→点击清空恢复空白初始态→迟到的旧 compositionend→再次调度300ms→空值错误提示，甚至可能受后续原生事件影响重新写入旧会话内容。此为接口契约允许的反例，不是已经复现的真实浏览器故障。请由 AI 拟定一致的会话失效/事件顺序处理办法，使清空立即取消，并使来自旧会话的迟到事件不能恢复旧文本或自动制造空值错误。真实新输入仍正常启动新的300ms防抖。同步数据模型、事件接口、流程、错误恢复、实现任务及验收，明确可观察测试序列和未具备真实IME环境时的待验证状态。后台计时器可能产生明显延迟，不能仅写成“微小漂移”或保证绝对300ms完成；明确前台测量前提、后台/恢复前台的预期行为、清空及后发输入优先级，并给出可观察测试。保留无确认弹窗、无Enter专属提交、空值不保留旧结果、失败保留原始输入和回焦要求。\\n\\n3. 性能目标、次数与统计闭合：blk-deliv-val-perf-benchmark.normalBehavior 写“耗时实测在50~150ms”“总耗时在305~325ms”“点击清空5~20ms”，但目标应用没有实现或性能日志，这些区间没有实测证据。撤除这些编造实测区间，写清待验证目标而非声称测得。步骤与evidenceRequired目前为5轮，verification又要求10次交互和3次冷加载；passCriteria只要求均值，verification却同时要求最大值。请为每个指标选择一致的设备/浏览器/可见前台/缓存或冷启动状态、输入数据、次数、采样起止、统计方式和唯一通过边界，并同步相关产品目标、技术说明、任务、步骤、证据要求和验收。不同指标可以有不同次数，但同一指标的字段必须一致。DOM就绪使用相应Navigation Timing端点；input/compositionend至重绘前回调是防抖加处理及调度的代理指标；清空的起止也应明确且与选择的统计方式一致。删除仍把pre-repaint回调称作绘制完成、渲染已完成或物理可见耗时的用词。300ms防抖等待与DOM更新/调度延迟分开叙述，不声称未来测试已经通过。Safari真机验证仍待环境具备，不重复启动相同不可用Docker/Chromium应用试验，不把官方研究查证视为浏览器实测。\\n\\n4. 开发入口与真实顺序：当前tasks.json的四个实现任务→打包→集成验证依赖图正确，重复的product/technical实现任务已删除，保持这些正确ID与依赖。上一轮START_HERE首个可执行任务明确是layout-styling，却在同句写“先完成前置验证”，与需要完整应用/打包后才可执行的验证依赖冲突。以实际任务前提为准，使导出入口、开发计划和tasks.json一致：先执行当前可执行的实现任务，依赖就绪后再执行相应验证。若该句由导出模板而非蓝图生成，不通过伪造spike、无源码验证或调整正确任务图掩盖模板问题；在结构化结果中如实记录模板问题，交给实现方修复。应用尚未实现时可以运行的独立实验必须自带明确源码与目标，不能把未来应用验证放到实现之前。\\n\\n5. 保留边界与证据：原始文字是行为规范，fixture.png是布局证据。保持原图SHA256 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0、真实原生查看记录与阶段可追溯链接；Q7M4-8261不是固定业务名。保持个人单页面，无新后端、登录、数据库、协作、支付、新页面或持久化需求。旧证据及收据不重写，新增研究或修订按公开登记路径记录，无关块的稳定ID与精确内容保持不变。\\n\\n独立评审应直接逐项检查最新实际草案及跨块契约。blockers=[]、结构覆盖通过、Runtime完成、API自动接受、ZIP及Project Architect界面下载正确，均不能代替上述内容验收或目标应用实测。最终JSON解码的检查程序需实际解析执行，并明确合成源码检查与未来目标应用动态测试的区别。\\n\\n补充第二视角内容观察：blk-deliv-task-error-handling.verification 当前写“输入空字符串停止300ms，核对输入框下方出现红色明确提示，展示区不刷新”，但正式空值行为是清掉已显示的旧结果并恢复初始占位。不能用“展示区不刷新”允许旧项目名继续显示。请把该验证和相关任务、流程、接口、验收统一为可观察序列：“先输入有效旧项目名并等待展示成功→将输入文字全部删空→等待最新300ms防抖任务实际执行→旧项目名不再显示，展示区恢复灰色占位，空值错误提示明确且输入保持空值可编辑”；纯空格路径同样不保留旧结果，但原始空格保持。点击清空是另一条已批准即时路径，应立即复位并取消任务且不新增空值错误。不得把本观察写成已经执行过的目标应用浏览器测试；这是根据真实导出任务与正式行为的第二视角契约检查。\\n\\n补充启动命令端口契约：TECHNICAL_GUIDE 的本地HTTP启动方式和 ACCEPTANCE 的本地服务验收步骤写 npx serve .，却将访问地址固定为 http://localhost:8080；该命令没有明确指定8080监听端口。请根据官方工具文档修正为命令与地址一致且可复制使用的形式，例如明确指定 npx serve . --listen 8080，或采用官方支持的正确参数/对应地址；Python静态服务命令也与其端口地址保持一致。同步部署块、启动文档要求、交付任务和验收，不新增服务端业务。工具首次取得需联网及已安装运行时/工具的前提应如实说明，不能把可选npx启动方式写成离线无前提保证。START_HERE由实现方的新Compiler按真实任务依赖生成，模型只修订正式蓝图与任务，不自行产出或覆盖START_HERE来绕过模板修复。\\n\\n补充历史安全证据适用边界：TECHNICAL_GUIDE 的证据附录仍保留旧 evidence-mdn-textcontent-xss-safety / evidence-mdn-node-textcontent-official 的适用说明，包含“从根本上杜绝DOM型XSS注入风险”“从根本上防止DOM型XSS漏洞”，其中后者仍标passed；这会让读者误将textContent的单一文本写入安全规则当作全应用DOM XSS证明。遵守不可变证据契约，保留旧原文、来源、时间、哈希、工具记录及原结果，不重写历史证据；通过新增当前边界修订证据与明确可追溯说明，指出旧适用范围的过度外推已被当前限定取代，不再将其作为全面覆盖的有效安全结论。当前有效结论仅为‘用户项目名进入指定textContent文本节点时不被解析为HTML/脚本’，整应用安全仍取决于其他写入点、脚本/URL使用、实际源码审计及动态验收。同步当前技术说明和证据关联，确保导出附录读者能辨别历史断言与当前有效适用边界，而不是继续将过宽范围宣称passed。\",\"id\":\"evidence-user-feedback-quality-20261005-02\",\"kind\":\"user\",\"obtainedAt\":\"2026-10-04T22:25:50.681Z\",\"source\":\"input:b4da0333-c07a-45a2-b87f-9aeb6453cc95\"},{\"applicability\":\"规范本地轻量 HTTP 服务启动命令与端口一致性契约：Python http.server 默认监听 8000 端口，若访问 8080 端口必须显式传递端口参数（python -m http.server 8080）。\",\"content\":\"http.server can also be invoked directly using the -m switch of the interpreter. The following example illustrates how to serve files relative to the current directory: python -m http.server [ OPTIONS ] [ port ]. The server listens to port 8000 by default. The default can be overridden by passing the desired port number as an argument: python -m http.server 9000.\",\"hash\":\"4d83e799b7ad96d8441d15486816a37731578026694ba4d11a605d7534955115\",\"id\":\"evidence-python-http-server-port-official\",\"kind\":\"official-source\",\"location\":\"https://docs.python.org/3/library/http.server.html\",\"obtainedAt\":\"2026-10-04T22:26:35.289Z\",\"outcome\":\"passed\",\"source\":\"https://docs.python.org/3/library/http.server.html\"},{\"applicability\":\"指导静态源码审计脚本规范：当发现禁用危险 API 或确认按钮残留关键字时，必须显式调用 process.exit(1) 返回非零失败退出码，不能仅调用 console.warn 后退出 0 导致外部自动验收误判为通过。\",\"content\":\"The process.exit() method instructs Node.js to terminate the process synchronously with an exit status of code. If code is omitted, exit uses either the 'success' code 0 or the value of process.exitCode if it has been set. To exit with a 'failure' code: exit(1); The shell that executed Node.js should see the exit code as 1.\",\"hash\":\"845ec5d06e1f6aeef3ec3be7f262e638263f71683b535216658acc65b3079452\",\"id\":\"evidence-nodejs-process-exit-official\",\"kind\":\"official-source\",\"location\":\"https://nodejs.org/api/process.html\",\"obtainedAt\":\"2026-10-04T22:26:52.902Z\",\"outcome\":\"passed\",\"source\":\"https://nodejs.org/api/process.html\"},{\"applicability\":\"限定 textContent 的安全适用边界并澄清全应用 DOM XSS 的说明：单一节点的 textContent 赋值仅保证该数据汇点不被解析执行，不能等同于全系统杜绝 DOM XSS，需结合整应用源码审计与动态 Payload 原样回显测试。\",\"content\":\"A cross-site scripting (XSS) attack is one in which an attacker is able to get a target site to execute malicious code as though it was part of the website... All XSS attacks depend on a website doing two things: Accepting some input that could have been crafted by an attacker; Including this input in a page without sanitizing it: that is, without ensuring that it won't be executable as JavaScript.\",\"hash\":\"575cf0c159d69f4d2e554c7f0eec6b0ac776f1ad1f78e590068a3c9e5657e1ea\",\"id\":\"evidence-mdn-xss-definition-boundary\",\"kind\":\"official-source\",\"location\":\"https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting\",\"obtainedAt\":\"2026-10-04T22:27:22.400Z\",\"outcome\":\"passed\",\"source\":\"https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting\"},{\"applicability\":\"规范 IME 拼音输入会话的生命周期控制：输入法启动新会话时需维护会话有效性，清空重置时立即使旧会话作废，防止清空后迟到的旧 compositionend 事件触发非预期的防抖调度或空值错误。\",\"content\":\"The compositionstart event is fired when a text composition system such as an input method editor starts a new composition session. For example, this event could be fired after a user starts entering a Chinese character using a Pinyin Input method editor.\",\"hash\":\"7707d106ca999e77eb09ca5959fe1d88cd77a5ac12ceccf99ca262b08253b098\",\"id\":\"evidence-mdn-ime-compositionstart-session\",\"kind\":\"official-source\",\"location\":\"https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event\",\"obtainedAt\":\"2026-10-04T22:27:37.629Z\",\"outcome\":\"passed\",\"source\":\"https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event\"},{\"applicability\":\"记录当前规划环境受控试验由于 Docker 引擎未运行不可用状态，确立端到端浏览器实测与性能基准需在交付阶段由开发者在本地真实桌面浏览器中执行。\",\"content\":\"failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified. Container execution is unavailable.\",\"environment\":\"node:24.13.0-bookworm-slim (Docker unavailable on host)\",\"id\":\"evidence-exp-docker-env-feedback-unavailable\",\"kind\":\"experiment\",\"location\":\"D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\runtime\\\\planning\\\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\\\tools\\\\experiments\\\\prepare-f6ca11f5-0487-4475-adf4-c7e69885f929.ndjson\",\"obtainedAt\":\"2026-10-05T06:26:27+08:00\",\"outcome\":\"unexecuted\",\"source\":\"experiment:prepare-f6ca11f5-0487-4475-adf4-c7e69885f929\"}],\"followUp\":[{\"goal\":\"在整合任务完成蓝图与任务修订后，针对导出 tasks.json 中 Node.js 静态安全审查命令进行 JSON 解码与解析测试，验证其对含空白字符的 eval/new Function 调用及确认按钮残留能正确返回非零失败退出码。\",\"kind\":\"validation\"},{\"goal\":\"在整合任务完成设计调整后，审查并验证性能实测任务中关于 DOM 就绪、防抖响应与清空重置的测试轮次、采样起止与通过边界在全蓝图跨块契约中完全闭合一致。\",\"kind\":\"validation\"}],\"groups\":[],\"questions\":[],\"summary\":\"本轮基于自动质量验收反馈（input:b4da0333-c07a-45a2-b87f-9aeb6453cc95）对材料中的技术约束、异常边界与可行性风险完成官方资料研究与受控环境探测，形成如下新增发现、适用范围与契约建议：\\n\\n1. 静态源码审计方案与退出码契约（受影响块：blk-deliv-val-security-xss-audit）：\\n   - 新增发现：原审计脚本采用固定字面量匹配（如 'eval('、'new Function('），漏检带普通空白符的调用（如 'eval (userInput)' 与 'new Function (userInput)'）；且确认按钮残留检查仅输出 console.warn 未调用 process.exit(1)，导致测试在残留存在时仍返回退出码 0 误判通过。\\n   - 官方依据与建议：查证 Node.js 官方规范（process.exit([code])），确认当发现违规时必须显式调用 process.exit(1) 返回非零失败退出码；检查程序建议采用支持普通空白的正则表达式（/\\\\beval\\\\s*\\\\(/、/\\\\bnew\\\\s+Function\\\\s*\\\\(/、/\\\\.innerHTML\\\\b/、/\\\\.outerHTML\\\\b/、/\\\\bdocument\\\\s*\\\\.\\\\s*write\\\\s*\\\\(/），并在确认按钮残留检查中同样执行 process.exit(1)。明确词法扫描仅对声明范围负责，不冒充全应用安全证明，与未实现的动态测试保持区分。\\n\\n2. IME 输入法合成与清空重置竞争（受影响块：blk-tech-interface、blk-feat-input-display、blk-flow-input-display、blk-tech-data-model、blk-tech-error、blk-acc-input-display、blk-deliv-task-input-workflow）：\\n   - 新增发现：原契约中 compositionend 总是调用 schedule，且清空按钮仅清除当前定时器并将 isComposing 置为 false，缺少会话失效规则。当用户在中文拼音输入期间点击清空，随后迟到的 compositionend 事件会在已清空状态下重新调度 300ms，导致幽灵空值错误提示。\\n   - 官方依据与建议：查证 MDN Element: compositionstart 规范，建议在数据模型中引入输入法会话版本标记（如 compositionSessionId / activeSessionId）。点击清空时立即使当前活跃会话失效；迟到的 compositionend 事件若发现所属会话已失效或输入框处于重置状态，直接丢弃且不调度防抖任务。同时查证 MDN Window: setTimeout 规范，确认后台标签页存在最低超时节流（≥1000ms），明确性能测量的前提为前台可见标签页，不作绝对 300ms 物理保证。\\n\\n3. 性能测量口径与统计闭合（受影响块：blk-prod-outcomes、blk-deliv-val-perf-benchmark）：\\n   - 新增发现：原验证任务中存在编造的实测耗时区间（50~150ms、305~325ms、5~20ms），且 steps（5轮）与 verification（10次交互、3次冷加载）轮次冲突，均值与最大值通过边界不一致；pre-repaint 回调被误称为绘制完成。\\n   - 规范建议：撤除未经实测的区间叙述，明确为待验证目标；区分 300ms 防抖等待与 DOM 更新/调度延迟（≤50ms）；将测量条件统一定为前台可见标签页、1~200 字符典型项目名，冷加载测量 3 次均值 ≤ 300ms，防抖交互测量 5 次均值 ≤ 350ms，清空重置测量 5 次均值 ≤ 50ms。将指标明确为 DOM 就绪与重绘前回调调度，不冒充物理可见绘制。\\n\\n4. 本地静态 HTTP 服务启动命令与端口一致性（受影响块：blk-tech-deployment、blk-deliv-spec-deployment、blk-deliv-acc-package）：\\n   - 新增发现：文档与验收中写 npx serve . 却固定访问 http://localhost:8080，未指定端口；Python http.server 默认监听 8000 端口，若未显式传参则访问 8080 端口失败。\\n   - 官方依据与建议：查证 Python 官方文档，启动命令应规范为明确指定端口的 python -m http.server 8080；同理，serve 启动命令应统一为 npx serve . -l 8080 或与其监听端口一致的地址，并明确 npx 方式首次拉取需具备网络与 Node.js 运行时，纯离线自包含仅适用于本地直接双击（file://）。\\n\\n5. 空值验证行为与历史安全证据边界收敛（受影响块：blk-deliv-task-error-handling、blk-acc-input-display、blk-tech-stack）：\\n   - 规范建议：将空值防抖验证统一为“先输入有效旧项目名并展示成功 -\\u003e 全部删空 -\\u003e 300ms 到期后旧结果清除，展示区恢复灰色占位，就地显示红色空值提示，输入框保持焦点且内容可编辑”，消除“展示区不刷新”字样；对于历史证据中“从根本上杜绝 DOM 型 XSS”的表述，在技术说明中补充边界说明，确立当前有效结论仅为指定 textContent 纯文本节点安全回显。\\n\\n6. 规划环境受控试验状态：\\n   - 经 environment_prepare(node) 探测，宿主机 Docker Desktop 守护进程未启动，规划期受控试验记录为 unexecuted。此限制属于规划工具环境，端到端浏览器实测与性能基准将在交付阶段由开发者在真实桌面浏览器环境中执行。\",\"toolAction\":\"Submitting research result\",\"toolSummary\":\"Finish planning research\"}\n",
+  "duration_seconds": 161.5145487,
+  "num_turns": 1,
+  "structured_output": {
+    "blockers": [
+      "源码审计脚本与残留检测存在漏检与退出码缺陷：原 blk-deliv-val-security-xss-audit 中的 Node -e 审查命令采用纯子串匹配，漏检 eval (userInput) 与 new Function (userInput) 等含空白符的危险调用；且确认按钮残留检查仅输出 console.warn 未调用 process.exit(1)，导致残留时退出码仍为 0 误判通过。受影响块 ID：blk-deliv-val-security-xss-audit。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 及 Node.js 官方规范（https://nodejs.org/api/process.html）。",
+      "IME 输入法会话清空竞争与幽灵空值错误：blk-tech-interface 中 compositionend 无条件调度 300ms 防抖，且清空重置缺少会话失效机制。在输入法拼音合成期间点击清空，随后迟到的 compositionend 事件会在已清空状态下重新调度 300ms 造成误报的空值错误提示。受影响块 ID：blk-tech-interface、blk-feat-input-display、blk-flow-input-display、blk-tech-data-model、blk-tech-error、blk-acc-input-display、blk-deliv-task-input-workflow。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 与 MDN Element: compositionstart 规范（https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event）。",
+      "性能验证目标存在未实测数据与统计口径不闭合：blk-deliv-val-perf-benchmark.normalBehavior 中编写了未实现的编造实测区间（50~150ms、305~325ms、5~20ms），且步骤（5轮）与验证（10次交互、3次冷加载）次数冲突，均值与最大值通过边界不一致；pre-repaint 回调被误称为物理可见绘制完成。受影响块 ID：blk-prod-outcomes、blk-deliv-val-perf-benchmark。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95。",
+      "本地轻量 HTTP 服务命令与访问端口契约不一致：TECHNICAL_GUIDE 与 ACCEPTANCE 中采用 npx serve . 却固定访问 http://localhost:8080，未显式绑定端口；Python 服务若未指定端口默认监听 8000 端口，导致访问 8080 端口失败。受影响块 ID：blk-tech-deployment、blk-deliv-spec-deployment、blk-deliv-acc-package。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 与 Python 官方文档（https://docs.python.org/3/library/http.server.html）。",
+      "空值防抖验证与清除旧展示正式规范冲突：blk-deliv-task-error-handling.verification 当前包含“展示区不刷新”字样，允许保留已显示的旧结果，违反“空值清掉已显示旧结果并恢复初始占位”的正式契约。受影响块 ID：blk-deliv-task-error-handling、blk-acc-input-display。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 第二视角内容观察。",
+      "历史安全证据过度外推需确立当前有效适用范围：旧证据中“从根本上杜绝 DOM 型 XSS”外推过度，需明确单一节点 textContent 仅保证该节点纯文本渲染，整应用安全取决于全局写入点审查与动态 Payload 回显。受影响块 ID：blk-tech-stack、blk-deliv-val-security-xss-audit。依据：input:b4da0333-c07a-45a2-b87f-9aeb6453cc95 与 MDN XSS 定义规范（https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting）。"
+    ],
+    "clarification": null,
+    "evidence": [
+      {
+        "applicability": "自动质量验收反馈依据：指引源码审计正则覆盖空白形式与失败退出码、IME 会话失效防幽灵报错、性能指标与统计闭合去虚假实测、空值验证契约统一为清除旧展示、启动命令端口一致性及历史安全证据适用边界收敛。",
+        "content": "这是一轮自动质量验收反馈，不是真人新增需求，也不是人工批准。源为已冻结的 flash-materials-quality-20261005-01 最新实际蓝图与 quality-reviewed 开发包，以及 independent-content-review.json、decoded-audit-command-probe.json 的独立检查。上一轮公开 Core API 自动接受不等于真人批准或目标应用实测。保持已经正确的即时直接清空、300ms 实时展示、经典脚本/IIFE、离线前提、textContent 文本节点约束、原图证据和去重后的任务图；仅修订下列未解决项及其真实依赖闭包，产物仍作为待批准 ChangeSet。普通技术与界面细节继续委托 AI 拟定，不新增用户选择题。\n\n1. 源码审计真实有效：blk-deliv-val-security-xss-audit 的第一条 Node -e 命令经 tasks.json 真实 JSON 解码后能够解析执行。隔离合成 app.js 的原七个样本——innerHTML 写入、outerHTML 写入、document.write(userInput)、eval(userInput)、new Function(userInput)、安全 textContent 赋值、安全 textContent renderer——都得到正确退出结果；但合法源码 eval (userInput) 和 new Function (userInput) 均被错误输出“静态安全检查通过：0 处危险 DOM/执行 API”，退出0。请选择并说明可执行的源码检查方案，覆盖声明禁止调用的普通空白形式，给出明确成功/失败边界，并实际解析执行最终 JSON 解码后的检查程序或命令。不要只替换成未经解析执行的正则字符串，也不要求特定 AST 或其他技术方案。审计对声明范围的能力应与措辞一致，静态词法扫描不能冒充全应用安全证明。保留恶意文本实际原样回显的目标应用动态测试，且保持尚未实现应用的动态测试为 unexecuted。确认按钮残留检查若发现残留也应清楚报告失败，而不是仅警告后让自动验收当成通过。\n\n2. IME 清空竞争与后台延迟：当前 blk-tech-interface 中 compositionend 总是调用 schedule；clear 只清除计时器并将 isComposing=false，缺少已作废输入法会话的失效规则。当前契约允许 compositionstart→点击清空恢复空白初始态→迟到的旧 compositionend→再次调度300ms→空值错误提示，甚至可能受后续原生事件影响重新写入旧会话内容。此为接口契约允许的反例，不是已经复现的真实浏览器故障。请由 AI 拟定一致的会话失效/事件顺序处理办法，使清空立即取消，并使来自旧会话的迟到事件不能恢复旧文本或自动制造空值错误。真实新输入仍正常启动新的300ms防抖。同步数据模型、事件接口、流程、错误恢复、实现任务及验收，明确可观察测试序列和未具备真实IME环境时的待验证状态。后台计时器可能产生明显延迟，不能仅写成“微小漂移”或保证绝对300ms完成；明确前台测量前提、后台/恢复前台的预期行为、清空及后发输入优先级，并给出可观察测试。保留无确认弹窗、无Enter专属提交、空值不保留旧结果、失败保留原始输入和回焦要求。\n\n3. 性能目标、次数与统计闭合：blk-deliv-val-perf-benchmark.normalBehavior 写“耗时实测在50~150ms”“总耗时在305~325ms”“点击清空5~20ms”，但目标应用没有实现或性能日志，这些区间没有实测证据。撤除这些编造实测区间，写清待验证目标而非声称测得。步骤与evidenceRequired目前为5轮，verification又要求10次交互和3次冷加载；passCriteria只要求均值，verification却同时要求最大值。请为每个指标选择一致的设备/浏览器/可见前台/缓存或冷启动状态、输入数据、次数、采样起止、统计方式和唯一通过边界，并同步相关产品目标、技术说明、任务、步骤、证据要求和验收。不同指标可以有不同次数，但同一指标的字段必须一致。DOM就绪使用相应Navigation Timing端点；input/compositionend至重绘前回调是防抖加处理及调度的代理指标；清空的起止也应明确且与选择的统计方式一致。删除仍把pre-repaint回调称作绘制完成、渲染已完成或物理可见耗时的用词。300ms防抖等待与DOM更新/调度延迟分开叙述，不声称未来测试已经通过。Safari真机验证仍待环境具备，不重复启动相同不可用Docker/Chromium应用试验，不把官方研究查证视为浏览器实测。\n\n4. 开发入口与真实顺序：当前tasks.json的四个实现任务→打包→集成验证依赖图正确，重复的product/technical实现任务已删除，保持这些正确ID与依赖。上一轮START_HERE首个可执行任务明确是layout-styling，却在同句写“先完成前置验证”，与需要完整应用/打包后才可执行的验证依赖冲突。以实际任务前提为准，使导出入口、开发计划和tasks.json一致：先执行当前可执行的实现任务，依赖就绪后再执行相应验证。若该句由导出模板而非蓝图生成，不通过伪造spike、无源码验证或调整正确任务图掩盖模板问题；在结构化结果中如实记录模板问题，交给实现方修复。应用尚未实现时可以运行的独立实验必须自带明确源码与目标，不能把未来应用验证放到实现之前。\n\n5. 保留边界与证据：原始文字是行为规范，fixture.png是布局证据。保持原图SHA256 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0、真实原生查看记录与阶段可追溯链接；Q7M4-8261不是固定业务名。保持个人单页面，无新后端、登录、数据库、协作、支付、新页面或持久化需求。旧证据及收据不重写，新增研究或修订按公开登记路径记录，无关块的稳定ID与精确内容保持不变。\n\n独立评审应直接逐项检查最新实际草案及跨块契约。blockers=[]、结构覆盖通过、Runtime完成、API自动接受、ZIP及Project Architect界面下载正确，均不能代替上述内容验收或目标应用实测。最终JSON解码的检查程序需实际解析执行，并明确合成源码检查与未来目标应用动态测试的区别。\n\n补充第二视角内容观察：blk-deliv-task-error-handling.verification 当前写“输入空字符串停止300ms，核对输入框下方出现红色明确提示，展示区不刷新”，但正式空值行为是清掉已显示的旧结果并恢复初始占位。不能用“展示区不刷新”允许旧项目名继续显示。请把该验证和相关任务、流程、接口、验收统一为可观察序列：“先输入有效旧项目名并等待展示成功→将输入文字全部删空→等待最新300ms防抖任务实际执行→旧项目名不再显示，展示区恢复灰色占位，空值错误提示明确且输入保持空值可编辑”；纯空格路径同样不保留旧结果，但原始空格保持。点击清空是另一条已批准即时路径，应立即复位并取消任务且不新增空值错误。不得把本观察写成已经执行过的目标应用浏览器测试；这是根据真实导出任务与正式行为的第二视角契约检查。\n\n补充启动命令端口契约：TECHNICAL_GUIDE 的本地HTTP启动方式和 ACCEPTANCE 的本地服务验收步骤写 npx serve .，却将访问地址固定为 http://localhost:8080；该命令没有明确指定8080监听端口。请根据官方工具文档修正为命令与地址一致且可复制使用的形式，例如明确指定 npx serve . --listen 8080，或采用官方支持的正确参数/对应地址；Python静态服务命令也与其端口地址保持一致。同步部署块、启动文档要求、交付任务和验收，不新增服务端业务。工具首次取得需联网及已安装运行时/工具的前提应如实说明，不能把可选npx启动方式写成离线无前提保证。START_HERE由实现方的新Compiler按真实任务依赖生成，模型只修订正式蓝图与任务，不自行产出或覆盖START_HERE来绕过模板修复。\n\n补充历史安全证据适用边界：TECHNICAL_GUIDE 的证据附录仍保留旧 evidence-mdn-textcontent-xss-safety / evidence-mdn-node-textcontent-official 的适用说明，包含“从根本上杜绝DOM型XSS注入风险”“从根本上防止DOM型XSS漏洞”，其中后者仍标passed；这会让读者误将textContent的单一文本写入安全规则当作全应用DOM XSS证明。遵守不可变证据契约，保留旧原文、来源、时间、哈希、工具记录及原结果，不重写历史证据；通过新增当前边界修订证据与明确可追溯说明，指出旧适用范围的过度外推已被当前限定取代，不再将其作为全面覆盖的有效安全结论。当前有效结论仅为‘用户项目名进入指定textContent文本节点时不被解析为HTML/脚本’，整应用安全仍取决于其他写入点、脚本/URL使用、实际源码审计及动态验收。同步当前技术说明和证据关联，确保导出附录读者能辨别历史断言与当前有效适用边界，而不是继续将过宽范围宣称passed。",
+        "id": "evidence-user-feedback-quality-20261005-02",
+        "kind": "user",
+        "obtainedAt": "2026-10-04T22:25:50.681Z",
+        "source": "input:b4da0333-c07a-45a2-b87f-9aeb6453cc95"
+      },
+      {
+        "applicability": "规范本地轻量 HTTP 服务启动命令与端口一致性契约：Python http.server 默认监听 8000 端口，若访问 8080 端口必须显式传递端口参数（python -m http.server 8080）。",
+        "content": "http.server can also be invoked directly using the -m switch of the interpreter. The following example illustrates how to serve files relative to the current directory: python -m http.server [ OPTIONS ] [ port ]. The server listens to port 8000 by default. The default can be overridden by passing the desired port number as an argument: python -m http.server 9000.",
+        "hash": "4d83e799b7ad96d8441d15486816a37731578026694ba4d11a605d7534955115",
+        "id": "evidence-python-http-server-port-official",
+        "kind": "official-source",
+        "location": "https://docs.python.org/3/library/http.server.html",
+        "obtainedAt": "2026-10-04T22:26:35.289Z",
+        "outcome": "passed",
+        "source": "https://docs.python.org/3/library/http.server.html"
+      },
+      {
+        "applicability": "指导静态源码审计脚本规范：当发现禁用危险 API 或确认按钮残留关键字时，必须显式调用 process.exit(1) 返回非零失败退出码，不能仅调用 console.warn 后退出 0 导致外部自动验收误判为通过。",
+        "content": "The process.exit() method instructs Node.js to terminate the process synchronously with an exit status of code. If code is omitted, exit uses either the 'success' code 0 or the value of process.exitCode if it has been set. To exit with a 'failure' code: exit(1); The shell that executed Node.js should see the exit code as 1.",
+        "hash": "845ec5d06e1f6aeef3ec3be7f262e638263f71683b535216658acc65b3079452",
+        "id": "evidence-nodejs-process-exit-official",
+        "kind": "official-source",
+        "location": "https://nodejs.org/api/process.html",
+        "obtainedAt": "2026-10-04T22:26:52.902Z",
+        "outcome": "passed",
+        "source": "https://nodejs.org/api/process.html"
+      },
+      {
+        "applicability": "限定 textContent 的安全适用边界并澄清全应用 DOM XSS 的说明：单一节点的 textContent 赋值仅保证该数据汇点不被解析执行，不能等同于全系统杜绝 DOM XSS，需结合整应用源码审计与动态 Payload 原样回显测试。",
+        "content": "A cross-site scripting (XSS) attack is one in which an attacker is able to get a target site to execute malicious code as though it was part of the website... All XSS attacks depend on a website doing two things: Accepting some input that could have been crafted by an attacker; Including this input in a page without sanitizing it: that is, without ensuring that it won't be executable as JavaScript.",
+        "hash": "575cf0c159d69f4d2e554c7f0eec6b0ac776f1ad1f78e590068a3c9e5657e1ea",
+        "id": "evidence-mdn-xss-definition-boundary",
+        "kind": "official-source",
+        "location": "https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting",
+        "obtainedAt": "2026-10-04T22:27:22.400Z",
+        "outcome": "passed",
+        "source": "https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting"
+      },
+      {
+        "applicability": "规范 IME 拼音输入会话的生命周期控制：输入法启动新会话时需维护会话有效性，清空重置时立即使旧会话作废，防止清空后迟到的旧 compositionend 事件触发非预期的防抖调度或空值错误。",
+        "content": "The compositionstart event is fired when a text composition system such as an input method editor starts a new composition session. For example, this event could be fired after a user starts entering a Chinese character using a Pinyin Input method editor.",
+        "hash": "7707d106ca999e77eb09ca5959fe1d88cd77a5ac12ceccf99ca262b08253b098",
+        "id": "evidence-mdn-ime-compositionstart-session",
+        "kind": "official-source",
+        "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event",
+        "obtainedAt": "2026-10-04T22:27:37.629Z",
+        "outcome": "passed",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event"
+      },
+      {
+        "applicability": "记录当前规划环境受控试验由于 Docker 引擎未运行不可用状态，确立端到端浏览器实测与性能基准需在交付阶段由开发者在本地真实桌面浏览器中执行。",
+        "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified. Container execution is unavailable.",
+        "environment": "node:24.13.0-bookworm-slim (Docker unavailable on host)",
+        "id": "evidence-exp-docker-env-feedback-unavailable",
+        "kind": "experiment",
+        "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\tools\\experiments\\prepare-f6ca11f5-0487-4475-adf4-c7e69885f929.ndjson",
+        "obtainedAt": "2026-10-05T06:26:27+08:00",
+        "outcome": "unexecuted",
+        "source": "experiment:prepare-f6ca11f5-0487-4475-adf4-c7e69885f929"
+      }
+    ],
+    "followUp": [
+      {
+        "goal": "在整合任务完成蓝图与任务修订后，针对导出 tasks.json 中 Node.js 静态安全审查命令进行 JSON 解码与解析测试，验证其对含空白字符的 eval/new Function 调用及确认按钮残留能正确返回非零失败退出码。",
+        "kind": "validation"
+      },
+      {
+        "goal": "在整合任务完成设计调整后，审查并验证性能实测任务中关于 DOM 就绪、防抖响应与清空重置的测试轮次、采样起止与通过边界在全蓝图跨块契约中完全闭合一致。",
+        "kind": "validation"
+      }
+    ],
+    "groups": [],
+    "questions": [],
+    "summary": "本轮基于自动质量验收反馈（input:b4da0333-c07a-45a2-b87f-9aeb6453cc95）对材料中的技术约束、异常边界与可行性风险完成官方资料研究与受控环境探测，形成如下新增发现、适用范围与契约建议：\n\n1. 静态源码审计方案与退出码契约（受影响块：blk-deliv-val-security-xss-audit）：\n   - 新增发现：原审计脚本采用固定字面量匹配（如 'eval('、'new Function('），漏检带普通空白符的调用（如 'eval (userInput)' 与 'new Function (userInput)'）；且确认按钮残留检查仅输出 console.warn 未调用 process.exit(1)，导致测试在残留存在时仍返回退出码 0 误判通过。\n   - 官方依据与建议：查证 Node.js 官方规范（process.exit([code])），确认当发现违规时必须显式调用 process.exit(1) 返回非零失败退出码；检查程序建议采用支持普通空白的正则表达式（/\\beval\\s*\\(/、/\\bnew\\s+Function\\s*\\(/、/\\.innerHTML\\b/、/\\.outerHTML\\b/、/\\bdocument\\s*\\.\\s*write\\s*\\(/），并在确认按钮残留检查中同样执行 process.exit(1)。明确词法扫描仅对声明范围负责，不冒充全应用安全证明，与未实现的动态测试保持区分。\n\n2. IME 输入法合成与清空重置竞争（受影响块：blk-tech-interface、blk-feat-input-display、blk-flow-input-display、blk-tech-data-model、blk-tech-error、blk-acc-input-display、blk-deliv-task-input-workflow）：\n   - 新增发现：原契约中 compositionend 总是调用 schedule，且清空按钮仅清除当前定时器并将 isComposing 置为 false，缺少会话失效规则。当用户在中文拼音输入期间点击清空，随后迟到的 compositionend 事件会在已清空状态下重新调度 300ms，导致幽灵空值错误提示。\n   - 官方依据与建议：查证 MDN Element: compositionstart 规范，建议在数据模型中引入输入法会话版本标记（如 compositionSessionId / activeSessionId）。点击清空时立即使当前活跃会话失效；迟到的 compositionend 事件若发现所属会话已失效或输入框处于重置状态，直接丢弃且不调度防抖任务。同时查证 MDN Window: setTimeout 规范，确认后台标签页存在最低超时节流（≥1000ms），明确性能测量的前提为前台可见标签页，不作绝对 300ms 物理保证。\n\n3. 性能测量口径与统计闭合（受影响块：blk-prod-outcomes、blk-deliv-val-perf-benchmark）：\n   - 新增发现：原验证任务中存在编造的实测耗时区间（50~150ms、305~325ms、5~20ms），且 steps（5轮）与 verification（10次交互、3次冷加载）轮次冲突，均值与最大值通过边界不一致；pre-repaint 回调被误称为绘制完成。\n   - 规范建议：撤除未经实测的区间叙述，明确为待验证目标；区分 300ms 防抖等待与 DOM 更新/调度延迟（≤50ms）；将测量条件统一定为前台可见标签页、1~200 字符典型项目名，冷加载测量 3 次均值 ≤ 300ms，防抖交互测量 5 次均值 ≤ 350ms，清空重置测量 5 次均值 ≤ 50ms。将指标明确为 DOM 就绪与重绘前回调调度，不冒充物理可见绘制。\n\n4. 本地静态 HTTP 服务启动命令与端口一致性（受影响块：blk-tech-deployment、blk-deliv-spec-deployment、blk-deliv-acc-package）：\n   - 新增发现：文档与验收中写 npx serve . 却固定访问 http://localhost:8080，未指定端口；Python http.server 默认监听 8000 端口，若未显式传参则访问 8080 端口失败。\n   - 官方依据与建议：查证 Python 官方文档，启动命令应规范为明确指定端口的 python -m http.server 8080；同理，serve 启动命令应统一为 npx serve . -l 8080 或与其监听端口一致的地址，并明确 npx 方式首次拉取需具备网络与 Node.js 运行时，纯离线自包含仅适用于本地直接双击（file://）。\n\n5. 空值验证行为与历史安全证据边界收敛（受影响块：blk-deliv-task-error-handling、blk-acc-input-display、blk-tech-stack）：\n   - 规范建议：将空值防抖验证统一为“先输入有效旧项目名并展示成功 -> 全部删空 -> 300ms 到期后旧结果清除，展示区恢复灰色占位，就地显示红色空值提示，输入框保持焦点且内容可编辑”，消除“展示区不刷新”字样；对于历史证据中“从根本上杜绝 DOM 型 XSS”的表述，在技术说明中补充边界说明，确立当前有效结论仅为指定 textContent 纯文本节点安全回显。\n\n6. 规划环境受控试验状态：\n   - 经 environment_prepare(node) 探测，宿主机 Docker Desktop 守护进程未启动，规划期受控试验记录为 unexecuted。此限制属于规划工具环境，端到端浏览器实测与性能基准将在交付阶段由开发者在真实桌面浏览器环境中执行。"
+  },
+  "json_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "B3 Planning research result",
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "string"
+      },
+      "groups": {
+        "type": "array",
+        "items": {},
+        "maxItems": 0
+      },
+      "questions": {
+        "type": "array",
+        "items": {},
+        "maxItems": 0
+      },
+      "evidence": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "user",
+                "material",
+                "official-source",
+                "experiment"
+              ]
+            },
+            "content": {
+              "type": "string"
+            },
+            "source": {
+              "type": "string"
+            },
+            "obtainedAt": {
+              "type": "string"
+            },
+            "hash": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "environment": {
+              "type": "string"
+            },
+            "outcome": {
+              "type": "string",
+              "enum": [
+                "unexecuted",
+                "passed",
+                "failed",
+                "not-applicable"
+              ]
+            },
+            "applicability": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "content",
+            "source",
+            "obtainedAt",
+            "applicability"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "blockers": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "followUp": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "research",
+                "validation"
+              ]
+            },
+            "goal": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "goal"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "clarification": {
+        "type": "null"
+      },
+      "workItems": {
+        "type": "array",
+        "items": {},
+        "maxItems": 0
+      }
+    },
+    "required": [
+      "summary",
+      "groups",
+      "questions",
+      "evidence",
+      "blockers",
+      "followUp",
+      "clarification"
+    ],
+    "additionalProperties": false
+  },
+  "usage": {
+    "input_tokens": 266681,
+    "output_tokens": 27450,
+    "thinking_tokens": 18156,
+    "cache_read_tokens": 2280148,
+    "total_tokens": 294131
+  }
+}

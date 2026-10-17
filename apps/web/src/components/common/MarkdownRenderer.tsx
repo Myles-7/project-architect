@@ -10,11 +10,15 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
   const { showToast } = useToast();
   const [copiedCodeIdx, setCopiedCodeIdx] = useState<number | null>(null);
 
-  const handleCopyCode = (codeText: string, idx: number) => {
-    navigator.clipboard.writeText(codeText);
-    setCopiedCodeIdx(idx);
-    showToast('已复制代码片段', 'success');
-    setTimeout(() => setCopiedCodeIdx(null), 2000);
+  const handleCopyCode = async (codeText: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(codeText);
+      setCopiedCodeIdx(idx);
+      showToast('已复制代码片段', 'success');
+      setTimeout(() => setCopiedCodeIdx(null), 2000);
+    } catch {
+      showToast('复制失败，请选择代码后手动复制。', 'error');
+    }
   };
 
   const lines = content.split('\n');
@@ -144,6 +148,22 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
       continue;
     }
 
+    // Ordered steps preserve the author's numbering in planning instructions.
+    const orderedStart = line.trim().match(/^(\d+)[.)]\s+/);
+    if (orderedStart) {
+      const listItems: string[] = [];
+      while (i < lines.length && /^\d+[.)]\s+/.test(lines[i].trim())) {
+        listItems.push(lines[i].trim().replace(/^\d+[.)]\s+/, ''));
+        i++;
+      }
+      elements.push(
+        <ol key={`ol-${blockIdx++}`} start={Number(orderedStart[1])} className="my-2.5 space-y-1.5 pl-4 list-decimal text-xs text-zinc-700 dark:text-zinc-300">
+          {listItems.map((item, idx) => <li key={idx} className="leading-relaxed">{renderInlineFormatting(item)}</li>)}
+        </ol>
+      );
+      continue;
+    }
+
     // 6. Tables
     if (line.includes('|') && line.trim().startsWith('|')) {
       const tableLines: string[] = [];
@@ -242,10 +262,16 @@ function renderInlineFormatting(text: string): ReactNode {
     // Link [label](url)
     const linkMatch = remaining.match(/^\[([^\]]+)\]\(([^)]+)\)/);
     if (linkMatch) {
+      const href = safeMarkdownHref(linkMatch[2]);
+      if (href === null) {
+        parts.push(linkMatch[1]);
+        remaining = remaining.slice(linkMatch[0].length);
+        continue;
+      }
       parts.push(
         <a
           key={`link-${keyIdx++}`}
-          href={linkMatch[2]}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-0.5 text-orange-600 dark:text-orange-400 underline hover:opacity-80"
@@ -273,4 +299,12 @@ function renderInlineFormatting(text: string): ReactNode {
   }
 
   return parts;
+}
+
+/** Generated document links must not execute browser code. */
+export function safeMarkdownHref(value: string): string | null {
+  const href = value.trim().replace(/[\u0000-\u0020\u007f]/g, '');
+  if (!href) return null;
+  const scheme = /^[a-z][a-z0-9+.-]*:/i.exec(href)?.[0].toLowerCase();
+  return scheme && !['http:', 'https:', 'mailto:'].includes(scheme) ? null : href;
 }

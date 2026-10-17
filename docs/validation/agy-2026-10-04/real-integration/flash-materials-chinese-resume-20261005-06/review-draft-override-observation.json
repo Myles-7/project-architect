@@ -1,0 +1,148 @@
+{
+  "kind": "Independent review quality observation; no state or artifact changes",
+  "blockId": "blk-deliv-val-perf-benchmark",
+  "input": {
+    "path": "docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-chinese-resume-20261005-06\\observed-inputs\\task-dba10c3c-b4e4-4989-a628-04f0a08d0ae7-1.context.json",
+    "sha256": "18119e8a85fc4099282ffdb324d445f705f196ddd7b9bd8d3676f5a1c89e2af1"
+  },
+  "output": {
+    "path": "D:/Temp/User/pa-real-integration-AiRDUO/项目构思/runtime/planning/run-67045f9a-4c95-4756-b449-fb72f37327b6/tasks/task-dba10c3c-b4e4-4989-a628-04f0a08d0ae7/result.json",
+    "sha256": "4c1e578326e75803889a7a7acb136cf192ae751bf618ad66f1a24d553d6a0347"
+  },
+  "formalBlock": {
+    "content": "实测首屏渲染时间（目标≤300ms）与交互响应延迟（目标≤50ms）指标，建立精确测量基准。",
+    "dependsOn": [
+      "blk-tech-val-performance",
+      "blk-deliv-val-standalone-runtime"
+    ],
+    "evidenceIds": [
+      "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "evidence-docker-env-prep-delivery"
+    ],
+    "id": "blk-deliv-val-perf-benchmark",
+    "kind": "validation",
+    "requirementIds": [
+      "blk-prod-outcomes",
+      "blk-tech-val-performance"
+    ],
+    "stage": "delivery",
+    "task": {
+      "assumptions": [
+        "运行在主流性能配置的桌面计算机（如 4 核以上 CPU，8GB 以上内存）"
+      ],
+      "completionCriteria": [
+        "实测数据完整，冷启动耗时 ≤ 300ms，交互响应耗时 ≤ 50ms",
+        "无阻塞主线程的长任务（Long Task）",
+        "形成完整的性能实测归档记录"
+      ],
+      "environment": "桌面 PC（现代 x86_64 或 Apple Silicon 架构），Chrome 最新稳定版无痕模式，禁用所有第三方浏览器扩展",
+      "evidenceRequired": [
+        "Chrome DevTools Performance 跟踪导出的 JSON 记录与控制台打印的 5 轮耗时数据日志"
+      ],
+      "exclusions": "不测量网络传输延时（测试在本地文件或本地回环服务下进行）",
+      "failureBehavior": "若实测超出阈值，分析是否有强制同步布局（Forced Synchronous Layout）或不必要的 DOM 重查，精简 DOM 操作后复测",
+      "goal": "实测验证轻量纯原生单页面的首屏冷启动耗时≤300ms、确认展示与清空交互响应延迟≤50ms 的性能设计目标",
+      "modules": [
+        "AppController",
+        "DisplayRenderer",
+        "InputController"
+      ],
+      "normalBehavior": "打开页面时，从 navigationStart 到 domContentLoaded 耗时实测在 50~150ms 之间（符合 300ms 目标）；点击确认或清空时，从事件触发到微任务执行完毕及 requestAnimationFrame 渲染帧完成，耗时在 5~20ms 之间（符合 50ms 目标）",
+      "onFailure": "若某项指标超时，审查 styles.css 中的选择器复杂度，检查 app.js 中是否存在频繁的 getComputedStyle 或重复 querySelector，将 DOM 引用缓存化后重新测试。",
+      "passCriteria": [
+        "冷启动渲染耗时平均值 ≤ 300ms；",
+        "确认提交渲染耗时平均值 ≤ 50ms，清空重置渲染耗时平均值 ≤ 50ms；",
+        "测试过程中主线程无卡顿。"
+      ],
+      "scope": "使用浏览器标准 Performance Navigation Timing API 与 Performance.now() 进行冷启动与点击交互的精确毫秒级打点测量",
+      "steps": [
+        "1. 启动 Chrome 无痕模式并加载交付的 index.html；",
+        "2. 在 Console 执行 `const [nav] = performance.getEntriesByType('navigation'); console.log('冷启动耗时:', nav.domContentLoadedEventEnd - nav.startTime);` 记录冷启动耗时；",
+        "3. 注入交互测试探针：在 confirmButton 点击监听中记录 `const t0 = performance.now()`，在 `requestAnimationFrame(() => console.log('交互渲染延迟:', performance.now() - t0))` 打印重绘耗时；",
+        "4. 录入 50 字符项目名并点击确认，重复 5 次取平均值；",
+        "5. 点击清空按钮，重复 5 次取平均值；",
+        "6. 汇总冷启动与交互延迟数据，比对是否符合 ≤300ms 与 ≤50ms 指标。"
+      ],
+      "verification": [
+        "在 Chrome DevTools Performance 面板录制 3 次冷加载 Trace，查验 DOMContentLoaded 均值是否 ≤ 300ms",
+        "在控制台注入性能测量脚本，连续执行 10 次确认提交与 10 次清空操作，统计交互响应平均耗时与最大耗时是否均 ≤ 50ms",
+        "输出包含设备配置、测试数据规模与测量起止记录的性能实测数据表"
+      ]
+    },
+    "title": "交付前置验证任务：首屏冷启动与交互响应性能基准实测",
+    "approvedBy": "api-automated-acceptance-flash-materials-chinese-20261005-01-delivery-1791131287489",
+    "approvedAt": "2026-10-04T16:28:07.521Z"
+  },
+  "candidateBlock": {
+    "content": "实测首屏渲染时间（目标≤300ms）与防抖实时反馈响应延迟（目标≤350ms）指标，建立精确测量基准。",
+    "dependsOn": [
+      "blk-tech-val-performance",
+      "blk-deliv-val-standalone-runtime"
+    ],
+    "evidenceIds": [
+      "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+      "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "evidence-docker-env-prep-delivery"
+    ],
+    "id": "blk-deliv-val-perf-benchmark",
+    "kind": "validation",
+    "requirementIds": [
+      "blk-prod-outcomes",
+      "blk-tech-val-performance"
+    ],
+    "stage": "delivery",
+    "task": {
+      "assumptions": [
+        "运行在主流性能配置的桌面计算机（如 4 核以上 CPU，8GB 以上内存）"
+      ],
+      "completionCriteria": [
+        "实测数据完整，冷启动耗时 ≤ 300ms，实时输入防抖响应延迟 ≤ 350ms（DOM 渲染延迟 ≤ 50ms），清空耗时 ≤ 50ms",
+        "无阻塞主线程的长任务（Long Task）",
+        "形成完整的性能实测归档记录"
+      ],
+      "environment": "桌面 PC（现代 x86_64 或 Apple Silicon 架构），Chrome 最新稳定版无痕模式，禁用所有第三方浏览器扩展",
+      "evidenceRequired": [
+        "Chrome DevTools Performance 跟踪导出的 JSON 记录与控制台打印的 5 轮耗时数据日志"
+      ],
+      "exclusions": "不测量网络传输延时（测试在本地文件或本地回环服务下进行）",
+      "failureBehavior": "若实测超出阈值，分析是否有强制同步布局或不必要的 DOM 重查，精简 DOM 操作后复测",
+      "goal": "实测验证轻量纯原生单页面的首屏冷启动耗时≤300ms、输入 300ms 防抖自动展示整体延迟≤350ms（其中 DOM 渲染≤50ms）与清空交互响应延迟≤50ms 的性能设计目标",
+      "modules": [
+        "AppController",
+        "DebounceScheduler",
+        "DisplayRenderer",
+        "InputController"
+      ],
+      "normalBehavior": "打开页面时，从 navigationStart 到 domContentLoaded 耗时实测在 50~150ms 之间（符合 300ms 目标）；输入字符停止 300ms 后触发渲染，整体耗时在 305~320ms 之间（符合 350ms 目标）；点击清空时，从事件触发到微任务执行完毕及 requestAnimationFrame 渲染帧完成，耗时在 5~20ms 之间（符合 50ms 目标）",
+      "onFailure": "若某项指标超时，审查 styles.css 中的选择器复杂度，检查 app.js 中是否存在频繁的 getComputedStyle 或重复 querySelector，将 DOM 引用缓存化后重新测试。",
+      "passCriteria": [
+        "冷启动渲染耗时平均值 ≤ 300ms；",
+        "实时输入防抖响应整体耗时平均值 ≤ 350ms（其中 DOM 更新渲染耗时 ≤ 50ms）；",
+        "清空重置渲染耗时平均值 ≤ 50ms；",
+        "测试过程中主线程无卡顿。"
+      ],
+      "scope": "使用浏览器标准 Performance Navigation Timing API 与 Performance.now() 进行冷启动与 input 防抖交互的精确毫秒级打点测量",
+      "steps": [
+        "1. 启动 Chrome 无痕模式并加载交付的 index.html；",
+        "2. 在 Console 执行 `const [nav] = performance.getEntriesByType('navigation'); console.log('冷启动耗时:', nav.domContentLoadedEventEnd - nav.startTime);` 记录冷启动耗时；",
+        "3. 注入交互测试探针：在 input 事件监听中记录 `window.__t_input = performance.now()`；在防抖回调渲染完成的 `requestAnimationFrame` 回调中计算 `console.log('防抖响应耗时:', performance.now() - window.__t_input)`；",
+        "4. 录入 50 字符项目名并停止输入，重复 5 次取平均值；",
+        "5. 点击清空按钮，重复 5 次测量重置耗时并取平均值；",
+        "6. 汇总冷启动、防抖响应与清空延迟数据，比对是否符合设计指标。"
+      ],
+      "verification": [
+        "在 Chrome DevTools Performance 面板录制 3 次冷加载 Trace，查验 DOMContentLoaded 均值是否 ≤ 300ms",
+        "在控制台注入性能测量脚本，连续执行 10 次防抖输入与 10 次清空操作，统计响应平均耗时与最大耗时是否均符合指标",
+        "输出包含设备配置、测试数据规模与测量起止记录的性能实测数据表"
+      ]
+    },
+    "title": "交付前置验证任务：首屏冷启动与防抖实时反馈性能基准实测"
+  },
+  "blockers": [
+    "受影响块 ID: blk-deliv-acc-package。依据: 用户已批准决策 dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0（基于 evidence-03983966-c7ef-4f6b-991a-1db0f5f05e90 与 evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564，正式确认彻底移除确认按钮、重构为单清空按钮纯实时反馈排布）及交付任务 blk-deliv-task-layout-styling、blk-deliv-task-package。具体缺口与冲突: 交付阶段验收标准块 blk-deliv-acc-package 未随需求变更更新，其 Scenario 1 中的 Then 验收断言仍描述为“页面呈现白底背景、顶部灰字占位提示、输入框及底部蓝橙双按钮”，与现行已批准决策及新草案中“从 DOM 与样式中彻底删除确认按钮、仅保留底部橙色圆形清空按钮”的规范产生直接冲突，两处描述无法同时成立，需在登记整合任务中更新为单按钮布局验收断言。",
+    "受影响块 ID: blk-deliv-acc-security-edge。依据: 用户已批准决策 dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0、用户需求变更输入 evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564、交付任务 blk-deliv-task-input-workflow。具体缺口与冲突: 交付阶段安全与边界验收标准块 blk-deliv-acc-security-edge 未随需求变更更新，其 Scenario 1、Scenario 2、Scenario 3 中的 When 触发条件均明确写为“用户输入 ... 并点击确认”及“点击确认提交”。在确认按钮 DOM 节点及其点击与回车专属提交逻辑已被彻底删除（blk-deliv-task-input-workflow 明确声明不绑定确认按钮 click 与 keydown Enter 事件）的情况下，该验收标准中的操作步骤在实际交付产物中不存在对应物理控件，无法执行验收。需在登记整合任务中将该块的触发方式重构为 300ms 防抖静止自动触发。",
+    "受影响块 ID: blk-deliv-val-perf-benchmark。依据: 用户已批准成效衡量指标 blk-prod-outcomes、技术验证任务 blk-tech-val-performance、已批准决策 dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0。具体缺口与冲突: 交付前置验证任务 blk-deliv-val-perf-benchmark 的性能目标、通过标准和执行步骤未与 300ms 防抖等待机制闭合。该块 goal 仍写为“验证确认展示与清空交互响应延迟≤50ms”，passCriteria 仍写为“确认提交渲染耗时平均值 ≤ 50ms”，steps 第 3、4 步仍要求“在 confirmButton 点击监听中记录 const t0 = performance.now()”、“录入 50 字符项目名并点击确认”，verification 仍要求连续执行 10 次确认提交。这与 blk-prod-outcomes 和 blk-tech-val-performance 中确立的“实时输入响应耗时整体目标≤350ms（含 300ms 防抖等待与≤50ms DOM 渲染延迟）、通过 input 事件打点”完全脱节，且在页面无 confirmButton 的情况下性能探针无法挂载，需在登记整合任务中对齐防抖性能指标与测量步骤。",
+    "受影响块 ID: blk-deliv-val-security-xss-audit。依据: 用户已批准决策 dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0、交付开发任务 blk-deliv-task-input-workflow、blk-deliv-spec-deployment。具体缺口与冲突: 交付前置验证任务 blk-deliv-val-security-xss-audit 的执行步骤与查验标准未更新。其 steps 第 4 步仍要求“逐一录入并点击确认”，verification 仍要求“填入输入框确认”。在确认按钮彻底移除后，该手动确认操作路径已失效，需在登记整合任务中更新为“输入 Payload 文本后等待 300ms 防抖自动渲染，查验展示区 textContent 安全转义与纯 TextNode 节点属性”。"
+  ],
+  "observation": "Review cited the old formal confirmButton/50ms version although workerResults.draft contains its 350ms/input replacement; the other three omitted-block blockers remain separate."
+}

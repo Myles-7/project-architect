@@ -2,6 +2,7 @@ import type {
   ProjectSnapshot,
   KnowledgeArea,
   ProjectMaturityLevel,
+  ReadinessScoreItem,
 } from '@project-architect/contracts';
 import { KnowledgeChecklist } from './KnowledgeChecklist.js';
 
@@ -13,6 +14,7 @@ export interface ReadinessResult {
   blockingIssues: string[];
   warnings: string[];
   assumptions: string[];
+  scoreBreakdown?: ReadinessScoreItem[];
 }
 
 export class ReadinessEvaluator {
@@ -89,6 +91,30 @@ export class ReadinessEvaluator {
 
     const ready = blockingIssues.length === 0;
 
+    const knowledgeAreaWeights: Record<KnowledgeArea, { weight: number; name: string }> = {
+      vision: { weight: 0.2, name: '核心愿景与概述' },
+      user: { weight: 0.2, name: '目标用户画像与场景' },
+      scope: { weight: 0.2, name: '首发 MVP 边界' },
+      problem: { weight: 0.1, name: '核心痛点界定' },
+      flow: { weight: 0.1, name: '核心用户主流程' },
+      constraints: { weight: 0.1, name: '技术与平台约束' },
+      ux: { weight: 0.05, name: '交互体验基线' },
+      acceptance: { weight: 0.05, name: '验收交付标准' },
+    };
+
+    const scoreBreakdown: ReadinessScoreItem[] = Object.entries(knowledgeAreaWeights).map(
+      ([areaKey, meta]) => {
+        const areaScore = knowledgeEval.knowledgeScore[areaKey as KnowledgeArea] || 0;
+        const weighted = Math.round(areaScore * meta.weight);
+        return {
+          label: `${meta.name} (权重 ${Math.round(meta.weight * 100)}%)`,
+          score: weighted,
+          type: 'base',
+          description: `基线评分 ${areaScore}/100，贡献 ${weighted} 分`,
+        };
+      }
+    );
+
     return {
       ready,
       score: knowledgeEval.overallScore,
@@ -97,6 +123,7 @@ export class ReadinessEvaluator {
       blockingIssues,
       warnings,
       assumptions,
+      scoreBreakdown,
     };
   }
 }

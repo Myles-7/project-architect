@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "evidence": [
+    {
+      "id": "answer-dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "kind": "user",
+      "content": "即时直接清空",
+      "source": "question:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation",
+      "obtainedAt": "2026-10-04T16:12:46.337Z",
+      "applicability": "dec-clear-interaction-mode"
+    },
+    {
+      "applicability": "用户原始需求、功能范围界定与非目标约束依据",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+      "kind": "material",
+      "obtainedAt": "2026-10-04T16:08:03.059Z",
+      "outcome": "passed",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "参考截图视觉元素与空间结构映射依据",
+      "content": "fixture.png 真实像素呈现白底背景，上方居中偏左为黑色无衬线文本“Q7M4-8261”，下方左侧为蓝色矩形色块，下方右侧为橙色圆形色块。布局结构对应为：顶部/上方结果展示区域，底部/下方左侧为主操作区域（确认按钮），底部/下方右侧为辅助操作区域（清空按钮）。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+      "kind": "material",
+      "location": "D:\\\\Temp\\\\User\\\\pa-real-integration-AiRDUO\\\\项目构思\\\\inputs\\\\inp-1791129999124\\\\fixture.png",
+      "obtainedAt": "2026-10-04T16:08:06.988Z",
+      "outcome": "passed",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "可行性与安全防护分析依据：用户输入任意项目名可能包含 HTML 标签、特殊符号或潜在脚本字符串。项目名展示区必须使用 Node.textContent（或同等安全文本绑定）进行回显，从根本上杜绝 DOM 型 XSS 注入风险，确保纯前端展示的安全与鲁棒性。",
+      "content": "MDN 官方文档 Node: textContent property 指出：textContent 属性表示节点及其后代的文本内容。MDN 明确建议避免使用 innerHTML 来获取或设置元素内的文本，因为 innerHTML 处理原始 HTML 而非纯文本，容易受到 XSS 攻击；而 textContent 不调用 HTML 解析器，能够保证文本安全地作为纯文本呈现，避免 XSS 漏洞。",
+      "hash": "fde1787705a45a0ec71c5eab0e9c2a2acb0151d62eaf9a4092593c69e74dfcb8",
+      "id": "evidence-mdn-textcontent-xss-safety",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innerhtml",
+      "obtainedAt": "2026-10-04T16:08:26.012Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+    },
+    {
+      "applicability": "异常处理与交互体验依据：用户在输入框按 Enter 或点击确认提交时，若采用原生 form 或按钮结构，必须调用 preventDefault() 阻止浏览器默认页面刷新行为，从而保证纯前端单页面的即时校验、空值错误提示与失败保留输入得以稳定生效。",
+      "content": "MDN 官方文档 Event: preventDefault() method 指出：preventDefault() 方法告知用户代理该事件正在被显式处理，其默认行为（如表单提交导致页面刷新跳转、链接导航等）不应执行。",
+      "hash": "41e832f668dde9a4c32adbb89bedce1b323932d878f57b1bdea773d12da7a877",
+      "id": "evidence-mdn-event-prevent-default",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault",
+      "obtainedAt": "2026-10-04T16:08:43.712Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault"
+    }
+  ],
+  "topics": [
+    {
+      "key": "dec-clear-interaction-mode",
+      "aliases": [],
+      "history": [
+        "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d"
+      ],
+      "effectiveDecisionId": "dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+      "lastAnswerKind": "selection",
+      "lastAnsweredQuestionId": "run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0-ques-clear-confirmation"
+    },
+    {
+      "key": "dec-product-scope-boundary",
+      "aliases": [],
+      "history": [
+        "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583"
+      ],
+      "effectiveDecisionId": "dec-f958b2fb-9b6f-4a7c-8e9f-b350734c1583"
+    },
+    {
+      "key": "dec-failure-preserve-input",
+      "aliases": [],
+      "history": [
+        "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911"
+      ],
+      "effectiveDecisionId": "dec-f6f1b966-47d4-4308-bc6b-1403c71e1911"
+    },
+    {
+      "key": "dec-safe-text-rendering",
+      "aliases": [],
+      "history": [
+        "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78"
+      ],
+      "effectiveDecisionId": "dec-a91fa65d-c78f-4089-9475-4a3f24ef6d78"
+    },
+    {
+      "key": "dec-visual-layout-mapping",
+      "aliases": [],
+      "history": [
+        "dec-72513e55-a5a7-44e1-90ad-087b5927447e"
+      ],
+      "effectiveDecisionId": "dec-72513e55-a5a7-44e1-90ad-087b5927447e"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "inp-01",
+      "raw": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "kind": "statement",
+      "createdAt": "2026-10-04T16:06:39.032Z"
+    }
+  ],
+  "operations": [
+    {
+      "id": "questions:run-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-0",
+      "fingerprint": "abf6957eb054f0be6f827dc53d368938d8da6d75be9b97b7c69ce28cb2ab3734",
+      "revision": 3
+    },
+    {
+      "id": "simulated-answer-flash-materials-chinese-20261005-01-1791130366315",
+      "fingerprint": "40b3c87d76d5ac74dfa1bd6e4ea0394a869b31ae5505d2d3f9f904a2f41d31c0",
+      "revision": 4
+    },
+    {
+      "id": "proposal:change-c463e392-91bc-4076-b7fb-514ce507bc3f-delivery-1",
+      "fingerprint": "8b4c585f1bbf0ff96e1c6e67dc7bfdb104b8da515f4994877651c7374e1b6d87",
+      "revision": 5
+    },
+    {
+      "id": "api-automated-acceptance-flash-materials-chinese-20261005-01-product-1791130586096",
+      "fingerprint": "9ddbbd23bda89780a71d024503f818b73fd67c86e4cf4a5bb97e419f8b69c67b",
+      "revision": 6
+    }
+  ],
+  "diagnostics": []
+}

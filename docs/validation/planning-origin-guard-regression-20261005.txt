@@ -1,0 +1,179 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ✓ apps/server/tests/planning-draft-revision.test.ts (30 tests) 13911ms
+   ✓ revises an unapproved first product through HTTP, keeps the source candidate and never approves it  804ms
+   ✓ never unlocks or overwrites a locked formal block while revising a pending feedback source  1007ms
+   ✓ does not ignore unrelated input when retrying an interrupted prepared start  510ms
+   ✓ freezes only pending groups of a partial approval and preserves the approved prefix as Core facts  779ms
+   ✓ atomically carries only the source manual pending lock intent to the same stable block through Core  774ms
+   ✓ continues a cancelled draft revision from its frozen candidate after server restart  770ms
+   ✓ refuses changed frozen source on restart without accepting it or calling a Provider  414ms
+   ✓ refuses missing frozen source on restart without accepting it or calling a Provider  438ms
+   ✓ recovers a start interrupted after feedback commit by replaying its exact operation once  699ms
+   ✓ retains the latest revised candidate and its frozen source across a question answer and server restart  963ms
+   ✓ exposes no pending proposal before its inherited lock intent and trace commit, including an approval race  516ms
+   ✓ handles EIO before the atomic proposal commit without publishing a lockless draft  395ms
+   ✓ handles EIO after the atomic proposal commit without publishing a lockless draft  441ms
+   ✓ refuses changed-source at the Core revision boundary without writes  355ms
+   ✓ refuses changed-reference at the Core revision boundary without writes  346ms
+   ✓ refuses provider-lock at the Core revision boundary without writes  350ms
+   ✓ refuses a source edited after capture rather than accepting its formerly matching reference  428ms
+   ✓ resumes a failed atomic Runtime proposal without leaving an earlier lockless pending package  920ms
+   ✓ rechecks its frozen source before a transient Provider retry and rejects the altered bytes  542ms
+ ✓ packages/core/tests/PlanningBoundaries.test.ts (24 tests) 12832ms
+   ✓ Planning state boundaries on real files > keeps same-basis feedback siblings pending until explicitly rejected without reviving stale approval  1106ms
+   ✓ Planning state boundaries on real files > retains accumulated approval when another feedback package joins an ongoing review  1100ms
+   ✓ Planning state boundaries on real files > does not mark newer input reviewed when the remainder of old feedback is rejected  1025ms
+   ✓ Planning state boundaries on real files > completes feedback after sequential approvals while retaining every approved stage  990ms
+   ✓ Planning state boundaries on real files > allows rejecting the first feedback group before approving the remaining one  913ms
+   ✓ Planning state boundaries on real files > lets a fresh complete feedback review supersede unrelated stale review history  1162ms
+   ✓ Planning state boundaries on real files > projects legacy partially approved feedback back into review and can finish it explicitly  973ms
+   ✓ Planning state boundaries on real files > keeps untouched downstream design pending when feedback combines a decision change with product-only revision  850ms
+   ✓ Planning state boundaries on real files > keeps complete three-stage feedback approved when it also changes a decision  844ms
+   ✓ Planning state boundaries on real files > keeps all three stages approved when one feedback package explicitly revises every affected stage  805ms
+   ✓ Planning state boundaries on real files > allows separate answers to an approved project batch while invalidating affected design  476ms
+   ✓ Planning state boundaries on real files > refuses newly colliding aliases and overlapping blocks before any commit  326ms
+   ✓ Planning state boundaries on real files > finishes a partial package after rejecting its optional group, without reviving stale readiness  323ms
+   ✓ Planning state boundaries on real files > makes decision-only feedback require redesign while preserving history  387ms
+ ✓ apps/server/tests/planning-runtime.test.ts (54 tests) 31730ms
+   ✓ Planning runtime lifecycle and authority > rejects 'feedback' feedback before changing state and preserves the prerequisite error on retry  332ms
+   ✓ Planning runtime lifecycle and authority > rejects 'technical' feedback before changing state and preserves the prerequisite error on retry  306ms
+   ✓ Planning runtime lifecycle and authority > rejects 'delivery' feedback before changing state and preserves the prerequisite error on retry  509ms
+   ✓ Planning runtime lifecycle and authority > rejects 'product' feedback before changing state and preserves the prerequisite error on retry  300ms
+   ✓ Planning runtime lifecycle and authority > sends complete explicitly selected tradeoffs in provider context after saving and restarting  655ms
+   ✓ Planning runtime lifecycle and authority > sends custom raw answers and all options after restart without inventing a selection  683ms
+   ✓ Planning runtime lifecycle and authority > sends delegate raw answers and all options after restart without inventing a selection  744ms
+   ✓ Planning runtime lifecycle and authority > sends defer raw answers and all options after restart without inventing a selection  719ms
+   ✓ Planning runtime lifecycle and authority > keeps a historical label-matching answer unknown and retains the original options and formal decision as reference  783ms
+   ✓ Planning runtime lifecycle and authority > pauses for valid questions before follow-ups and reevaluates them after answers  735ms
+   ✓ Planning runtime lifecycle and authority > deduplicates asynchronous follow-ups before scheduling and reuses the completed task  494ms
+   ✓ Planning runtime lifecycle and authority > keeps sibling follow-up work registered and cancellable after another task fails  345ms
+   ✓ Planning runtime lifecycle and authority > finishes ready clarification and passes deferred work to design without running it early  610ms
+   ✓ Planning runtime lifecycle and authority > repairs an incomplete clarification instead of declaring an unusable completion  346ms
+   ✓ Planning runtime lifecycle and authority > does not present old clarification constraints after a structured choice changes decisions  401ms
+   ✓ Planning runtime lifecycle and authority > reexecutes the same follow-up when a user answer changes its basis  741ms
+   ✓ Planning runtime lifecycle and authority > freezes model and official-source preferences through answers and server restart  591ms
+   ✓ Planning runtime lifecycle and authority > retries transient service failures twice and records every invocation  380ms
+   ✓ Planning runtime lifecycle and authority > pauses after three unchanged drafts even if question IDs and timestamps change  343ms
+   ✓ Planning runtime lifecycle and authority > runs independent review and repairs a blocking finding before offering a package  685ms
+   ✓ Planning runtime lifecycle and authority > lets independent review resolve stale worker observations while retaining their exact raw output and receipt  588ms
+   ✓ Planning runtime lifecycle and authority > repairs a genuine current review finding without copying adjudicated old observations into current issues  671ms
+   ✓ Planning runtime lifecycle and authority > does not let an empty review waive invalid 'official-source' provenance  617ms
+   ✓ Planning runtime lifecycle and authority > does not let an empty review waive invalid 'material' provenance  626ms
+   ✓ Planning runtime lifecycle and authority > does not let an empty review waive invalid 'user' provenance  608ms
+   ✓ Planning runtime lifecycle and authority > repairs a four-block ordinary revision before review or proposal and preserves its exact receipt  782ms
+   ✓ Planning runtime lifecycle and authority > keeps the latest delivery edits across consecutive four-block and eight-block ordinary revisions without rewriting source receipts  861ms
+   ✓ Planning runtime lifecycle and authority > restores the complete candidate scope after an ordinary partial question and restart (registered metadata)  1066ms
+   ✓ Planning runtime lifecycle and authority > restores the complete candidate scope after an ordinary partial question and restart (legacy metadata)  1101ms
+   ✓ Planning runtime lifecycle and authority > allows an explicit ordinary revision removal and leaves a new feedback run scoped to its own candidate  684ms
+   ✓ Planning runtime lifecycle and authority > keeps the latest corrected draft explicit when a new decision resumes revision  1021ms
+   ✓ Planning runtime lifecycle and authority > resumes only the failed parallel task and preserves the completed design  693ms
+   ✓ Planning runtime lifecycle and authority > repairs immutable evidence conflicts before publishing a proposal  688ms
+   ✓ Planning runtime lifecycle and authority > rejects changed persisted intermediate output before launching another call  345ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s selection answer and preserves completed calls  609ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s custom answer and preserves completed calls  633ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s delegate answer and preserves completed calls  644ms
+   ✓ Planning runtime lifecycle and authority > continues only this round’s defer answer and preserves completed calls  621ms
+   ✓ Planning runtime lifecycle and authority > rejects an unrelated change when attempting answer continuation  533ms
+   ✓ Planning runtime lifecycle and authority > keeps partial selection answers resumable after an early continue attempt  691ms
+   ✓ Planning runtime lifecycle and authority > keeps partial custom answers resumable after an early continue attempt  694ms
+   ✓ Planning runtime lifecycle and authority > keeps partial delegate answers resumable after an early continue attempt  713ms
+   ✓ Planning runtime lifecycle and authority > keeps partial defer answers resumable after an early continue attempt  688ms
+   ✓ Planning runtime lifecycle and authority > cannot cancel a different project and waits for the old executor before resume  520ms
+   ✓ Planning runtime lifecycle and authority > does not accept a ready clarification after the basis changed  767ms
+   ✓ Planning runtime lifecycle and authority > rejects product feedback that changes a ready clarification basis without saving it  368ms
+   ✓ Planning runtime lifecycle and authority > records accepted product redesign feedback once and registers the resulting input basis  852ms
+   ✓ Planning runtime lifecycle and authority > can redesign a previously approved product without making stale content formal again  851ms
+   ✓ Planning runtime lifecycle and authority > recovers a completed result and event sequence from the interrupted journal  494ms
+   ✓ Planning runtime lifecycle and authority > survives a runtime disk fault without a poisoned write tail or registration leak  418ms
+ ✓ apps/server/tests/planning-package.test.ts (14 tests) 12159ms
+   ✓ Approved development package publication > blocks compilation until every feedback group is reviewed and preserves the approved subset  1239ms
+   ✓ Approved development package publication > rejects 'a non-task-only cycle unreachable fro…' before publishing any package artifacts  613ms
+   ✓ Approved development package publication > rejects 'a missing dependency reference unreac…' before publishing any package artifacts  629ms
+   ✓ Approved development package publication > projects indirect approved blueprint prerequisites, stops at the first task, and shares the order across entry and plan  991ms
+   ✓ Approved development package publication > does not tell a developer to run integration validation before its required implementation  940ms
+   ✓ Approved development package publication > topologically orders shuffled inputs with deterministic multiple roots and a validation prerequisite  1266ms
+   ✓ Approved development package publication > does not invent task edges from shared or task-valued requirementIds  894ms
+   ✓ Approved development package publication > keeps historical schemaVersion 1 bytes readable and does not upgrade an existing manifest  814ms
+   ✓ Approved development package publication > refuses to reissue an old approved blueprint after unreviewed input or material changes  876ms
+   ✓ Approved development package publication > compiles distinct documents, matching task data, hashes and actual ZIP  752ms
+   ✓ Approved development package publication > checks idempotent requests against revision and all file contents  829ms
+   ✓ Approved development package publication > recovers only verified artifacts after publication failure and permits a new operation  801ms
+   ✓ Approved development package publication > refuses damaged unpublished output without publishing half a package  671ms
+   ✓ Approved development package publication > invalidates exports when requirements change after approval  843ms
+ ✓ apps/server/tests/planning-ordinary-revision-prompt.test.ts (6 tests) 5546ms
+   ✓ Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps all 44 same-run actions in each prompt through complementary 3/41 partial outputs (replace)  1044ms
+   ✓ Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps all 44 same-run actions in each prompt through complementary 3/41 partial outputs (remove)  973ms
+   ✓ Actual ordinary revision Provider requests distinguish issues from complete candidate scope > scopes a new feedback revision to its own three actions rather than 44 formal or earlier-run candidate actions  1197ms
+   ✓ Actual ordinary revision Provider requests distinguish issues from complete candidate scope > keeps revision slices on their own registered partition prompt  1023ms
+   ✓ Actual ordinary revision Provider requests distinguish issues from complete candidate scope > stores a large repeated review finding once and shares it through registered repair fragments while preserving all 44 actions  1042ms
+ ✓ packages/core/tests/PlanningService.test.ts (14 tests) 3949ms
+   ✓ Planning approval safety > draft never confirms; approval is atomic and idempotent and preserves provenance  323ms
+   ✓ Planning approval safety > refuses stale proposals and locked replacement without partial writes  546ms
+   ✓ Planning approval safety > allows a user to save draft lock intent, applies it only on approval, and requires explicit unlock for replacement  538ms
+   ✓ Planning approval safety > free text and delegation preserve raw input without confirmed decisions  391ms
+ ✓ apps/server/tests/planning-api.test.ts (13 tests) 3643ms
+   ✓ keeps partial feedback gated through HTTP and protects newer input (false)  1287ms
+   ✓ keeps partial feedback gated through HTTP and protects newer input (true)  1178ms
+   ✓ replays SSE after a Last-Event-ID with ordered, nonduplicated progress  341ms
+ ✓ packages/core/tests/PlanningInspection.test.ts (14 tests) 2622ms
+   ✓ Read-only committed planning inspection > matches the formal basis after public decision creation in project_overview without rewriting history  348ms
+   ✓ Read-only committed planning inspection > matches the formal basis after public decision creation in tech_stack without rewriting history  350ms
+   ✓ Read-only committed planning inspection > uses the formal legacy partial-feedback review projection while preserving the committed approvals  1011ms
+ ✓ apps/server/tests/planning-diagnostics.test.ts (20 tests) 1820ms
+ ✓ packages/core/tests/PlanningMigration.test.ts (5 tests) 1514ms
+   ✓ Old-format project migration on copies > requires explicit cleanup approval and unlock, preserving all original records as history  391ms
+   ✓ Old-format project migration on copies > honors rejected cleanup for the same record text across unrelated input, but reviews changed text again  395ms
+ ✓ apps/server/tests/planning-role-contract.test.ts (48 tests) 1471ms
+   ✓ Planning worker role output contracts > checks the actual scoped call schema and never adopts unauthorized workItems (illegal=false)  853ms
+   ✓ Planning worker role output contracts > checks the actual scoped call schema and never adopts unauthorized workItems (illegal=true)  567ms
+ ✓ apps/server/tests/planning-blueprint-context.test.ts (7 tests) 798ms
+   ✓ supplies the pending view and an explicitly historical comparison baseline to review while preserving formal state  795ms
+ ✓ apps/server/tests/planning-context.test.ts (15 tests) 24ms
+ ✓ apps/server/tests/planning-assembly-evidence.test.ts (7 tests) 12ms
+ ✓ packages/core/tests/PlanningDependencyGraph.test.ts (4 tests) 6ms
+ ✓ apps/server/tests/planning-partition.test.ts (47 tests) 34986ms
+   ✓ Registered recovery from actual Provider output limits > splits the failed authoring task, assembles all validated fragments and preserves draft authority  901ms
+   ✓ Registered recovery from actual Provider output limits > restarts only the failed slice and keeps successful results, receipts and the original failed schema unchanged  882ms
+   ✓ Registered recovery from actual Provider output limits > resumes a legal old support receipt into a new role-filtered assembly without changing source bytes or hashes  926ms
+   ✓ Registered recovery from actual Provider output limits > preserves an old unversioned assembly containing legal legacy support groups (missing receipt=false, origin omitted=false)  1000ms
+   ✓ Registered recovery from actual Provider output limits > preserves an old unversioned assembly containing legal legacy support groups (missing receipt=true, origin omitted=false)  943ms
+   ✓ Registered recovery from actual Provider output limits > preserves an old unversioned assembly containing legal legacy support groups (missing receipt=false, origin omitted=true)  955ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds version 1 worker evidence and both assembly receipts without repeating source calls or changing source bytes  1048ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds version 2 worker evidence and both assembly receipts without repeating source calls or changing source bytes  1037ms
+   ✓ Registered recovery from actual Provider output limits > restores a hash-registered legacy role0 assembly when role1 reconstruction throws before the fallback  1055ms
+   ✓ Registered recovery from actual Provider output limits > prevents assembly delivery after cancel while child work is running  575ms
+   ✓ Registered recovery from actual Provider output limits > prevents assembly delivery after basis-change while child work is running  719ms
+   ✓ Registered recovery from actual Provider output limits > offers four valid slice questions in two batches and continues after all answers without discarding any  1386ms
+   ✓ Registered recovery from actual Provider output limits > restores assembly provenance from the receipt after an interrupted run metadata write  916ms
+   ✓ Registered recovery from actual Provider output limits > rejects a changed frozen Core evidence assembly basis before repeating any Provider call  727ms
+   ✓ Registered recovery from actual Provider output limits > rejects a missing frozen Core evidence assembly basis before repeating any Provider call  687ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'registered assembly downgrade' before another call and preserves all stored artifacts  747ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'partition ownership downgrade' before another call and preserves all stored artifacts  703ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'version 2 downgrade' before another call and preserves all stored artifacts  698ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'missing version 2 origin' before another call and preserves all stored artifacts  702ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'empty receipt origin' before another call and preserves all stored artifacts  705ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'null receipt origin' before another call and preserves all stored artifacts  706ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'unknown receipt origin' before another call and preserves all stored artifacts  705ms
+   ✓ Registered recovery from actual Provider output limits > rejects 'registered provider relabeled assembly' before another call and preserves all stored artifacts  700ms
+   ✓ Registered recovery from actual Provider output limits > isolates conflicting inherited candidate evidence against actual immutable Core records in a version 2 repair assembly  851ms
+   ✓ Registered recovery from actual Provider output limits > retains the unfinished registered scope through user answers and automatically repairs an otherwise covered draft that omits it  1213ms
+   ✓ Registered recovery from actual Provider output limits > preserves the pending modify of a formal block through an unanswered slice and carries its legal candidate intent into answer continuation  1201ms
+   ✓ Registered recovery from actual Provider output limits > preserves the pending delete of a formal block through an unanswered slice and carries its legal candidate intent into answer continuation  1159ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds an assembly from source receipts after result writing and before receipt writing (complete orphan)  911ms
+   ✓ Registered recovery from actual Provider output limits > rebuilds an assembly from source receipts after result writing and before receipt writing (truncated orphan)  942ms
+   ✓ Registered recovery from actual Provider output limits > blocks final delivery when a later complete revision drops registered modifications and removals of formal blocks  835ms
+   ✓ Registered recovery from actual Provider output limits > still rejects a Provider result whose receipt is missing instead of treating it as a recoverable assembly  796ms
+   ✓ Registered recovery from actual Provider output limits > shows a deferred fourth question with a valid reopen reason even when its topic has an earlier answer  1643ms
+   ✓ Registered recovery from actual Provider output limits > requires an explicit candidate action for a registered formal-block modify in initial design splitting without a base candidate  1108ms
+   ✓ Registered recovery from actual Provider output limits > requires an explicit candidate action for a registered formal-block delete in initial design splitting without a base candidate  1103ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (none interruption)  1224ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (after-reference interruption)  1303ms
+   ✓ Registered recovery from actual Provider output limits > retries a legacy completed scope and rejects all derived drafts while retaining source evidence (after-cleanup interruption)  1266ms
+
+ Test Files  16 passed (16)
+      Tests  322 passed (322)
+   Start at  11:15:50
+   Duration  68.44s (transform 715ms, setup 0ms, collect 6.00s, tests 127.02s, environment 2ms, prepare 1.09s)
+

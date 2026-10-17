@@ -101,4 +101,93 @@ describe('Document Revision & Diff Engine Unit Tests (Phase 4.5.3)', () => {
     expect(flowDoc?.status).toBe('outdated');
     expect(agentsDoc?.status).toBe('up-to-date');
   });
+
+  it('4. Correctly flags specialty specs when technical_boundary or security is modified', () => {
+    const snapshot = createDiffSnapshot(10);
+    const manifest: DocumentsState = {
+      schemaVersion: 1,
+      projectId: 'proj-diff-test',
+      items: [
+        { id: 'doc-sec', type: 'security', title: 'SECURITY_SPEC.md', path: 'docs/specs/SECURITY_SPEC.md', status: 'generated', generatedAt: '', sourceRevision: 8 },
+        { id: 'doc-sync', type: 'sync-spec', title: 'SYNC_SPEC.md', path: 'docs/specs/SYNC_SPEC.md', status: 'generated', generatedAt: '', sourceRevision: 8 },
+        { id: 'doc-user', type: 'user-flow', title: 'USER_FLOWS.md', path: 'docs/USER_FLOWS.md', status: 'generated', generatedAt: '', sourceRevision: 8 },
+      ],
+      updatedAt: '',
+    };
+
+    const diffResults = diffEngine.diff(snapshot, manifest, ['security']);
+    const secDoc = diffResults.find((d) => d.document === 'SECURITY_SPEC.md');
+    const syncDoc = diffResults.find((d) => d.document === 'SYNC_SPEC.md');
+    const userDoc = diffResults.find((d) => d.document === 'USER_FLOWS.md');
+
+    expect(secDoc?.status).toBe('outdated');
+    expect(syncDoc?.status).toBe('up-to-date');
+    expect(userDoc?.status).toBe('up-to-date');
+  });
+
+  describe('P0-2: Myers LCS computeFileDiff Robustness', () => {
+    it('eliminates false positive diffs when 1 line is inserted at top of a 200-line document', () => {
+      // 200 lines of architectural content
+      const originalLines = Array.from({ length: 200 }, (_, i) => `## Section ${i + 1}: Invariant definition and verification rules.`);
+      const diskContent = originalLines.join('\n');
+
+      // Insert 1 empty line at the top
+      const newContent = '\n' + diskContent;
+
+      const diffResult = diffEngine.computeFileDiff(diskContent, newContent, 'TEST_DOC.md');
+
+      expect(diffResult.hasDiff).toBe(true);
+      expect(diffResult.additionsCount).toBe(1);
+      expect(diffResult.deletionsCount).toBe(0);
+      expect(diffResult.unchangedCount).toBe(200);
+
+      // Verify unified diff contains exactly one '+' line (the inserted line) and zero '-' lines
+      const diffLines = diffResult.unifiedDiff.split('\n');
+      const addedLines = diffLines.filter((l) => l.startsWith('+') && !l.startsWith('+++'));
+      const removedLines = diffLines.filter((l) => l.startsWith('-') && !l.startsWith('---'));
+
+      expect(addedLines.length).toBe(1);
+      expect(removedLines.length).toBe(0);
+    });
+
+    it('returns hasDiff: false and accurate unchangedCount when disk and new content are identical', () => {
+      const content = '# Title\n\nSome invariant paragraph.\n';
+      const result = diffEngine.computeFileDiff(content, content, 'DOC.md');
+      expect(result.hasDiff).toBe(false);
+      expect(result.unifiedDiff).toBe('');
+      expect(result.additionsCount).toBe(0);
+      expect(result.deletionsCount).toBe(0);
+      expect(result.unchangedCount).toBe(4);
+    });
+
+    it('accurately identifies localized replacement in 100-line document', () => {
+      const lines = Array.from({ length: 100 }, (_, i) => `Line ${i + 1}`);
+      const diskContent = lines.join('\n');
+
+      // Modify only line 50
+      const modifiedLines = [...lines];
+      modifiedLines[49] = 'Line 50 (Custom Manual Modification)';
+      const newContent = modifiedLines.join('\n');
+
+      const result = diffEngine.computeFileDiff(diskContent, newContent, 'DOC.md');
+      expect(result.hasDiff).toBe(true);
+      expect(result.additionsCount).toBe(1);
+      expect(result.deletionsCount).toBe(1);
+      expect(result.unchangedCount).toBe(99);
+      expect(result.unifiedDiff).toContain('-Line 50');
+      expect(result.unifiedDiff).toContain('+Line 50 (Custom Manual Modification)');
+    });
+
+    it('correctly diffs against an empty document without crashing', () => {
+      const result1 = diffEngine.computeFileDiff('', 'Line 1\nLine 2', 'DOC.md');
+      expect(result1.hasDiff).toBe(true);
+      expect(result1.additionsCount).toBe(2);
+      expect(result1.deletionsCount).toBe(0);
+
+      const result2 = diffEngine.computeFileDiff('Line 1\nLine 2', '', 'DOC.md');
+      expect(result2.hasDiff).toBe(true);
+      expect(result2.additionsCount).toBe(0);
+      expect(result2.deletionsCount).toBe(2);
+    });
+  });
 });

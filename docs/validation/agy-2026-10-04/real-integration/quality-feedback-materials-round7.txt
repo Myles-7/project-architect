@@ -1,0 +1,26 @@
+本轮是自动质量验收反馈，不是真人新增需求、真人审阅或人工批准。仅对 flash-materials-final-20261005-03 已自动批准的 sourceRevision=40 / quality-reviewed-r6-development-package 做精确局部修订。独立复核报告为该控制的 INDEPENDENT_CONTENT_REVIEW_R6_20261005.md；反例来自直接提取冻结规范完整JS的合成DOM及手动调度器，不是目标应用实测。目标应用仍未开发，不运行不可用Docker，不新增选择题，不自行启动未登记工作者。
+
+范围与保持性：保留30个稳定块ID，r6的19个无关区块完整正文与字段，所有既有38个证据完整对象（包括原29条及后续历史）；新证据用新ID登记，不覆写旧证据、原收据、控制、包或报告。保留300ms输入防抖、即时单橙色清空按钮、单输入布局、手动删空、失败原文保留、安全textContent、经典defer/IIFE、8080端口与首次安装联网前提、五类持久属性及瞬态重置、8任务既有DAG（包括r6新增error-handling依赖reset-workflow）、十文件编译包和五轮均值性能代理边界。保留r5已修复的显式DOM/模块装配与属性复制；保留r6替换前失败后原会话可继续编辑的改善，不重新设计无关功能。
+
+交付粒度校正：本项目按原批准粒度交付清晰接口、状态事务规则与可观察故障验收，不要求规划阶段提供整段可直接执行的目标实现。blk-tech-interface 中“完整自包含/无ReferenceError风险/契约基准”的整段内部JavaScript已产生与正文不一致的额外偏差，请明确降为“非执行示意，非CodingAgent直接复制的参考实现”；优先用简洁状态转换示意替代大段内部JS。同步title/content及所有相关引用，不能一处降级而别处仍宣称可执行模板或已证明恢复。正式规范的权威应是接口参数和状态所有权、成功提交/失败恢复后置条件以及下列具体故障用例。示意若保留，也应正确表达这些语义，不保留已知反例再用“仅示意”豁免；删去大段JS不能删验收、降低输入保留标准或删既有模块/初始化/持久属性契约。
+
+R6-B1 / P1：替换后回滚留下两个同ID输入框。
+冻结TECHNICAL_GUIDE.md:384的rollback用activeInputNode!==oldNode判断replacement，但handleReset直到:460最后提交才把activeInputNode切到newNode。因此replaceWith已成功、随后renderPlaceholder/clearInputError/newNode.focus抛错时，active仍为old。rollback走:387 insertBefore只回插old，未移除已经挂载的new。独立合成结果在三条路径均得到2个input和2个project-name-input ID，值分别为''、'Keep me'；第一个可见新字段键入登记0个任务。原节点编辑可工作，但撤除故障并重试成功后仍残留2个输入。这违反原子DOM拓扑恢复、唯一输入/label关联、继续编辑、幂等重试契约。
+修订接口和事务状态应显式记录实际replacement对象、原parent/nextSibling位置及替换/提交阶段，不依赖未提交的active指针猜测挂载状态。替换后任一失败，按原输入保留决策撤掉本次replacement并恢复原节点位置、原文、会话/闭包、代际、展示和错误状态及调度归属。恢复成功后只有一个有效输入、唯一关联ID，不留不可用孤儿输入或重复事件监听。不要只改说明或某个数值而原状态流仍制造重复节点。普通具体实现由CodingAgent选择，不要求在本轮生成整段内部JS。
+
+R6-B2 / P2：回滚丢失empty/whitespace待校验任务。
+冻结TECHNICAL_GUIDE.md:416仅在hadPendingTimer && draft.trim().length>0时重新调度。反例：先展示'Old displayed value'；用户删为''或录入三个空格并发出input，此时各有1个待校验任务；立即清空且注入replaceWith失败。cancel清掉原timer，rollback因trim条件跳过恢复。故障撤除后待任务=0，旧项目名持续显示且无空值警示。相同非空草稿'New pending draft'却能恢复1任务并显示，故不是环境问题。
+契约必须覆盖所有被接受的原始草稿快照，空字符串和纯空白同样要按原校验规则清除旧展示并显示非空提示；不得因校验结果无效而忽略尚未完成的工作。定义取消/恢复任务、纪元及迟到回调的归属，使回滚不会复活旧回调或重复调度，且不重读被改变的DOM当作旧草稿。原文原样保持。若因调度器自身故障无法恢复，明确可见错误和继续编辑/重试路径，不能静默声称已恢复；正常可恢复条件下上述empty/whitespace/nonempty三例均要执行原校验。
+
+严重回滚失败复制兜底的正文/接口同步缺口：r6 flow/error/task承诺只读文本框/草稿容器供复制，精确JS:429却只拼入普通横幅textContent。注入替换后呈现失败及回插失败时active仍指向脱离的原节点，页面只剩空replacement；没有约定的只读原文容器。请定义恢复失败的诚实状态：不声称“完整恢复”，不刷新页面，不把空输入当原文已恢复。保留恢复快照，在可用的独立只读草稿容器中原样呈现文本（包括换行和前后/重复空白），允许用户手动选中复制；可用readonly textarea.value或等效安全纯文本方式，不引入HTML注入，不强制依赖Clipboard API权限或另增下载系统。复制容器、入口与失败提示具体可观察；若呈现本身不可用，也须如实表明该限制而非假造复制成功。该兜底只要求原文可取回，不冒称主编辑器已恢复可用。
+
+必须保留并精确补齐的Given/When/Then验收：
+1. 初态带持久id/name、ARIA关联/描述/必填、tabindex、class/style、data-*，带原文、既有展示、错误状态和可选待任务。分别注入创建、属性复制、事件绑定前失败、replaceWith抛错、replaceWith完成后的呈现失败、错误清理失败、focus失败；至少明确前/中/后三阶段，不只验证catch发生。
+2. 对每个可恢复失败断言原节点回到原parent/nextSibling位置，文档只有1个input及唯一关联ID，无replacement残留；active/会话/闭包与generation/epoch/草稿/任务一致，展示和错误状态符合快照恢复，通知内容诚实。
+3. 故障撤除后继续录入'Edited after failure'，正常300ms调度并更新纯文本；手动删空/纯空格300ms后清旧展示并报非空警示且保留原文；再清空和重复清空成功仍为单输入，无重复监听或重复更新。分别验证empty、三个空格、nonempty原本已有待任务时的失败恢复，旧显示不得永久残留。
+4. 成功提交后向旧节点/旧闭包派发迟到compositionend/input以及旧timer回调，不能改新草稿、结束新合成或取消新任务；保留既有旧节点合成隔离反例A/B。原生事件若重定向至新节点，仍不是generation guard已能保证隔离的情况，真实IME/焦点/辅助技术测试继续unexecuted，失败须修订策略后回归。
+5. 对替换后失败再注入回滚DOM失败：恢复提示必须诚实，原文在独立只读容器中可取回；包含换行/空白的文本逐字符一致，可手动选中复制，不使用刷新掩盖问题。允许该严重失败暂不能继续主编辑，但不得降低原文保存与可见恢复指引要求。
+
+将上述接口、事务记录及提交/回滚后置条件同步至关联feature/flow/page/data_model/interface/error，reset/error-handling task的scope/normalBehavior/failureBehavior/verification/completionCriteria及其他相关字段，必要validation/acceptance；只在任务scope加一句不能消解正文/接口矛盾。不要因规划JS降级削弱具体故障验收，也不要求目标应用在规划期已完成或把合成结果当真实浏览器通过。
+
+登记的独立review接收完整当前candidate与source40旧批准比较基线，核对两个反例、严重回滚原文兜底、规范示意层级和所有保留项，不能只读片段或仅blockers=[]。生成pending修订包；经公开Core流程自动批准与新compiler导出，只说明自动验收身份，真人审阅pending。START_HERE/tasks.json/DEVELOPMENT_PLAN保持同一真实DAG；目标应用实现、真实浏览器/IME/辅助技术/性能仍未执行，相关验证任务保留诚实限制及失败修订路径。

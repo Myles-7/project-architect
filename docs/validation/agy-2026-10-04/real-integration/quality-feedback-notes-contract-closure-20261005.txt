@@ -1,0 +1,15 @@
+自动独立质量验收反馈，不是真人新增需求、真人审阅或批准。来源是冻结的 flash-vague-final-consistency-20261005-10 最新完整未批准候选，反例及原文定位见其 independent-content-review.json。保留43个稳定块ID、已正确规则、当前有效决定、原证据完整对象和任务DAG；只闭合以下跨契约缺口，不开发目标应用，不要求用户决定普通实现细节。变更组 decisions 保持空数组。旧反馈全部仍有效，已经修好内容不退回旧版本。
+
+N9：IBackupService.importOverwrite(file: File)/importMerge(file: File) 不能表达预览后其他页写入导致重新预览。定义完整、可校验的导入预览契约：文件字节身份、预览时库代际和数据库写版本/所有目标版本依据、预览摘要、用户选定合并策略，以及执行时的同事务比较。执行不能仅靠File重新读取后直接覆盖；文件变化、他页新增/修改/删除、代际变化都应拒绝旧预览并要求重新预览，零改动。避免只用单条note revision而漏他页新增。明确这些依据如何生成、变化及验收，不使用未声明字段。保留现有CAS、禁止复活和导入代际规则。
+
+N10：acceptance-foundation-and-storage 使用 listExpiredTrashedNotes()，IStorageService 却没有此方法。统一公共接口、任务调用和验收：声明完整方法契约，或采用已声明 listNotes 加明确到期谓词。不要留下不存在方法供Coding Agent猜测。精确七天>=及停留跨到期不暗删规则保持。
+
+N11：SessionDraft 是版本化完整对象，但 acceptance-quick-capture 指定直接 sessionStorage.setItem(key, content)。生产者、序列化、getDraft()、恢复校验及草稿导出全部采用同一对象形状与键规则。列出字段、合法性、损坏/存储不可用行为；原字符串记录如需迁移说明真实规则。恢复只装载编辑器，不写正式便笺；键按ID与库代际隔离。
+
+N12：BackupPayload.meta.appMeta: AppMeta[] 与独立 backupTracker: BackupTrackerMeta 存在重复表示。明确唯一规范形状、允许key集合、重复key拒绝规则、两处重复数据的一致性规则（或局部消除重复表示），给出完整逐字段强校验；不能接受任意未定义AppMeta混入。导入操作性本地代际单调递增，不照搬备份代际。明确合并/覆盖后备份计数、提醒时间、上次备份状态等哪些保留、哪些重新计算、哪些更新，避免导入立刻将自身误认为已备份或计数倒退。保留备份追踪的用户能力和完整数据往返；预览、事务、任务和验收一致。
+
+N13：规范把标签大小写归一化，验收输入#Dexie却要求Dexie。确定同一存储/显示规则，若保留显示大小写明确独立字段，否则验收期待规范化值。页面N快捷键须在input/textarea/contenteditable以及IME组合输入时不劫持；正常输入n不能移动焦点或丢文本。与Ctrl/Cmd+Enter统一契约保持。
+
+逐块交叉审查接口、数据、feature、flow、page、task全部字段及Given/When/Then。独立评审应指出具体矛盾和影响，不能用blockers=[]证明正确。评审复用既有不可变证据；无新研究时 evidence=[]，不得重造旧官方记录、改旧hash或把评审摘要当新来源。引用证据必须在正式证据或本候选完整evidence中存在，不借用其他未批准草案。
+
+目标应用尚未开发，Docker未就绪；真实IME/平台/性能验证继续作为蓝图validation、unexecuted，不列为当前不可执行followUp反复调用。产出仍pending；Core自动审批仅自动验收，不能标真人审阅通过。

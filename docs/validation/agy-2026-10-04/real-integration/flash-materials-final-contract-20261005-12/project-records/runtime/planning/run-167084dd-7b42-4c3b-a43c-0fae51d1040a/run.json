@@ -1,0 +1,123 @@
+{
+  "id": "run-167084dd-7b42-4c3b-a43c-0fae51d1040a",
+  "projectId": "proj-1791129999032",
+  "stage": "feedback",
+  "basis": {
+    "revision": 30,
+    "hash": "28bfdca45efa1d555b4ba119f4ac812538709c0e90104fa4bda882b2bd24f4b6"
+  },
+  "operationId": "real-flash-materials-final-20261004-01-feedback-1791157235461",
+  "request": {
+    "stage": "feedback",
+    "expectedRevision": 29,
+    "operationId": "real-flash-materials-final-20261004-01-feedback-1791157235461",
+    "feedback": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。只针对 flash-materials-quality-20261005-06 的 sourceRevision28 / quality-reviewed-r3 最新真实蓝图，旧证据和旧包保留。原生目标应用尚未开发；本轮只有导出契约的静态/合成反例，不能称浏览器实测。\n\n已修正确内容完整保留：300ms实时反馈、即时单按钮清空、手动删空清除旧结果、纯空格原文保留、失败保留输入、无确认按钮和Enter专属提交、经典defer/IIFE/textContent、完整官方证据、端口8080命令、npx首次安装前提、10文件及任务DAG。性能全部字段目前已统一“清空重置至重绘前调度延迟”代理指标，五轮均值<=50ms；该项通过，不再改指标或夸成物理绘制实测。保留原30块稳定ID和28条历史证据原完整对象，新增证据另附。\n\n现在仅输入节点生命周期/定时器隔离契约仍阻断。r3隔离态期间会拒绝尾随input，但解除隔离之后仍使用一个全局currentSessionToken。反例A：旧compositionstart→reset→新keydown解除隔离→新input('Brand-New')并schedule→旧compositionend被拒绝分支强写当前value=''→挂起timer读DOM空值→新输入丢失且产生empty错误。反例B：旧会话reset后新compositionstart覆盖global token→旧compositionend误通过相等检查并置新会话isComposing=false。scheduler仅clearTimeout且直接callback，没检查generation/session/句柄快照；inputGeneration只是声明和清空递增却从未使用，末尾却说有双重守卫。不得继续用这种策略重新声称彻底杜绝竞态。\n\n请在待批准方案中采用明确的“清空时替换输入节点＋节点代际闭包隔离”作为最小修订建议，AI完成普通实现细节。技术契约至少准确表达：\n1. activeInputNode、单调递增inputGeneration、每节点独立组合输入状态；事件绑定时闭包捕获node和bornGeneration。input/beforeinput/compositionstart/compositionend的处理前先核对event.currentTarget、node===activeInputNode、bornGeneration===inputGeneration及节点仍在当前页面；失败立即返回，不能写新节点、改新会话状态或取消新timer。普通InputEvent没有应用自增token，不能假称其自带会话身份。\n2. 清空操作先增加代际并取消/作废定时器，再用新input节点替换旧节点，正确保留id、name、label关联、样式、可访问属性、监听绑定与焦点行为；新节点value=''/trustedDraft=''，清结果和错误。旧节点迟到事件只能到旧闭包并被拒绝，不操作activeInputNode。新节点键入、粘贴、组合输入均正常，不要求用户额外keydown才能解除永久隔离。组合输入状态属于节点闭包，旧end不可能重写新isComposing。不要把强制清新DOM作为拒绝旧事件动作。\n3. schedule接受“已接受的原始草稿快照、node、generation”，保存单调schedulerEpoch/本次timer身份；schedule替代、cancel、clear、compositionstart均使旧epoch失效。即使旧回调已经进入队列、clearTimeout来不及，执行时仍先检查epoch/generation/active node，过期立即return。有效回调只验证capturedDraft，再textContent输出；不要到期读取可能被旧事件更改的DOM。clear同步清空，失败保留对应已接受原文；新用户输入能正常300ms调度。\n4. 给出内部自洽、可以直接指导实现的事件/清空/scheduler接口与伪代码；所有被引用变量有定义且校验实际被使用。不得在正文声称守卫存在而示例缺失。同步data_model、interface、errors、相关flow/page、任务spec全部字段、validation及acceptance；只改真实关联句子，不整块删除原目标、范围和已正确验收。\n5. 精确测试：清空后旧节点end与input不得重显/造错；新节点input之后旧节点end不得抹新草稿/取消新timer；新节点compositionstart之后旧节点end不得结束新composition；旧timer已出队后clear/新输入再执行旧callback无效；新键入/粘贴/完整新中文composition仍可显示；清空替换后label/焦点/ARIA/布局保留。断言写具体状态与输出，不能只写“无竞态”。\n6. 该策略是待批准的技术建议，合成事件只能验证书面事件契约。浏览器是否把旧原生IME事件重新定向到新节点、替换节点能否结束原生会话、实际焦点/辅助技术行为，必须作为Chrome/Edge/Firefox和Safari适用环境的开发验证任务，说明证据与失败后修订策略；不得写100%/彻底杜绝所有浏览器竞态或已验证通过。不要重新运行不可用Docker。\n\n独立review必须核对真正的最新候选正文/字段及实际守卫代码，明确上述每个反例的对应规则。blockers=[]本身不证明内容通过。完成后仍由公开Core自动验收审批并编译新版本，不冒称真人批准，不编辑旧产物或收据。\n"
+  },
+  "effectiveConfig": {
+    "concurrency": 4,
+    "designModel": "gemini-3.8-flash-high",
+    "reviewModel": "gemini-3.8-flash-high",
+    "officialHosts": [
+      "antigravity.google",
+      "www.antigravity.google",
+      "modelcontextprotocol.io",
+      "ts.sdk.modelcontextprotocol.io",
+      "nodejs.org",
+      "docs.docker.com",
+      "docs.python.org",
+      "playwright.dev",
+      "react.dev",
+      "www.typescriptlang.org",
+      "vite.dev",
+      "expressjs.com",
+      "developer.mozilla.org",
+      "www.w3.org",
+      "www.rfc-editor.org",
+      "docs.github.com",
+      "docs.anthropic.com",
+      "ai.google.dev"
+    ]
+  },
+  "status": "reviewable",
+  "tasks": [
+    {
+      "id": "task-d00654de-5243-4ccb-b9bf-f0617f375907",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "28bfdca45efa1d555b4ba119f4ac812538709c0e90104fa4bda882b2bd24f4b6",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:40:35.712Z",
+      "completedAt": "2026-10-04T23:44:12.988Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-d00654de-5243-4ccb-b9bf-f0617f375907/result.json",
+      "outputHash": "d6eee0fe5c987a5d9e8ce39c5d653e1b814f5c85115f12e0dc4ff69cee0370cc"
+    },
+    {
+      "id": "task-a26684af-62bd-4424-afd7-5e3dc898ee1e",
+      "kind": "research",
+      "goal": "独立分析材料中的约束、异常使用场景与可行性风险；只返回证据和建议。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "28bfdca45efa1d555b4ba119f4ac812538709c0e90104fa4bda882b2bd24f4b6",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:40:35.786Z",
+      "completedAt": "2026-10-04T23:42:25.176Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-a26684af-62bd-4424-afd7-5e3dc898ee1e/result.json",
+      "outputHash": "bd592db0b54cdea85bc9104d2c096ed8120953991b9e2ccd4a5792cb248fd9b5"
+    },
+    {
+      "id": "task-33fb7ec3-42bf-4909-8c96-e1b61514f90d",
+      "kind": "integration",
+      "goal": "整合当前工作者产物，交付本阶段完整、自洽的待批准变更包。",
+      "dependsOn": [
+        "task-d00654de-5243-4ccb-b9bf-f0617f375907",
+        "task-a26684af-62bd-4424-afd7-5e3dc898ee1e"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "28bfdca45efa1d555b4ba119f4ac812538709c0e90104fa4bda882b2bd24f4b6",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:44:13.042Z",
+      "completedAt": "2026-10-04T23:47:38.868Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-33fb7ec3-42bf-4909-8c96-e1b61514f90d/result.json",
+      "outputHash": "5281849b5b65c300ec36cb1c4125dba14149c45606b2c3ebd5766382b4cee455"
+    },
+    {
+      "id": "task-ec6519a1-bbfb-491c-bd47-66a2d8355a14",
+      "kind": "review",
+      "goal": "独立检查最新草案与证据，返回具体阻塞；只有全部满足时 blockers=[]。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "28bfdca45efa1d555b4ba119f4ac812538709c0e90104fa4bda882b2bd24f4b6",
+      "inputRefs": [],
+      "startedAt": "2026-10-04T23:47:38.959Z",
+      "completedAt": "2026-10-04T23:49:52.121Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-ec6519a1-bbfb-491c-bd47-66a2d8355a14/result.json",
+      "outputHash": "be3b37e35a9bfeb68af64ba3d0428f67f3ca455de6e5b665593cc8d634d14f63"
+    }
+  ],
+  "createdAt": "2026-10-04T23:40:35.617Z",
+  "updatedAt": "2026-10-04T23:49:52.280Z",
+  "pendingQuestions": [],
+  "nextEventSeq": 20,
+  "progressSignatures": [
+    "5d9dda58e40e9080628fec84377c88c064bfd706bf7943b21fe2235828b22fdb"
+  ],
+  "deferredQuestions": [],
+  "unfinishedBlockIds": [],
+  "summary": "依据最新自动质量验收反馈 input:58d9b19d-41b2-4b33-9b82-848c086d1399 与独立评审意见，针对 sourceRevision 28 蓝图在清空后依赖单一全局令牌与临时隔离态导致的反例 A（清空后迟到 compositionend 强写 DOM 导致新输入丢失且造错）与反例 B（新合成覆盖全局令牌导致旧事件误结束新会话组合态）以及防抖调度器缺少单调纪元与快照校验问题，本轮规划完成自洽闭环修订：\n1. 采纳“清空时替换输入节点＋节点代际闭包隔离”最小修订方案：清空时通过 Element.replaceWith() 物理替换旧输入框，全局递增代际 inputGeneration，为新节点绑定独立闭包（捕获 bornGeneration、私有 isComposing=false 与 trustedDraft=''）；所有事件处理前核验 event.currentTarget === node && node === activeInputNode && bornGeneration === inputGeneration && document.body.contains(node) 四重守卫，旧节点迟到事件在旧闭包入口被直接丢弃返回，完全脱离与 activeInputNode 的接触，不制造空值错误；新节点真实输入（键入、粘贴、新合成）顺畅流转 300ms 防抖，无需额外按键解除隔离；\n2. 调度器草稿快照与单调纪元校验：DebounceScheduler.schedule 捕获 draftSnapshot、node 与 targetGeneration，维护单调递增 schedulerEpoch；唤醒执行时校验 thisEpoch === schedulerEpoch && targetGeneration === inputGeneration，仅对草稿快照校验并安全输出，彻底避免到期重读被篡改 DOM 的竞态；\n3. 同步技术契约与伪代码：在 blk-tech-interface 中提供内部自洽、包含所有变量定义与实际校验调用的完整运行接口与伪代码，同步修订 data_model、error、flow、page 与任务 spec；\n4. 明确待验证状态与真实浏览器环境：将桌面主流浏览器原生 IME 真实派发与节点替换行为明确定义在 blk-deliv-val-standalone-runtime 开发验证任务中，当前规划环境标记为 unexecuted，不作 100% 绝对杜绝原生未定义行为的无证据承诺；\n5. 保持 30 个稳定块 ID、未变更批准块（包括已通过的 5 轮均值 <=50ms 清空重绘前调度延迟指标、8080 端口契约、经典脚本 defer 与 textContent 安全边界限定）与 28 条历史不可变证据完整继承，生成完整、自洽、待批准的变更包。",
+  "clarification": null,
+  "changeSetId": "change-167084dd-7b42-4c3b-a43c-0fae51d1040a-delivery-0"
+}

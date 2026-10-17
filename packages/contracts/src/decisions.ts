@@ -5,7 +5,8 @@ export type DecisionStatus =
   | 'confirmed'
   | 'locked'
   | 'superseded'
-  | 'rejected';
+  | 'rejected'
+  | 'deprecated';
 
 export type DecisionOrigin = 'user' | 'agent';
 
@@ -17,11 +18,15 @@ export interface DecisionItem {
   origin: DecisionOrigin;
   evidenceRefs: TypedRef[];         // Pointing to input/question/etc.
   confirmedBy?: 'user';             // Required when status is 'confirmed' or 'locked'
+  approvalSource?: string;
+  evidenceIds?: string[];
   supersededBy?: DecisionRef;       // Points to the new decision replacing this one
   decisionKey?: string;             // Topic key from B3 Discovery
+  dependsOn?: string[];             // Explicit dependencies on other decisions (IDs or decisionKeys)
   rationale?: string;               // Justification / tradeoffs
   affectedAreas?: string[];         // Secondary areas impacted by this decision
   sourceArea?: string;              // Preserved original area before migration/normalization
+  rejectionReason?: string;         // e.g. 'retracted_by_user'
   createdAt: string;                // ISO 8601
   updatedAt: string;                // ISO 8601
 }

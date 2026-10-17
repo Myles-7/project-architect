@@ -1,3 +1,25 @@
+> 2026-10-04 重构：冲突项以 docs/blueprint/13_PLANNING_WORKBENCH.md 为准。旧单 Agent/单调用、通用兜底题、百分比准备度、短时强制超时规则已撤销。自由文本先保存，结构化答案或变更包批准才成为正式事实。以下保留旧设计背景。
+
+## 2026-10-04 正式规划契约
+
+`packages/contracts/src/planning.ts` 为类型权威，`planning-schema.ts` 为 AI 输出 Schema 权威。`pnpm schema:sync` 同步 B3 JSON，`pnpm schema:check` 检查一致性。历史 B3/B2 JSON 仅供读取。
+
+| 契约 | 实施要点 |
+|---|---|
+| `BlueprintState` / `BlueprintBlock` | 三阶段、模块化正式内容、关联需求/依赖/证据；`decisionBasisHash` 跟踪有效决定，`approvedInputHash` 跟踪审批覆盖的原话/约束/材料 |
+| `PlanningState` / `PlanningLedger` | 正式蓝图、变更包、证据、主题、原文、幂等账本、迁移诊断及开发包 manifest；纳入两阶段提交 |
+| `ChangeSet` / `ChangeGroup` | 依据版本/哈希、分组依赖、替换/删除操作、部分批准、审批来源；未批准内容保持草案 |
+| `AgentTaskResult` | 发现、建议分组、问题、证据、阻塞、后续研究/试验、五项澄清结果；不能带批准标志 |
+| `PlanningRun` / `PlanningTask` | 登记任务/依赖/执行/模型/调用次数、恢复状态、产物引用及 `outputHash`；运行日志单独落盘 |
+| `DecisionTopic` | 稳定 key、批准别名、有效决定/历史、重问原因；`lastAnswerKind` 与 `lastAnsweredQuestionId` 保留委托/暂缓/自定义处理记录，不误确认 |
+| `EvidenceRecord` | 原话、材料位置、来源、获取日期、哈希、实验环境与 passed/failed/unexecuted/not-applicable；外部证据须校验真实来源 |
+| `DevelopmentTaskSpec` | 目标、范围、排除、模块、正常/异常、验证/完成、假设；验证任务追加环境、步骤、通过标准、证据与失败处理 |
+| `PlanningPackageManifest` | 来源/发布版本、依据 hash、操作 ID、独立产物目录及文件 SHA-256 列表 |
+
+运行目录的 `result-receipt.json` 记录 taskId、结果 hash、依据 hash，恢复校验保存的结构化结果与 receipt；事件序号恢复不改正式版本。自由文本保留完整原文，只有结构化选择或用户批准可以形成正式决定。
+
+---
+
 # Project Architect V1：全系统共享类型契约 (Shared Contracts)
 
 > 文档状态：Phase 0 Engineering Blueprint  

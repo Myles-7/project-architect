@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 2,
+  "projectId": "proj-1787926467702",
+  "gaps": [
+    {
+      "id": "gap-chk-delivery_plan-univ-success-signal",
+      "area": "delivery_plan",
+      "decisionKey": "checklist:chk-univ-success-signal",
+      "dependsOn": [],
+      "severity": "medium",
+      "reason": "Checklist 标准检查项尚未明确：项目有一项可被直观验证的完成信号或验收标准。",
+      "impact": "影响 delivery_plan 的完整度闭环。",
+      "shouldAskUser": false,
+      "status": "open",
+      "source": "checklist",
+      "uncertainty": "high",
+      "stageRelevance": "readiness-review",
+      "priorityFactors": {
+        "impact": "medium",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "medium",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 55,
+      "priority": "medium"
+    },
+    {
+      "id": "gap-ai-ux_ui_direction-z6pl",
+      "area": "ux_ui_direction",
+      "decisionKey": "background_notifications",
+      "dependsOn": [],
+      "severity": "low",
+      "reason": "尚未明确在一方锁屏或切后台时，如何同步或通知对方的消息与状态。",
+      "impact": "由于网页在手机后台运行的限制，若不提前约定体验预期，可能会导致互动滞后或体验不佳。",
+      "shouldAskUser": true,
+      "status": "open",
+      "source": "ai",
+      "uncertainty": "high",
+      "stageRelevance": "readiness-review",
+      "priorityFactors": {
+        "impact": "low",
+        "uncertainty": "high",
+        "dependency": "high",
+        "irreversibility": "low",
+        "stageRelevance": "medium"
+      },
+      "priorityScore": 49,
+      "priority": "medium"
+    }
+  ],
+  "conflicts": [],
+  "tensions": [
+    {
+      "id": "tns-1787926514809-at1o",
+      "description": "Local-First 的高隐私性与双人实时互动的便利性之间的权衡",
+      "reason": "Local-First 强调数据在本地，不经过中心服务器，但实时动作同步和通知提醒在没有中心服务器或双方不同时在线时，会面临极大的技术挑战和使用不便。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787926514809-7f62",
+      "description": "情侣专属的高定制化与快速开发上线（MVP 边界）之间的权衡",
+      "reason": "如果追求极度定制化的专属形象和房间（如手绘上传并带动画），会极大拉长首期开发时间；而使用预设模板则会牺牲一定的专属感。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787928353331-zz1h",
+      "description": "移动端网页优先的UI体验与双人同居室复杂拖拽布景的交互冲突。",
+      "reason": "移动端屏幕空间有限且主要通过触屏操作，而像素风房间装扮通常需要较多拖拽与精细布局，这在手机上操作门槛较高。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787928353331-3rpg",
+      "description": "纯本地/点对点（Local-First）架构与数据高可靠性之间的张力。",
+      "reason": "不使用云端数据库使得部署成本极低且极为私密，但在多端同步和浏览器数据持久化方面的可靠性相比云端会有所下降。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787928425956-pr5u",
+      "description": "实时同步与纯本地存储（Local-First）在断网情况下的行为冲突。",
+      "reason": "用户既要求“无感传输（实时同步动作）”，又希望“Local-First（本地拥有数据）”。在两端都离线或其中一方离线时，本地做出的修改在重新连线时如何合并，需要精细的合并逻辑来避免覆盖对方最新的装扮。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787928425956-9lkf",
+      "description": "手机移动端优先的交互与拖拽家具的精细度矛盾。",
+      "reason": "屏幕尺寸较小，二维像素风拖拽家具在手机屏幕上操作可能不够精准，需要在“大点击区域”和“小家具陈列”之间进行 UX 体验的权衡。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787928606500-qcio",
+      "description": "既希望实现无感知的异地实时状态同步，又不希望引入复杂的云端账号注册和服务器高额维护成本。",
+      "reason": "这需要在“随时随地可访问”的便利性与“免部署、完全私密”的简易性之间找到平衡点。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787928985975-16xx",
+      "description": "无干扰陪伴与实时状态同步的矛盾",
+      "reason": "用户希望实时了解对方忙什么，但又确认了‘无干扰陪伴，不强制高频同步’。这需要在 UI 呈现上非常克制，既要显示状态，又不能打扰用户当前的手头工作。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787929221176-zi5q",
+      "description": "在纯对等网络直连（P2P）的设想与首期引入 WebSocket 中转服务器的折中方案之间存在架构张力。",
+      "reason": "纯 P2P 直连（如 WebRTC）在移动公网环境下穿透率低且开发复杂，因此首期折中使用 WebSocket 轻量服务器进行状态转发，这在一定程度上偏离了完全“无服务器”的初衷，但在工程上能更稳妥地实现数据无感传输。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787929221176-n4ms",
+      "description": "在本地数据完全掌控（Local-First）与双人实时数据无感传输之间存在同步体验的张力。",
+      "reason": "本地优先要求数据保存在本地（如 LocalForage），而无感传输要求实时同步。如果在不同步或离线时发生并发修改，需要妥善处理，否则会影响用户数据一致性的信任体验。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787929982035-q5do",
+      "description": "本地隐私权与实时互通便利性的平衡",
+      "reason": "用户要求数据完全归本地掌控，同时希望实现“数据无感传输”和“实时同步”。这需要技术方案在不引入传统的长期存储云服务器的前提下，利用 WebSocket 转发轻量级状态，对本地存储和冲突合并提出了较高要求。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787930020773-ew5o",
+      "description": "无注册与数据防丢的拉扯",
+      "reason": "为了极致隐私和免去注册烦恼，系统采用本地优先且无账号的架构；但本地存储极易因浏览器清理缓存或换机而丢失数据，这与珍贵记忆“永久保存”的需求存在天生张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1787930020773-jhp2",
+      "description": "实时状态同步与后台保活/能耗的拉扯",
+      "reason": "移动端浏览器在后台运行时容易挂起连接，为了保持实时同步可能需要频繁心跳或频繁重连，这与手机电量消耗及无感陪伴存在张力。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788175122032-2tcv",
+      "description": "实时状态同步的实现方式中，同时保留了“无服务器对等网络直连”与“轻量 Node.js 服务器中转”两个技术设想。",
+      "reason": "纯对等直连（P2P）在移动端公网环境下受限于NAT穿透，连接可能不够稳定；而引入 Node.js 中转服务器则违背了完全“无服务器”的设想。这需要在实现时折中处理，例如使用 Node.js 服务器仅作为信令中转或兜底中转。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788175374109-cghr",
+      "description": "在无服务器 P2P 愿景与公网复杂网络同步的高成功率要求之间存在张力。",
+      "reason": "P2P 可以免去服务器的托管费用和隐私泄露可能，但在复杂的移动端网络下 NAT 穿透率并不完美，首期建议引入轻量 WebSocket 中转作为兜底。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788175533801-nzok",
+      "description": "实时同步网络机制在“完全无服务器对等直连”与“轻量 Node.js 服务器中转”之间的技术选择偏好。",
+      "reason": "完全对等直连免去了服务器维护成本，但在异地或复杂网络环境下打洞成功率低；引入 WebSocket 中转服务器可确保高稳定性，但需要托管或运行一个轻量中转节点，首期需折中处理中转服务器的定位（如仅作握手或做数据暂存中转）。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788175533801-h1ie",
+      "description": "本地优先的私密性与数据丢失风险之间的平衡。",
+      "reason": "不引入账号注册和中心化云端存储保障了极高的个人隐私和独立拥有权，但也使用户数据完全暴露在浏览器缓存清理的风险之下，必须通过手动导出或机制补偿来防丢。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788175879250-nu3p",
+      "description": "无服务器对等网络直连与使用轻量 Node.js 服务器中转之间的技术选型权衡。",
+      "reason": "用户同时确认了“采用无服务器的对等网络直连方式”和“选用基于 WebSocket 连接的轻量 Node.js 服务器作为中转站”。这在最终实现时存在技术路线的微调，但首期通过 Node.js WebSocket 服务器作为中转能更好地解决公网下 NAT 穿透的问题，两者是技术演进的张力关系而非绝对冲突。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788176110724-vrcm",
+      "description": "“实时显示动作”与“低频网络同步/允许离线”之间的张力。",
+      "reason": "用户希望能够“实时”知道对方在忙什么，但同时为了无干扰陪伴和降低网络要求，又不强制持续高频的网络同步。这需要在产品设计上通过状态缓存和非即时渐进同步来妥协平衡。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788176262598-ed5x",
+      "description": "Local-First 离线优先与手机浏览器在后台被系统挂起（无法保持连接）之间的折中。",
+      "reason": "网页端应用在手机锁屏或切后台时会被系统休眠，导致 WebSocket 连接中断，难以像原生 App 那样保持实时常驻同步。",
+      "status": "open"
+    },
+    {
+      "id": "tns-1788176262598-u4an",
+      "description": "二维像素风房间的可定制性与开发美术资产工作量之间的平衡。",
+      "reason": "支持自定义装扮房间需要绘制多种家具的像素切图，以及不同动作下的角色形象，这对个人开发者来说存在资产生产的瓶颈。",
+      "status": "open"
+    }
+  ],
+  "updatedAt": "2026-09-25T01:24:36.632Z"
+}

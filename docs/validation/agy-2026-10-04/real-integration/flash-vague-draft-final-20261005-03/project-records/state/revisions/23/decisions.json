@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1791125866356",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "我想做一个帮自己整理随手灵感的小工具。",
+      "status": "candidate",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "createdAt": "2026-10-04T14:57:46.356Z",
+      "updatedAt": "2026-10-04T14:57:46.356Z"
+    },
+    {
+      "id": "dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "area": "project_overview",
+      "decisionKey": "product.platform_form",
+      "statement": "这个随手灵感小工具的主要运行形态与使用场景偏向哪种？\n轻量 Web 单页应用（浏览器即开即用）：开发本地运行或静态托管的轻量 Web 应用，通过浏览器书签或常驻标签页随手记录与整理。",
+      "rationale": "技术选型将聚焦前端现代化轻量框架（如 React/Vite），数据优先存储于浏览器本地（IndexedDB/LocalStorage）或轻量本地后端。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-20261004-03-1791125950709",
+      "evidenceRefs": [
+        "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form"
+      ],
+      "createdAt": "2026-10-04T14:59:10.732Z",
+      "updatedAt": "2026-10-04T14:59:10.732Z",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+      "area": "project_overview",
+      "decisionKey": "product.backup_restore_strategy",
+      "statement": "基于浏览器本地存储（IndexedDB）无服务端数据库的特性，您偏好哪种本地数据备份与导入恢复策略？\n标准 JSON 导入导出 + 温和防丢备份提醒（推荐）：提供标准的 JSON 导出与导入校验能力，同时在前端追踪自上次备份以来的新增/修改灵感数量与时间；当积累较多未备份内容（如新增超20条或超7天未备份）时，在侧边/底部状态栏温和显示‘未备份’状态点与一键导出快捷操作。",
+      "rationale": "需在持久化元数据中记录上次导出时间戳与变更计数，并在界面增加低侵入的状态提示。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-resume-20261004-04-1791127308730",
+      "evidenceRefs": [
+        "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy"
+      ],
+      "createdAt": "2026-10-04T15:21:48.751Z",
+      "updatedAt": "2026-10-04T15:21:48.751Z",
+      "sourceArea": "data_persistence"
+    },
+    {
+      "id": "dec-92a76638-c80a-43c8-bef4-9959af9a62f6",
+      "area": "project_overview",
+      "statement": "随手灵感采用‘无层级扁平便签卡片 + 灵活多标签（Tags）+ 快捷置顶收藏（Pin & Favorite）+ 即时全文模糊检索’的轻量组织模型。",
+      "decisionKey": "product.organization_model",
+      "rationale": "用户已明确委托 AI 拟定灵感组织模型。随手灵感具有瞬时碎片化、多维度归属的特征，传统的树形多级文件夹会给记录带来预先归类的心理门槛与维护负担；而扁平便签卡片结合自由多标签（Tags）、快速置顶/加星收藏与毫秒级即时模糊检索，既保证极低的心智负担，又能实现多维高效归纳与查找。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-org-model"
+      ],
+      "createdAt": "2026-10-04T15:25:37.579Z",
+      "updatedAt": "2026-10-04T15:25:37.579Z",
+      "approvalSource": "change-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-04-product-1791127537555",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-69b7317d-53b6-49f0-98e6-b810b0cefec7",
+      "area": "project_overview",
+      "statement": "随手记录的内容形态采用‘纯文本与轻量 Markdown 混合排版便签，支持单行/多行自适应极速输入、超链接自动识别、待办清单勾选与代码块语法高亮’。",
+      "decisionKey": "product.capture_modality",
+      "rationale": "用户已明确委托 AI 拟定记录形态。针对个人开发者及灵感记录者的轻量捕捉诉求，极速响应至关重要；重量级富文本编辑器加载慢且交互打断感强，而纯文本结合行内 Markdown 语法（标题、代码块、待办项、超链接）兼具输入极速感与代码、链接的清晰结构化排版，输入即保存，无多余加载负担。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-capture-modality"
+      ],
+      "createdAt": "2026-10-04T15:25:37.579Z",
+      "updatedAt": "2026-10-04T15:25:37.579Z",
+      "approvalSource": "change-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-04-product-1791127537555",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-22c4d85c-5b93-4fe2-846c-b47a8a67fbca",
+      "area": "project_overview",
+      "decisionKey": "technical.storage_driver",
+      "statement": "在前端 IndexedDB 客户端持久化层的技术实现上，您偏好哪种封装策略？\nDexie.js 响应式封装库（推荐）：引入 Dexie.js 作为客户端数据库管理层，声明强类型 Schema 与复合索引，配合 useLiveQuery 或事件驱动实现 UI 自动响应更新。",
+      "rationale": "存储服务模块直接基于 Dexie 实例构建，简化 CRUD 与复合条件筛选逻辑。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-resume-20261004-04-1791127943827",
+      "evidenceRefs": [
+        "question:run-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-0-q-tech-storage-driver"
+      ],
+      "createdAt": "2026-10-04T15:32:23.849Z",
+      "updatedAt": "2026-10-04T15:32:23.849Z",
+      "sourceArea": "storage_architecture"
+    },
+    {
+      "id": "dec-8550d453-7c29-4076-9673-fc1cee581819",
+      "area": "project_overview",
+      "statement": "采用 React 19 + TypeScript 5.x + Vite 现代化工程架构作为轻量 Web 单页应用的核心开发基座。",
+      "decisionKey": "technical.frontend_framework",
+      "rationale": "根据已确认的产品形态决策（dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d），技术选型聚焦现代化轻量单页架构。React 19 提供卓越的声明式组件生态与状态更新模型，结合 Vite 极速的本地 HMR 与高度优化的纯静态打包能力，输出零服务端运行时依赖的前端产物。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-react-official",
+        "evidence-vite-official",
+        "evidence-typescript"
+      ],
+      "createdAt": "2026-10-04T15:58:45.282Z",
+      "updatedAt": "2026-10-04T15:58:45.282Z",
+      "approvalSource": "change-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-05-technical-1791129525256",
+      "sourceArea": "frontend_architecture"
+    },
+    {
+      "id": "dec-c00154dd-6d41-4df3-8a92-5b833ee57cf4",
+      "area": "project_overview",
+      "statement": "以浏览器原生 IndexedDB 作为本地数据唯一持久化存储介质，采用已确认决策 dec-22c4d85c-5b93-4fe2-846c-b47a8a67fbca 的 Dexie.js 响应式封装库管理对象仓库、强类型 Schema 与复合索引，辅以 StorageManager API 进行配额与用量感知。",
+      "decisionKey": "technical.storage_baseline",
+      "rationale": "IndexedDB 原生支持大容量结构化数据存储与事务回滚，彻底规避 LocalStorage 的 5MB 配额限制与同步阻塞问题。结合已确认的 Dexie.js 封装库（dec-22c4d85c-5b93-4fe2-846c-b47a8a67fbca）与 StorageManager.estimate()，兼具响应式查询（useLiveQuery）与配额预警保护能力。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-mdn-indexeddb",
+        "evidence-storage-estimate"
+      ],
+      "createdAt": "2026-10-04T15:58:45.282Z",
+      "updatedAt": "2026-10-04T15:58:45.282Z",
+      "approvalSource": "change-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-05-technical-1791129525256",
+      "sourceArea": "storage_architecture"
+    },
+    {
+      "id": "dec-dee44aa2-3d10-4ab9-8e4b-74ce333bce64",
+      "area": "project_overview",
+      "statement": "采用标准 JSON Schema v1 导出与强校验规范，结合 W3C File API（Blob 与 FileReader）实现纯客户端无后端依赖的导入导出，并在持久化元数据中维护 unbackedChangesCount 与 lastBackupAt 驱动温和防丢提醒。",
+      "decisionKey": "technical.backup_format_and_verification",
+      "rationale": "精准落地已确认决策 dec-b17f49d8-86c3-4a74-baee-856b5d753129，确保在无服务器环境下数据完全由用户自主掌控，兼具导入格式严密校验与轻量温和提醒。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-file-api",
+        "evidence-indexeddb-spec"
+      ],
+      "createdAt": "2026-10-04T15:58:45.282Z",
+      "updatedAt": "2026-10-04T15:58:45.282Z",
+      "approvalSource": "change-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-05-technical-1791129525256",
+      "sourceArea": "data_portability"
+    },
+    {
+      "id": "dec-d6ff701c-4666-4605-a6da-ef57a741635e",
+      "area": "project_overview",
+      "statement": "采用 marked + DOMPurify 轻量安全组合作为便签详情与预览的 Markdown 编译与 XSS 消毒方案，配合 Prism.js 实现代码语法高亮。",
+      "decisionKey": "technical.markdown_engine",
+      "rationale": "用户已明确委托 AI 拟定 Markdown 解析策略。marked 具有极高的编译性能与仅约 7KB 的超轻量体积，配合工业级 DOMPurify 白名单过滤能够有效防范恶意脚本注入（XSS），并能轻松支持 GitHub Flavored Markdown (GFM) 任务清单复选框交互与代码块高亮，兼顾极速首屏体验与严格的数据安全。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-react-official"
+      ],
+      "createdAt": "2026-10-04T15:58:45.282Z",
+      "updatedAt": "2026-10-04T15:58:45.282Z",
+      "approvalSource": "change-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-05-technical-1791129525256",
+      "sourceArea": "markdown_rendering"
+    },
+    {
+      "id": "dec-f0dfaad0-c1a3-4d44-b16f-8da9e86c3f53",
+      "area": "project_overview",
+      "statement": "采用 Vitest + React Testing Library + fake-indexeddb 构建端到端与单元测试体系。",
+      "decisionKey": "delivery.test_framework",
+      "rationale": "Vitest 与 Vite 共享同一套配置与转换管线，冷启动极其迅速，开箱支持 TypeScript；搭配 fake-indexeddb 能够在 Node.js 环境中对 Dexie.js 与 IndexedDB 的复杂事务、多值索引进行毫秒级无头单元测试，无需耗时的浏览器拉起开销。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-vite-official",
+        "evidence-typescript"
+      ],
+      "createdAt": "2026-10-04T16:26:52.074Z",
+      "updatedAt": "2026-10-04T16:26:52.074Z",
+      "approvalSource": "change-9163513e-9744-4972-b64c-6bb5a56ce5f6-delivery-0:api-automated-acceptance-flash-vague-resume-20261005-06-delivery-1791131212040",
+      "sourceArea": "testing_framework"
+    },
+    {
+      "id": "dec-55d3c13d-ed9d-4de7-af5a-4258b19b9087",
+      "area": "project_overview",
+      "statement": "采用按领域与特性模块解耦的工程目录架构（src/services, src/modules, src/components, src/hooks, src/types）。",
+      "decisionKey": "delivery.code_organization",
+      "rationale": "清晰的按特性/领域分层（服务访问层、领域模型层、视图交互层）使得便签、搜索、标签、备份等核心逻辑互不耦合并便于自动化测试，同时满足个人开发者极简维护与 Coding Agent 高度可靠编码的要求。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-vite-official",
+        "evidence-typescript"
+      ],
+      "createdAt": "2026-10-04T16:26:52.074Z",
+      "updatedAt": "2026-10-04T16:26:52.074Z",
+      "approvalSource": "change-9163513e-9744-4972-b64c-6bb5a56ce5f6-delivery-0:api-automated-acceptance-flash-vague-resume-20261005-06-delivery-1791131212040",
+      "sourceArea": "code_architecture"
+    },
+    {
+      "id": "dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c",
+      "area": "project_overview",
+      "decisionKey": "product.trash_expiry_behavior",
+      "statement": "在回收区便签超过 7 天保留期限时，您偏好哪种提示时机与永久删除触发机制？\n回收区常驻提示横幅 + 用户主动确认一键清空（推荐）：在侧边栏“回收区”入口展示过期预警状态点；用户切换至回收区视图时，顶部常驻琥珀色提示横幅“有 X 条便签已超过 7 天保留期限”，提供【清空已过期便签】与【一键彻底清空】按钮，经二次确认弹窗后执行物理删除。",
+      "rationale": "影响回收区视图组件、侧边栏计数徽标及彻底删除确认弹窗设计。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-resume-20261005-06-1791131582735",
+      "evidenceRefs": [
+        "question:run-65c5ee22-af96-4d2c-b6f2-d2b4e9126daf-delivery-0-question-trash-expiry-trigger-mode"
+      ],
+      "createdAt": "2026-10-04T16:33:02.774Z",
+      "updatedAt": "2026-10-04T16:33:02.774Z",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-22b51ed5-b37b-47b9-a680-3eb23217348a",
+      "area": "project_overview",
+      "statement": "在全量 JSON 备份导出时，默认包含回收区暂存便签（完整保留 status='trashed' 与 trashedAt 时间戳），同时在导出面板提供【排除回收区便签】复选框开关供按需排除；导入时按原状态还原，若处于回收区且已超过 7 天，则在导入完成后立即纳入过期提示范围。",
+      "decisionKey": "product.backup_trash_inclusion_policy",
+      "rationale": "用户已明确委托 AI 拟定备份导出中回收区便签的处理策略。在纯前端单页架构与浏览器本地持久化模式下，全量 JSON 备份是防止宿主清理与数据意外丢失的核心屏障；默认包含回收区便签可最大程度避免用户误删后尚未恢复又遭遇数据丢失的风险，同时保留 trashedAt 字段保证 7 天过期周期的严格连续性；提供排除选项兼顾了需要纯净导出活跃便签的场景，导入后即时触发超期检查确保生命周期规则严密一致。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d",
+        "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be"
+      ],
+      "createdAt": "2026-10-04T16:39:07.082Z",
+      "updatedAt": "2026-10-04T16:39:07.082Z",
+      "approvalSource": "change-65c5ee22-af96-4d2c-b6f2-d2b4e9126daf-delivery-1:api-automated-acceptance-flash-vague-resume-20261005-06-feedback-1791131947046",
+      "sourceArea": "product_specification"
+    }
+  ],
+  "traces": [
+    {
+      "id": "b9b499d6-3284-43e4-9ed3-6c83b796ac60",
+      "questionRef": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form",
+      "userAnswer": "轻量 Web 单页应用（浏览器即开即用）",
+      "decisionRef": "decision:dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "stateChanges": [
+        {
+          "ref": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T14:59:10.732Z"
+    },
+    {
+      "id": "158fed9c-ea21-45fa-9f5d-b0c30f8fc8b4",
+      "questionRef": "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy",
+      "userAnswer": "标准 JSON 导入导出 + 温和防丢备份提醒（推荐）",
+      "decisionRef": "decision:dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+      "stateChanges": [
+        {
+          "ref": "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T15:21:48.751Z"
+    },
+    {
+      "id": "df09c72e-e2dc-4d10-9416-02f5b36cda36",
+      "questionRef": "question:run-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-0-q-tech-storage-driver",
+      "userAnswer": "Dexie.js 响应式封装库（推荐）",
+      "decisionRef": "decision:dec-22c4d85c-5b93-4fe2-846c-b47a8a67fbca",
+      "stateChanges": [
+        {
+          "ref": "question:run-a28bf7b6-44c3-4461-be52-0f24fe6081f4-delivery-0-q-tech-storage-driver",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-22c4d85c-5b93-4fe2-846c-b47a8a67fbca",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T15:32:23.849Z"
+    },
+    {
+      "id": "eaab8039-77e4-4ea7-a1a1-66acd4e40608",
+      "questionRef": "question:run-65c5ee22-af96-4d2c-b6f2-d2b4e9126daf-delivery-0-question-trash-expiry-trigger-mode",
+      "userAnswer": "回收区常驻提示横幅 + 用户主动确认一键清空（推荐）",
+      "decisionRef": "decision:dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c",
+      "stateChanges": [
+        {
+          "ref": "question:run-65c5ee22-af96-4d2c-b6f2-d2b4e9126daf-delivery-0-question-trash-expiry-trigger-mode",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T16:33:02.774Z"
+    }
+  ],
+  "updatedAt": "2026-10-04T14:57:46.356Z"
+}

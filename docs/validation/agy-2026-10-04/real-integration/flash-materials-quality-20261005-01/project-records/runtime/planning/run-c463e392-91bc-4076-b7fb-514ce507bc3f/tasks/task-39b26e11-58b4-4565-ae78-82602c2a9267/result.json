@@ -1,0 +1,86 @@
+{
+  "blockers": [],
+  "clarification": {
+    "constraints": "浏览器纯前端本地运行，桌面优先；无需服务端、登录认证、协作或支付功能；上传截图仅作为视觉与布局参考，图中的示例文字不转为业务需求。",
+    "delegated": [
+      "组件样式与具体视觉渲染细节",
+      "前端轻量技术方案选型（原生HTML/JS或现代轻量单页结构）",
+      "空值提示与输入反馈的动画/微交互细节",
+      "单页面DOM节点组织与异常防护细节"
+    ],
+    "outcomes": "用户在输入框中输入任意项目名后，点击确认即可在页面明确展示该项目名；支持点击清空以重置显示与输入状态；空值提交时给出可见提示；操作异常或失败时不丢失已输入的内容。",
+    "problem": "解决个人开发者在本地快速核对原型输入反馈的需求，提供即时展示、空值校验提示以及输入保护能力。",
+    "scope": "纯前端单页面应用，包含输入项目名、确认提交、结果展示以及清空重置；页面结构参考 fixture.png（白底，上方展示区，下方左侧确认操作区、右侧辅助/清空操作区），其余普通细节由 AI 拟定待批。",
+    "target": "个人开发者本人使用的本地轻量原型核对单页面应用。"
+  },
+  "evidence": [
+    {
+      "applicability": "确立项目的目标、功能范围与硬性约束：纯前端浏览器本地运行（桌面优先，零服务端、无登录认证、无多用户协作、无支付系统）；核心业务行为由文字说明决定，包含项目名输入、确认展示、清空重置与空值校验提示；确立操作失败或校验异常时必须保留已输入内容的鲁棒性要求；确立上传截图仅作为布局参考，图中文本不自动转为业务需求。",
+      "content": "我想做一个给自己用的本地原型核对页面：上传截图仅作布局参考；文字说明负责行为，不自动把图里的示例文字变成业务需求。只做一个输入项目名、点击确认、展示项目名和清空的单页面。目标是快速核对输入反馈，失败时保留输入。浏览器运行，桌面优先；无需服务端、登录、协作或支付。核心验收：输入任意项目名后可确认显示，空值有提示；具体布局请完整查看截图并描述真实内容。其余普通细节明确委托 AI 拟定，设计建议仍待批准。",
+      "hash": "5feeb9ec9123fa64c0c12e448303eaafebb56333c01fe10738a5af505148d1f3",
+      "id": "evidence-ae8ceeba-90b0-4fdf-a7db-868f3f2f9472",
+      "kind": "user",
+      "location": "inputs/inp-01/source.txt",
+      "obtainedAt": "2026-10-04T16:07:58.964Z",
+      "outcome": "not-applicable",
+      "source": "input:inp-01"
+    },
+    {
+      "applicability": "提供单页面原型界面的空间布局结构参考：页面划分为上部内容展示区与下部操作功能区；下部左侧承载输入框与确认操作（主操作），下部右侧承载清空/重置辅助操作。严格遵循用户指示，图中的“Q7M4-8261”仅作为视觉排版占位示例，不转为业务需求或默认数据。",
+      "content": "参考图像 fixture.png 真实像素分析：整体为白色背景。图像上半部分居中偏左位置为黑色大号等宽/无衬线文本“Q7M4-8261”；图像下半部分左侧为蓝色水平实心矩形色块（RGB/Hex约为 #3D6EE8 / #4169E1 蓝）；图像下半部分右侧为橙红色实心正圆形色块（RGB/Hex约为 #F25022 / #FF4500 橙）。布局构成上呈现“上方展示区、下方双区块（左侧主功能、右侧辅助功能）”的双层结构。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-e1af34b3-3804-4415-b1a4-f5d8b5993abf",
+      "kind": "material",
+      "location": "inputs/inp-1791129999124/fixture.png",
+      "obtainedAt": "2026-10-04T16:08:04.044Z",
+      "outcome": "not-applicable",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "可行性与安全防护分析依据：用户输入任意项目名可能包含 HTML 标签、特殊符号或潜在脚本字符串。项目名展示区必须使用 Node.textContent（或同等安全文本绑定）进行回显，从根本上杜绝 DOM 型 XSS 注入风险，确保纯前端展示的安全与鲁棒性。",
+      "content": "MDN 官方文档 Node: textContent property 指出：textContent 属性表示节点及其后代的文本内容。MDN 明确建议避免使用 innerHTML 来获取或设置元素内的文本，因为 innerHTML 处理原始 HTML 而非纯文本，容易受到 XSS 攻击；而 textContent 不调用 HTML 解析器，能够保证文本安全地作为纯文本呈现，避免 XSS 漏洞。",
+      "hash": "fde1787705a45a0ec71c5eab0e9c2a2acb0151d62eaf9a4092593c69e74dfcb8",
+      "id": "evidence-mdn-textcontent-xss-safety",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innerhtml",
+      "obtainedAt": "2026-10-04T16:08:26.012Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent"
+    },
+    {
+      "applicability": "异常处理与交互体验依据：用户在输入框按 Enter 或点击确认提交时，若采用原生 form 或按钮结构，必须调用 preventDefault() 阻止浏览器默认页面刷新行为，从而保证纯前端单页面的即时校验、空值错误提示与失败保留输入得以稳定生效。",
+      "content": "MDN 官方文档 Event: preventDefault() method 指出：preventDefault() 方法告知用户代理该事件正在被显式处理，其默认行为（如表单提交导致页面刷新跳转、链接导航等）不应执行。",
+      "hash": "41e832f668dde9a4c32adbb89bedce1b323932d878f57b1bdea773d12da7a877",
+      "id": "evidence-mdn-event-prevent-default",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault",
+      "obtainedAt": "2026-10-04T16:08:43.712Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault"
+    },
+    {
+      "applicability": "记录当前规划环境 Docker 限制导致自动化受控试验未执行。明确纯前端无服务端架构在本地浏览器运行的可行性已由 MDN 官方文档确证，实际交互与 DOM 边界验证已列入后续开发与交付阶段的端到端浏览器验证任务。",
+      "content": "在规划环境尝试为 Node 受控试验准备执行环境，返回 status: unavailable。原因：failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; The system cannot find the file specified。因此规划期无法在当前受控 Docker 环境中运行自动化实验。",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop unavailable on host)",
+      "id": "evidence-env-node-docker-unavailable",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-c463e392-91bc-4076-b7fb-514ce507bc3f\\tools\\experiments\\prepare-0d0948d7-a53a-4b17-abd4-3727f02d8504.ndjson",
+      "obtainedAt": "2026-10-05T00:08:14+08:00",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-0d0948d7-a53a-4b17-abd4-3727f02d8504"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "在技术阶段查证纯前端无依赖轻量实现与本地桌面浏览器（file:// 协议与静态服务）下的兼容性细节。",
+      "kind": "research"
+    },
+    {
+      "goal": "在开发交付阶段，在真实桌面浏览器中验证空值提示、长文本换行、Node.textContent 防 XSS 渲染与失败保留输入的交互行为。",
+      "kind": "validation"
+    }
+  ],
+  "groups": [],
+  "questions": [],
+  "summary": "### 约束、异常使用场景与可行性风险独立分析报告\n\n本报告严格依据用户需求原文（`input:inp-01`）、参考图像像素核查（`fixture.png`）及 MDN Web 官方标准规范，对当前项目的约束边界、异常交互场景与可行性风险进行全面审视，并给出具体规划与防护建议：\n\n---\n\n#### 1. 核心约束与范围边界分析\n1. **纯前端本地无后端约束**：项目明确限定为个人开发者本地自用原型核对页面，运行于现代桌面浏览器。架构上为零服务端（Zero-Backend）、无数据库持久化、无用户登录认证系统，亦排除多用户协作与支付模块。\n2. **参考图像定位约束**：通过原生像素核验 `fixture.png`，确认图像为白色背景，上方为黑色文字“Q7M4-8261”，下方左侧为蓝色矩形色块、右侧为橙色圆形色块。严格落实用户“仅作布局参考”原则，图像中的“Q7M4-8261”确认为占位示例文字，不作为业务数据或默认值；页面空间结构采纳其“上方信息展示区、下方主操作（输入+确认）与辅助操作（清空）”的双层排版。\n3. **输入保护硬性约束**：用户明确提出“失败时保留输入”。当校验失败（如空值触发提示）或发生任何脚本/操作异常时，系统不得自动重置或丢弃输入框中已有字符。\n\n---\n\n#### 2. 异常使用场景与边界防护设计\n1. **空值与空白字符提交场景（Empty / Whitespace Submission）**：\n   - **现象**：用户未输入任何内容或仅输入连续半角/全角空格即点击确认或按 Enter。\n   - **交互处理**：前端必须对输入值执行 `trim()` 判断；若为空值，立即在输入框邻近区域展示明确的错误提示（如“项目名不能为空”），同时输入焦点重新聚焦（`.focus()`）至输入框，严禁清空用户输入的已有空格，且不得修改或覆盖上方展示看板的当前状态。\n2. **极端超长字符串与无空白连续字符（Overflow / Long String）**：\n   - **现象**：用户输入极端长文本（如数十或上百字符无空格英文/哈希/路径）。\n   - **防护处理**：展示看板容器必须预置 CSS 换行属性（`overflow-wrap: break-word` 与 `word-break: break-word`），并限制容器最大高度或配置适度滚动，防止长字符串撑破页面宽度或破坏“左操作-右清空”的双区块布局。\n3. **恶意脚本与特殊字符注入场景（XSS / Special Characters）**：\n   - **现象**：用户输入包含 `<script>`、`<img src=x onerror=alert(1)>`、`&`、`\"` 等 HTML 敏感字符。\n   - **官方依据与防护**：依据 MDN 官方文档规范（证据 `evidence-mdn-textcontent-xss-safety`），展示区严禁使用 `innerHTML`，必须使用 DOM 的 `Node.textContent` 属性进行纯文本绑定。该机制不调用 HTML 解析器，能够原生确保任意输入文本忠实回显，彻底杜绝 DOM 型 XSS 攻击风险。\n4. **键盘交互与表单原生跳转冲突场景（Form Submit & Keyboard Navigation）**：\n   - **现象**：用户在输入框内按 Enter 键触发提交时，浏览器原生行为可能导致页面重新载入刷新，破坏内存状态。\n   - **官方依据与防护**：依据 MDN 官方文档规范（证据 `evidence-mdn-event-prevent-default`），在表单或键盘事件监听中显式调用 `event.preventDefault()`，拦截原生重载行为，确保纯前端客户端即时响应。\n5. **清空（Reset）操作边界**：\n   - **现象**：用户点击清空按钮时，同时重置输入框内容、清空上方展示看板并清除未消除的空值错误提示，使系统干净回归初始空白就绪状态。\n\n---\n\n#### 3. 可行性与技术风险评估\n1. **技术可行性**：\n   - 项目功能聚焦且边界清晰，单 HTML 结合轻量 CSS/原生 JavaScript 即可 100% 达成要求，无需任何第三方大型框架或后端运行环境依赖，桌面浏览器本地直接双击打开（`file://` 协议）或通过本地静态服务器启动均可完美运行。\n2. **环境与受控试验说明**：\n   - 在当前规划环境尝试拉取 Node 运行镜像准备自动化受控试验时，因本地未启动 Docker Desktop 引擎（返回 `Docker API unavailable`），试验记录为 `unexecuted`。\n   - 鉴于纯前端 DOM API（`textContent`、`preventDefault`）属于 W3C/MDN 权威标准，架构风险可控；未执行的端到端浏览器实测已制定为后续开发交付阶段的浏览器验收任务（详见 `followUp`），不阻断当前规划推进。\n3. **用户委托项与无未决阻断问题**：\n   - 用户的目标、问题、成效、范围与约束均已完全明确，组件微交互与底层 DOM 组织等普通实现细节已全权委托 AI 拟定，且材料中已有明确答案，无需发起冗余选择题打扰用户。所有设计建议均保持待批准状态。"
+}

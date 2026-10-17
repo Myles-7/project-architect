@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createApp } from '../src/server.js';
 import type { Express } from 'express';
+import { ProjectStateEngine, WorkspaceGuard, FileStorage } from '@project-architect/core';
+import { approvedPlanningFixture } from '../../../tests/fixtures/approved-planning.js';
 
 describe('Phase 5.7: V1 End-to-End Lifecycle Integration Test (Real Express & Filesystem Tier)', () => {
   let tempWorkspace: string;
@@ -110,7 +112,7 @@ describe('Phase 5.7: V1 End-to-End Lifecycle Integration Test (Real Express & Fi
       .expect(200);
 
     expect(imageInputRes.body.success).toBe(true);
-    expect(imageInputRes.body.data.inputRef.analysisAvailability).toBe('unavailable');
+    expect(imageInputRes.body.data.inputRef.analysisAvailability).toBe('available');
     rev = imageInputRes.body.stateRevision;
 
     // 6. Concurrency Conflict Defense: Repeat write with stale revision -> 409 Conflict
@@ -132,6 +134,7 @@ describe('Phase 5.7: V1 End-to-End Lifecycle Integration Test (Real Express & Fi
       .post(`/api/projects/${projectId}/documents/generate`)
       .send({
         expectedRevision: rev,
+        operationId: 'premature-package',
       })
       .expect(422);
 
@@ -178,64 +181,14 @@ describe('Phase 5.7: V1 End-to-End Lifecycle Integration Test (Real Express & Fi
       .expect(200);
     rev = editRes4.body.stateRevision;
 
-    // 8. Run Readiness Review
-    const reviewRes = await request(app)
-      .post(`/api/projects/${projectId}/readiness/review`)
-      .send({
-        expectedRevision: rev,
-      })
-      .expect(200);
-
-    expect(reviewRes.body.success).toBe(true);
-    rev = reviewRes.body.stateRevision;
-
-    // 9. User Disposition Approval
-    const approveRes = await request(app)
-      .post(`/api/projects/${projectId}/readiness/approve`)
-      .send({
-        disposition: 'approved-with-warnings',
-        acknowledgedIssueRefs: [],
-        expectedRevision: rev,
-      })
-      .expect(200);
-
-    expect(approveRes.body.success).toBe(true);
-    expect(approveRes.body.data.snapshot.metadata.stage).toBe('approved');
-    rev = approveRes.body.stateRevision;
-
-    // 10. Generate Specification Documents
-    const generateDocsRes = await request(app)
-      .post(`/api/projects/${projectId}/documents/generate`)
-      .send({
-        expectedRevision: rev,
-      })
-      .expect(200);
-
-    expect(generateDocsRes.body.success).toBe(true);
-    expect(generateDocsRes.body.data.manifest).toBeDefined();
-    expect(generateDocsRes.body.data.manifest.items.length).toBeGreaterThan(0);
-    rev = generateDocsRes.body.stateRevision;
-
-    // 11. Read Documents via Projection and Read Endpoint
-    const docsViewRes = await request(app)
-      .get(`/api/projects/${projectId}/documents`)
-      .expect(200);
-
-    expect(docsViewRes.body.success).toBe(true);
-    expect(docsViewRes.body.data.hasCompiledDocs).toBe(true);
-    expect(docsViewRes.body.data.isManifestStale).toBe(false);
-    expect(docsViewRes.body.data.items.some((d: any) => d.path === 'AGENTS.md')).toBe(true);
-
-    const readDocRes = await request(app)
-      .post(`/api/projects/${projectId}/documents/read`)
-      .send({
-        docPath: 'AGENTS.md',
-      })
-      .expect(200);
-
-    expect(readDocRes.body.success).toBe(true);
-    expect(readDocRes.body.data.content).toContain('Coding Agent Guidelines');
-    expect(readDocRes.body.data.content).toContain('Lossless Audio Player');
+    // 8-10. Approve the complete Planning fixture and publish its package.
+    const fixtureEngine = new ProjectStateEngine(new FileStorage(), new WorkspaceGuard(tempWorkspace));
+    rev = (await approvedPlanningFixture(fixtureEngine, join(tempWorkspace, 'projects', projectId))).metadata.stateRevision;
+    const generated = await request(app).post(`/api/projects/${projectId}/documents/generate`).send({ expectedRevision: rev, operationId: 'lifecycle-package' }).expect(200);
+    rev = generated.body.stateRevision;
+    expect(generated.body.data.manifest.files.length).toBeGreaterThanOrEqual(10);
+    const read = await request(app).get(`/api/projects/${projectId}/planning/package/files/AGENTS.md`).expect(200);
+    expect(read.text).toContain('Lossless Audio Player');
 
     // 12. State Recovery & Restart Simulation: Re-create app on same workspace directory
     const reloadedApp = createApp({
@@ -249,9 +202,9 @@ describe('Phase 5.7: V1 End-to-End Lifecycle Integration Test (Real Express & Fi
 
     expect(reloadProjectRes.body.success).toBe(true);
     const reloadedSnap = reloadProjectRes.body.data.snapshot;
-    expect(reloadedSnap.metadata.stage).toBe('documents-generated');
+    expect(reloadedSnap.planning.package.directory).toBe(generated.body.data.manifest.directory);
     expect(reloadedSnap.metadata.stateRevision).toBe(rev);
     expect(reloadedSnap.documents).toBeDefined();
-    expect(reloadedSnap.documents.items.length).toBeGreaterThan(0);
+    expect(reloadedSnap.documents.items).toEqual([]);
   });
 });

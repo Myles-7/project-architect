@@ -8,9 +8,11 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import type { QuestionItem, QuestionRef } from '@project-architect/contracts';
+import { useOptionalProjectSession } from '../../state/ProjectSessionContext.js';
 
-interface QuestionCardProps {
+export interface QuestionCardProps {
   question: QuestionItem;
+  projectId?: string;
   onAnswerRecord: (questionRef: QuestionRef, answer: string) => Promise<void>;
   onAnswerAndDiscover?: (
     questionRef: QuestionRef,
@@ -29,6 +31,7 @@ interface QuestionCardProps {
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
+  projectId,
   onAnswerRecord,
   onAnswerAndDiscover,
   onAnswerAsAssumption,
@@ -37,6 +40,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   isSelectedForDismiss = false,
   onToggleDismiss,
 }) => {
+  const session = useOptionalProjectSession();
+  const activeProjectId = projectId || session?.state.activeProjectId || 'global';
   const isAnswered = question.status === 'answered';
   const isDismissed = question.status === 'dismissed';
   const isSuperseded = question.status === 'superseded' || isDismissed;
@@ -47,7 +52,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       ? '优先明确'
       : '建议明确';
 
-  const draftKey = `pa:q_draft:${question.id}`;
+  const draftKey = `pa_${activeProjectId}_draft_${question.id}`;
+  const currentKeyRef = React.useRef(draftKey);
+
   const [selectedOption, setSelectedOption] = useState<string | null>(() => {
     if (question.status === 'answered') return null;
     try {
@@ -66,17 +73,32 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   });
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
-  // Auto-persist draft
+  // Synchronize state and auto-persist draft without cross-contaminating when draftKey changes
   React.useEffect(() => {
+    if (currentKeyRef.current !== draftKey) {
+      currentKeyRef.current = draftKey;
+      try {
+        const savedOpt = question.status === 'answered' ? null : localStorage.getItem(`${draftKey}:opt`) || null;
+        const savedInput = localStorage.getItem(`${draftKey}:input`) || question.answer || '';
+        setSelectedOption(savedOpt);
+        setFreeInput(savedInput);
+      } catch {}
+      return;
+    }
+
     if (!isAnswered && !isSuperseded) {
       try {
         if (selectedOption) localStorage.setItem(`${draftKey}:opt`, selectedOption);
         else localStorage.removeItem(`${draftKey}:opt`);
       } catch {}
     }
-  }, [draftKey, selectedOption, isAnswered, isSuperseded]);
+  }, [draftKey, selectedOption, isAnswered, isSuperseded, question.status, question.answer]);
 
   React.useEffect(() => {
+    if (currentKeyRef.current !== draftKey) {
+      return;
+    }
+
     if (!isAnswered && !isSuperseded) {
       try {
         if (freeInput) localStorage.setItem(`${draftKey}:input`, freeInput);
@@ -86,13 +108,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   }, [draftKey, freeInput, isAnswered, isSuperseded]);
 
   React.useEffect(() => {
-    if (isAnswered) {
+    if (isAnswered || isDismissed) {
       try {
         localStorage.removeItem(`${draftKey}:opt`);
         localStorage.removeItem(`${draftKey}:input`);
       } catch {}
     }
-  }, [isAnswered, draftKey]);
+  }, [isAnswered, isDismissed, draftKey]);
 
   const handleSelectOption = (optLabel: string) => {
     if (isAnswered || isSuperseded) return;
@@ -147,14 +169,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div
       className={`rounded-2xl border transition-all overflow-hidden ${
         isAnswered
-          ? 'border-emerald-300 dark:border-emerald-900/60 bg-white dark:bg-[#121316]'
+          ? 'border-emerald-500/30 bg-surface-base'
           : isSuperseded
-          ? 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 opacity-75'
-          : 'border-orange-400/90 dark:border-orange-700/80 bg-white dark:bg-[#121316] shadow-sm'
+          ? 'border-border-subtle bg-surface-subtle/40 opacity-75'
+          : 'border-border-default bg-surface-base shadow-sm'
       }`}
     >
-      {/* Header */}
-      <div className="p-4 sm:p-5 bg-zinc-50/80 dark:bg-[#15161A]/80 border-b border-zinc-200 dark:border-zinc-800/80 space-y-2.5">
+      {/* Header: Level 1 Subtle Surface */}
+      <div className="p-4 sm:p-5 bg-surface-subtle/50 border-b border-border-subtle space-y-2.5">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             {!isAnswered && !isSuperseded && onToggleDismiss && (
@@ -167,17 +189,17 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               />
             )}
             <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+              className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
                 question.importance === 'critical'
-                  ? 'bg-red-100 text-red-800 dark:bg-red-950/80 dark:text-red-300 border border-red-200 dark:border-red-800'
+                  ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
                   : question.importance === 'high'
-                  ? 'bg-orange-100 text-orange-800 dark:bg-orange-950/80 dark:text-orange-300 border border-orange-200 dark:border-orange-800'
-                  : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700'
+                  ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20'
+                  : 'bg-surface-raised text-text-secondary border border-border-subtle'
               }`}
             >
               {importanceLabel}
             </span>
-            <span className="text-[11px] text-zinc-400 dark:text-zinc-500">当前批次问题</span>
+            <span className="text-[11px] text-text-muted">当前批次问题</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -186,36 +208,36 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 type="button"
                 onClick={handleAdoptRecommendation}
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/80 dark:hover:bg-orange-900 text-orange-800 dark:text-orange-300 border border-orange-300 dark:border-orange-800 transition-all cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 transition-all cursor-pointer shadow-xs"
                 title={`选中推荐选项: ${recommendedOption.label}`}
               >
-                <Sparkles className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                <Sparkles className="w-3.5 h-3.5 text-orange-500" />
                 <span>采纳推荐: {recommendedOption.label}</span>
               </button>
             )}
 
             {isAnswered && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-2.5 py-1 rounded-md border border-emerald-200 dark:border-emerald-800">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
                 <Check className="w-3.5 h-3.5" />
                 <span>已确立决策</span>
               </span>
             )}
             {isSuperseded && (
-              <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
+              <span className="text-xs font-medium text-text-muted bg-surface-raised px-2 py-0.5 rounded">
                 {isDismissed ? '已跳过' : '已由新推演替换'}
               </span>
             )}
           </div>
         </div>
 
-        <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 leading-snug">
+        <h3 className="text-sm sm:text-base font-semibold text-text-primary leading-snug">
           {question.question}
         </h3>
         {!isAnswered && !isSuperseded && (
           <button
             type="button"
             onClick={() => setIsExpanded((value) => !value)}
-            className="inline-flex items-center gap-1 text-[11px] font-medium text-orange-700 dark:text-orange-300 cursor-pointer"
+            className="inline-flex items-center gap-1 text-[11px] font-medium text-orange-600 dark:text-orange-400 cursor-pointer"
           >
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             {isExpanded ? '收起回答区' : '展开回答与详情'}
@@ -225,11 +247,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Answered Decision Banner */}
       {isAnswered && (
-        <div className="p-4 sm:p-5 bg-emerald-50/40 dark:bg-emerald-950/20 border-b border-emerald-100 dark:border-emerald-900/40 flex items-start gap-2.5 text-xs">
+        <div className="p-4 sm:p-5 bg-emerald-500/5 border-b border-emerald-500/20 flex items-start gap-2.5 text-xs">
           <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <span className="font-semibold text-emerald-900 dark:text-emerald-200">已确认决策：</span>
-            <div className="text-zinc-800 dark:text-zinc-200 leading-relaxed font-medium">
+            <span className="font-semibold text-emerald-700 dark:text-emerald-300">已确认决策：</span>
+            <div className="text-text-primary leading-relaxed font-medium">
               {question.answer || selectedOption || '已确认并沉淀为项目决策'}
             </div>
           </div>
@@ -237,54 +259,55 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       )}
 
       {/* Decision Rationale & Recommendation */}
-      {isExpanded && !isAnswered && !isSuperseded && <div className="p-4 sm:p-5 bg-zinc-50/40 dark:bg-[#141519]/40 border-b border-zinc-200 dark:border-zinc-800/80 space-y-2.5 text-xs">
-
-        {question.reason && (
-          <div className="flex items-start gap-2 text-zinc-700 dark:text-zinc-300">
-            <HelpCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">为什么现在必须明确：</strong>
-              <span className="ml-1 text-zinc-600 dark:text-zinc-400 leading-relaxed">{question.reason}</span>
+      {isExpanded && !isAnswered && !isSuperseded && (
+        <div className="p-4 sm:p-5 bg-surface-subtle/30 border-b border-border-subtle space-y-2.5 text-xs">
+          {question.reason && (
+            <div className="flex items-start gap-2 text-text-secondary">
+              <HelpCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-text-primary font-semibold">为什么现在必须明确：</strong>
+                <span className="ml-1 text-text-secondary leading-relaxed">{question.reason}</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {question.recommendation && (
-          <div className="flex items-start gap-2 text-zinc-700 dark:text-zinc-300 pt-1.5 border-t border-zinc-200/60 dark:border-zinc-800/60">
-            <Sparkles className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">推荐方向：</strong>
-              <span className="font-mono text-orange-700 dark:text-orange-300 font-semibold mx-1">
-                {question.recommendation}
-              </span>
-              {question.recommendationReason && (
-                <span className="text-zinc-500 dark:text-zinc-400">({question.recommendationReason})</span>
-              )}
+          {question.recommendation && (
+            <div className="flex items-start gap-2 text-text-secondary pt-1.5 border-t border-border-subtle">
+              <Sparkles className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-text-primary font-semibold">推荐方向：</strong>
+                <span className="font-mono text-orange-600 dark:text-orange-400 font-semibold mx-1">
+                  {question.recommendation}
+                </span>
+                {question.recommendationReason && (
+                  <span className="text-text-muted">({question.recommendationReason})</span>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>}
+          )}
+        </div>
+      )}
 
       {/* Answer Body */}
       {isAnswered ? (
-        <div className="p-4 sm:p-5 bg-emerald-50/20 dark:bg-emerald-950/10 space-y-1.5">
-          <div className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
+        <div className="p-4 sm:p-5 bg-emerald-500/5 space-y-1.5">
+          <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
             用户确立的回答
           </div>
-          <div className="text-xs text-zinc-900 dark:text-zinc-100 leading-relaxed font-medium bg-white dark:bg-[#17181D] p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/60">
+          <div className="text-xs text-text-primary leading-relaxed font-medium bg-surface-raised p-3 rounded-xl border border-emerald-500/20">
             {question.answer}
           </div>
         </div>
       ) : isSuperseded ? (
-        <div className="p-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+        <div className="p-4 text-center text-xs text-text-muted">
           {isDismissed ? '你已明确跳过此问题，不会生成决策。' : '该问题已被后续对话确立的决策替代。'}
         </div>
       ) : !isExpanded ? null : (
         <div className="p-4 sm:p-5 space-y-4">
-          {/* Options Grid */}
+          {/* Options Grid: Clean Surface Raised Cards */}
           {question.options && question.options.length > 0 && (
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              <label className="block text-xs font-semibold text-text-secondary">
                 可选方向
               </label>
               <div role="radiogroup" aria-label="可选方向" className="grid grid-cols-1 gap-2">
@@ -317,10 +340,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                             ?.focus();
                         }
                       }}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${
+                      className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
                         isSelected
-                          ? 'border-orange-500 bg-orange-50/40 dark:bg-orange-950/30 text-zinc-900 dark:text-zinc-100 shadow-2xs'
-                          : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-700 dark:text-zinc-300'
+                          ? 'border-orange-500 bg-orange-500/10 text-text-primary shadow-xs'
+                          : 'border-border-subtle bg-surface-raised hover:border-border-default text-text-secondary'
                       }`}
                     >
                       <div className="space-y-1 min-w-0 flex-1">
@@ -328,26 +351,28 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                           <span
                             className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
                               isSelected
-                                ? 'border-orange-600 bg-orange-600 text-white'
-                                : 'border-zinc-300 dark:border-zinc-600'
+                                ? 'border-orange-500 bg-orange-500 text-white'
+                                : 'border-border-strong'
                             }`}
                           >
                             {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                           </span>
-                          <span>{opt.label}</span>
+                          <span className={isSelected ? 'text-text-primary' : 'text-text-secondary'}>
+                            {opt.label}
+                          </span>
                           {isSelected && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded font-semibold bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                            <span className="text-xs px-1.5 py-0.5 rounded font-semibold bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30">
                               已选中
                             </span>
                           )}
                           {opt.reversibility && (
                             <span
-                              className={`text-[10px] px-1.5 py-0.5 rounded font-normal ${
+                              className={`text-xs px-1.5 py-0.5 rounded font-normal ${
                                 opt.reversibility === 'easy'
-                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                   : opt.reversibility === 'hard'
-                                  ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
-                                  : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                                  ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
+                                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                               }`}
                             >
                               {opt.reversibility === 'easy'
@@ -363,26 +388,26 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                         {(opt.gain || opt.sacrifice || opt.impact || opt.tradeoffs) && (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] pt-1 pl-5.5 leading-relaxed">
                             {opt.gain && (
-                              <div className="text-emerald-700 dark:text-emerald-400">
+                              <div className="text-emerald-600 dark:text-emerald-400">
                                 <span className="font-semibold">收益：</span>
                                 <span>{opt.gain}</span>
                               </div>
                             )}
                             {opt.sacrifice && (
-                              <div className="text-amber-700 dark:text-amber-400">
+                              <div className="text-amber-600 dark:text-amber-400">
                                 <span className="font-semibold">代价：</span>
                                 <span>{opt.sacrifice}</span>
                               </div>
                             )}
                             {opt.tradeoffs && (
-                              <div className="text-zinc-600 dark:text-zinc-300 col-span-full">
+                              <div className="text-text-secondary col-span-full">
                                 <span className="font-semibold">权衡：</span>
                                 <span>{opt.tradeoffs}</span>
                               </div>
                             )}
                             {opt.impact && (
-                              <div className="text-zinc-500 dark:text-zinc-400 col-span-full">
-                                <span className="font-semibold text-zinc-700 dark:text-zinc-300">影响：</span>
+                              <div className="text-text-muted col-span-full">
+                                <span className="font-semibold text-text-secondary">影响：</span>
                                 <span>{opt.impact}</span>
                               </div>
                             )}
@@ -399,14 +424,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           {/* Free Input Option */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label htmlFor={inputId} className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              <label htmlFor={inputId} className="block text-xs font-semibold text-text-secondary">
                 {question.options && question.options.length > 0 ? '自定义补充或改写回答 (可选)' : '输入你的具体决策陈述'}
               </label>
               {question.recommendation && !freeInput && (
                 <button
                   type="button"
                   onClick={() => setFreeInput(question.recommendation || '')}
-                  className="text-[11px] text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:underline cursor-pointer flex items-center gap-1 font-medium"
+                  className="text-[11px] text-orange-600 dark:text-orange-400 hover:underline cursor-pointer flex items-center gap-1 font-medium"
                   title="将上方推荐方向一键填入输入框"
                 >
                   <Sparkles className="w-3 h-3" />
@@ -421,43 +446,43 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               onChange={(e) => setFreeInput(e.target.value)}
               placeholder={
                 question.area === 'target_user'
-                  ? '例如：首发版本仅供我们两个人私密使用，无需多用户注册或外部社交体系...'
+                  ? '例如：首发面向个人开发者与敏捷团队，暂不引入复杂的企业组织多租户权限...'
                   : question.area === 'mvp_scope'
-                  ? '例如：首发仅做虚拟同居室与动作实时同步，把日记和同步观影等延后到二期...'
+                  ? '例如：首发聚焦核心推演引擎与规范生成，将云端协作与实时同步延期至二期...'
                   : question.area === 'core_features'
-                  ? '例如：优先实现点击吃饭/睡觉动作同步，自定义装扮先提供基础预设...'
+                  ? '例如：优先实现两阶段快照提交与自适应问答流，模板编辑暂做只读渲染...'
                   : question.area === 'user_flows'
-                  ? '例如：打开网页即直接进入双人房间，通过轻量状态栏一键切换当前状态...'
+                  ? '例如：创建项目后直接进入发现流问答，并在右侧概览实时投影决策蓝图...'
                   : question.area === 'page_structure'
-                  ? '例如：单屏沉浸展示主房间，装扮和设置收纳在右侧抽屉弹层中...'
+                  ? '例如：三栏弹性工作台，左侧导航、中间对话推演、右侧项目架构概览...'
                   : question.area === 'ux_ui_direction'
-                  ? '例如：采用像素风/温馨可爱的治愈系色调，配合轻量微动效...'
+                  ? '例如：宁静专业的暗色工程工作台，高对比度排版与纯净表面标高...'
                   : question.area === 'technical_boundary'
-                  ? '例如：采用轻量 WebSocket 实现实时状态同步，数据存储在本地或简单单机后端...'
+                  ? '例如：本地文件两阶段提交保证原子性，拒绝中心化数据库，保持 Core 纯净零依赖...'
                   : question.area === 'delivery_plan'
-                  ? '例如：双人能在不同电脑上正常登录房间并看到对方实时动作即算首期交付...'
+                  ? '例如：完成全部核心 8 篇 Markdown 架构文档导出与代码审查基线即算首期交付...'
                   : '如有特殊考量，可在此直接输入你的具体决策陈述...'
               }
               disabled={isSubmitting}
-              className="w-full px-3.5 py-2 rounded-xl text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600"
+              className="w-full px-3.5 py-2.5 rounded-xl text-xs bg-surface-raised border border-border-subtle focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all text-text-primary placeholder-text-muted"
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
-            <div className="text-[11px] text-zinc-400 dark:text-zinc-500">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border-subtle">
+            <div className="text-[11px] text-text-muted">
               当前批次 · 回答即时生效
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {/* Secondary Path: Save as Assumption (uncertain / provisional) */}
+              {/* Secondary Path: Save as Assumption */}
               <button
                 type="button"
                 onClick={handleSaveAsAssumption}
                 disabled={isSubmitting || !getFinalAnswerText()}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-300/80 dark:border-amber-800 disabled:opacity-40 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 disabled:opacity-40 transition-colors cursor-pointer"
                 title="存为活跃假设 (Assumption)，后续随时可推翻，不作为不可修改的决策"
               >
-                <HelpCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
                 <span>存为待验证假设</span>
               </button>
 
@@ -466,7 +491,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   type="button"
                   onClick={handleAnswerAndDiscover}
                   disabled={isSubmitting || !getFinalAnswerText()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-orange-700 dark:text-orange-300 bg-white dark:bg-zinc-900 hover:bg-orange-50 dark:hover:bg-orange-950/40 border border-orange-300 dark:border-orange-800 disabled:opacity-40 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-orange-600 dark:text-orange-400 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 disabled:opacity-40 transition-colors cursor-pointer"
                   title="先立即保存当前回答，再在后台整理并生成下一批问题"
                 >
                   <Sparkles className="w-3.5 h-3.5" />

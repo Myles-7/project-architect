@@ -9,6 +9,7 @@ interface ActiveDiscoveryJob {
   projectPath: string;
   userMessage?: string;
   turnId?: string;
+  allowRebase?: boolean;
   baselineSuggestionRefs: Set<string>;
 }
 
@@ -35,6 +36,7 @@ export class DiscoveryJobManager {
     expectedRevision: number,
     userMessage?: string,
     turnId?: string,
+    allowRebase = false,
   ): Promise<DiscoveryJobView> {
     const snapshot = await this.getSnapshot(projectPath);
     if (snapshot.metadata.stateRevision !== expectedRevision) {
@@ -83,6 +85,7 @@ export class DiscoveryJobManager {
       projectPath,
       userMessage: effectiveUserMessage,
       turnId: activeTurnId,
+      allowRebase,
       baselineSuggestionRefs: this.suggestionRefs(snapshot),
     };
     this.jobs.set(projectId, job);
@@ -138,6 +141,12 @@ export class DiscoveryJobManager {
         },
         undefined,
         job.controller.signal,
+        {
+          allowRebase: job.allowRebase ?? false,
+          onPhaseChange: (phase) => {
+            job.view.currentPhase = phase;
+          },
+        },
       );
 
       if (job.controller.signal.aborted) {

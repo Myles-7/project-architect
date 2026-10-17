@@ -1,0 +1,55 @@
+{
+  "label": "flash-materials-final-consistency-20261005-10",
+  "checkedAt": "2026-10-05T10:35:48.471Z",
+  "status": "blocked",
+  "contentPassed": false,
+  "scope": "Independent reading of selected exact counterexamples in the frozen latest candidate. Not a complete final artifact review or target execution.",
+  "candidateContextSha256": "07164ad1d8750684bd17704858de3496b8497ed165e0d79794861eeefe918769",
+  "candidatePreviewSha256": "3edb5ebf9fc1ec77a5a762a14c9ee10e3c45a4949c30b947d0f72d35c8dbdc6e",
+  "taskId": "task-59b3c940-ce86-48ae-92fe-a7d179f3c91b",
+  "blockCount": 30,
+  "findings": [
+    {
+      "id": "M4",
+      "blocks": [
+        "blk-tech-module",
+        "blk-tech-interface"
+      ],
+      "excerpts": [
+        "schedulerEpoch = 0，isInitialized = true",
+        "禁止重复调用"
+      ],
+      "reason": "Initialization declares ready before binding/render/focus finish, although these can fail. Only missing-dependency failure is specified; safe retry without duplicate input/reset listeners or clearing existing draft is absent."
+    },
+    {
+      "id": "M5",
+      "blocks": [
+        "blk-tech-interface",
+        "blk-flow-reset"
+      ],
+      "excerpts": [
+        "rollback(snapshot: ResetTransactionSnapshot",
+        "snapshot 为 null"
+      ],
+      "reason": "Snapshot-capture failure sends null to rollback, but the public signature requires a non-null snapshot. The no-snapshot branch must preserve the untouched node, timer, generation, and text without claiming a rollback was performed."
+    },
+    {
+      "id": "M6",
+      "blocks": [
+        "blk-tech-module",
+        "blk-tech-interface",
+        "blk-feat-reset"
+      ],
+      "excerpts": [
+        "若挂载失败在控制台输出草稿文本",
+        "若兜底容器缺失或呈现失败，如实明确报错"
+      ],
+      "reason": "Fallback mount failure is promised to be visibly reported, but the public technical contract only logs text to console. Define visible failure notification and an honest retention status when no textarea can be shown."
+    }
+  ],
+  "proposedQualityFeedback": "..\\quality-feedback-materials-contract-closure-20261005.txt",
+  "feedbackApplied": false,
+  "finalReviewStatus": "pending",
+  "humanReview": "pending",
+  "targetApplicationExecution": "unexecuted"
+}

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1791125866356",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "我想做一个帮自己整理随手灵感的小工具。",
+      "status": "candidate",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "createdAt": "2026-10-04T14:57:46.356Z",
+      "updatedAt": "2026-10-04T14:57:46.356Z"
+    },
+    {
+      "id": "dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "area": "project_overview",
+      "decisionKey": "product.platform_form",
+      "statement": "这个随手灵感小工具的主要运行形态与使用场景偏向哪种？\n轻量 Web 单页应用（浏览器即开即用）：开发本地运行或静态托管的轻量 Web 应用，通过浏览器书签或常驻标签页随手记录与整理。",
+      "rationale": "技术选型将聚焦前端现代化轻量框架（如 React/Vite），数据优先存储于浏览器本地（IndexedDB/LocalStorage）或轻量本地后端。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-20261004-03-1791125950709",
+      "evidenceRefs": [
+        "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form"
+      ],
+      "createdAt": "2026-10-04T14:59:10.732Z",
+      "updatedAt": "2026-10-04T14:59:10.732Z",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+      "area": "project_overview",
+      "decisionKey": "product.backup_restore_strategy",
+      "statement": "基于浏览器本地存储（IndexedDB）无服务端数据库的特性，您偏好哪种本地数据备份与导入恢复策略？\n标准 JSON 导入导出 + 温和防丢备份提醒（推荐）：提供标准的 JSON 导出与导入校验能力，同时在前端追踪自上次备份以来的新增/修改灵感数量与时间；当积累较多未备份内容（如新增超20条或超7天未备份）时，在侧边/底部状态栏温和显示‘未备份’状态点与一键导出快捷操作。",
+      "rationale": "需在持久化元数据中记录上次导出时间戳与变更计数，并在界面增加低侵入的状态提示。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-resume-20261004-04-1791127308730",
+      "evidenceRefs": [
+        "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy"
+      ],
+      "createdAt": "2026-10-04T15:21:48.751Z",
+      "updatedAt": "2026-10-04T15:21:48.751Z",
+      "sourceArea": "data_persistence"
+    },
+    {
+      "id": "dec-92a76638-c80a-43c8-bef4-9959af9a62f6",
+      "area": "project_overview",
+      "statement": "随手灵感采用‘无层级扁平便签卡片 + 灵活多标签（Tags）+ 快捷置顶收藏（Pin & Favorite）+ 即时全文模糊检索’的轻量组织模型。",
+      "decisionKey": "product.organization_model",
+      "rationale": "用户已明确委托 AI 拟定灵感组织模型。随手灵感具有瞬时碎片化、多维度归属的特征，传统的树形多级文件夹会给记录带来预先归类的心理门槛与维护负担；而扁平便签卡片结合自由多标签（Tags）、快速置顶/加星收藏与毫秒级即时模糊检索，既保证极低的心智负担，又能实现多维高效归纳与查找。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-org-model"
+      ],
+      "createdAt": "2026-10-04T15:25:37.579Z",
+      "updatedAt": "2026-10-04T15:25:37.579Z",
+      "approvalSource": "change-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-04-product-1791127537555",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-69b7317d-53b6-49f0-98e6-b810b0cefec7",
+      "area": "project_overview",
+      "statement": "随手记录的内容形态采用‘纯文本与轻量 Markdown 混合排版便签，支持单行/多行自适应极速输入、超链接自动识别、待办清单勾选与代码块语法高亮’。",
+      "decisionKey": "product.capture_modality",
+      "rationale": "用户已明确委托 AI 拟定记录形态。针对个人开发者及灵感记录者的轻量捕捉诉求，极速响应至关重要；重量级富文本编辑器加载慢且交互打断感强，而纯文本结合行内 Markdown 语法（标题、代码块、待办项、超链接）兼具输入极速感与代码、链接的清晰结构化排版，输入即保存，无多余加载负担。",
+      "status": "confirmed",
+      "origin": "agent",
+      "confirmedBy": "user",
+      "evidenceRefs": [],
+      "evidenceIds": [
+        "evidence-capture-modality"
+      ],
+      "createdAt": "2026-10-04T15:25:37.579Z",
+      "updatedAt": "2026-10-04T15:25:37.579Z",
+      "approvalSource": "change-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-2:api-automated-acceptance-flash-vague-resume-20261004-04-product-1791127537555",
+      "sourceArea": "product"
+    }
+  ],
+  "traces": [
+    {
+      "id": "b9b499d6-3284-43e4-9ed3-6c83b796ac60",
+      "questionRef": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form",
+      "userAnswer": "轻量 Web 单页应用（浏览器即开即用）",
+      "decisionRef": "decision:dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "stateChanges": [
+        {
+          "ref": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T14:59:10.732Z"
+    },
+    {
+      "id": "158fed9c-ea21-45fa-9f5d-b0c30f8fc8b4",
+      "questionRef": "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy",
+      "userAnswer": "标准 JSON 导入导出 + 温和防丢备份提醒（推荐）",
+      "decisionRef": "decision:dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+      "stateChanges": [
+        {
+          "ref": "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T15:21:48.751Z"
+    }
+  ],
+  "updatedAt": "2026-10-04T14:57:46.356Z"
+}

@@ -1,0 +1,1077 @@
+{
+  "contextPath": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-vague-contract-closure-20261005-11\\observed-inputs\\task-ae7e2517-083a-43fe-8f39-4ef6ea0a85ec-1.context.json",
+  "contextSha256": "7dafdf756a5db79ba0c85c66038a80dd2f0f6135aed2199d34bc835923d0bc4d",
+  "controlStatus": "running",
+  "taskId": "task-ae7e2517-083a-43fe-8f39-4ef6ea0a85ec",
+  "candidateBlocks": [
+    {
+      "content": "### 目标用户画像与核心使用场景\n1. **主要目标用户**：面向具备高频碎片灵感记录诉求的个人开发者（用户本人），追求在编码或日常浏览时以极低阻力随手捕获想法与备忘，坚决不盲目扩展为多用户协作、团队知识库或公开社区平台。\n2. **核心行为特征**：\n   - 习惯于在个人桌面或移动现代浏览器中通过常驻标签页或书签随时调用。\n   - 对记录阻力极其敏感，追求从闪念产生到键入保存的秒级流畅闭环，排斥繁琐步骤。\n   - 彻底排斥强制标题、强制层级分类或强制远程登录的重量级流程。\n   - 偏好数据自主掌控，重视本地数据隐私、纯客户端离线使用与轻量格式备份。\n3. **典型使用场景**：\n   - **编码/查阅资料时的瞬时灵感捕捉**：在浏览器常驻标签页中，页面处于激活焦点状态下按下快捷键 `N` 立即聚焦输入框，键入内容后按全字段统一快捷键 `Ctrl/Cmd + Enter` 瞬时保存，不打断主开发流程。去除非页面激活的系统级“全局唤起”承诺。\n   - **零碎便签的轻量归类与回顾**：通过扁平瀑布流或紧凑列表浏览近期卡片，为便签添加自由多标签（桌面支持快捷键点选，移动/触控支持面板顶部多选模式开关），将重要便签加星收藏或置顶，释放标签与状态标记的回顾与整理价值。\n   - **特定任务的全文即时检索**：通过顶部搜索框输入关键词，80ms 防抖即时筛选出匹配便签并黄色高亮；处于回收区的便签严格隔离在常规检索之外。\n   - **纯客户端离线使用与数据备份**：在弱网或断网环境下正常进行本地便签的增删改查与打标，数据保存在浏览器本地持久化存储（IndexedDB）中，支持一键导出结构化 JSON/Markdown 备份。\n   - **回收区 7 天保留与防误删恢复**：删除便签移入回收区暂存保留 7 天，记录 previousStatus，支持随时一览还原或经二次确认彻底清空。",
+      "dependsOn": [],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "block-target-user-scenarios",
+      "kind": "target",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "目标用户画像与核心使用场景"
+    },
+    {
+      "content": "### 核心痛点剖析与解决路径（4个核心痛点完整价值闭环）\n1. **录入心理门槛高导致瞬时灵感流失**：传统知识库或笔记工具打开缓慢、强制要求填写标题、选择分类目录或富文本格式设置，阻断了编程或浏览资料时一闪而过的瞬时思考，导致大量碎片灵感因录入阻力大而直接流失。本方案采用输入框常驻、行内标签与全字段快捷键 `Ctrl/Cmd + Enter` 瞬时提交，实现零门槛极速记录。\n2. **碎片信息无序堆积导致灵感沉没与查找困难**：缺乏零负担的多标签分类、毫秒级全文模糊检索与清晰的状态标记（置顶、加星收藏、归档），随手记录的内容在快速累积后容易沦为信息黑洞，难以快速重新定位与唤醒，失去了后续深度回顾、串联与转化的价值。本方案通过灵活多标签聚合、即时模糊搜索高亮及四大系统视图，赋予碎片信息极高的回顾与检索价值。\n3. **多层级分类树与无限嵌套目录的沉重维护负担**：传统的树形多级文件夹和复杂层级目录给记录带来“预先归类”的心理门槛，容易在记录初期陷入分类纠结，后期又面临目录膨胀与交叉分类失效的维护困境，徒增心智负担。本方案坚持扁平便签卡片结合自由多标签（Tags），彻底免除树状层级维护成本。\n4. **数据资产安全感缺失与云端/本地丢失风险**：依赖远端第三方云笔记存在隐私泄露、账号绑定与网络依赖隐患；而纯前端本地存储又面临浏览器清理缓存、无交互主动驱逐（如 WebKit 7天 ITP 策略）以及缺乏便捷备份机制导致的灵感永久丢失风险。本方案以本地 IndexedDB 为核心，辅以温和防丢提醒与标准格式导出，保障数据自主掌控与资产安全。",
+      "dependsOn": [
+        "block-target-user-scenarios"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "block-problem-fragmented-ideas",
+      "kind": "problem",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "随手灵感碎片化与整理负担痛点"
+    },
+    {
+      "content": "### 预期交付的业务成效与核心体验成果\n1. **即开即用的极速冷启动与输入体验（待验证目标）**：\n   - 在主流桌面 PC 浏览器（Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+）在无 HTTP 缓存冷启动环境下，从浏览器导航起始（`navigationStart` / `performance.timeOrigin` 时间原点 0）到首屏核心组件渲染完成且输入框可交互（可响应键盘按键与聚焦，TTI）目标 <= 1.0 秒。明确以此端到端口径观测，严禁从骨架屏消失起算。\n   - 页面激活状态下按键 `N` 瞬时聚焦（在非输入框且非输入法状态下），全字段快捷键统一 `Ctrl/Cmd + Enter` 保存，端到端输入保存交互流目标在 3 秒内闭环。\n2. **低心智负担的高效整理与统一检索性能口径（待验证目标）**：\n   - 采用扁平便签卡片流，无需预设复杂目录树，支持标签聚合、多标签交集筛选与状态标记，充分释放灵感回顾与检索价值。\n   - 检索性能口径：从实际击键输入动作（keydown）起算，包含 80ms 防抖、内存比对筛选至 DOM 结果高亮呈现可见的完整端到端周期；在灌入 1,000 条混合格式固定种子数据（800 活跃、100 归档、100 回收区，单条平均 150 字符）基准下，经 3 次预热后连续 10 次模糊搜索，采用 nearest-rank 方法计算的 95 分位端到端响应延迟（P95）统一标准目标 <= 150ms。若 P95 超出 150ms，判定性能未达标并触发倒排索引与虚拟滚动优化。数字为待验证目标，需在前台浏览器及真实设备上实测，不伪装成已实测事实。\n3. **纯本地离线优先与数据自主安全**：\n   - 数据完全保存在用户浏览器本地 IndexedDB 中，已打开页面在断网状态下所有 CRUD、打标与检索均 100% 离线运行，零网络报错。\n   - 结合标准 JSON (schemaVersion: 1) / Markdown 导出，配合“超 20 条变更或超 7 天未备份”温和防丢提醒，有效防御浏览器存储清理风险。\n4. **配额超限与状态恢复诚实保障**：\n   - 当本地持久化遭遇浏览器存储配额满（`QuotaExceededError`）或写入异常时，快速捕获输入框与详情编辑弹窗绝对不关闭、不清空用户已输入的文字草稿。\n   - 草稿按 `noteId`（或新建临时 ID `new_draft`）与 `libraryGeneration`（库代际）隔离暂存于当前标签页 `sessionStorage` 中（键名 `spark_draft_${libraryGeneration}_${noteId}`），界面浮出琥珀色告警并提供【复制草稿到剪贴板】、【导出当前未保存草稿】独立文件与【重试保存】入口。\n   - 诚实说明恢复机制：`sessionStorage` 仅保证当前会话及页面刷新时可保留草稿；若标签页被完全关闭或受不同浏览器隐私策略清理，未保存工作可能丢失，因此提供显式的手动导出草稿保护机制，绝不作“100%保证不丢数据”或“零丢稿”等绝对化承诺。",
+      "dependsOn": [
+        "block-problem-fragmented-ideas"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "block-outcomes-lightweight-experience",
+      "kind": "outcomes",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "即开即用、零阻力捕获与敏捷整理的核心成效"
+    },
+    {
+      "content": "### 明确的非目标与版本功能边界（Non-Goals）\n1. **不做复杂目录树、多层级文件夹或无限嵌套分类**：坚决摒弃树状目录与父子文件夹体系，坚持扁平便签卡片结合灵活多标签（Tags）、快捷置顶收藏与模糊检索，降低分类维护负担。\n2. **不做重量级富文本排版（WYSIWYG）编辑器**：不支持复杂的富文本排版控件、表格公式排版或大型排版引擎（如 Draft.js/TinyMCE/ProseMirror），采用纯文本与行内轻量 Markdown（标题、代码高亮、任务清单复选框、超链接），输入即保存，无多余加载负担。\n3. **不做多用户协同与云端同步产品**：不引入远端用户账户体系、多端实时 WebSockets 协同光标或中心化云端数据库，严格限定为面向个人开发者的轻量本地单页工具。\n4. **不做复杂富媒体图文工作站**：不支持大体积音视频附件嵌入、本地文件系统内嵌大型图库、手写涂鸦或无限缩放白板画布，保持核心轻便性。\n5. **去除非浏览器激活的操作系统全局唤起**：由于采用浏览器轻量 Web SPA 形态，不承诺也不实现脱离浏览器激活焦点的系统全局热键呼出，仅支持页面处于激活焦点状态下的快捷键操作（如 `N` 聚焦，全字段统一 `Ctrl/Cmd + Enter` 提交）。全字段提交统一为 Ctrl/Cmd+Enter，消除纯回车直接保存。\n6. **不做 file:// 协议免服务器直接运行支持**：依据现代浏览器 ESM 模块规范与安全上下文限制，应用必须运行于标准 HTTPS 或 localhost 受信任安全上下文中（本地静态预览 `npm run preview` 或静态托管），首版不支持直接双击本地 HTML 文件运行。\n7. **首版不作未验证的 PWA/Service Worker 脱机冷重启绝对保证**：首版确保已打开/缓存页面的本地数据读写 100% 离线可用；完全脱机冷重启依赖本地静态服务器支持，离线 Service Worker 缓存作为未来演进规划。",
+      "dependsOn": [
+        "block-target-user-scenarios"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "block-non-goals-exclusions",
+      "kind": "non_goals",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "明确的非目标与版本功能边界"
+    },
+    {
+      "content": "### 功能范围界定（In Scope - 对齐个人使用、痛点闭环与生命周期规范）\n1. **页面内即时灵感捕获（Quick Capture）**：\n   - 常驻页面顶部的快速输入卡片，单行至最多 8 行多行自适应撑开。\n   - 页面激活状态下支持按字母键 `N` 瞬时平滑滚动并聚焦输入框（当活动焦点不在输入框/文本域/可编辑区域且非输入法组词状态时触发）；全字段快捷键统一为 `Ctrl/Cmd + Enter` 提交（消除纯回车直接保存，避免换行误触提交）；去除非浏览器激活的系统级全局唤起。\n   - 正文中直接键入 `#标签名` 智能提取标签，正文保留原始语义；提取标签统一归一化为规范小写存储（如 `#Dexie` 存为 `dexie`）。\n   - 独立新建动作 `createNote`，携带当前库代际 `sessionGeneration`，生成全新 UUID 并初始化 revision=1，禁止通过 saveNote 的 upsert 机制隐式复活已删除或不存在的便签。\n   - 配额超限/写入失败时，输入框文字保持完整保留不清空，卡片不关闭，草稿以结构化 `SessionDraft` 对象序列化隔离暂存至 sessionStorage（`spark_draft_${libraryGeneration}_new_draft`），提供复制与导出草稿入口。\n2. **便签流式浏览与系统视图流转（Feed & Views）**：\n   - 响应式便签流，支持网格瀑布流与紧凑列表双形态无缝切换，偏好持久化。\n   - 多维生命周期状态：置顶（Pinned）、加星收藏（Favorite）、活跃（Active）、归档（Archived）、回收区暂存（Trashed）。\n   - 四大系统视图：【全部灵感】（仅活跃 active）、【已收藏】（活跃或归档中加星收藏）、【已归档】（仅已归档 archived）、【回收区】（仅回收区 trashed），展示各自实时计数徽标。\n   - **归档视图常驻取消归档恢复路径**：在【已归档】视图中，每张卡片常驻提供明确的【取消归档】按钮（不仅依赖短暂 Toast），点击后原子更新 `status = 'active'`, `updatedAt = Date.now()`, `revision += 1`，将便签恢复至主工作区流。\n3. **灵感回收区生命周期与 7 天保留保护（Recycle Bin & 7-Day Retention）**：\n   - 删除便签不再直接物理丢弃，移入回收区持久化记录 `status = 'trashed'`, `trashedAt = Date.now()`, 并保存删除前状态 `previousStatus`（记录删除前是 `active` 还是 `archived`）。重复删除不得将 `previousStatus` 改写为 `trashed` 或重置 `trashedAt`/到期时间。\n   - 回收区便签保留 7 天，期间支持用户一览查看、随时一键还原；还原时严格按 `previousStatus` 精确恢复（若删除前是 archived 则恢复为 archived，删除前是 active 则恢复为 active），清空 `trashedAt`，恢复原有标签与置顶收藏状态。\n   - **超期提示与永久清理（依据 dec-cd105627-1e53-4251-9f8e-9422bdfbbd5c）**：\n     - 当回收区便签驻留满足 `Date.now() - trashedAt >= 7 * 86400 * 1000`（即 604,800,000 ms，>= 边界）时，侧边栏回收区入口显示琥珀色预警红点。\n     - 用户切换至回收区视图，顶部常驻琥珀色提示横幅“有 X 条便签已超过 7 天保留期限”，提供【清空已过期便签】与【一键彻底清空】按钮。停留跨到期自动标出待清理但不暗删。\n     - 点击清理超期便签或单条彻底删除时，弹出模态二次确认对话框，用户确认后在单原子事务中物理永久删除；用户点击取消则不执行任何写入。\n4. **多维灵活标签过滤体系（Tag Organization）**：\n   - 侧边栏聚合有效标签列表与频次计数，严格排除回收区便签标签；标签全部按规范小写进行大小写不敏感归一化存储与显示。\n   - 桌面端支持按住 `Ctrl/Cmd` 点击多标签组合交集（AND）过滤；移动/触控屏幕在标签面板顶部常驻提供“多选模式”开关，开启后触控点选标签即执行交集组合筛选。\n   - 支持全局标签重命名，在单原子事务中批量更新对应便签 revision 与标签，失败整体回滚。\n5. **即时全文模糊检索（Instant Search）**：\n   - 80ms 防抖全文模糊检索，全局快捷键 `/` 聚焦与 `Escape` 一键清空重置。\n   - 正则控制字符安全转义（escapeRegExp），匹配关键词黄色 `<mark>` 高亮渲染。\n   - 作用域严格依视图隔离：全部灵感视图仅检索 active，已归档视图仅检索 archived，回收区仅检索 trashed，已收藏仅检索收藏。四视图互不掺杂。\n   - 1000条混合数据下检索端到端时延 nearest-rank P95 目标 <= 150ms（含 80ms 防抖与 DOM 渲染）。\n6. **便签详情模态、Markdown 排版与并发控制（Detail & Edit Modal）**：\n   - 居中模态弹窗，轻量 Markdown 格式化、GFM 待办清单交互与 Prism.js 代码块高亮及一键复制。\n   - 详情内保存统一快捷键为 `Ctrl/Cmd + Enter`，消除 `Ctrl/Cmd + S` 快捷键冲突。\n   - 回收区便签强制只读模式保护，禁止编辑。\n   - 严禁任何关闭弹窗或点击遮罩操作静默自动保存；未保存修改退出时强制模态二次确认拦截，提供【保存并退出】、【放弃修改】与【继续编辑】。\n   - 强制 CAS 乐观并发锁，以 `expectedRevision` 与 `sessionGeneration` 防御两标签页多实例并发冲突与库代际失效。\n7. **数据资产管理、导入导出与草稿隔离（Data Portability）**：\n   - 统一 `schemaVersion: 1` 规范的全量 JSON 备份与 Markdown 归档导出；提供独立的【导出当前未保存草稿】动作。\n   - 消除元数据重复表示，规范 `meta.backupTracker` 为单一可信源；导入执行完整强类型校验。\n   - 建立完整可校验的导入预览契约：包含文件字节签名、预览时库代际与目标库状态快照依据（便签总数、版本累加和与最后更新时间戳）；执行时在单原子事务中严格比对快照，若他页写入或代际变更则拒绝执行并要求重新预览，零改动。\n   - 覆盖导入单原子事务清库与写入，成功后本地单调递增库代际（`libraryGeneration += 1`），使旧编辑会话失效；合并导入采用保留本地同 ID 策略，新增记录按条累加未备份计数。\n   - `sessionStorage` 会话草稿按 `noteId` 与 `libraryGeneration` 双重隔离，采用版本化 `SessionDraft` 对象序列化暂存；温和防丢提醒状态机。",
+      "dependsOn": [
+        "block-target-user-scenarios",
+        "block-outcomes-lightweight-experience"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "block-scope-core-boundaries",
+      "kind": "scope",
+      "requirementIds": [],
+      "stage": "product",
+      "title": "功能范围界定"
+    },
+    {
+      "content": "### 单页应用工作区架构（Main Workspace - 体验与状态规范）\n整个产品采用高内聚的现代化 Web 单页结构（SPA），界面由五大核心功能区构成：\n\n1. **顶部操作栏（Top Navigation Bar）**：\n   - 左侧：产品 Logo 与应用标题 “SparkNotes 随手灵感”。\n   - 中间：全局即时搜索框（含放大镜图标、快捷键 `/` 提示、清空按钮 `Esc`、黄色高亮提示），输入关键词触发 80ms 防抖全文检索。\n   - 右侧：视图形态切换（网格瀑布流/紧凑列表）、数据中心按钮（打开导入导出模态弹窗）、存储状态徽标与防丢提醒小黄点。\n2. **全局快速捕获输入区（Quick Capture Bar）**：\n   - 常驻于主内容流顶部，默认呈现轻量单行输入卡片。\n   - 页面激活状态下按键 `N` 平滑滚动至顶部并获得输入焦点；严格规避输入冲突：当页面焦点已在 input、textarea、contenteditable 元素内部，或正在处于中文/拼音等输入法合成态（`e.isComposing === true` 或 `keyCode === 229`）时，按键 `N/n` 仅作为普通字符输入，绝不劫持焦点或触发滚动。\n   - 键入内容高度自适应扩展（1~8 行），正文行内解析 `#标签`（实时归一化为规范小写高亮胶囊预览）。\n   - 全字段统一快捷键 `Ctrl/Cmd + Enter` 立即提交；按普通 `Enter` 仅为普通换行，消除回车误触提交。\n   - 提交失败或配额满时，输入框文字绝对不清空、卡片不关闭，以 `SessionDraft` 对象序列化保存至 `sessionStorage`，浮出琥珀色告警横幅并提供一键复制与导出草稿文件按钮。\n3. **左侧导航与标签筛选面板（Sidebar & TagRail）**：\n   - 系统四大视图切换：\n     - 【全部灵感】：展示活跃便签（`status === 'active'`），支持置顶排序；\n     - 【已收藏】：展示活跃与已归档中加星收藏的便签（`isFavorite === true`）；\n     - 【已归档】：展示归档便签（`status === 'archived'`），常驻提供【取消归档】恢复按钮；\n     - 【回收区】：展示删除后 7 天内便签（`status === 'trashed'`），卡片展示剩余保留天数，超期（>= 7 天）展示琥珀色横幅，提供清空与单条彻底删除二次确认。\n   - 标签聚合区：实时展示所有活跃与归档便签的去重标签与计数（排除回收区便签）。\n     - 桌面端：支持 `Ctrl/Cmd` 点击多选进行交集（AND）组合过滤；\n     - 移动/触控端：面板顶部常驻提供“多选模式”开关，开启后触控单点标签即进入多选交集过滤。\n4. **主内容便签流展示区（Notes Feed）**：\n   - 响应式自适应卡片流（支持 Masonry 瀑布流与 List 列表切换）。\n   - 卡片呈现：正文轻量 Markdown 解析预览、小写规范标签胶囊、创建与修改时间、加星收藏按钮、置顶切换按钮、归档按钮与删除按钮。\n   - 搜索高亮：匹配关键词以 `<mark class=\"search-highlight\">` 呈现黄色醒目标记。\n5. **便签详情与 Markdown 编辑模态（Note Detail Modal）**：\n   - 点击卡片展开居中模态，支持 Markdown 渲染（GFM 待办复选框交互、Prism.js 代码高亮与复制）。\n   - 编辑与保存：全字段统一快捷键 `Ctrl/Cmd + Enter` 提交保存，消除 `Ctrl/Cmd + S` 快捷键冲突。\n   - 关闭与防误丢：点击遮罩、关闭按钮或按 `Escape` 时若存在未保存变更，强制弹出模态二次确认弹窗（【保存并退出】/【放弃修改】/【继续编辑】），严禁任何静默自动保存。\n   - 回收区保护：从回收区打开便签时强制进入只读模式，禁用编辑与待办勾选，仅提供还原与彻底删除。",
+      "dependsOn": [
+        "block-scope-core-boundaries"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-3995dd0b-9949-417c-91e0-e0189cfc5586",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "page-main-workspace",
+      "kind": "page",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "单页应用主工作区页面设计与状态规范"
+    },
+    {
+      "content": "### 秒级随手灵感极速捕获功能（Quick Capture）\n1. **输入交互与自适应撑开**：\n   - 常驻页面主内容顶部，未聚焦时为紧凑单行卡片，占位提示 “记录灵感闪念...（按 N 聚焦，Ctrl/Cmd + Enter 保存，#添加标签）”。\n   - 获得焦点后卡片轻微浮起投影，随输入文本行数平滑撑开，最小 1 行，最大 8 行（约 200px），超出后内部自适应纵向滚动。\n   - 统一全字段快捷键为 `Ctrl/Cmd + Enter` 保存提交。单按 `Enter` 仅执行文本换行，消除回车误触直接保存的缺陷。\n2. **页面焦点激活快捷键 N 规范（严格规避输入冲突）**：\n   - 仅在页面获得焦点且活动元素（activeElement）非输入控件（非 input、非 textarea、非 contenteditable）且非输入法组词态（`!e.isComposing && e.keyCode !== 229`）时，按下按键 `N` 或 `n` 触发页面平滑滚动并聚焦输入框。\n   - 若用户正在搜索框、详情编辑框或输入法中文打字过程中键入字母 n，绝对不触发滚动或焦点转移，正常输入字符，保障输入流畅性。\n3. **行内标签智能提取与小写规范化**：\n   - 正文实时匹配正则 `/(?:^|\\s)#([\\w\\u4e00-\\u9fa5]{1,20})/g`，将提取到的标签统一调用 `.toLowerCase()` 转换为规范小写字符串（如 `#Dexie` 转换为 `'dexie'`），正文保持用户原始输入的语义。\n4. **独立新建动作与隐式复活防御**：\n   - 捕获保存调用底层独立的 `createNote` 契约，自动生成全新 UUID v4 与初始 `revision = 1`，传入当前库代际 `sessionGeneration`。\n   - 坚决不用 `saveNote` 的 upsert 逻辑，避免复活已被彻底删除的便签。\n5. **配额超限与异常双重隔离暂存**：\n   - 写入 IndexedDB 遭遇配额满（`StorageQuotaExceededError`）或未知异常时，输入框文字绝对不清空、卡片不关闭。\n   - 将当前草稿作为结构化 `SessionDraft` 对象序列化存储至 `sessionStorage.setItem('spark_draft_${libraryGeneration}_new_draft', JSON.stringify(sessionDraft))`。\n   - 输入框下方立即浮出琥珀色告警横幅，提供【复制草稿到剪贴板】、【导出当前未保存草稿】独立下载与【重试保存】按钮。",
+      "dependsOn": [
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-3995dd0b-9949-417c-91e0-e0189cfc5586",
+        "evidence-6b828513-73a6-427e-8fe9-8dfe2f4a9c8a",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "feature-quick-capture",
+      "kind": "feature",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "秒级随手灵感极速捕获功能"
+    },
+    {
+      "content": "### 快速捕获与标签解析交互流\n```mermaid\nflowchart TD\n    Start([用户按下键盘 N 键]) --> CheckFocus{当前焦点是否在输入控件\\\\n或正处于 IME 组词态?}\n    CheckFocus -- 是 (在 input/textarea/contenteditable 或 isComposing) --> PassKey[忽略快捷键，正常输入字符 n] --> End([流程结束])\n    CheckFocus -- 否 --> FocusCard[页面平滑滚动至顶部\\\\n聚焦快速捕获输入框]\n    \n    FocusCard --> InputContent[键入灵感文本与 #标签]\n    InputContent --> EnterAction{用户按键操作}\n    \n    EnterAction -- 单按 Enter 键 --> NewLine[编辑器普通换行\\\\n自适应撑开高度至最高8行] --> InputContent\n    EnterAction -- 按 Ctrl/Cmd + Enter --> SubmitAction[触发提交保存]\n    \n    SubmitAction --> ParseTags[行内提取 #标签 并执行小写规范化]\n    ParseTags --> CallCreate[调用 StorageService.createNote\\\\n携带当前库代际 sessionGeneration]\n    \n    CallCreate --> DBWrite{IndexedDB 写入结果}\n    DBWrite -- 成功 --> ResetInput[清空输入框并重置高度\\\\n更新未备份计数\\\\n新便签插入主工作区流顶部] --> Done([保存完成])\n    DBWrite -- 失败 / 配额超限 --> RetainDraft[文字绝对保留不清空\\\\n卡片维持展开]\n    \n    RetainDraft --> SessionStore[构造 SessionDraft 对象\\\\n序列化存入 sessionStorage spark_draft_代际_new_draft]\n    SessionStore --> ShowWarning[展示琥珀色告警横幅\\\\n提供复制到剪贴板/导出草稿文件/重试] --> End\n```",
+      "dependsOn": [
+        "feature-quick-capture"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-3995dd0b-9949-417c-91e0-e0189cfc5586",
+        "evidence-6b828513-73a6-427e-8fe9-8dfe2f4a9c8a",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "flow-quick-capture",
+      "kind": "flow",
+      "requirementIds": [
+        "feature-quick-capture"
+      ],
+      "stage": "product",
+      "title": "快速捕获与标签解析交互流"
+    },
+    {
+      "content": "### 快速捕获组件与标签即时提取开发任务\n本任务负责开发 `QuickCaptureCard` 组件与相关逻辑。实现页面焦点激活 `N` 键监听（严格忽略输入框、文本域与 IME 组词态输入）；自适应高度文本域（1~8 行）；统一全字段快捷键 `Ctrl/Cmd + Enter` 提交与纯 `Enter` 换行；实现 `tagParser` 正则提取并将标签大小写归一化为小写；集成调用 `IStorageService.createNote` 独立新建便签并传递当前代际；在存储配额满载或写入异常时，确保输入框文字完整保留，以版本化 `SessionDraft` 对象序列化暂存于 `sessionStorage`，浮出琥珀色告警横幅并提供一键复制与导出当前草稿文件入口。",
+      "dependsOn": [
+        "feature-quick-capture",
+        "flow-quick-capture",
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-3995dd0b-9949-417c-91e0-e0189cfc5586",
+        "evidence-6b828513-73a6-427e-8fe9-8dfe2f4a9c8a",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-quick-capture",
+      "kind": "task",
+      "requirementIds": [
+        "feature-quick-capture"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "页面通过 Vite 本地预览或标准安全上下文加载。",
+          "IStorageService 与 ISessionDraftService 已完成基础封装。"
+        ],
+        "completionCriteria": [
+          "N 键仅在非输入控件且非 IME 组词态时聚焦输入框，正常打字不丢失字符 n。",
+          "纯 Enter 换行不提交，全字段统一 Ctrl/Cmd+Enter 提交保存。",
+          "标签解析提取成功归一化为规范小写数组（如 #Dexie 转换为 dexie）。",
+          "异常时文字完整保留，卡片不关闭，以 SessionDraft 对象序列化存入 sessionStorage。",
+          "单元测试与交互测试覆盖率达 100%。"
+        ],
+        "environment": "Node 18+ / React 19 / Vitest + Testing Library 运行环境。",
+        "exclusions": "不实现复杂富文本排版引擎；不实现操作系统级全局热键；不使用 upsert 隐式复活。",
+        "failureBehavior": "输入法组词或输入框聚焦时按下 n 保持原有输入行为；提交失败时输入框文字保留并暂存结构化会话草稿，弹出告警提供复制与导出。",
+        "goal": "开发 QuickCaptureCard 组件，实现防输入冲突 N 键聚焦、全字段 Ctrl/Cmd+Enter 保存、小写标签提取、独立 createNote 写入与配额超限结构化草稿隔离保护。",
+        "modules": [
+          "src/components/capture/QuickCaptureCard.tsx",
+          "src/utils/tagParser.ts",
+          "tests/unit/components/QuickCaptureCard.test.tsx"
+        ],
+        "normalBehavior": "按 N 聚焦输入框；键入文本自适应伸展高度；识别标签高亮；按 Ctrl/Cmd+Enter 提交并调用 createNote；成功后清空输入框并重置高度。",
+        "scope": "实现 QuickCaptureCard 组件 UI 与自适应高度样式（1~8行）；实现全局键盘监听 Hook（支持聚焦态 N 判定，规避 input/textarea/contenteditable/IME 组词冲突，全字段 Ctrl/Cmd+Enter 提交）；实现 tagParser 标签解析与小写规范化工具函数；集成 NotesContext 进行数据新增；集成 SessionDraftService 进行异常状态 SessionDraft 对象序列化隔离。编写组件单元与交互测试。",
+        "verification": [
+          "运行测试套件验证快捷键触发、标签提取、存储调用及异常保留行为；",
+          "检查控制台无 React 警告与内存泄露。"
+        ]
+      },
+      "title": "快速捕获组件与标签即时提取开发任务"
+    },
+    {
+      "content": "### 快速捕获功能验收标准（Given / When / Then）\n\n#### 场景 1：快捷键聚焦与灵感提交保存（统一 Ctrl/Cmd + Enter，消除回车误触与输入冲突）\n- **Given**：用户打开应用处于主工作区，页面处于前台聚焦状态，快速捕获输入框处于空闲单行状态；\n- **When 1.0（输入控件与 IME 防冲突检验）**：用户在顶部搜索框或便签编辑框中正在输入文字，或者处于拼音输入法组词状态（`e.isComposing === true`），按下键盘字母键 `N` 或 `n`；\n- **Then 1.0**：系统**绝对不触发**快速录入框聚焦，页面**绝对不发生滚动**，字符 `n` 正常输入到当前活动控件中，文本无任何丢失；\n- **When 1.1（页面聚焦触发快速聚焦）**：用户在页面空白区域点击获得焦点（非可编辑元素），按下键盘字母键 `N`；\n- **Then 1.1**：页面平滑滚动至顶部，快速捕获输入框立即获得光标焦点并呈现高亮边框；\n- **When 1.2（回车换行不提交）**：用户键入文本 `重构前端持久化存储驱动 #架构设计 #Dexie`，随后按下普通 `Enter` 键；\n- **Then 1.2**：编辑器仅执行文本换行，输入框自适应向下平滑展开为 2 行，**绝对不触发提交保存**；\n- **When 1.3（组合键提交与标签小写规范化）**：用户按下快捷键组合 `Ctrl/Cmd + Enter`；\n- **Then 1.3**：系统触发保存，提取出规范小写标签 `[\"架构设计\", \"dexie\"]`，调用独立 `createNote` 契约生成全新 UUID 与 `revision: 1` 写入数据库；输入框清空并平滑收拢为初始单行高度，便签卡片即时呈现在主工作区流顶部。\n\n#### 场景 2：存储满载异常防御（文字完整保留、SessionDraft 结构化对象隔离与独立草稿导出）\n- **Given**：用户在输入框中键入了长篇灵感文字，本地存储因磁盘空间满载触发 `StorageQuotaExceededError`；\n- **When**：用户按下 `Ctrl/Cmd + Enter` 提交保存；\n- **Then**：\n  1. 系统捕获配额异常，**输入框文字绝对完整保留、输入卡片绝对不关闭**；\n  2. 草稿作为结构化版本对象被序列化写入 `sessionStorage.setItem('spark_draft_${libraryGeneration}_new_draft', JSON.stringify({ schemaVersion: 1, noteId: 'new_draft', libraryGeneration: 1, baseRevision: 0, content, savedAt: Date.now() }))`；\n  3. 输入框下方浮出琥珀色告警横幅：“存储配额已满，文字已临时保存在会话草稿中”；\n  4. 横幅右侧提供【复制到剪贴板】与【导出当前未保存草稿】按钮，用户点击导出可下载独立 JSON 文件，确保灵感资产不丢失。",
+      "dependsOn": [
+        "task-quick-capture"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-3995dd0b-9949-417c-91e0-e0189cfc5586",
+        "evidence-6b828513-73a6-427e-8fe9-8dfe2f4a9c8a",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-quick-capture",
+      "kind": "acceptance",
+      "requirementIds": [
+        "feature-quick-capture"
+      ],
+      "stage": "delivery",
+      "title": "秒级灵感极速捕获验收标准"
+    },
+    {
+      "content": "### 便签流多视图展示、生命周期流转与回收区保留功能\n1. **多视图架构与严格作用域划分**：\n   - 【全部灵感】：仅展示活跃便签（`status === 'active'`），支持置顶卡片排在首部。\n   - 【已收藏】：展示被加星标记的便签（`isFavorite === true` 且处于 active 或 archived 状态）。\n   - 【已归档】：展示已归档便签（`status === 'archived'`），**每张卡片常驻提供【取消归档】按钮**，点击后在单原子事务中恢复为 `status = 'active'`, `updatedAt = Date.now()`, `revision += 1`，将便签恢复至主工作区流，彻底摆脱单靠短暂 Toast 撤销的限制。\n   - 【回收区】：展示暂存便签（`status === 'trashed'`），卡片展示删除前状态、移入时间与剩余天数。\n2. **回收区 7 天生命周期与超期提示机制**：\n   - 便签删除时移入回收区，持久化记录 `status = 'trashed'`, `trashedAt = Date.now()`, 并严格保存删除前状态 `previousStatus`（`active` 或 `archived`）。重复删除为幂等操作，禁止改写原有 `previousStatus` 与 `trashedAt`。\n   - 保留 7 天策略：在回收区暂存保留 7 天（即 604,800,000 ms），期间支持随时一键还原；还原时严格依据 `previousStatus` 精确恢复至 active 或 archived，清空 trashedAt 并递增 revision。\n   - 超期提示横幅：当回收区便签存在满足 `Date.now() - trashedAt >= 7 * 86400 * 1000`（>= 边界）时，回收区顶部常驻琥珀色提示横幅“有 X 条便签已超过 7 天保留期限”，提供【清空已过期便签】与【一键彻底清空】按钮。停留跨到期自动标出待清理但不暗删。\n   - 彻底删除二次确认：单条彻底删除或清空回收区时，强制弹出模态确认对话框；用户确认后在单读写事务中物理永久删除对应记录，取消则零改动退出。\n3. **便签卡片丰富状态呈现与快捷操作**：\n   - 卡片正文支持轻量 Markdown 解析渲染；标签以小写胶囊显示；底部提供置顶、收藏、归档/取消归档与删除快捷按钮。\n   - 处于回收区的便签卡片呈现灰色保护蒙层，禁用编辑入口与快捷打标，仅提供【还原】与【彻底删除】。",
+      "dependsOn": [
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "feature-note-card-view",
+      "kind": "feature",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "便签流多视图展示、生命周期流转与回收区保留功能"
+    },
+    {
+      "content": "### 便签状态流转、回收区 7 天保留与还原清空交互流\n```mermaid\nflowchart TD\n    Card[用户操作便签卡片] --> ActionChoice{选择卡片操作}\n    \n    ActionChoice -- 点击【归档】 --> ArchiveTx[单读写事务 CAS 校验\\\\nstatus = 'archived', revision += 1] --> MoveArchived[便签移入【已归档】视图]\n    \n    MoveArchived --> ArchivedView[进入【已归档】视图]\n    ArchivedView --> UnarchiveAction[点击卡片常驻【取消归档】按钮]\n    UnarchiveAction -- 单读写事务 CAS 校验 --> RestoreActive[status = 'active', revision += 1\\\\n便签恢复至主工作区全部灵感流]\n    \n    ActionChoice -- 点击【删除】 --> TrashTx[单读写事务 CAS 校验\\\\n记录 previousStatus = 原状态\\\\nstatus = 'trashed', trashedAt = Date.now()\\\\nrevision += 1] --> MoveTrash[便签移入【回收区】]\n    \n    MoveTrash --> RecycleBinView[进入【回收区】视图]\n    RecycleBinView --> CheckExpired{判定 Date.now() - trashedAt >= 7天?}\n    \n    CheckExpired -- 未到期 (<7天) --> ShowNormalCard[展示剩余保留天数\\\\n卡片置灰只读保护]\n    CheckExpired -- 已超期 (>=7天) --> ShowBanner[顶部常驻琥珀色超期提示横幅\\\\n标出已过期便签]\n    \n    ShowNormalCard --> RestoreAction[点击【还原】按钮]\n    RestoreAction --> RestoreTx[单事务依据 previousStatus 还原\\\\n若原为 archived 恢复至已归档\\\\n若原为 active 恢复至全部灵感\\\\ntrashedAt = null, revision += 1]\n    \n    ShowBanner --> PurgeAction{点击【清空过期】或【单条彻底删除】}\n    PurgeAction --> ConfirmDialog[弹出模态二次确认对话框]\n    ConfirmDialog -- 用户点击取消 --> Abort[取消操作，保持原状零写入]\n    ConfirmDialog -- 用户确认删除 --> HardDeleteTx[单读写事务 CAS 物理永久删除记录\\\\n未备份计数 +1] --> PurgedDone([物理删除完成])\n```",
+      "dependsOn": [
+        "feature-note-card-view"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "flow-note-card-actions",
+      "kind": "flow",
+      "requirementIds": [
+        "feature-note-card-view"
+      ],
+      "stage": "product",
+      "title": "便签状态流转、回收区 7 天保留与还原清空交互流"
+    },
+    {
+      "content": "### 便签卡片流展示、回收区 7 天生命周期与操作开发任务\n本任务负责开发 `NoteFeed` 便签流、`NoteCard` 卡片组件、`RecycleBinView` 回收区管理视图与二次确认对话框。实现四大系统视图（全部灵感/已收藏/已归档/回收区）响应式流式布局；在已归档视图实现常驻【取消归档】操作；实现便签移入回收区并保存 `previousStatus` 与 `trashedAt`；实现 7 天超期判定（>= 604,800,000 ms）与顶部琥珀色提示横幅；实现基于 `previousStatus` 的状态精准还原；实现清空与单条彻底删除二次确认模态对话框，所有状态流转均通过 `IStorageService` 读写事务 CAS 执行并维护版本递增。",
+      "dependsOn": [
+        "feature-note-card-view",
+        "flow-note-card-actions",
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-note-card-view",
+      "kind": "task",
+      "requirementIds": [
+        "feature-note-card-view"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "IStorageService 已完成状态流转方法封装。",
+          "Dexie useLiveQuery 响应式监听就绪。"
+        ],
+        "completionCriteria": [
+          "四大视图严格状态隔离展示，计数徽标准确。",
+          "已归档卡片具备常驻取消归档按钮，点击安全恢复 active。",
+          "删除记录 previousStatus，还原时精确恢复原状态。",
+          "超期便签准确提示，彻底删除具备二次确认。",
+          "所有操作均通过单原子事务 CAS 执行。"
+        ],
+        "environment": "Node 18+ / React 19 / Vitest + Testing Library 运行环境。",
+        "exclusions": "不处理全文检索高亮算法（由 task-search-filter 负责）；不处理详情模态编辑（由 task-note-detail-edit 负责）。",
+        "failureBehavior": "CAS 版本冲突提示刷新；物理删除取消不执行任何数据库改动；时钟回拨防御不暗删数据。",
+        "goal": "开发 NoteFeed、NoteCard 与 RecycleBinView 组件，实现四大视图切换、常驻取消归档、7 天回收区保留、精确状态还原与物理清空二次确认。",
+        "modules": [
+          "src/components/feed/NoteFeed.tsx",
+          "src/components/feed/NoteCard.tsx",
+          "src/components/feed/RecycleBinView.tsx",
+          "tests/unit/components/NoteFeed.test.tsx"
+        ],
+        "normalBehavior": "视图响应式渲染卡片流；点击置顶/收藏/归档实时流转；回收区展示超期提示与还原彻底删除入口。",
+        "scope": "实现 NoteFeed 瀑布流/列表布局组件；实现 NoteCard 卡片渲染与操作按钮（常驻取消归档）；实现 RecycleBinView 回收区面板与超期横幅；实现状态还原逻辑；实现模态二次确认删除对话框。编写单元测试。",
+        "verification": [
+          "运行 Vitest 测试卡片操作、状态还原与超期横幅；",
+          "人工在浏览器中验证归档与回收区流转。"
+        ]
+      },
+      "title": "便签卡片流展示、回收区 7 天生命周期与操作开发任务"
+    },
+    {
+      "content": "### 便签卡片展示、回收区 7 天生命周期与清空验收标准（Given / When / Then）\n\n#### 场景 1：已归档视图常驻取消归档恢复（非短暂 Toast 依赖）\n- **Given**：便签卡片处于【已归档】视图（`id: \"note-1\"`, `status: 'archived'`, `revision: 2`）；\n- **When**：用户进入已归档视图，点击该卡片上常驻的【取消归档】操作按钮；\n- **Then**：系统在单原子读写事务内执行 CAS 更新 `status = 'active'`, `updatedAt = Date.now()`, `revision = 3`；该便签即时从已归档视图移除，并重新出现在主工作区【全部灵感】流中。\n\n#### 场景 2：移入回收区 7 天保留、previousStatus 记录与精确还原\n- **Given**：系统存在一条已归档便签 A（`status: 'archived'`）与一条活跃便签 B（`status: 'active'`）；\n- **When 2.1**：用户分别点击便签 A 与便签 B 的【删除】按钮；\n- **Then 2.1**：便签 A 变为 `status: 'trashed', previousStatus: 'archived', trashedAt = Date.now()`；便签 B 变为 `status: 'trashed', previousStatus: 'active', trashedAt = Date.now()`；两张卡片均移入回收区；\n- **When 2.2**：用户切换至回收区视图，点击便签 A 的【还原】按钮；\n- **Then 2.2**：便签 A 严格依据其 `previousStatus` 恢复为 `status: 'archived'`，回到【已归档】视图，**绝不错误恢复为 active**；\n- **When 2.3**：用户点击便签 B 的【还原】按钮；\n- **Then 2.3**：便签 B 恢复为 `status: 'active'`，回到【全部灵感】主工作区。\n\n#### 场景 3：回收区 7 天超期提示横幅与彻底清理二次确认\n- **Given**：回收区中存在一条已被删除 8 天的便签 C（`Date.now() - trashedAt = 8 * 86400 * 1000 >= 604,800,000 ms`）；\n- **When 3.1**：用户打开侧边栏切换至【回收区】视图；\n- **Then 3.1**：视图顶部常驻展示琥珀色横幅：“有 1 条便签已超过 7 天保留期限”，卡片边缘呈现醒目过期标记；\n- **When 3.2**：用户点击横幅中的【清空已过期便签】或卡片上的【彻底删除】按钮；\n- **Then 3.2**：系统强制弹出模态二次确认对话框：“此操作将物理永久删除便签，无法恢复，确定继续吗？”；\n- **When 3.3**：用户点击对话框中的【取消】；\n- **Then 3.3**：对话框关闭，底层数据库**绝对零写入**，便签完好保留；\n- **When 3.4**：用户再次点击并确认【确定删除】；\n- **Then 3.4**：系统在单原子读写事务中物理永久删除该记录，未备份变更计数 +1，回收区即时清空该记录。",
+      "dependsOn": [
+        "task-note-card-view"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-note-card-view",
+      "kind": "acceptance",
+      "requirementIds": [
+        "feature-note-card-view"
+      ],
+      "stage": "delivery",
+      "title": "便签卡片展示、回收区 7 天生命周期与清空验收标准"
+    },
+    {
+      "content": "### 多维灵活标签过滤体系与全局重命名功能（Tag Organization）\n1. **聚合展示与回收区严格隔离**：\n   - 侧边栏实时聚合当前所有有效便签的标签集合并统计词频计数。\n   - **严格排除回收区标签**：处于回收区（`status === 'trashed'`）的便签所包含的标签，绝对不计入侧边栏标签聚合列表与频次中，防止垃圾标签干扰常规整理。\n   - **小写规范化存储与统一展示**：所有标签在录入时均转换为规范小写字符串（如 `#Dexie` 存为 `'dexie'`），聚合列表统一展示规范小写标签，保证大小写不敏感的一致性。\n2. **桌面端与移动/触控端多选交集（AND）过滤**：\n   - 桌面端：支持用户按住 `Ctrl` (Windows/Linux) 或 `Cmd` (macOS) 键连续点选多个标签，系统计算标签交集，主工作区仅展示同时包含所有选中标签的便签。\n   - 移动/触控屏幕：在侧边栏标签面板顶部常驻提供“多选模式”开关按钮；开启后，用户直接通过单点触控即可逐个勾选/取消标签，实时触发交集组合过滤，无需物理键盘按键。\n3. **标签全局原子重命名与回滚机制**：\n   - 提供标签全局管理入口，支持对已有标签进行重命名（如将 `#工作` 改为 `#项目`）。\n   - 在底层单原子读写事务中批量更新所有包含该标签的便签，单次事务递增涉及便签的 revision；若任一写入失败，整体自动回滚，保持数据一致性。",
+      "dependsOn": [
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "feature-tag-organization",
+      "kind": "feature",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "多维灵活标签过滤体系与全局重命名功能"
+    },
+    {
+      "content": "### 标签过滤交互流与全局重命名流程\n```mermaid\nflowchart TD\n    Start([用户浏览侧边栏标签面板]) --> CheckTrash[聚合活跃与归档便签标签\\\\n严格排除 status === 'trashed']\n    CheckTrash --> NormalizeTags[统一规范小写归一化显示与去重]\n    NormalizeTags --> RenderTags[渲染标签胶囊列表与频次计数]\n    \n    RenderTags --> InteractionChoice{交互方式}\n    InteractionChoice -- 桌面端 Ctrl/Cmd 点选 --> MultiFilter[多标签组合筛选]\n    InteractionChoice -- 触控屏开启'多选模式'开关 --> MultiFilter\n    InteractionChoice -- 普通单点标签 --> SingleFilter[单标签过滤便签流]\n    InteractionChoice -- 点击标签管理【重命名】 --> RenameDialog[弹出标签重命名输入框]\n    \n    MultiFilter --> ComputeIntersect[计算多标签交集 AND 过滤结果] --> UpdateFeed[主工作区仅展示同时包含选定小写标签的便签]\n    SingleFilter --> UpdateFeed\n    \n    RenameDialog --> InputNewTag[输入新标签名称并点击确认]\n    InputNewTag --> ValidateNewTag{新名称是否合法?}\n    ValidateNewTag -- 否 --> ShowError[提示标签名称不合法] --> RenameDialog\n    ValidateNewTag -- 是 --> BatchTx[调用 batchUpdateTags\\\\n单原子读写事务批量替换小写标签并递增 revision]\n    \n    BatchTx --> TxResult{事务结果}\n    TxResult -- 成功 --> RefreshAll[标签面板与便签流全局响应式刷新] --> End([完成重命名])\n    TxResult -- 失败 --> RollbackAll[事务自动整体回滚\\\\n弹出错误提示保持原状] --> End\n```",
+      "dependsOn": [
+        "feature-tag-organization"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "flow-tag-organization",
+      "kind": "flow",
+      "requirementIds": [
+        "feature-tag-organization"
+      ],
+      "stage": "product",
+      "title": "标签过滤交互流与全局重命名流程"
+    },
+    {
+      "content": "### 多维标签聚合、交集筛选与全局重命名开发任务\n本任务负责开发 `TagRail` 侧边栏标签面板与全局标签管理逻辑。实现从活跃与已归档便签中动态提取去重标签与频次计数（严格排除回收区便签）；实现标签大小写规范化转换为小写；实现桌面端 `Ctrl/Cmd` 点击多标签交集（AND）过滤；实现触控/移动屏幕常驻“多选模式”开关驱动的交集过滤；实现全局标签重命名模态弹窗与 `IStorageService.batchUpdateTags` 单原子事务批量更新及失败回滚。编写相关单元测试。",
+      "dependsOn": [
+        "feature-tag-organization",
+        "flow-tag-organization",
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-tag-organization",
+      "kind": "task",
+      "requirementIds": [
+        "feature-tag-organization"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "NotesContext 已支持多选标签筛选过滤状态存储。",
+          "IStorageService 已暴露 batchUpdateTags 事务契约。"
+        ],
+        "completionCriteria": [
+          "标签列表严格排除回收区便签，频次统计精确。",
+          "标签统一规范化转换为小写存储与匹配。",
+          "桌面端 Ctrl/Cmd 多选与触控端多选模式开关均能正常执行交集过滤。",
+          "全局重命名在单原子事务中更新所有关联便签，失败完整回滚。"
+        ],
+        "environment": "Node 18+ / React 19 / Vitest + Testing Library 运行环境。",
+        "exclusions": "不实现标签层级树与嵌套目录；不引入外部重型标签状态机。",
+        "failureBehavior": "批量重命名遇并发冲突抛错回滚并提示刷新；非法标签名拦截并提示。",
+        "goal": "开发 TagRail 标签面板，实现小写标签聚合、回收区标签隔离、双端多选交集筛选与单原子事务全局重命名。",
+        "modules": [
+          "src/components/sidebar/TagRail.tsx",
+          "src/utils/tagUtils.ts",
+          "tests/unit/components/TagRail.test.tsx"
+        ],
+        "normalBehavior": "聚合展示有效小写标签列表；点击标签过滤主工作区；多选标签计算交集；重命名更新数据库并刷新。",
+        "scope": "实现 TagRail 标签展示列表；实现小写归一化；实现桌面多选按键监听与触控端“多选模式”状态切换；实现标签交集计算；实现标签重命名弹窗与事务调用。编写组件测试。",
+        "verification": [
+          "Vitest 验证交集过滤算法与回收区排除规则；",
+          "测试批量重命名原子性与回滚机制。"
+        ]
+      },
+      "title": "多维标签聚合、交集筛选与全局重命名开发任务"
+    },
+    {
+      "content": "### 多维标签聚合与筛选验收标准（Given / When / Then）\n\n#### 场景 1：标签排除回收区与小写规范化聚合\n- **Given**：数据库包含便签 1（`status: 'active'`, `tags: ['dexie', '架构']`）与便签 2（`status: 'trashed'`, `tags: ['垃圾', 'dexie']`）；\n- **When**：用户打开侧边栏标签聚合面板；\n- **Then**：\n  1. 标签面板仅展示 `dexie (1)` 与 `架构 (1)`；\n  2. 处于回收区的标签 `垃圾` **绝对不出现在列表中**，`dexie` 计数仅为 1（严格排除回收区便签）；\n  3. 标签全部呈现为规范小写字符串。\n\n#### 场景 2：移动/触控端“多选模式”开关交集（AND）筛选\n- **Given**：用户在无实体键盘的平板/移动端设备上浏览应用，便签流包含三种便签：便签 A（标签 `['react', 'vite']`）、便签 B（标签 `['react']`）、便签 C（标签 `['vite']`）；\n- **When 2.1**：用户点击标签面板顶部的【多选模式】开关按钮，开启多选模式；\n- **When 2.2**：用户先后点击触控勾选标签 `react` 与标签 `vite`；\n- **Then 2.2**：系统执行交集筛选（AND），主工作区便签流中仅展示同时包含这两个标签的便签 A，便签 B 与便签 C 均被精准过滤隐藏。\n\n#### 场景 3：标签全局原子重命名与单事务更新\n- **Given**：存在 3 条便签包含标签 `旧标签`；\n- **When**：用户在标签管理中将 `旧标签` 重命名为 `新标签` 并点击确认；\n- **Then**：系统在单原子读写事务内批量更新 3 条便签的 tags 数组（替换为 `新标签`）并各自自增 revision，未备份计数 +3，更新后标签面板与主工作区流全局响应式刷新。",
+      "dependsOn": [
+        "task-tag-organization"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-tag-organization",
+      "kind": "acceptance",
+      "requirementIds": [
+        "feature-tag-organization"
+      ],
+      "stage": "delivery",
+      "title": "多维标签聚合与筛选验收标准"
+    },
+    {
+      "content": "### 即时全文模糊检索与关键词高亮功能（回收区隔离机制）\n1. **即时响应与 80ms 防抖**：\n   - 顶部常驻搜索输入框，键盘快捷键 `/` 瞬时聚焦，按下 `Escape` 一键清空并重置列表。\n   - 输入检索词触发 80ms 防抖延迟后执行内存模糊检索，防抖周期内多次击键合并执行，兼顾极速响应与主线程防卡顿。\n2. **正则安全转义与安全高亮包裹**：\n   - 对用户输入的搜索关键词执行 `escapeRegExp` 安全转义，杜绝正则表达式注入崩溃。\n   - 匹配到的关键词在便签卡片正文中以安全黄色高亮标签 `<mark class=\"search-highlight\">` 渲染呈现。\n3. **四大系统视图检索作用域严格隔离（状态闭环）**：\n   - 全部灵感视图检索：仅在 `status === 'active'` 活跃便签集合中检索；\n   - 已收藏视图检索：仅在 `isFavorite === true` 的收藏集合中检索；\n   - 已归档视图检索：仅在 `status === 'archived'` 归档便签集合中检索，**反例规则：活跃便签即使包含相同关键词也绝不出现在归档检索结果中**；\n   - 回收区视图检索：仅在 `status === 'trashed'` 暂存便签中检索。\n4. **统一性能目标口径**：\n   - 检索时延观测口径：从实际击键输入动作（keydown）起算，包含 80ms 防抖、内存比对筛选至 DOM 结果高亮呈现可见的完整端到端周期；在灌入 1,000 条混合格式固定种子数据基准下，经 3 次预热后连续 10 次模糊搜索，采用 nearest-rank 方法计算的 95 分位端到端响应延迟（P95）统一标准目标 <= 150ms。数字为待验证目标。",
+      "dependsOn": [
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "feature-search-filter",
+      "kind": "feature",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "即时全文模糊检索与关键词高亮功能"
+    },
+    {
+      "content": "### 即时检索、动态高亮与快捷清除交互流\n```mermaid\nflowchart TD\n    Start([用户按下快捷键 /]) --> FocusSearch[顶部搜索框获得焦点]\n    FocusSearch --> TypeKeyword[输入搜索关键词]\n    \n    TypeKeyword --> ClearCheck{是否按下 Escape?}\n    ClearCheck -- 是 --> ResetAll[清空输入框文本\\\\n重置筛选条件并恢复完整视图] --> End([检索结束])\n    \n    ClearCheck -- 否 --> Debounce[启动 80ms 防抖等待计时]\n    Debounce --> EscapeRegex[调用 escapeRegExp 转义正则控制字符]\n    \n    EscapeRegex --> GetScope{获取当前系统视图作用域}\n    GetScope -- 全部灵感视图 --> FilterActive[仅比对 status === 'active']\n    GetScope -- 已归档视图 --> FilterArchived[仅比对 status === 'archived'\\\\n严格排除 active 便签]\n    GetScope -- 回收区视图 --> FilterTrashed[仅比对 status === 'trashed']\n    GetScope -- 已收藏视图 --> FilterFav[仅比对 isFavorite === true]\n    \n    FilterActive --> MemoryMatch[在内存镜像中执行模糊比对]\n    FilterArchived --> MemoryMatch\n    FilterTrashed --> MemoryMatch\n    FilterFav --> MemoryMatch\n    \n    MemoryMatch --> HighlightDom[匹配字符包裹 mark 标签\\\\n渲染黄色高亮并更新便签流] --> End\n```",
+      "dependsOn": [
+        "feature-search-filter"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "flow-search-filter",
+      "kind": "flow",
+      "requirementIds": [
+        "feature-search-filter"
+      ],
+      "stage": "product",
+      "title": "即时检索、动态高亮与快捷清除交互流"
+    },
+    {
+      "content": "### 全文模糊检索引擎与关键词高亮开发任务\n本任务负责开发 `SearchBar` 搜索栏组件与 `SearchEngine` 检索服务。实现快捷键 `/` 聚焦与 `Escape` 一键清空；实现 80ms 防抖控制；实现 `escapeRegExp` 正则转义与关键词安全黄色高亮包裹；实现四大系统视图严格检索作用域隔离与反例防污染过滤；在 1000 条混合种子数据基准下实现 nearest-rank P95 <= 150ms 检索延迟待验证目标。编写单元测试。",
+      "dependsOn": [
+        "feature-search-filter",
+        "flow-search-filter",
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-search-filter",
+      "kind": "task",
+      "requirementIds": [
+        "feature-search-filter"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "NotesContext 已维护当前视图的本地便签列表快照。",
+          "前端支持 requestAnimationFrame 与防抖计时。"
+        ],
+        "completionCriteria": [
+          "快捷键 / 与 Escape 响应准确。",
+          "80ms 防抖合并连续输入，无高频卡顿。",
+          "正则控制字符转义安全，无 XSS 或正则崩溃。",
+          "四大视图检索作用域严格隔离，归档视图零活跃便签污染。",
+          "端到端延迟测试符合规范要求。"
+        ],
+        "environment": "Node 18+ / React 19 / Vitest + Testing Library 运行环境。",
+        "exclusions": "不引入服务器端 Elasticsearch/Meilisearch；不实现重量级分词倒排引擎。",
+        "failureBehavior": "非法正则转义为普通字符处理；空搜索词自动恢复完整视图。",
+        "goal": "开发 SearchBar 与 SearchEngine，实现 80ms 防抖即时模糊搜索、安全正则转义、四视图隔离与高亮渲染。",
+        "modules": [
+          "src/components/search/SearchBar.tsx",
+          "src/services/search/SearchEngine.ts",
+          "src/utils/regexUtils.ts",
+          "tests/unit/services/SearchEngine.test.tsx"
+        ],
+        "normalBehavior": "输入检索词防抖后在当前作用域比对，匹配内容黄色高亮；按 Esc 恢复完整视图。",
+        "scope": "实现 SearchBar 组件 UI 与快捷键监听；封装 SearchEngine 模糊匹配算法；实现 escapeRegExp 转义；实现四视图作用域筛选与高亮包裹；编写检索单元测试。",
+        "verification": [
+          "Vitest 测试模糊匹配精度、特殊字符转义与四视图隔离；",
+          "性能基准测试验证 P95 <= 150ms 目标。"
+        ]
+      },
+      "title": "全文模糊检索引擎与关键词高亮开发任务"
+    },
+    {
+      "content": "### 即时全文模糊检索验收标准（Given / When / Then）\n\n#### 场景 1：80ms 防抖、关键词黄色高亮与 Escape 一键重置\n- **Given**：用户处于【全部灵感】视图，便签流包含多条技术记录；\n- **When 1.1**：用户按下键盘按键 `/`；\n- **Then 1.1**：页面顶部搜索框立即获得焦点并展示蓝色外发光边框；\n- **When 1.2**：用户连续快速键入字符 `架构*设计`；\n- **Then 1.2**：系统合并按键动作并在最后一次按键后执行 80ms 防抖等待；特殊符号 `*` 被安全转义，匹配到的文本在卡片中被 `<mark class=\"search-highlight\">` 标签包裹并呈现黄色背景高亮；\n- **When 1.3**：用户按下键盘 `Escape` 键；\n- **Then 1.3**：搜索框文本立即被清空，光标失焦，便签流瞬间恢复为全部便签未过滤状态。\n\n#### 场景 2：四大系统视图作用域严格隔离与反例验证\n- **Given**：系统中存在两条便签：活跃便签 A（`status: 'active'`, 正文包含 `SQLite存储`）、归档便签 B（`status: 'archived'`, 正文包含 `SQLite历史备忘`）；\n- **When 2.1**：用户切换至【已归档】视图，在搜索框中键入关键词 `SQLite`；\n- **Then 2.1**：\n  1. 搜索结果列表仅展示归档便签 B；\n  2. **反例断言**：正文同样包含 `SQLite` 的活跃便签 A **绝对不出现在搜索结果中**（视图隔离 100% 成立）；\n- **When 2.2**：用户切换至【全部灵感】视图检索 `SQLite`；\n- **Then 2.2**：仅展示活跃便签 A，归档便签 B 绝对不出现。",
+      "dependsOn": [
+        "task-search-filter"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-search-filter",
+      "kind": "acceptance",
+      "requirementIds": [
+        "feature-search-filter"
+      ],
+      "stage": "delivery",
+      "title": "即时全文模糊检索验收标准"
+    },
+    {
+      "content": "### 便签详情模态、Markdown 排版与并发版本控制功能（Detail & Edit Modal）\n1. **居中模态与 Markdown 即时渲染**：\n   - 点击主工作区便签卡片展开居中模态弹窗，提供阅读预览与编辑双模式。\n   - 预览模式：支持轻量 Markdown 格式化（标题、加粗、斜体、列表、GFM 待办清单复选框），Prism.js 代码块语法高亮并提供一键复制按钮。\n   - GFM 待办复选框交互：在只读预览状态下点击待办复选框，系统在单原子事务中精准切换该项状态并自增 revision，避免触发全量编辑重排。\n2. **统一保存快捷键与显式放弃确认拦截**：\n   - 详情模态内全字段保存快捷键统一为 `Ctrl/Cmd + Enter`，消除 `Ctrl/Cmd + S` 冲突。\n   - 严禁任何关闭弹窗或点击遮罩操作一律静默自动保存。\n   - 弹窗底部常驻提供明确的【保存并退出】（统一快捷键 `Ctrl/Cmd + Enter` 或点击按钮）、【放弃修改】与【继续编辑】。\n   - 用户尝试关闭弹窗、按 Escape 或点击遮罩时：若存在未保存修改，系统强制弹出模态二次确认拦截框：“有尚未保存的修改，确定放弃吗？”；用户确认放弃后恢复原始数据，绝不产生误写。\n3. **回收区便签强制只读保护**：\n   - 从回收区打开便签时，弹窗强制进入只读预览模式，禁用正文编辑框与待办复选框交互。\n   - 顶部展示黄色警示条：“此便签处于回收区，处于只读保护状态”，右侧提供【还原】与【彻底删除】快捷入口。\n4. **并发版本冲突检测与代际失效防护**：\n   - 保存时传递 `expectedRevision` 与 `sessionGeneration`。若检测到 revision 不一致，弹窗锁定并展示黄色冲突横幅，提供三项明确消解分支：\n     1) 【强制覆盖】：以界面当前看到的最新 revision 再次 CAS 更新；\n     2) 【放弃修改加载最新】：丢弃本地修改并加载数据库最新内容；\n     3) 【另存为新便签】：生成新便签保留当前草稿副本。\n   - 若检测到 `sessionGeneration !== currentLibraryGeneration`（外部已覆盖导入），阻断保存并提供【复制未保存内容】与【导出草稿文件】保护。",
+      "dependsOn": [
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "feature-note-detail-edit",
+      "kind": "feature",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "便签详情模态、Markdown排版与并发版本控制功能"
+    },
+    {
+      "content": "### 便签详情查看、编辑与并发消解交互流\n```mermaid\nflowchart TD\n    Start([用户点击便签卡片]) --> CheckStatus{是否处于回收区?}\n    \n    CheckStatus -- 是 (trashed) --> ReadOnlyModal[打开强制只读详情弹窗\\\\n禁用编辑框与待办复选框]\n    ReadOnlyModal --> ShowTrashBanner[顶部常驻黄色警示条\\\\n提供【还原】与【彻底删除】入口]\n    \n    CheckStatus -- 否 (active/archived) --> OpenNormalModal[打开正常详情模态\\\\n记录打开时代际与 baseRevision]\n    OpenNormalModal --> UserAction{用户在弹窗内操作}\n    \n    UserAction -- 勾选 GFM 待办清单项 --> ToggleTodoTx[单读写事务精准切换勾选状态\\\\nrevision 自增 1]\n    UserAction -- 编辑正文后按 Ctrl/Cmd + Enter --> SubmitSave[提交保存修改]\n    UserAction -- 尝试按 Esc 或点击遮罩退出 --> CheckDirty{是否存在未保存修改?}\n    \n    CheckDirty -- 否 (未修改) --> CloseDirectly[平滑关闭弹窗]\n    CheckDirty -- 是 (已修改) --> ShowConfirmModal[弹出模态防误关确认对话框]\n    ShowConfirmModal -- 点击【放弃修改】 --> DiscardChanges[丢弃草稿恢复原状\\\\n关闭弹窗]\n    ShowConfirmModal -- 点击【继续编辑】 --> KeepEditing[留在编辑弹窗中]\n    ShowConfirmModal -- 点击【保存并退出】 --> SubmitSave\n    \n    SubmitSave --> CheckTx[调用 saveNote 提交 expectedRevision 与代际]\n    CheckTx --> TxResult{CAS 校验结果}\n    \n    TxResult -- 成功 --> SaveSuccess[更新 revision 与 updatedAt\\\\n关闭弹窗完成保存]\n    TxResult -- 库代际失效 --> BlockGen[锁定弹窗展示库已覆盖重置横幅\\\\n提供复制与导出草稿文件]\n    TxResult -- 版本并发冲突 --> ShowConflictModal[弹窗展示黄色冲突警示栏\\\\n呈现当前数据库最新内容对比]\n    \n    ShowConflictModal -- 选择【强制覆盖】 --> ForceOverwrite[以最新 revision 再次 CAS 保存]\n    ShowConflictModal -- 选择【加载最新】 --> LoadLatest[丢弃本地修改载入数据库最新版本]\n    ShowConflictModal -- 选择【另存为新便签】 --> SaveAsNew[调用 createNote 生成新便签保留副本]\n```",
+      "dependsOn": [
+        "feature-note-detail-edit"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "flow-note-detail-edit",
+      "kind": "flow",
+      "requirementIds": [
+        "feature-note-detail-edit"
+      ],
+      "stage": "product",
+      "title": "便签详情查看、编辑与并发消解交互流"
+    },
+    {
+      "content": "### 详情模态弹窗与 Markdown 编辑器开发任务\n本任务负责开发 `NoteDetailModal` 组件与 Markdown 编辑渲染逻辑。实现居中模态弹窗；集成 Prism.js 代码语法高亮与一键复制代码块；实现 Markdown 预览与 GFM 待办清单点击切换（单原子事务 CAS 切换）；统一详情保存快捷键为 `Ctrl/Cmd + Enter`（消除 `Ctrl/Cmd + S` 冲突）；严禁点击遮罩或关闭操作静默保存，实现模态二次确认防误关拦截（保存并退出/放弃修改/继续编辑）；实现回收区便签强制只读保护；实现 `saveNote` 并发冲突（ConcurrentEditConflictError）三项消解与库代际失效拦截。编写单元测试。",
+      "dependsOn": [
+        "feature-note-detail-edit",
+        "flow-note-detail-edit",
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-note-detail-edit",
+      "kind": "task",
+      "requirementIds": [
+        "feature-note-detail-edit"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "IStorageService 读写事务与版本比较方法已就绪。",
+          "Prism.js 库已安装配置。"
+        ],
+        "completionCriteria": [
+          "Markdown 渲染格式准确，代码块支持一键复制。",
+          "详情保存全字段统一 Ctrl/Cmd+Enter，消除 Ctrl/Cmd+S。",
+          "未保存修改退出强制弹出模态确认拦截，严禁静默自动保存。",
+          "回收区便签打开强制只读保护。",
+          "并发版本冲突与代际失效消解流程完整有效。"
+        ],
+        "environment": "Node 18+ / React 19 / Vitest + Testing Library 运行环境。",
+        "exclusions": "不引入 Draft.js 或大型富文本排版框架；不直接操作底层 DOM。",
+        "failureBehavior": "CAS 冲突锁定弹窗并展示消解面板；代际失效禁止保存并提供草稿导出。",
+        "goal": "开发 NoteDetailModal 组件，实现 Markdown 渲染、统一 Ctrl/Cmd+Enter 保存、防误关二次确认、回收区只读保护与 CAS 并发冲突消解。",
+        "modules": [
+          "src/components/detail/NoteDetailModal.tsx",
+          "src/components/detail/MarkdownRenderer.tsx",
+          "tests/unit/components/NoteDetailModal.test.tsx"
+        ],
+        "normalBehavior": "点击卡片展开模态；支持 Markdown 预览与编辑；按 Ctrl/Cmd+Enter 保存；未修改直接退出。",
+        "scope": "实现 NoteDetailModal 弹窗结构；集成 Markdown 解析与代码高亮；实现只读与编辑切换；实现保存快捷键与确认拦截弹窗；实现回收区只读状态；实现冲突消解三分支操作。编写组件测试。",
+        "verification": [
+          "运行测试套件验证 Markdown 解析、待办复选框切换、退出拦截与冲突处理；",
+          "验证代码一键复制功能。"
+        ]
+      },
+      "title": "详情模态弹窗与 Markdown 编辑器开发任务"
+    },
+    {
+      "content": "### 便签详情模态与编辑验收标准（Given / When / Then）\n\n#### 场景 1：未保存修改防误关模态二次确认（严禁静默自动保存）\n- **Given**：用户打开了一条便签（`id: \"note-1\"`, `content: \"原始技术方案\"`）的详情编辑弹窗；\n- **When 1.1**：用户修改正文为 `修改后的技术方案草稿`，未按快捷键保存，直接点击弹窗外部遮罩层或按下 `Escape` 键；\n- **Then 1.1**：\n  1. 系统**绝对不自动保存**，弹窗**绝对不直接关闭**；\n  2. 屏幕中央强制弹出模态防误关确认对话框：“有尚未保存的修改，确定放弃吗？”；\n  3. 对话框提供三个明确操作按钮：【保存并退出】、【放弃修改】与【继续编辑】；\n- **When 1.2**：用户点击【放弃修改】；\n- **Then 1.2**：系统丢弃本次编辑的草稿内容，弹窗关闭，数据库中该便签内容与 revision 保持原始状态不变，**绝对零误写**。\n\n#### 场景 2：回收区便签打开强制只读保护（禁用编辑与待办操作）\n- **Given**：便签处于回收区（`status: 'trashed'`），正文包含 Markdown 待办清单 `[ ] 待完成事项`；\n- **When**：用户在回收区视图中点击该卡片打开详情弹窗；\n- **Then**：\n  1. 弹窗强制呈现只读预览模式，正文编辑框禁用，底部不展示【保存并退出】按钮；\n  2. 正文中的 GFM 待办复选框处于 `disabled` 禁用状态，点击无法切换；\n  3. 模态顶部常驻展示黄色告警横幅：“此便签处于回收区，处于只读保护状态”，横幅右侧提供【还原】与【彻底删除】快捷操作按钮。\n\n#### 场景 3：双标签页并发编辑版本冲突消解（强制覆盖、加载最新与另存新便签）\n- **Given**：用户在两个浏览器标签页（标签页 1 与 标签页 2）中同时打开了同一条便签（`id: \"note-1\"`, `revision: 2`）；\n- **When 3.1**：标签页 1 修改后按 `Ctrl/Cmd + Enter` 保存成功，数据库中该便签 `revision` 变为 3；\n- **When 3.2**：标签页 2 随后修改并按 `Ctrl/Cmd + Enter` 尝试保存（携带期望版本 `expectedRevision: 2`）；\n- **Then 3.2**：存储层抛出 `ConcurrentEditConflictError`，标签页 2 详情弹窗锁定，顶部浮出黄色冲突横幅：“便签已被外部修改，存在版本冲突”；\n- **When 3.3**：用户在冲突横幅中点击【强制覆盖】；\n- **Then 3.3**：系统以当前界面最新获取到的 `revision = 3` 再次执行 CAS 更新，更新成功后便签 `revision` 变为 4，弹窗安全退出。",
+      "dependsOn": [
+        "task-note-detail-edit"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-note-detail-edit",
+      "kind": "acceptance",
+      "requirementIds": [
+        "feature-note-detail-edit"
+      ],
+      "stage": "delivery",
+      "title": "便签详情模态与编辑验收标准"
+    },
+    {
+      "content": "### 数据资产管理、导入导出与会话草稿隔离保护功能（Data Portability）\n1. **统一标准 JSON 导出与 Markdown 归档导出**：\n   - 导出结构严格遵循 `schemaVersion: 1` 标准的 `BackupPayload` 格式，完整封装 `notes`（含 active, archived, trashed 全生命周期实体）、`meta`（以 `backupTracker` 为单一可信源的备份追踪元数据与有效标签小写快照，局部消除 `appMeta` 数组重复表示）。\n   - Markdown 归档导出：将所有便签按 YAML FrontMatter 元数据（ID、创建时间、标签、状态）结合正文生成纯文本归档文件并打包为 Blob 下载。\n   - **独立导出当前未保存草稿**：在输入卡片或编辑弹窗异常暂存时，提供独立的【导出当前未保存草稿】动作，生成包含 `noteId`、基准 `revision`、库代际与完整正文的独立恢复 JSON 文件，区分正式备份与应急草稿文件。\n2. **全维度强类型校验器（Strong Backup Validator）**：\n   - 外部导入时严格校验：\n     1) JSON 顶层结构有效性与 `schemaVersion === 1`、`app === 'SparkNotes'`；\n     2) `notes` 记录数组完整性，检查主键 UUID 格式与唯一性；\n     3) 字段类型与必填约束校验（`content`, `status`, `createdAt`, `updatedAt`, `revision`）；\n     4) `status` 枚举合法性（`active`/`archived`/`trashed`），若为 trashed 必须具备有效的 `trashedAt` 毫秒时间戳与合法的 `previousStatus`；\n     5) 标签数组小写规范化验证；\n     6) 元数据 `meta.backupTracker` 格式有效性；若存在 `appMeta`，严格校验允许的 key 白名单集合（仅限 `backupTracker`、`libraryGeneration`、`appSettings`），杜绝任意未知 key 或重复 key；\n     7) 校验失败精确报错至具体损坏记录 ID 与字段原因，数据库绝对零改动。\n3. **完整可校验的导入预览契约与并发安全导入**：\n   - 校验通过后生成包含文件字节签名（SHA-256）与本地数据库状态依据（`libraryGeneration`、`notesCount`、`sumRevision`、`maxRevision`、`lastUpdatedAt`）的 `ImportPreview` 凭证对象，展示便签总数与状态分布。\n   - 用户明确选择导入模式并执行：\n     - **全量覆盖导入（Overwrite）**：在单读写事务 `[db.notes, db.meta]` 内首先执行同事务快照依据比对，若本地代际或数据库写版本已变动（他页写入），拒绝执行并要求重新预览；比对一致后清空旧表，写入备份便签，**本地单调递增库代际（`currentGeneration = localGen + 1`，绝不直接照搬备份旧代际）**，并将 `backupTracker.lastBackupAt` 设为备份文件的 `exportedAt`、重置 `unbackedChangesCount = 0`，使所有旧编辑会话失效。若中途崩溃自动整体回滚，保持原库完好。若备份文件导出距今已超 7 天，导入后立即触发超期备份提醒。\n     - **合并增量导入（Merge）**：采用“保留本地同 ID 记录，仅新增不冲突 ID 记录”（Keep Local on ID Conflict）策略，在单事务中执行快照比对并插入新记录，保留本地库代际与本地 `lastBackupAt`，未备份计数按新增条数累加（`unbackedChangesCount += addedCount`），向用户展示清晰统计。\n     - 用户点击取消则不执行任何写入。\n4. **会话草稿双重隔离与温和防丢提醒状态机**：\n   - 异常未保存草稿按 `noteId` 与 `libraryGeneration` 双重隔离，以结构化 `SessionDraft` 对象序列化暂存于 `sessionStorage`；打开匹配编辑器时显式提示恢复或丢弃，恢复仅载入编辑器内存受 CAS 控制，不静默写入数据库。\n   - 温和防丢提醒：当累计未备份变更次数超过 20 次，或距上次备份时间超过 7 天时，侧边栏底部展示琥珀色提醒点，提示用户导出备份。",
+      "dependsOn": [
+        "block-scope-core-boundaries",
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "feature-data-portability",
+      "kind": "feature",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "product",
+      "title": "数据资产管理、导入导出与会话草稿隔离保护功能"
+    },
+    {
+      "content": "### 数据备份、导入校验与会话草稿隔离流\n```mermaid\nflowchart TD\n    Start([用户进入数据中心]) --> ActionChoice{选择数据动作}\n    \n    ActionChoice -- 导出全量备份 --> GeneratePayload[构建 BackupPayload\\\\nschemaVersion:1, notes, meta] --> DownloadJSON[触发浏览器下载 .json 备份文件] --> UpdateTracker[更新 backupTracker.lastBackupAt\\\\n重置 unbackedChangesCount = 0]\n    ActionChoice -- 导出 Markdown 归档 --> GenerateZip[聚合 FrontMatter + 正文\\\\n生成 Blob 纯文本归档] --> DownloadMD[下载 Markdown 归档文件]\n    \n    ActionChoice -- 导入外部备份文件 --> UploadFile[用户选择本地 .json 文件]\n    UploadFile --> StrongValidate[执行全维度强类型校验器\\\\n校验 schemaVersion, UUID唯一性, status枚举, meta白名单]\n    \n    StrongValidate --> ValidateResult{校验是否通过?}\n    ValidateResult -- 失败 --> ShowValidationError[指出具体损坏记录 ID 与字段\\\\n终止导入流程，数据库零改动] --> End([流程结束])\n    ValidateResult -- 通过 --> GenPreview[生成 ImportPreview 凭证\\\\n记录文件 SHA-256 签名与当前库快照依据 targetState]\n    \n    GenPreview --> ShowPreviewModal[展示导入预览面板\\\\n呈现便签总数与状态分布]\n    ShowPreviewModal --> ImportChoice{用户选择导入模式}\n    \n    ImportChoice -- 点击取消 --> AbortImport[关闭弹窗，零改动退出]\n    \n    ImportChoice -- 选择【全量覆盖导入】 --> OverwriteTx[单原子读写事务 [db.notes, db.meta]]\n    OverwriteTx --> CheckSnapshot1{当前库状态是否仍匹配 targetState?}\n    CheckSnapshot1 -- 否 (他页已写入/代际变动) --> RejectOverwrite[抛出 ImportPreviewExpiredError\\\\n阻断执行并要求重新预览，零写入]\n    CheckSnapshot1 -- 是 --> ClearAndInsert[清空 notes 表并批量插入新便签\\\\n本地代际自增 currentGen + 1\\\\n重置 tracker 基准] --> OverwriteDone([全量覆盖完成])\n    \n    ImportChoice -- 选择【合并增量导入】 --> MergeTx[单原子读写事务 [db.notes, db.meta]]\n    MergeTx --> CheckSnapshot2{当前库状态是否仍匹配 targetState?}\n    CheckSnapshot2 -- 否 --> RejectMerge[抛出 ImportPreviewExpiredError\\\\n阻断执行并要求重新预览，零写入]\n    CheckSnapshot2 -- 是 --> DeduplicateInsert[保留本地同 ID 记录\\\\n仅写入不冲突新便签\\\\nunbackedChangesCount += 新增数] --> MergeDone([合并增量完成])\n```",
+      "dependsOn": [
+        "feature-data-portability"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-363d6a97-f368-4669-a5ad-d13965ca435d",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "flow-data-portability",
+      "kind": "flow",
+      "requirementIds": [
+        "feature-data-portability"
+      ],
+      "stage": "product",
+      "title": "数据备份、导入校验与会话草稿隔离流"
+    },
+    {
+      "content": "### 数据便携性与备份恢复模块开发任务\n本任务负责开发 `DataPortabilityModal` 数据中心组件与 `BackupService` 数据便携性服务。实现标准 `schemaVersion: 1` JSON 备份导出（消除元数据重复表示）、Markdown 归档导出及独立的【导出当前未保存草稿】动作；实现全维度强类型校验器（检验模式版本、UUID唯一性、字段类型、枚举与时间戳、元数据白名单与重复检查）；实现可校验的 `previewImport` 契约（文件字节签名与目标库状态快照依据）；实现全量覆盖导入单原子事务并发比对、失败整体回滚与本地库代际单调自增（`currentGeneration += 1`，避免陈旧会话错误覆写）；实现合并增量导入“保留本地同 ID、仅新增不冲突 ID”策略与计数维护；实现会话草稿双重隔离与温和防丢提醒状态机。严格区分正式备份与未保存草稿文件。",
+      "dependsOn": [
+        "feature-data-portability",
+        "flow-data-portability",
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-data-portability",
+      "kind": "task",
+      "requirementIds": [
+        "feature-data-portability"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "StorageService 事务与 SessionDraftService 已挂载。",
+          "用户浏览器支持 File API 与 Blob 下载。"
+        ],
+        "completionCriteria": [
+          "导出的 JSON 备份完全符合 schemaVersion: 1 契约，消除元数据重复表示，支持自导出自导入。",
+          "导入强校验器在遇到损坏字段或未知元数据 key 时准确拦截并定位具体记录。",
+          "previewImport 生成包含文件签名与库快照依据的凭证对象。",
+          "覆盖导入与合并导入在单原子事务中严格比对快照依据，若他页写入则拒绝执行并要求重新预览。",
+          "覆盖导入失败完全回滚，成功后本地库代际递增并刷新防丢追踪。",
+          "合并导入正确保留本地同 ID 记录，无混乱覆盖。",
+          "未保存草稿支持独立文件导出与按代际隔离暂存。",
+          "防丢提醒在超 20 次变更或超 7 天未备份时准确触发。"
+        ],
+        "environment": "Node 18+ / React 19 / Vitest + Testing Library 运行环境。",
+        "exclusions": "不包含便签全文检索引擎（由 task-search-filter 负责）；不包含详情模态（由 task-note-detail-edit 处理）。",
+        "failureBehavior": "导入格式不合法拦截并不写入；快照依据不匹配抛出 ImportPreviewExpiredError 阻断写入并提示重新预览；事务中途异常整体回滚原库；草稿读写异常提示手动复制。",
+        "goal": "开发 DataPortabilityModal 组件与 BackupService 服务，实现标准备份往返、强校验器、导入预览快照校验、单原子导入回滚、代际失效防护与草稿隔离机制。",
+        "modules": [
+          "src/components/portability/DataPortabilityModal.tsx",
+          "src/services/backup/BackupService.ts",
+          "src/services/backup/backupValidator.ts",
+          "tests/unit/services/BackupService.test.tsx"
+        ],
+        "normalBehavior": "导出 JSON/Markdown 备份；校验外部导入文件；生成预览快照凭证；同事务比对并执行覆盖或合并导入；更新防丢提醒状态。",
+        "scope": "实现 DataPortabilityModal UI 组件；封装 BackupService；实现 validateBackupFile 强校验器；实现 previewImport 凭证生成；实现 executeImportOverwrite 与 executeImportMerge 事务快照比对与原子写入；实现草稿独立导出；实现防丢提醒状态机。编写全面测试。",
+        "verification": [
+          "运行 Vitest 验证导出结构、强校验器拦截规则、导入并发冲突阻断及代际更新；",
+          "测试自导出文件的自导入往返一致性。"
+        ]
+      },
+      "title": "数据便携性与备份恢复模块开发任务"
+    },
+    {
+      "content": "### 数据资产与备份恢复验收标准（Given / When / Then）\n\n#### 场景 1：标准 JSON 自导出自导入往返一致性验证（单一元数据源与全字段保留）\n- **Given**：本地数据库包含 20 条便签（包含 active、archived 及回收区 trashed 各类状态便签）；\n- **When 1.1**：用户在数据中心点击【导出全量备份 (JSON)】；\n- **Then 1.1**：系统生成标准 `.json` 文件并触发下载，文件符合 `schemaVersion: 1`, `app: \"SparkNotes\"`, `notesCount: 20`，`meta` 包含单一规范的 `backupTracker` 与标签快照，`notes` 数组完整包含全部 20 条记录及所有字段（包含 `previousStatus`, `trashedAt`, `revision`）；\n- **When 1.2**：用户将该自导出的备份文件重新上传至导入校验器；\n- **Then 1.2**：全维度强校验器执行校验，检查项（schemaCheck, idUniquenessCheck, enumCheck, timestampCheck, metaCheck）全部通过，`valid === true`，预览面板正常呈现 20 条记录分布，自导出文件 100% 可自导入。\n\n#### 场景 2：格式损坏外部文件强校验拦截（零写入与精确错误定位）\n- **Given**：用户尝试导入一份损坏的备份文件，其中一条记录的 `status` 值为非法的 `\"deleted\"`，或者回收区记录缺少必填的 `trashedAt` 毫秒时间戳，或者元数据包含非法 key；\n- **When**：用户选择该文件并触发导入校验；\n- **Then**：\n  1. 强校验器立即拦截并返回 `valid === false`；\n  2. 错误详情明确指出失败记录 ID 及错误字段原因（如 `Record note-xyz: invalid status 'deleted'` 或 `Meta: disallowed key 'unknown'`）；\n  3. 系统终止导入流程，底层数据库执行**绝对零写入**，原数据完好无损。\n\n#### 场景 3：合并增量导入“保留本地同 ID 记录”（Keep Local on ID Conflict）策略与计数更新\n- **Given**：本地数据库包含便签 A（`id: \"note-1\"`, `content: \"本地最新内容\"`, `revision: 5`）；外部导入文件中同样包含 `id: \"note-1\"` 的便签（`content: \"备份旧内容\"`, `revision: 2`）以及一条新便签 B（`id: \"note-2\"`）；本地未备份计数为 3；\n- **When**：用户生成预览凭证后，确认选择【合并增量导入】模式执行；\n- **Then**：\n  1. 系统在单读写事务中比对快照通过，检测到 `id: \"note-1\"` 发生主键冲突，依据规则保留本地记录，**绝不覆写本地最新便签 A**；\n  2. 新便签 B 顺利写入本地数据库；\n  3. 本地库代际保持不变，未备份计数准确累加为 4（`3 + 1`）；\n  4. 导入完成弹窗明确提示用户：“成功新增 1 条便签，保留并跳过 1 条本地同 ID 冲突记录”。\n\n#### 场景 4：全量覆盖导入单原子事务回滚、代际自增与防丢追踪基准更新\n- **Given**：本地包含 10 条便签，`libraryGeneration = 1`；页面处于打开状态；\n- **When 4.1（覆盖导入成功）**：用户确认执行【全量覆盖导入】，导入一份包含 30 条便签且导出时间为 8 天前的文件；\n- **Then 4.1**：\n  1. 在单原子读写事务内旧数据被清空，30 条新记录写入；\n  2. 本地库代际单调递增更新为 `libraryGeneration = 2`；此前打开的任何绑定 `sessionGeneration = 1` 的旧编辑会话被立刻拦截并拒绝保存；\n  3. 备份追踪元数据更新：`lastBackupAt` 记录为备份文件的导出时间（8天前），`unbackedChangesCount` 设为 0；因距上次备份已满 8 天，系统在导入完成后立即触发防丢提醒小黄点；\n- **When 4.2（覆盖导入中途异常整体回滚）**：导入过程中因配额超限抛出异常；\n- **Then 4.2**：单原子事务整体回滚，本地原有 10 条便签完好无损，`libraryGeneration` 保持 1 不变，不留半空半满脏库。\n\n#### 场景 5：导入预览并发变动安全拦截（校验依据不匹配零写入）\n- **Given**：用户打开数据中心上传备份文件，系统生成 `ImportPreview`（记录此时 `notesCount = 10, sumRevision = 25`）；\n- **When**：在用户查看预览尚未点击执行期间，另一个浏览器标签页新增了一条便签，导致数据库状态变为 `notesCount = 11, sumRevision = 26`；随后当前标签页用户点击确认执行覆盖导入；\n- **Then**：\n  1. 执行事务同事务比对检测到 `targetState.notesCount (10) !== currentCount (11)`；\n  2. 事务立即中止回滚，抛出 `ImportPreviewExpiredError`；\n  3. 界面弹出警示横幅：“检测到本地数据库状态在预览后已发生变动，请重新预览后再操作”；\n  4. 底层数据库**绝对零修改**，原有数据完好无损。\n\n#### 场景 6：未保存草稿独立导出与 sessionStorage 双重隔离恢复\n- **Given**：用户在编辑便签时遭遇异常，草稿暂存于 `sessionStorage`；\n- **When**：用户点击错误横幅中的【导出当前未保存草稿】；\n- **Then**：系统生成独立的 `sparknotes_draft_${noteId}.json` 文件下载，包含当前未保存的完整原文与必要元数据；当用户重新打开该便签编辑器时，系统检测到会话草稿并弹出提示：“检测到未保存草稿，是否恢复？”，用户点击恢复后草稿载入编辑器内存受 CAS 控制，绝不静默写入底层数据库。",
+      "dependsOn": [
+        "task-data-portability"
+      ],
+      "evidenceIds": [
+        "evidence-user-inp-01",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-data-portability",
+      "kind": "acceptance",
+      "requirementIds": [
+        "feature-data-portability"
+      ],
+      "stage": "delivery",
+      "title": "数据资产与备份恢复验收标准"
+    },
+    {
+      "content": "### 核心技术栈、存储选型与并发运行环境基准\n1. **纯前端 Web 技术架构与核心选型**：\n   - 视图表现层：React 19 + TypeScript 5.x + Tailwind CSS。采用响应式组件化设计，实现极速渲染与轻量加载。\n   - 构建工具链：Vite 5.x。配置 ES2022+ 现代化编译目标与代码分包。\n   - 客户端持久化存储引擎：Dexie.js（IndexedDB 官方主流成熟封装库）。利用其强类型 Schema 与事务机制提供离线存储底座。\n2. **依据 W3C 规范的索引约束与排序策略**：\n   - 依据 W3C IndexedDB 规范（evidence-9ebc4dc8-ab21-4423-9e31-816e610bb43d），Boolean 并非合法键类型。\n   - 系统坚决不在 `isPinned` 与 `isFavorite` 布尔字段上声明直接索引，禁止 `where('isPinned').equals(true)` 语法。\n   - 索引声明仅包含合法键类型：`id, updatedAt, createdAt, status, trashedAt, *tags`。\n   - 置顶与收藏逻辑采用内存排序与过滤：活跃便签通过 `where('status').equals('active')` 获取后在内存中按 `isPinned` 降序重排；收藏便签通过内存 `.filter(n => n.isFavorite)` 提取。\n3. **单读写事务 CAS 乐观锁并发控制**：\n   - 为防御多标签页或多实例并发写覆盖，实体更新方法（`saveNote`, `trashNote`, `restoreNote`, `batchUpdateTags` 等）统一在同一个只读写事务 `[db.notes, db.meta]` 内执行 get-compare-put CAS 流程：\n     1) 获取当前记录与库代际；\n     2) 校验 `cur.revision === expectedRevision` 且 `generation === sessionGeneration`；\n     3) 若版本不匹配，立即抛出领域异常 `ConcurrentEditConflictError`，事务自动回滚拒绝写入；\n     4) 校验通过自增更新 `revision += 1` 并更新未备份变更计数。\n4. **单调递增库代际（Library Generation）隔离机制**：\n   - 全局维护库代际编号 `libraryGeneration`（单调递增整数，初始为 1），持久化保存在 `meta` 表中，结构统一为 `LibraryGenerationMeta { currentGeneration: number, lastResetAt: number }`。\n   - 当用户在外部触发全量覆盖导入或清空重建时，本地库代际单调递增更新（`currentGeneration += 1`，而非直接照搬备份文件中的旧代际）。\n   - 所有活跃的编辑会话在打开时绑定当前代际；保存时校验代际，若代际失效则立即拦截并拒绝保存，彻底杜绝全量导入后陈旧会话错误覆写新库。\n   - 单条修订号（revision）：单条便签的并发版本标识。创建时初始化为 1，每次内容编辑、打标、状态变更或回收还原均在单读写事务内执行 CAS 校验并自增 1。\n5. **单页应用运行环境与受信任安全上下文边界**：\n   - 现代浏览器基于 ESM 模块规范与 Web 安全标准，应用严格运行于 HTTPS 或 `http://localhost` / `http://127.0.0.1` 受信任的安全上下文中（本地静态预览 `npm run preview` / `npx serve`，或静态托管平台 GitHub Pages / Cloudflare Pages / Vercel）。普通非本地网络 HTTP 协议不属于受信任安全上下文，禁止宣称其完全安全。\n   - 明确不支持脱离 Web 服务的 `file://` 协议免服务运行。\n   - 离线边界：已打开且取得静态资源的页面在断网状态下通过本地 IndexedDB 进行 100% 离线 CRUD 操作；完全断网后脱机冷重启依赖本地静态 Web 服务器；首版明确不提供未验证的 Service Worker 脱机冷重启绝对保证。\n6. **宿主持久化保护与多浏览器支持**：\n   - 应用启动时调用 `navigator.storage.persisted()` 与 `navigator.storage.persist()` 向浏览器申请持久化存储授权，防止系统在磁盘压力下触发 LRU 自动清理。\n   - 针对 Safari 17+ 明确 WebKit 跨站跟踪防护（ITP）7天无交互主动清除脚本存储策略，配合温和防丢提醒提示备份。\n   - 隐私模式尽力探测：提供 `detectPrivateMode()` 接口，基于配额与存储特性进行启发式参考探测，并在诊断信息中诚实声明局限性与 `unverified` 状态，不伪装成 100% 可靠识别。",
+      "dependsOn": [
+        "page-main-workspace"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-mdn-storage-persist-api",
+        "evidence-mdn-storage-estimate-01",
+        "evidence-vite-static-deploy",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "tech-core-architecture",
+      "kind": "technology",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "核心技术栈、存储选型与并发运行环境基准"
+    },
+    {
+      "content": "### 模块化系统分解与依赖架构规范\n系统遵循现代前端单向数据流与分层清晰的关注点分离原则，划分为六大核心架构分层：\n\n1. **持久化与存储驱动层 (`src/services/storage/`)**：\n   - `SparkNotesDB`：继承 Dexie，声明 `notes`（复合索引：`id, updatedAt, createdAt, status, trashedAt, *tags`）与 `meta`（主键：`key`）两张表。\n   - `StorageService`：实现 `IStorageService` 接口。封装全部 IndexedDB 读写操作，实现强类型 CAS 并发更新（`saveNote` 强制必填 `expectedRevision` 与 `sessionGeneration`，在同读写事务 `[db.notes, db.meta]` 内执行 get-compare-put）、独立新建动作 `createNote`（生成全新 UUID 与 revision=1，杜绝 upsert 隐式复活）、回收区 7 天到期判定（`listExpiredTrashedNotes` 使用 `>= 604,800,000 ms` 谓词）与时钟回拨防御、单原子事务批量清空与覆盖导入回滚机制、以及持久化申请、配额感知与启发式隐私模式尽力探测。\n2. **会话草稿隔离服务层 (`src/services/session/`)**：\n   - `SessionDraftService`：实现 `ISessionDraftService`。基于当前标签页 `sessionStorage`，以 `spark_draft_${libraryGeneration}_${noteId}` 为键名，使用结构化 `SessionDraft` 对象序列化暂存。确保在存储配额满载或写入异常时输入框文字保持完整保留，并在恢复时仅载入编辑器内存受 CAS 检验，绝不静默写入数据库；提供独立的手动草稿导出能力。\n3. **备份与数据便携性服务层 (`src/services/backup/`)**：\n   - `BackupService`：实现 `IBackupService`。负责生成符合 `schemaVersion: 1` 协议的全量 JSON 备份与 Markdown 归档文件；提供独立的【导出当前未保存草稿】动作；实现全维度强类型导入校验器（校验 JSON 结构、字段类型、UUID唯一性、枚举合法性与时间戳有效性、元数据白名单与排重）；实现包含文件字节签名与库状态快照依据的 `previewImport` 契约；实现覆盖导入与合并增量导入事务快照校验执行；管理未备份变更计数与防丢提醒状态机。\n4. **即时检索引擎层 (`src/services/search/`)**：\n   - `SearchEngine`：实现 `ISearchService`。封装 80ms 防抖即时全文检索、`escapeRegExp` 正则控制字符安全转义、四大系统视图作用域严格状态隔离、以及匹配关键词 `<mark className=\"search-highlight\">` 安全高亮包裹。\n5. **状态管理与领域上下文层 (`src/context/`)**：\n   - `NotesContext`：封装便签集合状态、当前视图状态、标签交集过滤状态、当前库代际 `libraryGeneration`、搜索关键词与防抖逻辑。通过 Dexie `useLiveQuery` 监听底层数据库变更，向 UI 提供响应式状态与原子操作方法。\n6. **用户界面表现层 (`src/components/`)**：\n   - `capture/`：`QuickCaptureCard` 快速录入卡片（N 键平滑滚动聚焦防输入冲突、Ctrl/Cmd+Enter 提交、#标签 即时解析小写提取、配额超限 SessionDraft 对象暂存）。\n   - `feed/`：`NoteFeed` 便签流、`NoteCard` 卡片项、`RecycleBinView` 回收区管理面板（到期横幅、倒计时徽标、二次确认清空）。\n   - `sidebar/`：`AppSidebar` 侧边栏、`TagRail` 标签聚合面板（桌面 Ctrl/Cmd 点选与移动端常驻多选模式开关）。\n   - `search/`：`SearchBar` 顶部搜索栏（/ 键聚焦、Esc 清空、80ms 防抖）。\n   - `detail/`：`NoteDetailModal` 详情模态（Markdown 渲染、Prism.js 代码高亮复制、未保存修改防误关拦截、CAS 并发冲突消解）。\n   - `portability/`：`DataPortabilityModal` 数据中心弹窗。",
+      "dependsOn": [
+        "tech-core-architecture"
+      ],
+      "evidenceIds": [
+        "evidence-vite-official",
+        "evidence-typescript",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "module-system-decomposition",
+      "kind": "module",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "模块化系统分解与依赖架构规范"
+    },
+    {
+      "content": "### 客户端持久化存储与模糊检索技术架构（W3C 规范、单原子事务与范围隔离）\n\n1. **单一事实来源与无 Boolean 索引复合结构**：\n   - 所有便签数据持久化保存在 IndexedDB 数据库 `SparkNotesDB`（版本 1）中。\n   - `notes` 核心对象仓库声明复合索引：`id, updatedAt, createdAt, status, trashedAt, *tags`。坚决不建 boolean 索引。\n   - `meta` 仓库声明主键：`key`，用于存放 `backupTracker`、`libraryGeneration` 与 `appSettings` 等持久化全局数据。\n   - **元数据统一结构**：`libraryGeneration` 在 `meta` 表中存储为 `AppMeta<LibraryGenerationMeta>`，结构为 `{ key: 'libraryGeneration', value: { currentGeneration: 1, lastResetAt: Date.now() }, updatedAt: Date.now() }`，消除类型不一致隐患。\n   - **活跃便签置顶查询**：通过 `db.notes.where('status').equals('active').toArray()` 取出记录，在内存中依据 `b.isPinned - a.isPinned` 结合 `updatedAt` 降序重排。\n   - **收藏便签查询**：在活跃与归档便签集合中通过内存过滤 `.filter(n => n.isFavorite)`。\n2. **单调递增库代际与乐观并发 CAS 存储驱动**：\n   - 本地维护 `libraryGeneration`（单调递增整数，初始为 1），每次全量覆盖导入或清空重建时执行递增更新；\n   - 实体变更（保存、改状态、打标、物理删除）统一在同一个事务 `[db.notes, db.meta]` 内读取当前代际并校验：\n     ```typescript\n     await db.transaction('rw', [db.notes, db.meta], async () => {\n       const genRec = await db.meta.get('libraryGeneration');\n       const currentGen = genRec?.value?.currentGeneration ?? 1;\n       if (sessionGeneration !== currentGen) {\n         throw new LibraryGenerationMismatchError(sessionGeneration, currentGen);\n       }\n       const cur = await db.notes.get(note.id);\n       if (!cur) throw new NoteNotFoundError(note.id);\n       if (cur.revision !== expectedRevision) {\n         throw new ConcurrentEditConflictError(cur);\n       }\n       note.revision = cur.revision + 1;\n       note.updatedAt = Date.now();\n       await db.notes.put(note);\n\n       const trackerRec = await db.meta.get('backupTracker');\n       const tracker = trackerRec?.value ?? { lastBackupAt: 0, unbackedChangesCount: 0 };\n       tracker.unbackedChangesCount += 1;\n       await db.meta.put({ key: 'backupTracker', value: tracker, updatedAt: Date.now() });\n     });\n     ```\n   - 新建采用独立的 `createNote` 动作，传入 `sessionGeneration` 并校验当前代际，禁止使用 upsert 方式隐式复活已被永久物理删除的便签。\n   - 强制覆盖（Force Overwrite）流程：当发生并发冲突时，前端展示当前数据库记录，用户明确点击【强制覆盖】后，以当前界面看到的最新 `currentRevision` 再次执行 CAS 更新。\n3. **回收区 7 天到期判定、时钟回拨防御与批量清理**：\n   - **7 天毫秒判定区间**：定义常量 `RETENTION_MS = 7 * 86400 * 1000`（即 604,800,000 毫秒）。\n   - **超期判定规则与方法**：`listExpiredTrashedNotes(referenceTime?: number)`，以 `referenceTime ?? Date.now()` 为基准执行 `(refTime - trashedAt) >= RETENTION_MS`（严格使用 `>=` 边界判定）。\n   - **本地系统时钟回拨防御**：若检测到 `Date.now() < trashedAt`，系统判定本地系统时钟发生异常回拨，执行安全防御逻辑，保持便签处于回收区正常留存状态，绝不提前将其判定为到期或执行物理删除。\n   - **重复移入回收区幂等性**：若便签已处于 `status === 'trashed'`，重复触发删除操作为幂等操作，禁止改写原有 `previousStatus`，禁止更新原有 `trashedAt`，杜绝恶意或误触无限重置 7 天到期保留窗口。\n   - **批量物理清理与删除**：清理超期便签、单条彻底删除及清空回收区操作均在单原子读写事务内执行；清空前由前端提交当前界面看到的 `{ id, revision }` 目标快照列表并在事务中执行 CAS 比对，若单条版本失效或代际失效则全部不写并提示冲突。\n4. **全维度强校验与单原子覆盖导入回滚架构**：\n   - 导入执行全维度强类型校验：验证顶层 `schemaVersion === 1`、`notes` 记录数组完整性、UUID 格式唯一性、`status` 枚举合法性（`active`/`archived`/`trashed`）、`trashedAt` 有效时间戳与 `previousStatus` 一致性、元数据白名单与排重。校验失败直接终止，不进入写入流程。\n   - **导入预览与快照依据校验**：生成 `ImportPreview`，包含文件 SHA-256 签名与当前数据库快照依据（代际、总数、版本和、最后更新时间）。\n   - **全量覆盖导入（Overwrite）**：在单个 `rw` 事务 `[db.notes, db.meta]` 内先比对快照依据，一致后执行 `clear()`，再批量写入新便签，将本地代际单调递增更新（`currentGeneration = localGen + 1`），刷新备份追踪元数据。若中途发生异常，事务整体自动回滚，恢复原数据，绝不产生半空半满脏库。\n   - **合并增量导入（Merge）**：采用明确的“保留本地同 ID 记录，仅新增不冲突 ID 记录”（Keep Local on ID Conflict）策略，对冲突 ID 记录保留本地最新状态并计入跳过数，向用户反馈清晰统计。\n5. **四大系统视图检索作用域严格状态隔离架构**：\n   - 检索引擎入参明确声明 `viewScope: 'all' | 'favorites' | 'archived' | 'trashed'`。\n   - 全部灵感视图检索：作用域限定于 `status === 'active'` 的便签集合；\n   - 已收藏视图检索：作用域限定于 `isFavorite === true && (status === 'active' || status === 'archived')`；\n   - 已归档视图检索：作用域限定于 `status === 'archived'` 的便签集合，**反例断言：正文包含相同关键词的活跃便签绝对不出现在归档检索结果中**；\n   - 回收区视图检索：作用域严格限定于 `status === 'trashed'`。四视图作用域在检索引擎与 UI 流中实现 100% 严格隔离。",
+      "dependsOn": [
+        "tech-core-architecture"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-mdn-indexeddb",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "tech-storage-and-search",
+      "kind": "technology",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "客户端持久化存储与模糊检索技术架构"
+    },
+    {
+      "content": "### 客户端持久化数据模型与实体关系架构\n\n1. **便签实体定义 (`Note`)**：\n```typescript\nexport type NoteStatus = 'active' | 'archived' | 'trashed';\n\nexport interface Note {\n  id: string;                       // 唯一主键 UUID v4\n  content: string;                  // 便签正文纯文本（含行内 Markdown 语法与 #标签）\n  tags: string[];                   // 标签名称数组（去除 # 前缀，统一规范小写，元素去重，单标签字符长度 1~20）\n  isPinned: boolean;                // 是否置顶（由客户端内存排序与排版，IndexedDB 不建索引）\n  isFavorite: boolean;              // 是否加星收藏（内存过滤，IndexedDB 不建索引）\n  status: NoteStatus;               // 生命周期状态：'active' | 'archived' | 'trashed'\n  previousStatus?: 'active' | 'archived'; // 移入回收区前状态，用于还原时精确恢复\n  createdAt: number;                // 创建时间戳（毫秒级，不可变更）\n  updatedAt: number;                // 最后修改时间戳（毫秒级）\n  trashedAt: number | null;         // 移入回收区时间戳（非回收区为 null）\n  revision: number;                 // 单条便签单调递增修改修订号（初始为 1，每次修改自增 1，CAS 锁依据）\n  schemaVersion: 1;                 // 实体结构模式版本号，固定为 1（禁止与 revision 混淆）\n}\n```\n\n2. **全局元数据实体定义 (`AppMeta`)**：\n```typescript\nexport interface AppMeta<T = unknown> {\n  key: string;                      // 元数据主键，白名单仅限 'backupTracker' | 'libraryGeneration' | 'appSettings'\n  value: T;                         // 元数据具体结构体\n  updatedAt: number;                // 最后更新时间戳（毫秒）\n}\n\nexport interface BackupTrackerMeta {\n  lastBackupAt: number;             // 上次成功导出备份的时间戳（毫秒）\n  unbackedChangesCount: number;     // 累计未备份变更次数（新增/编辑/归档/移入回收区/还原/清空均 +1）\n}\n\nexport interface LibraryGenerationMeta {\n  currentGeneration: number;        // 当前本地库代际编号（初始为 1，每次全量覆盖导入或清库后递增 +1）\n  lastResetAt: number;              // 上次代际重置时间戳（毫秒）\n}\n```\n\n3. **会话隔离草稿实体定义 (`SessionDraft`)**：\n```typescript\nexport interface SessionDraft {\n  schemaVersion: 1;                 // 草稿结构模式版本号，固定为 1\n  noteId: string;                   // 便签 ID（新建草稿固定为 'new_draft'）\n  libraryGeneration: number;        // 草稿关联的本地库代际（与当前库代际比对）\n  baseRevision: number;             // 打开编辑时的基准 revision（新建时为 0）\n  content: string;                  // 未保存的草稿正文字符串\n  savedAt: number;                  // 暂存时间戳（毫秒）\n}\n```\n\n4. **导入预览契约与快照依据实体定义 (`ImportPreview`)**：\n```typescript\nexport interface ImportPreviewTargetState {\n  libraryGeneration: number;        // 预览时本地库代际\n  notesCount: number;               // 预览时本地便签总数\n  sumRevision: number;              // 预览时本地便签 revision 累加和（捕捉任意更新）\n  maxRevision: number;              // 预览时本地便签最大 revision\n  lastUpdatedAt: number;            // 预览时本地便签最大 updatedAt 时间戳\n}\n\nexport interface ImportPreview {\n  ticketId: string;                 // 预览工单唯一标识 UUID\n  fileSignature: string;            // 导入文件字节身份哈希（SHA-256）\n  payload: BackupPayload;           // 已通过全维度强类型校验的备份载荷对象\n  notesCount: number;               // 备份便签总数\n  summary: {\n    active: number;\n    archived: number;\n    trashed: number;\n  };\n  targetState: ImportPreviewTargetState; // 预览时本地数据库快照依据\n  previewedAt: number;              // 预览生成时间戳\n}\n\nexport interface ImportResult {\n  mode: 'overwrite' | 'merge';\n  importedCount: number;\n  skippedConflictCount?: number;\n  newLibraryGeneration: number;\n}\n```\n\n5. **备份往返数据载荷定义 (`BackupPayload` - 消除重复表示与白名单校验)**：\n```typescript\nexport interface BackupMetaPayload {\n  backupTracker: BackupTrackerMeta; // 唯一的备份追踪元数据可信源\n  tags: string[];                   // 导出时的有效标签小写快照\n  appSettings?: Record<string, unknown>; // 应用扩展设置\n  appMeta?: AppMeta[];              // 兼容元数据列表，严格校验 key 白名单 ['backupTracker', 'libraryGeneration', 'appSettings']，禁止未知 key 与重复 key\n}\n\nexport interface BackupPayload {\n  schemaVersion: 1;                 // 备份标准协议版本号，固定为 1\n  app: 'SparkNotes';                // 应用标识符，固定为 'SparkNotes'\n  exportedAt: number;               // 导出毫秒时间戳\n  notesCount: number;               // 包含便签总数，严格与 notes.length 相等\n  notes: Note[];                    // 全量便签实体数组（完整保留所有字段）\n  meta: BackupMetaPayload;          // 全局元数据单一规范形状\n}\n```",
+      "dependsOn": [
+        "tech-storage-and-search"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-mdn-indexeddb",
+        "evidence-file-api",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "data-model-core-entities",
+      "kind": "data_model",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "客户端持久化数据模型与实体关系架构"
+    },
+    {
+      "content": "### 核心服务契约与接口定义规范（并发控制、声明对齐与预览契约）\n\n1. **存储服务接口 (`IStorageService`)**：\n统一异常约定：所有实体变更方法执行成功时均返回解析后的最新对象（如 `Promise<Note>`），在遇到版本冲突、代际失效、实体不存在或配额满时统一通过抛出具体的 `SparkNotesError` 派生异常处理。对齐声明 `listExpiredTrashedNotes` 方法。\n\n```typescript\nexport interface StorageQuotaInfo {\n  usage: number;           // 已使用字节数\n  quota: number;           // 总可用配额字节数\n  percentUsed: number;     // 已用百分比 (0~100)\n}\n\nexport interface PrivateModeCheckResult {\n  isPrivate: boolean;      // 是否疑似处于隐私/无痕模式\n  confidence: 'low' | 'medium' | 'high' | 'unverified'; // 置信度，诚实声明为 unverified/启发式辅助参考\n  details: string;         // 检测诊断信息与局限性说明：现代主流浏览器反指纹安全策略下无标准 Web API，属尽力探测\n}\n\nexport interface IStorageService {\n  init(): Promise<void>;\n  close(): Promise<void>;\n\n  // 库代际接口\n  getCurrentLibraryGeneration(): Promise<number>;\n  bumpLibraryGeneration(): Promise<number>;\n\n  // 便签 CRUD 与严格 CAS 乐观锁\n  createNote(note: Omit<Note, 'id' | 'revision' | 'createdAt' | 'updatedAt'>, sessionGeneration: number): Promise<Note>;\n  getNoteById(id: string): Promise<Note | null>;\n  listNotes(filter?: { status?: NoteStatus; tags?: string[]; isFavorite?: boolean }): Promise<Note[]>;\n  listExpiredTrashedNotes(referenceTime?: number): Promise<Note[]>; // 声明对齐验收标准，使用 >= 604,800,000 ms 谓词\n  saveNote(note: Note, expectedRevision: number, sessionGeneration: number): Promise<Note>;\n  forceSaveNote(note: Note, currentDbRevision: number, sessionGeneration: number): Promise<Note>;\n\n  // 单实体生命周期流转（CAS 递增，携带 sessionGeneration）\n  trashNote(id: string, expectedRevision: number, sessionGeneration: number): Promise<Note>;\n  restoreNote(id: string, expectedRevision: number, sessionGeneration: number): Promise<Note>;\n  unarchiveNote(id: string, expectedRevision: number, sessionGeneration: number): Promise<Note>;\n  togglePin(id: string, expectedRevision: number, sessionGeneration: number): Promise<Note>;\n  toggleFavorite(id: string, expectedRevision: number, sessionGeneration: number): Promise<Note>;\n  hardDeleteNote(id: string, expectedRevision: number, sessionGeneration: number): Promise<void>;\n\n  // 批量生命周期与原子操作（快照 CAS 批量校验，失败整体回滚）\n  batchUpdateTags(targets: Array<{ id: string; expectedRevision: number }>, oldTag: string, newTag: string, sessionGeneration: number): Promise<void>;\n  purgeExpiredTrash(targets: Array<{ id: string; expectedRevision: number }>, sessionGeneration: number): Promise<number>;\n  emptyTrash(targets: Array<{ id: string; expectedRevision: number }>, sessionGeneration: number): Promise<number>;\n\n  // 持久化授权申请与状态查询\n  requestPersistence(): Promise<boolean>;\n  isPersisted(): Promise<boolean>;\n  getStorageQuota(): Promise<StorageQuotaInfo>;\n  detectPrivateMode(): Promise<PrivateModeCheckResult>; // 启发式尽力探测，诚实标明局限性\n}\n```\n\n2. **会话草稿隔离服务接口 (`ISessionDraftService`)**：\n```typescript\nexport interface ISessionDraftService {\n  saveDraft(noteId: string, content: string, libraryGeneration: number, baseRevision: number): void;\n  getDraft(noteId: string, currentLibraryGeneration: number): SessionDraft | null;\n  clearDraft(noteId: string, libraryGeneration: number): void;\n  exportDraftToFile(noteId: string, currentLibraryGeneration: number): void; // 独立导出当前草稿文件\n}\n```\n\n3. **备份与数据便携性服务接口 (`IBackupService`)**：\n```typescript\nexport interface ValidationResult {\n  valid: boolean;\n  errors: string[];\n  notesCount: number;\n  previewSummary?: { active: number; archived: number; trashed: number };\n}\n\nexport interface IBackupService {\n  exportFullBackupJSON(): Promise<void>;\n  exportMarkdownArchive(): Promise<void>;\n  validateBackupFile(file: File): Promise<ValidationResult>;\n  previewImport(file: File): Promise<ImportPreview>; // 生成包含字节签名与库状态快照依据的凭证\n  executeImportOverwrite(preview: ImportPreview): Promise<ImportResult>; // 同事务比对快照依据，若变动拒绝执行\n  executeImportMerge(preview: ImportPreview): Promise<ImportResult>; // 同事务比对快照依据，保留本地同 ID 记录\n  checkBackupReminderNeeded(): Promise<{ needed: boolean; reason: 'count' | 'time' | 'none'; unbackedCount: number; daysSinceLast: number }>;\n}\n```\n\n4. **即时检索引擎服务接口 (`ISearchService`)**：\n```typescript\nexport interface SearchQuery {\n  keyword: string;\n  viewScope: 'all' | 'favorites' | 'archived' | 'trashed'; // 四大系统视图严格作用域\n  selectedTags?: string[]; // 标签多选交集 (AND) 筛选\n}\n\nexport interface ISearchService {\n  search(query: SearchQuery): Promise<Note[]>;\n  highlightContent(content: string, keyword: string): string; // 生成安全转义的 mark 高亮 HTML\n}\n```",
+      "dependsOn": [
+        "data-model-core-entities"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-mdn-indexeddb",
+        "evidence-file-api",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "interface-service-contracts",
+      "kind": "interface",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "核心服务契约与接口定义规范"
+    },
+    {
+      "content": "### 全局错误类型体系、降级策略与状态恢复机制\n\n1. **领域与系统异常层次结构**：\n```typescript\nexport class SparkNotesError extends Error {\n  constructor(message: string, public code: string) {\n    super(message);\n    this.name = 'SparkNotesError';\n  }\n}\n\nexport class StorageQuotaExceededError extends SparkNotesError {\n  constructor(public quotaInfo: StorageQuotaInfo) {\n    super('浏览器本地存储空间已满，无法写入更多数据', 'QUOTA_EXCEEDED');\n  }\n}\n\nexport class ConcurrentEditConflictError extends SparkNotesError {\n  constructor(public currentDbNote: Note) {\n    super('便签已被其他会话修改，存在版本冲突', 'CONCURRENT_CONFLICT');\n  }\n}\n\nexport class LibraryGenerationMismatchError extends SparkNotesError {\n  constructor(public sessionGen: number, public currentGen: number) {\n    super('本地数据库已在外层全量导入或清库，当前编辑会话已失效', 'GENERATION_MISMATCH');\n  }\n}\n\nexport class ImportPreviewExpiredError extends SparkNotesError {\n  constructor(public reason: string) {\n    super(`导入预览已失效，本地数据库状态已变更: ${reason}，请重新预览后再操作`, 'IMPORT_PREVIEW_EXPIRED');\n  }\n}\n\nexport class NoteNotFoundError extends SparkNotesError {\n  constructor(public noteId: string) {\n    super(`便签不存在或已被物理永久删除: ${noteId}`, 'NOTE_NOT_FOUND');\n  }\n}\n\nexport class InvalidBackupPayloadError extends SparkNotesError {\n  constructor(public details: string) {\n    super(`备份文件格式校验失败: ${details}`, 'INVALID_BACKUP_PAYLOAD');\n  }\n}\n\nexport class DatabaseTransactionError extends SparkNotesError {\n  constructor(public originalError: unknown) {\n    super('本地数据库事务执行失败，已自动整体回滚', 'TRANSACTION_FAILED');\n  }\n}\n\nexport class SessionStorageCorruptedError extends SparkNotesError {\n  constructor(public originalError: unknown) {\n    super('会话草稿读写异常或配额受限', 'SESSION_STORAGE_CORRUPTED');\n  }\n}\n```\n\n2. **关键故障降级矩阵与恢复保证**：\n| 故障场景 | 触发条件 | 界面交互与降级行为 | 数据恢复与回滚保障 |\n| :--- | :--- | :--- | :--- |\n| **存储配额满载** | IndexedDB 抛出 `QuotaExceededError` | 输入框/编辑弹窗维持开启，绝不关闭、绝对不清空已输入文字；顶部浮出琥珀色告警横幅，提示存储已满 | 文字草稿按结构化 `SessionDraft` 序列化暂存于 `sessionStorage`（`spark_draft_${libraryGeneration}_${noteId}`）；提供【复制到剪贴板】与【导出当前未保存草稿】独立文件保存能力 |\n| **并发编辑版本冲突** | CAS 比对 `dbRevision !== expectedRevision` | 弹窗展示黄色冲突告警条，呈现“当前数据库版本”与“我的未保存草稿”差异 | 抛出 `ConcurrentEditConflictError`，提供三项明确消解分支：1) 【强制覆盖】（以最新 revision 再次 CAS）；2) 【放弃修改并载入最新】；3) 【另存为新便签】（保留当前草稿） |\n| **库代际失效阻断** | `sessionGeneration !== currentLibraryGeneration` | 弹窗锁定保存动作，显示外部库已被覆盖重置提示横幅 | 抛出 `LibraryGenerationMismatchError`，禁止脏数据写入；弹窗提供一键复制与独立草稿导出，不产生半脏库 |\n| **导入预览后数据变动** | 执行导入时同事务检测到本地代际或版本快照与 `preview.targetState` 不匹配 | 弹出提示“本地数据已在预览后发生变动，请重新预览”，阻止导入执行 | 抛出 `ImportPreviewExpiredError`，单读写事务零改动退出，原数据库记录与本地代际完好无损 |\n| **全量导入数据异常** | 强校验器校验失败或事务中途崩溃 | 立即终止导入，弹出错误对话框明确指出校验失败字段/记录原因 | 单原子事务 `[db.notes, db.meta]` 整体自动回滚，原数据库记录与本地代际完好无损，不产生半空半满脏库 |\n| **本地时钟异常回拨** | 当前时间 `Date.now() < trashedAt` | 界面正常展示回收区便签，倒计时徽标显示“保留中（时钟待校准）” | 防御性阻止提前到期判定，绝不暗中执行永久清理，严格保护用户资产 |",
+      "dependsOn": [
+        "interface-service-contracts"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "error-architecture-and-recovery",
+      "kind": "error",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "全局错误类型体系、降级策略与状态恢复机制"
+    },
+    {
+      "content": "### 静态构建打包、本地运行与静态托管部署规范（环境与协议基准）\n1. **构建工具与产物形态**：\n   - 基于 Vite 生产构建，执行 `npm run build`，TypeScript 类型检查无报错，产物输出至 `dist/` 目录。\n   - 静态资源零服务端 Node.js 运行时依赖，全部为标准 HTML、CSS、JS 与静态图标资源。\n2. **标准受信任安全上下文与协议限制**：\n   - 依据现代浏览器 ESM 规范与 Web 安全标准，应用严格运行于 HTTPS 或 `http://localhost` / `http://127.0.0.1` 受信任的安全上下文中（本地静态预览 `npm run preview` 或 `npx serve dist -p 4173`，或托管于 GitHub Pages / Cloudflare Pages / Vercel 等平台）。禁止将任意 HTTP 称为安全上下文。\n   - **明确不支持脱离 Web 服务的 `file://` 协议**：直接通过文件资源管理器双击本地 `dist/index.html` 运行将触发浏览器 ESM 模块与安全上下文跨域拦截，首版明确不支持该运行模式。\n3. **离线能力与脱机冷重启边界说明**：\n   - 已打开且取得静态资源的页面在断网或无网络环境下，100% 依赖本地 IndexedDB 离线进行便签的增删改查、打标、回收区流转与检索，零网络请求与报错。\n   - 完全断网后的脱机冷重启依赖本地静态 Web 服务器；首版明确不提供未验证的 Service Worker 脱机冷重启绝对保证。\n4. **多浏览器兼容性基准**：\n   - Chrome 120+、Edge 120+、Firefox 122+、Safari 17+。\n   - 针对 Safari 17+ 明确 WebKit 7 天无交互 ITP 存储清理策略，配合温和备份提醒保障资产安全。",
+      "dependsOn": [
+        "tech-core-architecture"
+      ],
+      "evidenceIds": [
+        "evidence-vite-static-deploy",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "deployment-and-build-specification",
+      "kind": "deployment",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "technical",
+      "title": "静态构建打包、本地运行与静态托管部署规范"
+    },
+    {
+      "content": "### 工程基座搭建与 Dexie 存储驱动封装实现任务（技术架构与持久化底座）\n本任务负责搭建 React 19 + TypeScript + Vite 工程底座，封装基于 Dexie.js 的强类型客户端持久化存储驱动，实现单调递增库代际、严格 CAS 乐观并发锁、独立新建 createNote、回收区 7 天到期判定（`listExpiredTrashedNotes` 方法，严格依据 `>= 604,800,000 ms` 谓词）、本地时钟回拨防御、单原子覆盖回滚事务以及结构化双重隔离会话草稿与启发式隐私模式探测服务契约。所有实体变更均在同一个事务 `[db.notes, db.meta]` 内校验代际与版本，异常统一通过抛出具体的 SparkNotesError 派生类实现。",
+      "dependsOn": [
+        "data-model-core-entities",
+        "error-architecture-and-recovery",
+        "interface-service-contracts",
+        "tech-core-architecture",
+        "tech-storage-and-search"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-mdn-storage-persist-api",
+        "evidence-mdn-storage-estimate-01",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-foundation-and-storage",
+      "kind": "task",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "宿主浏览器支持 IndexedDB 2.0 及 ES2022+ 基础特性。",
+          "开发者本地通过 Vite preview 或受信任安全上下文（HTTPS/localhost）运行，非 file:// 协议。"
+        ],
+        "completionCriteria": [
+          "Dexie 存储驱动与 Schema 成功编译无 TS 类型错误，无 boolean 索引。",
+          "IStorageService 与 ISessionDraftService 全部接口方法完整实现并导出，包含 listExpiredTrashedNotes 方法。",
+          "saveNote 统一成功返回更新后的 Note，冲突抛出 ConcurrentEditConflictError，代际失效抛出 LibraryGenerationMismatchError。",
+          "Vitest 单元测试通过率 100%，覆盖 CAS 冲突、代际失效、7天到期判定、单原子回滚与草稿隔离。",
+          "detectPrivateMode 明确标注启发式探测边界与 unverified 状态。"
+        ],
+        "environment": "Node 18+ / Vitest 单元测试运行环境，fake-indexeddb 内存持久化模拟器。",
+        "exclusions": "不实现便签 UI 交互组件（QuickCaptureCard、NoteFeed 等交由业务任务）；不实现 Markdown 编译高亮（由 detail-edit 处理）；不执行需真实前台浏览器的性能压测（由交付基准任务在开发后执行）；不引入任何远端数据库与多用户协同代码。",
+        "failureBehavior": "并发版本不匹配时抛出 ConcurrentEditConflictError；代际不匹配抛出 LibraryGenerationMismatchError；便签不存在抛出 NoteNotFoundError（严禁复活已删除数据）；配额超限抛出 StorageQuotaExceededError 并保留文本且结构化存入 sessionStorage；全量导入任一步骤失败自动回滚事务，原数据完好无损；本地系统时钟回拨时防御性保留便签不提前到期。",
+        "goal": "搭建 React 19 + TypeScript + Vite 工程底座，封装基于 Dexie.js 的强类型无 boolean 索引 IndexedDB 存储驱动，实现单调递增库代际、严格 CAS 乐观并发锁、独立新建 createNote、回收区 7 天到期判定（listExpiredTrashedNotes）、本地时钟回拨防御、单原子覆盖回滚事务以及双重隔离会话草稿与启发式隐私模式探测服务契约。",
+        "modules": [
+          "src/services/storage/IStorageService.ts",
+          "src/services/storage/StorageService.ts",
+          "src/services/session/SessionDraftService.ts",
+          "src/types/index.ts",
+          "tests/unit/storage/StorageService.test.ts"
+        ],
+        "normalBehavior": "应用启动初始化 SparkNotesDB 实例；通过 Dexie 响应式驱动 notes 与 meta；在读写事务内执行 get-compare-put CAS 校验；更新全局 unbackedChangesCount 计数；提供 listExpiredTrashedNotes 准确查询超期便签；提供草稿按代际隔离读写与独立导出。",
+        "scope": "搭建 Vite + React 19 + TypeScript 5.x 基础工程；引入并配置 Dexie.js，声明复合索引及 meta 表；封装 StorageService 类并实现 IStorageService 全部接口方法（包含 listExpiredTrashedNotes）；实现单调自增库代际更新与校验；实现单实体与批量动作事务 CAS；实现 7 天超期判定与时钟回拨防御；封装 SessionDraftService 实现版本化 SessionDraft 结构化草稿暂存；实现 persist() 申请与启发式 detectPrivateMode。编写全面单元测试。",
+        "verification": [
+          "运行 pnpm test 跑通所有 StorageService 单元测试用例；",
+          "类型检查 tsc --noEmit 零错误。"
+        ]
+      },
+      "title": "工程基座搭建与 Dexie 存储驱动封装实现任务"
+    },
+    {
+      "content": "### 存储驱动与持久化基座验收标准（Given/When/Then 细化）\n\n#### 场景 1：独立 createNote 与编辑 saveNote CAS 并发冲突控制（杜绝隐式复活与统一异常抛出）\n- **Given**：系统当前处于 `libraryGeneration = 1`，数据库中存在便签 A（`id: \"note-1\"`, `revision: 3`, `status: \"active\"`）；\n- **When 1（正常单事务 CAS）**：调用 `saveNote(noteA, 3, 1)`，提交新内容；\n- **Then 1**：在同一个 `readwrite` 事务 `[db.notes, db.meta]` 中读取 `note-1` 比对 `revision === 3` 与 `generation === 1` 成功，自增更新为 `revision = 4`, `updatedAt = Date.now()`，未备份计数 +1，Promise 成功 Resolve 返回更新后的 Note 实体；\n- **When 2（并发版本冲突拦截与统一抛错约定）**：两个页面同时基于 `revision: 3` 编辑，页面 1 保存成功后 `revision` 变为 4；页面 2 随后提交 `saveNote(noteA_stale, 3, 1)`；\n- **Then 2**：在同一个事务内检测到 `cur.revision (4) !== expectedRevision (3)`，事务立即终止拒绝写入，Promise 被 Reject 并抛出 `ConcurrentEditConflictError(curDbNote)`，错误对象中携带当前数据库中最新记录；数据库保持 `revision = 4` 不被脏写覆盖；UI 层捕获该异常后展示冲突消解面板；\n- **When 3（禁止 upsert 隐式复活已删除便签）**：便签 B 已被物理彻底删除（`hardDeleteNote(\"note-2\", 2, 1)`），陈旧编辑会话尝试提交 `saveNote(noteB, 2, 1)`；\n- **Then 3**：存储服务查询 `db.notes.get(\"note-2\")` 返回 undefined，Promise 被 Reject 并抛出 `NoteNotFoundError` 拦截，绝不执行 upsert，数据库绝不复活已删除记录。新建便签必须经由独立 `createNote` 动作生成新 UUID 并赋予 `revision = 1`。\n\n#### 场景 2：全量覆盖导入单原子事务回滚与库代际（libraryGeneration）失效防护\n- **Given**：本地数据库包含 50 条活跃便签，`libraryGeneration = 1`；页面 A 处于打开编辑便签 C（绑定会话代际 `sessionGeneration = 1`，`revision: 2`）；\n- **When 1（全量覆盖导入成功）**：用户从外部导入一份合法备份文件执行全量覆盖导入；\n- **Then 1**：在单原子事务 `[db.notes, db.meta]` 内清空旧表并写入备份中的便签，将本地代际单调递增更新为 `libraryGeneration = 2`；随后页面 A 尝试保存旧便签 C 提交 `saveNote(noteC, 2, 1)`，存储驱动检测到 `sessionGeneration (1) !== currentLibraryGeneration (2)`，Promise 被 Reject 并抛出 `LibraryGenerationMismatchError` 拦截，禁止旧编辑覆盖新导入数据库；\n- **When 2（导入异常单原子事务回滚）**：导入一份包含格式损坏记录或触发配额溢出的备份文件；\n- **Then 2**：单原子事务整体回滚，原有 50 条便签完好无损，`libraryGeneration` 保持 1 不变，不产生半空半满脏库。\n\n#### 场景 3：回收区 7 天到期边界判定（listExpiredTrashedNotes 与 >= 604,800,000 ms 谓词）、时钟回拨防御与重复删除幂等性\n- **Given**：回收区中存在三条便签：\n  - 便签 X：`trashedAt = Date.now() - 604,800,000`（恰好等于 7 天边界）；\n  - 便签 Y：`trashedAt = Date.now() - 604,799,999`（距 7 天差 1 毫秒）；\n  - 便签 Z：`trashedAt = Date.now() + 10,000`（用户本地系统时钟回拨，当前时间小于删除时间）；\n- **When**：调用 `IStorageService.listExpiredTrashedNotes()` 查询超期记录；\n- **Then**：系统严格依据 `>= 604,800,000 ms`（RETENTION_MS）谓词判定，返回仅包含便签 X 的数组；便签 Y 判定为未超期，便签 Z 因本地时钟回拨受到防御性保护判定为保留中，绝不提前清理；\n- **When 4（重复删除幂等性）**：对已处于回收区的便签 X 再次调用 `trashNote(noteX.id, noteX.revision, 1)`；\n- **Then 4**：存储驱动保持原有 `previousStatus` 不变，保持原有 `trashedAt` 不变，禁止重置 7 天倒计时窗口。",
+      "dependsOn": [
+        "task-foundation-and-storage"
+      ],
+      "evidenceIds": [
+        "evidence-indexeddb-spec",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-foundation-and-storage",
+      "kind": "acceptance",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "delivery",
+      "title": "存储驱动与持久化基座验收标准"
+    },
+    {
+      "content": "### 静态生产构建与部署流水线交付任务概述\n本交付任务负责建立 Vite 生产构建与本地预览流水线。关键交付规范：本任务严格建立在全部 7 项业务实现任务（task-foundation-and-storage, task-quick-capture, task-note-card-view, task-tag-organization, task-search-filter, task-note-detail-edit, task-data-portability）完成交付之后，确立全量业务代码合流后的系统打包。验证 TypeScript 严格类型检查无错误输出，输出纯静态资源目录 `dist/`；配置本地受信任安全上下文（`http://localhost:4173`）预览运行；明确 file:// 协议不兼容声明与首版离线边界。",
+      "dependsOn": [
+        "deployment-and-build-specification",
+        "task-data-portability",
+        "task-foundation-and-storage",
+        "task-note-card-view",
+        "task-note-detail-edit",
+        "task-quick-capture",
+        "task-search-filter",
+        "task-tag-organization"
+      ],
+      "evidenceIds": [
+        "evidence-vite-static-deploy",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "task-build-and-deploy",
+      "kind": "task",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "所有前置 7 项业务任务代码已全部合流。",
+          "本地已安装 Node.js 18+ 环境。"
+        ],
+        "completionCriteria": [
+          "npm run build 成功输出 dist/ 产物，TypeScript 零错误。",
+          "npm run preview 在 http://localhost:4173 本地提供标准 HTTP 服务。",
+          "产物部署在 GitHub Pages 等静态托管平台运行无 404 或 MIME 类型错误。"
+        ],
+        "environment": "Node 18+ / Vite 生产构建打包环境。",
+        "exclusions": "不搭建 Docker 容器化后端服务；不配置云端数据库。",
+        "failureBehavior": "TS 检查或打包失败阻断构建并输出定位日志；提示使用 npm run preview 而非直接打开 file://。",
+        "goal": "在全量业务代码合流后执行全量静态生产构建，验证受信任安全上下文本地预览与静态托管规范。",
+        "modules": [
+          "dist/",
+          "package.json",
+          "vite.config.ts"
+        ],
+        "normalBehavior": "运行 npm run build 生成静态产物；运行 npm run preview 在本地 4173 端口预览。",
+        "scope": "建立 Vite 生产构建打包流水线，配置 package.json 与 vite.config.ts，确保在全部 7 项业务任务（task-foundation-and-storage, task-quick-capture, task-note-card-view, task-tag-organization, task-search-filter, task-note-detail-edit, task-data-portability）完成交付合流之后执行全量静态打包；验证 TypeScript 零类型错误输出 dist/ 纯静态资源；配置 npm run preview 在本地 http://localhost:4173 提供受信任安全上下文预览服务；验证产物脱离服务端运行时依赖的静态托管能力；明确声明不支持 file:// 协议免服务运行及首版离线边界。",
+        "verification": [
+          "检查 dist/ 静态产物完整性；使用无痕浏览器访问本地预览地址验证应用初始化。"
+        ]
+      },
+      "title": "静态生产构建与部署流水线交付任务"
+    },
+    {
+      "content": "### 静态打包构建与部署验收标准（Given / When / Then）\n\n#### 场景 1：生产打包构建验证（TypeScript 零错误与纯静态输出）\n- **Given**：开发者拉取完整项目源码，全部 7 项业务功能任务（存储、捕获、卡片流、标签、检索、详情、便携性）已合流至主分支；\n- **When**：在项目根目录执行生产构建命令 `npm run build`；\n- **Then**：\n  1. TypeScript 编译器（`tsc`）执行全量严格类型检查，终端输出零报错、零类型警告；\n  2. Vite 成功输出生产包至 `dist/` 目录；\n  3. 检查 `dist/` 目录结构，仅包含 `index.html`、`assets/*.js`、`assets/*.css` 及静态图标，零 Node.js 服务端运行时依赖代码。\n\n#### 场景 2：受信任安全上下文本地预览服务与脱机运行验证\n- **Given**：项目已完成静态构建产物输出；\n- **When 2.1**：在终端执行预览命令 `npm run preview`（或 `npx serve dist -p 4173`）；\n- **Then 2.1**：终端在本地 `http://localhost:4173` 启动静态 Web 服务器，属于受信任安全上下文；使用 Chrome / Edge / Firefox 访问该地址，应用首屏正常渲染，IndexedDB 数据库初始化成功，控制台无任何 CORS 跨域拦截报错；\n- **When 2.2**：用户在浏览器中打开该地址后，物理断开网络连接或在 DevTools 中开启 Offline 模式；\n- **Then 2.2**：已打开的页面进行新增便签、打标、检索、回收区还原等全部操作均 100% 正常运行，控制台零网络报错；\n- **When 2.3**：若用户尝试直接在文件管理器中双击 `dist/index.html`（`file://` 协议）；\n- **Then 2.3**：浏览器按 ESM 规范产生 CORS 拦截，系统明确提示“请在本地 Web 服务器或静态托管环境中运行，不支持 file:// 协议免服务运行”。",
+      "dependsOn": [
+        "task-build-and-deploy"
+      ],
+      "evidenceIds": [
+        "evidence-vite-static-deploy",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004"
+      ],
+      "id": "acceptance-build-and-deploy",
+      "kind": "acceptance",
+      "requirementIds": [
+        "block-scope-core-boundaries"
+      ],
+      "stage": "delivery",
+      "title": "静态打包构建与部署验收标准"
+    },
+    {
+      "content": "### 宿主浏览器真实性能基准与配额防御验证任务\n本交付任务负责在目标应用完成开发后，于真实宿主物理机与多款前台浏览器（Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+）上执行性能基准测试与配额边界验证。核心验证场景包括：无 HTTP 缓存冷启动从导航起始原点（navigationStart）到首屏可交互（TTI）端到端耗时测量（目标 <= 1.0s）；1,000 条混合格式便签基准下从模拟击键键入（keydown，含 80ms 防抖与 DOM 渲染）至结果可见的端到端检索耗时测量（nearest-rank P95 目标 <= 150ms）；Safari 17+ 真实兼容性与 WebKit 7天主动驱逐防护；存储配额满载时输入框文字保持保留未被清空与 sessionStorage 会话隔离恢复；以及客观诚实的隐私模式启发式探测。因当前规划环境 Docker 不可用且目标代码尚未开发，本任务如实标记为 unexecuted。",
+      "dependsOn": [
+        "task-build-and-deploy"
+      ],
+      "evidenceIds": [
+        "evidence-198cfbdc-8296-4134-b4a0-abeeae5aaba6",
+        "evidence-2a4778de-3af2-4445-ad5d-3673becdb2e0",
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004",
+        "evidence-mdn-storage-estimate-01",
+        "evidence-mdn-storage-persist-api"
+      ],
+      "id": "val-storage-and-search-benchmark",
+      "kind": "validation",
+      "requirementIds": [
+        "block-outcomes-lightweight-experience"
+      ],
+      "stage": "delivery",
+      "task": {
+        "assumptions": [
+          "宿主系统拥有 4 核 CPU 及 8GB 内存，网络无缓存。",
+          "目标应用已完成开发并产出构建产物。"
+        ],
+        "completionCriteria": [
+          "宿主真实环境准备就绪，完成自动化 Playwright 测试脚本编写。",
+          "在四大主流浏览器中完成 10 次冷启动与 10 次检索采样。",
+          "冷启动 TTI <= 1.0s 与检索 P95 <= 150ms 得到实测数据验证。",
+          "在真实环境执行前保持 unexecuted 诚实状态。"
+        ],
+        "environment": "Node 18+ / Playwright 自动化测试运行时，Docker / Linux / Windows / macOS 真实宿主环境，包含真实 Chrome 120+、Edge 120+、Firefox 122+ 与 Safari 17+ 浏览器实例。当前规划环境 Docker 守护进程不可用（unavailable），目标代码待开发。",
+        "evidenceRequired": [
+          "playwright-report/index.html 自动化执行报告",
+          "benchmark-samples.json 原始测量耗时采样数据",
+          "safari-itp-verification.log 真实苹果设备测试日志",
+          "private-mode-detection.json 启发式隐私探测日志"
+        ],
+        "exclusions": "不伪造规划阶段已通过虚假测试；不执行云端高并发压力测试；自动化测试驱动模拟按键输入，不得虚称物理键盘人工实测；WebKit自动化与真Safari分开记录。",
+        "failureBehavior": "测试未达标时判定交付受阻并输出诊断分析；规划环境不可用时保持 unexecuted 并提供后续开发补测指引。",
+        "goal": "在真实宿主环境与主流浏览器中实测无缓存冷启动可交互时延（TTI <= 1.0s）、1000条数据即时检索端到端时延（P95 <= 150ms）、Safari 17+ 兼容性与配额防御机制。",
+        "modules": [
+          "tests/benchmark/coldStart.bench.ts",
+          "tests/benchmark/searchLatency.bench.ts",
+          "tests/benchmark/storageQuota.spec.ts"
+        ],
+        "normalBehavior": "拉起自动化浏览器；清除所有缓存；测量自导航原点至 TTI 耗时；灌入 1000 条种子便签；预热 3 次后模拟按键 keydown 采样 10 次搜索耗时并计算 nearest-rank P95。",
+        "onFailure": "若指标超标或环境失败，阻断交付，输出日志并指引执行倒排索引/虚拟滚动优化或补测。",
+        "passCriteria": [
+          "冷启动从 navigationStart 至可交互 TTI 在主流浏览器中均 <= 1.0s。",
+          "1000 条种子数据下模糊检索 nearest-rank P95 延迟 <= 150ms（含 80ms 防抖）。",
+          "Safari 17+ 存储持久化与 WebKit 7 天策略提示正常工作。",
+          "配额满载时输入框文字完好保留，sessionStorage 会话隔离有效。"
+        ],
+        "scope": "在应用开发构建完成后，于本地宿主物理机与主流前台浏览器中执行端到端基准测试与配额边界验证；度量导航起始原点至 TTI 冷启动耗时；在 1000 条种子数据基准下通过模拟按键 keydown、80ms 防抖至 DOM 高亮完全可见测量端到端检索耗时；验证 Safari 17+ WebKit ITP 防护与温和备份提示；验证配额满载时输入框文字保留与 sessionStorage 隔离；如实将当前未执行状态标为 unexecuted。",
+        "steps": [
+          "1. 在开发完成后启动本地受信任预览服务 http://localhost:4173；",
+          "2. 执行自动化 Playwright 脚本，清除全量磁盘与内存缓存，度量 PerformanceNavigationTiming 导航原点至输入框可交互耗时，重复 10 次记录均值与 P95；",
+          "3. 灌入 1000 条混合种子便签，预热 3 次后模拟触发 keydown 按键，采样 10 次端到端检索耗时并使用 nearest-rank 计算 P95；",
+          "4. 模拟配额溢出，验证输入卡片与详情弹窗文字不丢失及 sessionStorage 草稿隔离；",
+          "5. 在真实苹果设备 Safari 17+ 中验证存储与防丢提醒交互；",
+          "6. 生成测试报告并汇总采样数据。"
+        ],
+        "verification": [
+          "运行 Playwright 基准测试脚本；检查测试报告与数据采样日志。"
+        ]
+      },
+      "title": "宿主浏览器真实性能基准与配额防御验证任务"
+    },
+    {
+      "content": "### 真实浏览器性能基准与配额防御验收标准\n\n#### 场景一：无 HTTP 缓存冷启动性能验收（自导航原点起算）\n- **Given（前置条件）**：\n  1. 测试宿主为标准桌面 PC 物理机（配置 4 核 CPU，8GB 内存）；\n  2. 目标浏览器（Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+）处于无任何 HTTP 磁盘或内存缓存状态；\n  3. 应用通过本地静态服务器（`http://localhost:4173`）提供服务。\n- **When（执行动作）**：\n  1. 自动化测试脚本驱动浏览器导航至应用地址；\n  2. 通过 W3C 标准 `PerformanceNavigationTiming` 获取导航起始点时间戳（`startTime = 0`，对应 `performance.timeOrigin`）；\n  3. 监听快速捕获输入框达到可交互状态（挂载完成、绑定事件并可接收键盘输入）的时间戳；\n  4. 计算端到端冷启动耗时 `TTI = interactiveTime - startTime`；\n  5. 连续冷启动测量 10 次（每次前彻底清理浏览器缓存）。\n- **Then（预期结果）**：\n  1. 10 次测量的平均值与 95 分位数值（P95）均 <= 1.0 秒；\n  2. 严禁从骨架屏渲染或动画消失的时间起算，严格以此端到端口径测量；\n  3. 测试报告如实记录 10 次重复冷启动测量的平均值与 P95 数值。\n\n#### 场景二：1,000 条种子数据下即时检索端到端延迟验收（含 80ms 防抖与 DOM 渲染）\n- **Given（前置条件）**：\n  1. 本地数据库中已通过固定种子生成器预置灌入 1,000 条真实测试便签；\n  2. 数据结构分布：800 条活跃（active，含 15 条置顶与 30 条加星收藏）、100 条归档（archived）、100 条处于回收区（trashed）；单条便签平均正文长度 150 字符，包含行内 Markdown 与多标签；\n  3. 已在当前会话中执行过 3 次模糊搜索以完成 JavaScript 引擎 JIT 预热。\n- **When（执行动作）**：\n  1. 自动化脚本模拟用户在搜索输入框中触发按键事件（`keydown` 驱动，输入搜索关键词如 `\\\"架构设计\\\"`）；\n  2. 计时器自首个物理按键按下事件（`keydown`）触发瞬间立即启动计时；\n  3. 系统执行 80ms 防抖等待；\n  4. 检索引擎在内存便签镜像中执行关键词过滤比对，并严格依据当前视图作用域隔离；\n  5. 视图组件对匹配关键词执行黄色 `<mark class=\"search-highlight\">` 标签安全转义包裹，并触发 DOM 重渲染；\n  6. 监听最后一次 `requestAnimationFrame` 绘制完成、首批匹配便签及高亮在屏幕视口中完全可见的瞬间作为计时终点；\n  7. 连续执行 10 次不同关键词搜索采样。\n- **Then（预期结果）**：\n  1. 采用 nearest-rank 方法计算的 10 次端到端延迟样本的 95 分位数值（P95）<= 150ms；\n  2. 验证端到端口径完整包含：模拟击键 -> 80ms 防抖 -> 内存比对 -> DOM 高亮渲染可见；\n  3. 若 P95 超出 150ms，系统判定为验收未通过，阻断交付并触发性能修订路径（引入倒排索引、分词缓存或虚拟滚动优化）。\n\n#### 场景三：存储配额满载异常防御与草稿隔离恢复验收\n- **Given（前置条件）**：\n  1. 系统当前处于 `libraryGeneration = 1`；\n  2. 快速录入框或详情弹窗中已键入 2,000 字长篇技术方案草稿；\n  3. 本地存储由于磁盘配额触发 `StorageQuotaExceededError`。\n- **When（执行动作）**：\n  1. 用户按下 `Ctrl/Cmd + Enter` 提交保存；\n  2. 系统抛出配额满载异常；\n  3. 用户刷新当前网页标签页。\n- **Then（预期结果）**：\n  1. 提交失败时，输入框文字**绝对保持完整保留，绝不清空**；输入框下方浮出琥珀色告警横幅；\n  2. 草稿安全写入 `sessionStorage.getItem('spark_draft_1_new_draft')`，为包含 `schemaVersion: 1` 的合法 JSON 序列化对象；\n  3. 页面刷新后，系统在顶部提示：“检测到未保存草稿，是否恢复？”，点击恢复后文字完整载入输入框；\n  4. 诚实界定：草稿仅保证在当前标签页刷新状态下可恢复；若标签页被彻底关闭，数据可能丢失，系统已提供显式的【导出当前未保存草稿】独立文件保存入口。\n\n#### 场景四：Safari 17+ 真实兼容性与安全上下文部署验收\n- **Given（前置条件）**：\n  1. 测试宿主为运行 macOS 14+ / iOS 17+ 的苹果真实物理设备；\n  2. 浏览器为原生桌面或移动端 Safari 17+。\n- **When（执行动作）**：\n  1. 通过标准安全上下文访问应用；\n  2. 触发持久化授权申请并写入便签数据；\n  3. 模拟无交互静置与累计变更。\n- **Then（预期结果）**：\n  1. 应用正常初始化 Dexie 数据库，无任何未捕获异常；\n  2. 针对 WebKit ITP 7天可能清理脚本存储的特性，应用在满足条件时展示温和防丢提醒；\n  3. 验证任务在宿主物理设备真实执行前，如实标为 unexecuted，绝不伪造已通过结论。",
+      "dependsOn": [
+        "val-storage-and-search-benchmark"
+      ],
+      "evidenceIds": [
+        "evidence-cbcafb3b-0c67-4fa8-a242-6495eae59004",
+        "evidence-mdn-storage-persist-api"
+      ],
+      "id": "acceptance-storage-and-search-benchmark",
+      "kind": "acceptance",
+      "requirementIds": [
+        "block-outcomes-lightweight-experience"
+      ],
+      "stage": "delivery",
+      "title": "真实浏览器性能基准与配额防御验收标准"
+    }
+  ]
+}

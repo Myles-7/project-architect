@@ -79,12 +79,12 @@ export const ProviderDiagnosticsPanel: React.FC<ProviderDiagnosticsPanelProps> =
       </div>
 
       {/* Health Status Banner */}
-      <div className="p-4 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 space-y-4">
+      <div className="p-4 rounded-xl bg-surface-card border border-border-subtle space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">引擎可用性状态:</span>
+            <span className="text-xs font-semibold text-text-secondary">引擎可用性状态:</span>
             {loading ? (
-              <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+              <span className="inline-flex items-center gap-1 text-xs text-text-muted">
                 <RefreshCw className="w-3 h-3 animate-spin text-orange-500" />
                 <span>正在探测...</span>
               </span>
@@ -110,7 +110,7 @@ export const ProviderDiagnosticsPanel: React.FC<ProviderDiagnosticsPanelProps> =
             type="button"
             onClick={fetchHealth}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>重新检测</span>
@@ -124,7 +124,7 @@ export const ProviderDiagnosticsPanel: React.FC<ProviderDiagnosticsPanelProps> =
         )}
 
         {health?.guidance && (
-          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <div className="p-3 rounded-xl bg-surface-subtle border border-border-subtle text-xs text-text-secondary leading-relaxed">
             {health.guidance}
           </div>
         )}
@@ -133,8 +133,8 @@ export const ProviderDiagnosticsPanel: React.FC<ProviderDiagnosticsPanelProps> =
       {/* Grid Diagnostics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Core Infrastructure */}
-        <div className="p-4 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 space-y-3">
-          <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+        <div className="p-4 rounded-xl bg-surface-card border border-border-subtle space-y-3">
+          <div className="text-xs font-bold text-text-primary flex items-center gap-1.5">
             <Server className="w-3.5 h-3.5 text-zinc-400" />
             <span>推理通道与执行凭据</span>
           </div>
@@ -164,52 +164,52 @@ export const ProviderDiagnosticsPanel: React.FC<ProviderDiagnosticsPanelProps> =
         </div>
 
         {/* Data Safety & Privacy Metrics */}
-        <div className="p-4 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 space-y-3">
-          <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+        <div className="p-4 rounded-xl bg-surface-card border border-border-subtle space-y-3">
+          <div className="text-xs font-bold text-text-primary flex items-center gap-1.5">
             <Shield className="w-3.5 h-3.5 text-emerald-500" />
             <span>数据存储与网络边界</span>
           </div>
 
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between py-1 border-b border-zinc-100 dark:border-zinc-800/60">
-              <span className="text-zinc-400">计算与推理位置</span>
-              <span className="text-zinc-700 dark:text-zinc-300">
+            <div className="flex justify-between py-1 border-b border-border-subtle">
+              <span className="text-text-muted">计算与推理位置</span>
+              <span className="text-text-secondary">
                 {describeInferenceLocation(health?.inferenceLocation)}
               </span>
             </div>
-            <div className="flex justify-between py-1 border-b border-zinc-100 dark:border-zinc-800/60">
-              <span className="text-zinc-400">上下文数据去向</span>
-              <span className="text-zinc-700 dark:text-zinc-300">
+            <div className="flex justify-between py-1 border-b border-border-subtle">
+              <span className="text-text-muted">上下文数据去向</span>
+              <span className="text-text-secondary">
                 {describeContextDestination(health?.sendsProjectContextOffDevice)}
               </span>
             </div>
-            <div className="flex justify-between py-1 border-b border-zinc-100 dark:border-zinc-800/60">
-              <span className="text-zinc-400">结构化契约 (B3)</span>
-              <span className="text-zinc-700 dark:text-zinc-300">{describeStructuredOutput(health?.structuredOutput)}</span>
+            <div className="flex justify-between py-1 border-b border-border-subtle">
+              <span className="text-text-muted">结构化契约 (B3)</span>
+              <span className="text-text-secondary">{describeStructuredOutput(health?.structuredOutput)}</span>
             </div>
             <div className="flex justify-between py-1">
-              <span className="text-zinc-400">提示词缓存 (Cache)</span>
-              <span className="text-zinc-700 dark:text-zinc-300">{describePromptCache(health?.promptCache)}</span>
+              <span className="text-text-muted">提示词缓存 (Cache)</span>
+              <span className="text-text-secondary">{describePromptCache(health?.promptCache)}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Project Local Storage */}
-      <div className="p-4 rounded-xl bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 space-y-3">
-        <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+      <div className="p-4 rounded-xl bg-surface-card border border-border-subtle space-y-3">
+        <div className="text-xs font-bold text-text-primary flex items-center gap-1.5">
           <Database className="w-3.5 h-3.5 text-zinc-400" />
           <span>当前项目本地存储规范</span>
         </div>
 
         <div className="space-y-2 text-xs">
-          <div className="flex flex-col gap-1 py-1 border-b border-zinc-100 dark:border-zinc-800/60">
-            <span className="text-zinc-400">项目标识 (Project ID)</span>
-            <span className="font-mono text-zinc-700 dark:text-zinc-300">{projectId || '未载入'}</span>
+          <div className="flex flex-col gap-1 py-1 border-b border-border-subtle">
+            <span className="text-text-muted">项目标识 (Project ID)</span>
+            <span className="font-mono text-text-secondary">{projectId || '未载入'}</span>
           </div>
           <div className="flex flex-col gap-1 py-1">
-            <span className="text-zinc-400">本地磁盘实际路径</span>
-            <span className="font-mono text-[11px] text-zinc-600 dark:text-zinc-400 break-all">
+            <span className="text-text-muted">本地磁盘实际路径</span>
+            <span className="font-mono text-xs text-text-muted break-all">
               {projectPath || '由工作区统一接管'}
             </span>
           </div>

@@ -1,3 +1,5 @@
+> 2026-10-04 重构：冲突项以 docs/blueprint/13_PLANNING_WORKBENCH.md 为准。旧单 Agent/单调用、通用兜底题、百分比准备度、短时强制超时规则已撤销。自由文本先保存，结构化答案或变更包批准才成为正式事实。以下保留旧设计背景。
+
 # Project Architect V1：Agent Runtime 设计
 
 > 文档状态：Phase 1.3 Blueprint  

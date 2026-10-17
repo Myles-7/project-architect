@@ -1,0 +1,11 @@
+{
+  "id": "evidence-69cc46a5-cdc8-4a33-a331-3ab83aec0e40",
+  "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/compositionstart_event",
+  "capturedAt": "2026-10-04T22:28:11.451Z",
+  "sha256": "8ae8931e5d79c8453a8921ec985b8c0d0aa395f3ab798bdd4b07e40a78692959",
+  "scope": "指导 IME 会话失效机制与清空重置交互契约设计",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\tools\\evidence\\evidence-69cc46a5-cdc8-4a33-a331-3ab83aec0e40.json",
+  "approval": "candidate",
+  "content": "MDN 官方文档指出：compositionstart 事件在文本合成系统（如输入法编辑器 IME）开启新合成会话时触发。在输入法处于合成会话期间点击外部重置按钮，可能导致随后派发的 compositionend 事件在输入框已清空的状态下到达。若无会话有效性判定机制，迟到的 compositionend 可能被错误用于启动新的防抖校验从而导致幽灵空值报错。",
+  "conclusion": "为避免清空后旧合成会话迟到的 compositionend 触发非预期防抖或空值报错，需引入会话失效与状态校验机制。"
+}

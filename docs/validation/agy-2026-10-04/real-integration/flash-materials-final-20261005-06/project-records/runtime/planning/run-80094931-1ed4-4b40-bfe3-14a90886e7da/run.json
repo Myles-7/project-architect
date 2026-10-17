@@ -1,0 +1,123 @@
+{
+  "id": "run-80094931-1ed4-4b40-bfe3-14a90886e7da",
+  "projectId": "proj-1791129999032",
+  "stage": "feedback",
+  "basis": {
+    "revision": 38,
+    "hash": "15d698e0fd3aed02ae7884517a53e778d5ed497decce359f16d1fdd5fb2aa5c0"
+  },
+  "operationId": "real-flash-materials-final-20261005-03-feedback-1791160810212",
+  "request": {
+    "stage": "feedback",
+    "expectedRevision": 37,
+    "operationId": "real-flash-materials-final-20261005-03-feedback-1791160810212",
+    "feedback": "本轮是自动质量验收反馈，不是真人新增需求或人工批准。仅修订 flash-materials-final-20261005-02 已批准 source36 / quality-reviewed-r5 的相关异常契约。目标应用仍未开发；本轮反例来自独立提取导出规范 JavaScript 的合成 DOM 复核，不是目标应用真实浏览器实测。保留冻结控制、原产物、原收据、全部历史证据完整对象；新证据另登记，不覆写同ID旧记录。保留30个稳定块ID、r5的19个无关联块、至少原29条历史证据（当前pre-feedback实际33条均应保留）、r5三项既有修复、300ms输入、即时单按钮清空、手动删空、原文保留、textContent、defer-IIFE、8080端口及安装前提、十文件、原DAG边、五轮均值<=50ms的重绘前调度代理限制。只改相关内容及字段，不重新设计无关功能，不运行不可用Docker，不新增选择题。\n\nR5-B1：ResetController.handleReset先DebounceScheduler.cancel、inputGeneration++，再创建/绑定/replace输入节点。若oldNode.replaceWith抛错，旧输入框仍连接、activeInputNode仍是旧节点、原文仍在，但旧闭包bornGeneration已经永远不匹配inputGeneration。合成复核中用户继续键入'Edited after failure'不会登记任何timer，展示仍'Keep me'；横幅却声称'已为您保留当前状态'。这违背blk-tech-error E05与错误处理task的'输入框保持可编辑供修改重试'。请将清空定义为有明确提交点和失败恢复的状态事务：失败前后原node、当前session/闭包、generation、accepted/trusted draft、isComposing、调度epoch/任务归属必须一致。不要仅回退一个generation而留下新闭包或旧timer，也不要重复绑定导致同事件多次调度。明确失败后取消的旧任务是否按原草稿重新调度、如何避免迟到回调混入，保证用户能够继续输入、手动删空、重试清空和正常300ms呈现。\n\nR5-B2：节点replaceWith成功后若DisplayRenderer.renderPlaceholder（或后续错误清理/焦点操作）抛错，activeInputNode已经是空的新节点，原节点已脱离，catch只显示'已保留当前状态'，没有恢复原文或会话。因此'任何失败场景不丢输入且可继续'与完整伪代码不一致。请先保存明确恢复快照，并定义替换前、替换完成、呈现/焦点失败各阶段的提交与回滚语义；若仍按失败处理，则恢复原node/连接位置、原文字、会话、代际、展示/错误状态及可继续操作能力；若选择明确的已提交状态，需要如实告知且遵守现有失败保留输入决策，不能静默降低要求或假称恢复。恢复路径自身也需有可见错误、原文可复制/导出兜底，不把重新加载页面当恢复。\n\n同步相关feature/flow/page/data_model/interfaces/errors、reset与error处理task的scope/normalBehavior/failureBehavior/verification/completionCriteria、必要validation/acceptance全部字段。完整JavaScript内每个使用变量须显式定义或注入，初始化顺序自洽；保留FeedbackBanner、DisplayRenderer定义、get/set冗余方法已移除、五类持久属性完整复制且单独重置value/aria-invalid/错误状态。保留合成隔离仅限旧节点/旧闭包的边界，原生IME重定向、新会话终结、焦点/辅助技术、布局及真实兼容性继续unexecuted；微秒时间窗不得变成未经验证的隔离保证。\n\n验收必须包括确定的异常注入：创建/属性复制/事件绑定/replaceWith前失败、replaceWith抛错、替换后展示失败、错误清理失败、focus失败；断言原文与node/session/generation/调度归属符合所选事务语义。故障撤除后键入、手动删空、再次清空、重复清空以及旧节点/旧闭包/旧timer迟到反例均可观察且不重复响应、不丢新输入、不造旧结果。合成测试只能证明规范伪代码的对应分支；真实浏览器和原生IME仍待开发验证。\n\n独立review接收完整最新candidate与当前source36批准基线，核验两个阻塞及所有保留项，不能仅blockers=[]或只读片段。生成pending修订包，公开Core脚本批准/新compiler导出仅作为自动验收，不冒称真人审阅或目标实现已经测试。\n"
+  },
+  "effectiveConfig": {
+    "concurrency": 4,
+    "designModel": "gemini-3.8-flash-high",
+    "reviewModel": "gemini-3.8-flash-high",
+    "officialHosts": [
+      "antigravity.google",
+      "www.antigravity.google",
+      "modelcontextprotocol.io",
+      "ts.sdk.modelcontextprotocol.io",
+      "nodejs.org",
+      "docs.docker.com",
+      "docs.python.org",
+      "playwright.dev",
+      "react.dev",
+      "www.typescriptlang.org",
+      "vite.dev",
+      "expressjs.com",
+      "developer.mozilla.org",
+      "www.w3.org",
+      "www.rfc-editor.org",
+      "docs.github.com",
+      "docs.anthropic.com",
+      "ai.google.dev"
+    ]
+  },
+  "status": "reviewable",
+  "tasks": [
+    {
+      "id": "task-e14ed74c-6789-48f8-97ee-7f72ffdcae00",
+      "kind": "design",
+      "goal": "生成本阶段完整设计，保持稳定 ID 和关联；普通细节由你拟定。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "15d698e0fd3aed02ae7884517a53e778d5ed497decce359f16d1fdd5fb2aa5c0",
+      "inputRefs": [],
+      "startedAt": "2026-10-05T00:40:10.635Z",
+      "completedAt": "2026-10-05T00:44:23.391Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-e14ed74c-6789-48f8-97ee-7f72ffdcae00/result.json",
+      "outputHash": "aeed06696e2801425359a0702bd4e4f7d5792ae31980bc1f8d871b584172781c"
+    },
+    {
+      "id": "task-1a9bf758-f6a0-4d95-8a9e-6ada83374a83",
+      "kind": "research",
+      "goal": "独立分析材料中的约束、异常使用场景与可行性风险；只返回证据和建议。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "15d698e0fd3aed02ae7884517a53e778d5ed497decce359f16d1fdd5fb2aa5c0",
+      "inputRefs": [],
+      "startedAt": "2026-10-05T00:40:10.756Z",
+      "completedAt": "2026-10-05T00:42:19.371Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-1a9bf758-f6a0-4d95-8a9e-6ada83374a83/result.json",
+      "outputHash": "9e6c2a8260f9184d5771a8628ecc3f76faa3dbfcfdd789e965137e859c486286"
+    },
+    {
+      "id": "task-9b3a9841-ca15-4161-8daa-074fcf1b4660",
+      "kind": "integration",
+      "goal": "整合当前工作者产物，交付本阶段完整、自洽的待批准变更包。",
+      "dependsOn": [
+        "task-e14ed74c-6789-48f8-97ee-7f72ffdcae00",
+        "task-1a9bf758-f6a0-4d95-8a9e-6ada83374a83"
+      ],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "15d698e0fd3aed02ae7884517a53e778d5ed497decce359f16d1fdd5fb2aa5c0",
+      "inputRefs": [],
+      "startedAt": "2026-10-05T00:44:23.451Z",
+      "completedAt": "2026-10-05T00:48:29.365Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-9b3a9841-ca15-4161-8daa-074fcf1b4660/result.json",
+      "outputHash": "8850b4bf11ce7f7b6cc5f92d0f19318102ffee668e29bbb6444ff6d1645bf434"
+    },
+    {
+      "id": "task-df2f2464-2dcd-4180-a694-3c0df41dc452",
+      "kind": "review",
+      "goal": "独立检查最新草案与证据，返回具体阻塞；只有全部满足时 blockers=[]。",
+      "dependsOn": [],
+      "status": "completed",
+      "model": "gemini-3.8-flash-high",
+      "attempts": 1,
+      "basisHash": "15d698e0fd3aed02ae7884517a53e778d5ed497decce359f16d1fdd5fb2aa5c0",
+      "inputRefs": [],
+      "startedAt": "2026-10-05T00:48:29.555Z",
+      "completedAt": "2026-10-05T00:52:17.632Z",
+      "outputOrigin": "provider",
+      "outputRef": "tasks/task-df2f2464-2dcd-4180-a694-3c0df41dc452/result.json",
+      "outputHash": "d185a504bdfc6bbf0b014a571c2b63c93ae2d43084a2f07a603725d33cceecfc"
+    }
+  ],
+  "createdAt": "2026-10-05T00:40:10.472Z",
+  "updatedAt": "2026-10-05T00:52:17.865Z",
+  "pendingQuestions": [],
+  "nextEventSeq": 23,
+  "progressSignatures": [
+    "d096e5c8023c5acb1a1ce9795bf9cd1af6997eb5e43d0e8ed16c4ee1067b0d1a"
+  ],
+  "deferredQuestions": [],
+  "unfinishedBlockIds": [],
+  "summary": "# 规划整合产物与待批准变更包总结（Feedback 阶段 R6 修订）\n\n本轮规划工作依据最新自动质量验收反馈（`input:1488ed35-6288-4173-b10a-48bcd6cd16a4`）与真实 MDN Web API 官方标准，针对前期导出规范中揭示的清空重置异常处理缺陷（R5-B1 与 R5-B2）进行了深入查证与契约闭合重构，交付自洽、严密的待批准变更包：\n\n### 1. 核心问题定位与技术解决策略\n- **解决 R5-B1（replaceWith 异常导致旧节点闭包代际失配死锁）**：\n  原实现提前自增 `inputGeneration` 并取消定时器，当 `oldNode.replaceWith` 抛出 `DOMException`（如 MDN 文档记录的 `HierarchyRequestError`）时，旧输入框仍留在 DOM 树中，但其闭包内捕获的 `bornGeneration` 永远落后于全局代际，导致后续键盘事件被入口守卫拦截丢弃，输入框丧失可编辑性。\n  **解决方案**：将清空重置重构为**两阶段状态事务（Two-Phase State Transaction）**。在执行替换前捕获 `ResetTransactionSnapshot` 快照；在替换提交前不提前自增全局代际（新闭包捕获预期的 `nextGeneration`）；若 `replaceWith` 抛错立即触发 `ResetController.rollback`，全局代际、调度纪元与活跃节点严格还原，原闭包 `bornGeneration === inputGeneration` 契约严格自洽，用户键入 `'Edited after failure'` 正常触发 300ms 防抖更新。\n- **解决 R5-B2（替换后呈现/焦点异常导致用户草稿丢失）**：\n  原实现中 `replaceWith` 成功后，若随后的 `DisplayRenderer.renderPlaceholder` 或 `focus` 抛出异常，新空节点已接入 DOM 而保存原草稿的旧节点已脱离，导致用户输入丢失。\n  **解决方案**：快照完整记录原草稿文本、DOM 拓扑位置及展示/错误状态；若后续任何步骤抛错，`rollback` 执行物理回插（`replaceChild` 或插回原位置），将原草稿赋回原节点，并安全恢复原排队任务的防抖调度；极端回滚故障时在顶部横幅展开只读草稿容器供复制，坚决不调用 `window.location.reload()`。\n\n### 2. 规范伪代码与模块接口自洽化（R4-B2 闭合）\n- 在 `blk-tech-interface` 中提供了完整自包含、无未定义全局引用的 JavaScript 伪代码：\n  - 显式声明并注入 `displayElement`、`errorContainer`、`resetButton`；\n  - 完整实现 `DisplayRenderer`、`FeedbackBanner`（含 `showGlobalError`、`clearInputError`）、`ValidatorModule`、`DebounceScheduler`、`InputController`、`ResetController` 与 `AppController`；\n  - 从接口声明中彻底剔除未实现的 `getInputText` / `setInputText` 冗余声明；\n  - 5 类持久属性（label 关联、ARIA、tabindex、class/style、data-*）安全全量复制，瞬态 `value` 与 `aria-invalid` 显式过滤排除。\n\n### 3. 环境边界与未验证状态遵循（R4-B1 闭合）\n- 明确合成隔离保证严格限定于旧节点/旧闭包守卫拦截；删除“极其罕见”无依据判断，不作原生重定向会被代际守卫拦截的错误承诺；\n- 原生 IME 会话终结、浏览器事件重定向、真实辅助技术与真机兼容性标记为 `unexecuted` 待开发阶段真机实测；规划环境容器限制记录为规划约束，不重复安排不可用 Docker 试验。\n\n### 4. 证据完整性与阻断消除\n- 修正证据 `evidence-37699c07-e70f-4d97-b809-4d68ad503428` 来源为标准用户输入 `input:1488ed35-6288-4173-b10a-48bcd6cd16a4`，消除来源阻断；\n- 通过 `research_read` 取得 MDN 官方文档 `replaceWith` 与 `isConnected` 的不可变哈希证据，无虚构链接；\n- 保持 30 个稳定块 ID 与所有历史已批准事实完好无损，变更包处于待批准 `pending` 状态。",
+  "clarification": null,
+  "changeSetId": "change-80094931-1ed4-4b40-bfe3-14a90886e7da-delivery-0"
+}

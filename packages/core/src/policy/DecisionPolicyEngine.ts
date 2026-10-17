@@ -152,7 +152,7 @@ export class DecisionPolicyEngine {
     );
     const existingStatements = new Set(
       snapshot.decisions.items
-        .filter((d) => d.status !== 'superseded' && d.status !== 'rejected')
+        .filter((d) => d.status !== 'superseded' && d.status !== 'rejected' && (d.status as string) !== 'deprecated')
         .map((d) => d.statement.trim().toLowerCase())
     );
 

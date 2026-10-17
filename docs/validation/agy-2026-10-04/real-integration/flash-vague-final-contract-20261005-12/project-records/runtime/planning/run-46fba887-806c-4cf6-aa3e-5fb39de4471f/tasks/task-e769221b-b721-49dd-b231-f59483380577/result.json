@@ -1,0 +1,71 @@
+{
+  "blockers": [
+    "【导入预览契约与写版本缺口】受影响块 ID：interface-backup-service, flow-backup-restore, task-import-merge-overwrite, acceptance-backup-restore。依据：rawInputs/10 (N9) 反例证明，ImportPreviewTargetState 若仅使用 notesCount、sumRevision、maxRevision 反算状态，存在相同记录数和修订号总和的碰撞隐患（例如两记录 A(rev1 trashed)、B(rev5 active) 在预览后硬删除 A 并新建 C(rev1 active)，汇总值完全一致但实际库已失效）。必须在持久化 meta 中维护单调自增的 databaseWriteVersion，并在执行导入的同一只读/读写事务内强校验代际与 databaseWriteVersion 是否与预览完全一致，不一致则零写入并提示重新预览。",
+    "【SessionDraft 强校验与会话存储边界缺口】受影响块 ID：data-model-session-draft, interface-session-draft, flow-note-editing, task-note-editor, acceptance-quick-capture。依据：MDN 官方规范（evidence-af1dd771-ece0-428f-8f91-91f8e2dc0b79）与 rawInputs/10 (N11)。sessionStorage 仅绑定当前浏览器标签页会话（page session），关闭标签页或浏览器窗口即被彻底清除，且跨标签页不共享，不可承诺跨关闭必恢复；存储异常或容量超限时必须降级至内存草稿并提供显式手动草稿复制/导出功能；草稿恢复仅载入编辑器且继续遵守 CAS，不静默写入数据库。",
+    "【BackupPayload 规范格式与元数据强校验缺口】受影响块 ID：data-model-backup-payload, interface-backup-service, task-backup-export-import, acceptance-backup-restore。依据：rawInputs/10 (N12)。BackupPayload.meta 需消除 appMeta 与 backupTracker 的重复定义或建立严格等值强校验；appSettings 需明确具体偏好枚举（如 viewMode: 'grid' | 'list'）并拒绝未定义设置；区分备份存档与本地操作性代际/写版本，覆盖导入成功后本地代际单调递增，不继承旧备份代际，防止陈旧编辑会话覆盖新数据。",
+    "【检索性能测量口径与物理重绘断言缺口】受影响块 ID：technical-search-performance, task-search-perf-validation, acceptance-search-performance。依据：MDN requestAnimationFrame 官方规范（evidence-e1584b7c-8ea6-49d0-85a2-d0271fed1761）与 rawInputs/10 (N14)。rAF 回调执行于浏览器重绘之前（before the next repaint），只能作为从输入事件到 DOM 更新及重绘前回调的代理耗时，不能宣称物理像素已在屏幕可见；测量起点应统一定义为完整关键词输入后的最后 input 事件，包含 80ms 防抖，目标保持 1000 条种子数据下 Nearest-Rank P95 <= 150ms。受规划环境限制（evidence-368cf16b-b0ab-431a-9c64-8170e14498d5），真实性能指标继续如实标为 unexecuted，移交交付阶段前台浏览器验证。",
+    "【收藏检索分支排除回收区便签缺口】受影响块 ID：feature-search-filter, flow-search-filter, page-main-workspace, acceptance-search-filtering。依据：rawInputs/10 (N15)。主工作区收藏过滤分支若仅按 isFavorite === true 查询，会导致回收区已删除但曾标记收藏的便签意外泄漏。全链条过滤谓词必须统一为 isFavorite && (status === 'active' || status === 'archived')，回收区便签仅在自身独立视图内被检索，验收中需增加收藏且已删除的反例用例。",
+    "【页面全局快捷键 IME 组合输入防护缺口】受影响块 ID：page-main-workspace, feature-quick-capture, acceptance-quick-capture。依据：MDN KeyboardEvent.isComposing 官方规范（evidence-98e73cf3-c7db-4d86-b6ab-310fcd5aa492）与 rawInputs/10 (N13)。页面 'N' 快捷键必须在焦点位于 input/textarea/contenteditable 或 event.isComposing === true（输入法输入会话中）时完全放行，防止在用户中文输入时误触发新建便签；所有表单与弹窗提交快捷键统一为 Ctrl/Cmd + Enter。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "MDN 官方规范确认 requestAnimationFrame 回调执行于浏览器下一次重绘前（before the next repaint），仅作为从输入事件到 DOM 更新及重绘前回调的代理观测时机，不能等同于物理像素已上屏可见。检索验收规范应修正该物理绘制保证的表述口径。",
+      "content": "The window.requestAnimationFrame() method tells the browser you wish to perform an animation. It requests the browser to call a user-supplied callback function before the next repaint.",
+      "hash": "b97434d7e6cfcaac4e64c4061602712fd3c3944a7dead3419571d649a4f44315",
+      "id": "evidence-e1584b7c-8ea6-49d0-85a2-d0271fed1761",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame",
+      "obtainedAt": "2026-10-05T12:50:44.029Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame"
+    },
+    {
+      "applicability": "MDN 官方规范确认 Service Worker 离线缓存与注册仅在安全上下文（HTTPS 或 http://localhost）中可用，file:// 协议和普通不安全 HTTP 均不支持。首版离线部署与测试的前提条件必须限定在安全上下文中，不能承诺 file:// 免服务器离线运行。",
+      "content": "Service workers are only available in secure contexts : this means that their document is served over HTTPS, although browsers also treat http://localhost as a secure context, to facilitate local development.",
+      "hash": "c306d5d60744058752baf4bbb9207ee02a69fbd07452967b03ad9a7cb9ac8e4f",
+      "id": "evidence-b3e5a63d-2089-4832-a739-f15cd4ec7ce7",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API",
+      "obtainedAt": "2026-10-05T12:51:00.798Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API"
+    },
+    {
+      "applicability": "MDN 官方规范确认 sessionStorage 数据生命周期仅维持在当前标签页会话内，刷新可保留，但标签页或浏览器关闭即被清除，且跨标签页不共享。SessionDraft 草稿暂存仅能防范意外刷新，不能承诺跨窗口关闭必能恢复，需明确可用性边界。",
+      "content": "sessionStorage is partitioned by both origin and browser tabs (top-level browsing contexts). The data in sessionStorage is only kept for the duration of the page session. A page session lasts as long as the tab or the browser is open, and survives over page reloads and restores. Closing the tab/window ends the session and clears data in sessionStorage.",
+      "hash": "6bd80328159dbb8b1367e115cd8a3d20a0adfd7b0f6c6d5191256f1f5052bfc5",
+      "id": "evidence-af1dd771-ece0-428f-8f91-91f8e2dc0b79",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage",
+      "obtainedAt": "2026-10-05T12:51:16.353Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"
+    },
+    {
+      "applicability": "MDN 官方规范确认 KeyboardEvent.isComposing 在输入法输入合成（IME）过程中为 true。页面快捷键 'N' 必须在 input/textarea/contenteditable 聚焦以及 isComposing 期间予以放行，防止在用户中文拼音输入时误触发新建便签。",
+      "content": "The KeyboardEvent.isComposing read-only property returns a boolean value indicating if the event is fired within a composition session, i.e., after compositionstart and before compositionend.",
+      "hash": "d0fcee05af143cdeb3c013af3affffa8e0305b93e51c6eb0545173dfb25c0315",
+      "id": "evidence-98e73cf3-c7db-4d86-b6ab-310fcd5aa492",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/isComposing",
+      "obtainedAt": "2026-10-05T12:51:32.215Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/isComposing"
+    },
+    {
+      "applicability": "当前规划环境未启动 Docker 守护进程，沙盒容器自动化基准测试不可用。试验真实标记为 unexecuted 并说明缺少 Docker 运行环境，冷启动 TTI <= 1.0s 与 1000 条便签检索 P95 <= 150ms 等性能指标不可在规划期伪造已测通过，必须保留在后续真实浏览器环境的验证任务中执行。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "node:24.13.0-bookworm-slim (unavailable)",
+      "id": "evidence-368cf16b-b0ab-431a-9c64-8170e14498d5",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-05T12:52:11.062Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-4c0b7a50-a122-413b-99b7-9b8f1c7673ce"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本任务针对材料与自动质量验收反馈（rawInputs/10 及相关基线）展开独立可行性、异常使用场景及技术约束分析。通过研究查证并补充了 4 项官方权威 Web 标准规范与 1 项受控试验环境准备证据：1) 查证 MDN requestAnimationFrame 规范，明确其回调执行于下一次重绘前（before the next repaint），仅作为从输入事件到 DOM 更新及重绘前回调的代理时机，不能宣称为物理像素已可见；2) 查证 MDN Service Worker API 规范，明确 Service Worker 离线缓存与注册仅在安全上下文（HTTPS 或 http://localhost）中可用，file:// 与不安全 HTTP 协议不支持运行；3) 查证 MDN sessionStorage 规范，明确数据生命周期仅绑定单标签页会话，关闭标签页即销毁且跨标签页不共享，不可承诺跨关闭恢复；4) 查证 MDN KeyboardEvent.isComposing 规范，明确 IME 输入法组合输入期间返回 true，需在页面全局快捷键中予以放行；5) 试验环境表明宿主 Docker 守护进程未启动，自动化沙盒基准测试当前不可用，冷启动与检索性能指标如实保持 unexecuted。上述发现适用并影响导入预览契约、写版本机制（databaseWriteVersion）、SessionDraft 隔离、BackupPayload 强校验、检索耗时口径及快捷键拦截规则。所有设计修改需求均已具体列入 blockers，交由整合任务统一处理，不越权生成 groups 或变更正式状态。"
+}

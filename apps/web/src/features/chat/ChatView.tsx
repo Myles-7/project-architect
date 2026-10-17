@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Send,
   Sparkles,
@@ -9,6 +9,8 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
+  FileText,
+  Undo2,
 } from 'lucide-react';
 import { useProjectSession } from '../../state/ProjectSessionContext.js';
 import { QuestionCard } from './QuestionCard.js';
@@ -25,6 +27,7 @@ import type {
   QuestionItem,
   TypedRef,
   DiscoveryProgressView,
+  DiscoveryIntensity,
 } from '@project-architect/contracts';
 
 
@@ -36,6 +39,7 @@ export const ChatView: React.FC = () => {
     refreshSnapshot,
     scheduleDiscoveryJob,
     answerQuestionAsAssumption,
+    retractQuestion,
     setActiveTab,
   } = useProjectSession();
   const {
@@ -82,7 +86,14 @@ export const ChatView: React.FC = () => {
   }, [chatDraftKey, inputMessage]);
 
   const [isSending, setIsSending] = useState(false);
+  const [intensity, setIntensity] = useState<DiscoveryIntensity>('standard');
   const [lastError, setLastError] = useState<string | null>(null);
+  const [lastRecordedTurn, setLastRecordedTurn] = useState<{
+    turnId: string;
+    recordedRevision: number;
+    text: string;
+    clientTurnId: string;
+  } | null>(null);
   const [isConflictModalOpen, setIsConflictModalOpen] = useState(false);
   const [isSchedulingDiscovery, setIsSchedulingDiscovery] = useState(false);
   const [submittingQuestionIds, setSubmittingQuestionIds] = useState<Set<string>>(new Set());
@@ -92,6 +103,44 @@ export const ChatView: React.FC = () => {
   const [isAnsweredListExpanded, setIsAnsweredListExpanded] = useState(false);
   const [showOlderQuestions, setShowOlderQuestions] = useState(false);
   const [discoveryProgress, setDiscoveryProgress] = useState<DiscoveryProgressView | null>(null);
+
+  // 10-Second Undo State & Retract Handler
+  const [undoState, setUndoState] = useState<{
+    questionRef: QuestionRef;
+    questionText: string;
+    expiresAt: number;
+    timerId: any;
+  } | null>(null);
+
+  const handleRetractLastQuestion = useCallback(async () => {
+    if (!undoState || !activeProjectId) return;
+    if (undoState.timerId) clearTimeout(undoState.timerId);
+    const targetRef = undoState.questionRef;
+    setUndoState(null);
+    try {
+      await retractQuestion(targetRef);
+      success('已撤回题目的决策记录，卡片已还原为待选状态', '决策已撤回');
+      await refreshSnapshot();
+    } catch (err: any) {
+      const msg = err instanceof ApiClientError ? err.message : '撤回操作失败';
+      error(msg, '撤回异常');
+    }
+  }, [undoState, activeProjectId, retractQuestion, refreshSnapshot, success, error]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        const activeEl = document.activeElement;
+        const isEditing = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+        if (!isEditing && undoState) {
+          e.preventDefault();
+          void handleRetractLastQuestion();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undoState, handleRetractLastQuestion]);
 
   useEffect(() => {
     if (!activeProjectId) {
@@ -107,7 +156,7 @@ export const ChatView: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [activeProjectId, stateRevision]);
+  }, [activeProjectId, apiClient, stateRevision]);
 
   const answerQueueRef = useRef<Promise<void>>(Promise.resolve());
   const latestRevisionRef = useRef(stateRevision || 1);
@@ -134,41 +183,54 @@ export const ChatView: React.FC = () => {
   }, [isSending]);
 
   // --------------------------------------------------------------------------
-  // Send Discovery Message (Pre-persist input then schedule job)
+  // Action: Send Message / Start New Discovery (Record input -> Schedule Job)
   // --------------------------------------------------------------------------
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!inputMessage.trim() || !activeProjectId || ['queued', 'running'].includes(discoveryJob?.status || '')) return;
+    if (!activeProjectId || !inputMessage.trim() || isSending) return;
 
-    const messageText = inputMessage.trim();
-    const currentRev = stateRevision || 1;
+    const messageToSend = inputMessage.trim();
+    setIsSending(true);
     setLastError(null);
 
+    const clientTurnId = `ct-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
     try {
-      // 1. Pre-persist user input to disk and get turnId
+      // 1. Record input pre-persistence with clientTurnId
+      const currentRev = stateRevision || 1;
       const inputRes = await apiClient.recordDiscoveryInput(activeProjectId, {
         projectId: activeProjectId,
-        text: messageText,
+        text: messageToSend,
         expectedRevision: currentRev,
+        clientTurnId,
       });
 
-      // Clear input and draft only AFTER successful persistence
-      setInputMessage('');
-      setHasRestoredDraft(false);
-      if (chatDraftKey) {
-        try {
-          localStorage.removeItem(chatDraftKey);
-        } catch {}
-      }
+      const recordedTurn = {
+        turnId: inputRes.turnId,
+        recordedRevision: inputRes.snapshot.metadata.stateRevision,
+        text: messageToSend,
+        clientTurnId,
+      };
+      setLastRecordedTurn(recordedTurn);
 
       // Update state snapshot to latest revision
       if (inputRes.snapshot) {
         dispatch({ type: 'UPDATE_SNAPSHOT', payload: { snapshot: inputRes.snapshot } });
       }
 
-      // 2. Schedule discovery job using turnId
-      await scheduleDiscoveryJob(inputRes.snapshot.metadata.stateRevision, undefined, inputRes.turnId);
+      // 2. Schedule discovery job using turnId and intensity
+      await scheduleDiscoveryJob(inputRes.snapshot.metadata.stateRevision, undefined, inputRes.turnId, intensity);
+
+      // Step 2 succeeded: safely clear input and draft
+      setInputMessage('');
+      setHasRestoredDraft(false);
+      setLastRecordedTurn(null);
+      if (chatDraftKey) {
+        try {
+          localStorage.removeItem(chatDraftKey);
+        } catch {}
+      }
       success('构思输入已持久化并提交，AI 正在后台进行深度架构推演。', '后台推演已启动');
     } catch (err: any) {
       if (err instanceof ApiClientError && err.statusCode === 409) {
@@ -178,6 +240,46 @@ export const ChatView: React.FC = () => {
         setLastError(msg);
         error(msg, '推演中断');
       }
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleRetryDiscovery = async () => {
+    if (!activeProjectId || isSending) return;
+    setIsSending(true);
+    setLastError(null);
+
+    try {
+      if (lastRecordedTurn) {
+        await scheduleDiscoveryJob(
+          lastRecordedTurn.recordedRevision,
+          undefined,
+          lastRecordedTurn.turnId,
+          intensity
+        );
+        setInputMessage('');
+        setHasRestoredDraft(false);
+        setLastRecordedTurn(null);
+        if (chatDraftKey) {
+          try {
+            localStorage.removeItem(chatDraftKey);
+          } catch {}
+        }
+        success('推演任务已重新调度排队。', '重试成功');
+      } else if (inputMessage.trim()) {
+        await handleSendMessage();
+      } else {
+        const currentRev = snapshot?.metadata?.stateRevision ?? latestRevisionRef.current ?? stateRevision ?? 1;
+        await scheduleDiscoveryJob(currentRev, undefined, undefined, intensity);
+        success('已重新调度推演任务。', '重试成功');
+      }
+    } catch (err: any) {
+      const msg = err instanceof ApiClientError ? err.message : '重试推演失败，请稍后再试。';
+      setLastError(msg);
+      error(msg, '重试失败');
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -203,6 +305,22 @@ export const ChatView: React.FC = () => {
         return next;
       });
       await refreshSnapshot();
+
+      // Trigger 10-second undo toast
+      const qItem = snapshot?.questions.items.find(
+        (q) => q.id === questionRef || `question:${q.id}` === questionRef
+      );
+      if (undoState?.timerId) clearTimeout(undoState.timerId);
+      const timer = setTimeout(() => {
+        setUndoState(null);
+      }, 10000);
+      setUndoState({
+        questionRef,
+        questionText: qItem?.question || String(questionRef),
+        expiresAt: Date.now() + 10000,
+        timerId: timer,
+      });
+
       return response.snapshot.metadata.stateRevision;
     });
     answerQueueRef.current = operation.then(() => undefined, () => undefined);
@@ -248,6 +366,22 @@ export const ChatView: React.FC = () => {
         return next;
       });
       await refreshSnapshot();
+
+      // Trigger 10-second undo toast
+      const qItem = snapshot?.questions.items.find(
+        (q) => q.id === questionRef || `question:${q.id}` === questionRef
+      );
+      if (undoState?.timerId) clearTimeout(undoState.timerId);
+      const timer = setTimeout(() => {
+        setUndoState(null);
+      }, 10000);
+      setUndoState({
+        questionRef,
+        questionText: qItem?.question || String(questionRef),
+        expiresAt: Date.now() + 10000,
+        timerId: timer,
+      });
+
       return nextRev;
     });
     answerQueueRef.current = operation.then(() => undefined, () => undefined);
@@ -468,6 +602,8 @@ export const ChatView: React.FC = () => {
     legacy: '历史问题',
   }[currentBatchStage] || '需求澄清';
   const isBackgroundDiscoveryActive = discoveryJob && ['queued', 'running'].includes(discoveryJob.status);
+  const isInferring = state.requestState.status === 'loading';
+  const isBusyInferring = isBackgroundDiscoveryActive || isSending || isInferring;
 
   if (!activeProjectId) {
     return (
@@ -481,36 +617,74 @@ export const ChatView: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl w-full mx-auto flex flex-col justify-between min-h-full pb-6 space-y-6">
-      {/* Top Stream: Project Greeting / Idea Summary */}
-      <div className="space-y-6">
-        {/* Next Best Action Banner (Always visible anchor) */}
-        <NextBestActionBanner
-          snapshot={snapshot}
-          progress={discoveryProgress}
-          onFocusInput={() => chatInputRef.current?.focus()}
-          onJumpToTab={(tab) => setActiveTab(tab)}
-          onJumpToFirstUnanswered={scrollToQuestions}
-        />
-
-        {/* Latest Discovery Structured Breakdown & Comprehension Anchor */}
-        {latestDiscoveryResult && (
-          <DiscoveryResultCard
-            discoveryResult={latestDiscoveryResult}
-            timestamp={latestDiscoveryTimestamp || undefined}
-            projectName={snapshot?.metadata?.name}
-            diagnostics={latestDiscoveryDiagnostics || undefined}
-            onConfirmCandidate={handleConfirmCandidateFromChat}
-            onConfirmAssumption={handleConfirmAssumptionFromChat}
-            findCandidateRef={findCandidateRef}
-            findAssumptionRef={findAssumptionRef}
-            onScrollToQuestions={visibleBatchQuestions.length > 0 ? scrollToQuestions : undefined}
+    <div className="flex-1 min-h-0 h-full flex flex-col overflow-hidden w-full">
+      {/* Scrollable messages and questions stream */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6 scroll-smooth">
+        <div className="max-w-3xl xl:max-w-4xl 2xl:max-w-5xl w-full mx-auto space-y-6">
+          {/* Next Best Action Banner (Always visible anchor) */}
+          <NextBestActionBanner
+            snapshot={snapshot}
+            progress={discoveryProgress}
+            onFocusInput={() => chatInputRef.current?.focus()}
+            onJumpToTab={(tab) => setActiveTab(tab)}
+            onJumpToFirstUnanswered={scrollToQuestions}
           />
-        )}
 
-        {/* In-flight Discovery Dynamic Progress Ticker */}
-        {(isBackgroundDiscoveryActive || isSending) && (
-          <DiscoveryProgressTicker />
+          {/* Latest Discovery Structured Breakdown & Comprehension Anchor */}
+          {latestDiscoveryResult && (
+            <DiscoveryResultCard
+              discoveryResult={latestDiscoveryResult}
+              timestamp={latestDiscoveryTimestamp || undefined}
+              projectName={snapshot?.metadata?.name}
+              diagnostics={latestDiscoveryDiagnostics || undefined}
+              onConfirmCandidate={handleConfirmCandidateFromChat}
+              onConfirmAssumption={handleConfirmAssumptionFromChat}
+              findCandidateRef={findCandidateRef}
+              findAssumptionRef={findAssumptionRef}
+              onScrollToQuestions={visibleBatchQuestions.length > 0 ? scrollToQuestions : undefined}
+            />
+          )}
+
+          {/* In-flight Discovery Dynamic Progress Ticker */}
+          {isBusyInferring && (
+            <DiscoveryProgressTicker forceActive={isSending || isInferring} />
+          )}
+
+          {/* Cold-start prompt when completely fresh and not inferring */}
+          {!latestDiscoveryResult && visibleBatchQuestions.length === 0 && !isBusyInferring && (
+            <div className="p-8 rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 text-center space-y-3">
+              <Sparkles className="w-8 h-8 text-orange-500 mx-auto animate-pulse" />
+              <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                准备好开始构思推演
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">
+                在下方输入框中描述你的构思意图，或直接点击发送。AI 架构师将启动单次深度架构推演并生成自适应问题集。
+              </p>
+            </div>
+          )}
+
+        {/* Error / Retry Banner */}
+        {(lastError || discoveryJob?.status === 'failed') && !isSending && !isBackgroundDiscoveryActive && (
+          <div className="p-3.5 rounded-2xl border text-xs flex items-center justify-between gap-4 bg-rose-50/80 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/60 text-rose-900 dark:text-rose-200">
+            <div className="space-y-1">
+              <div className="font-semibold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                <span>推演调度或执行中断</span>
+              </div>
+              <div className="text-[11px] leading-relaxed opacity-90">
+                {lastError || discoveryJob?.message || '上一轮推演任务未能完成，构思输入已安全保留。'}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleRetryDiscovery}
+              disabled={isSending}
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-medium transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>重试推演</span>
+            </button>
+          </div>
         )}
 
         {/* Discovery Job Status / Manual Trigger Banner when not running */}
@@ -579,6 +753,45 @@ export const ChatView: React.FC = () => {
           </div>
         )}
 
+        {/* 10-Second Undo Toast Banner */}
+        {undoState && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="sticky top-2 z-30 p-3.5 rounded-xl border border-orange-500/30 bg-surface-overlay shadow-lg flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200"
+          >
+            <div className="flex items-center gap-2 text-xs text-text-primary min-w-0">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+              <div className="truncate">
+                <span>已确立决策: </span>
+                <span className="font-semibold text-text-primary">{undoState.questionText}</span>
+                <span className="text-text-muted ml-2">(10秒内可按 Ctrl+Z 撤回)</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => void handleRetractLastQuestion()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-orange-600 dark:text-orange-400 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 transition-colors cursor-pointer"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+                <span>撤回 (Ctrl+Z)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (undoState.timerId) clearTimeout(undoState.timerId);
+                  setUndoState(null);
+                }}
+                className="p-1 rounded text-text-muted hover:text-text-primary text-xs cursor-pointer"
+                title="关闭"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Questions Section Anchor: Wizard View vs List View */}
         {visibleBatchQuestions.length > 0 && (
           <div ref={questionsSectionRef} className="space-y-4 pt-2">
@@ -630,6 +843,7 @@ export const ChatView: React.FC = () => {
                   <QuestionCard
                     key={q.id}
                     question={q}
+                    projectId={activeProjectId || undefined}
                     onAnswerRecord={handleQuestionRecordAnswer}
                     onAnswerAndDiscover={handleQuestionAnswerAndDiscover}
                     onAnswerAsAssumption={handleQuestionAnswerAsAssumption}
@@ -646,6 +860,45 @@ export const ChatView: React.FC = () => {
                     }
                   />
                 ))}
+
+                {activeQuestions.length === 0 && answeredQuestions.length > 0 && !isBackgroundDiscoveryActive && !isSending && (
+                  <div className="p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/60 dark:bg-emerald-950/20 text-emerald-950 dark:text-emerald-200 space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-semibold">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>本轮问题已全部处理完毕，已沉淀为项目决策与假设！</span>
+                    </div>
+                    <p className="text-[11px] text-emerald-800 dark:text-emerald-300 opacity-90">
+                      你可以在下方输入框随时补充新想法与约束，或选择下一步推荐动作：
+                    </p>
+                    <div className="flex items-center gap-2 flex-wrap pt-1">
+                      <button
+                        type="button"
+                        onClick={handleScheduleDiscovery}
+                        disabled={isSchedulingDiscovery}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>继续深度推演（发掘下一阶段盲点）</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('readiness')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-medium rounded-xl text-xs transition-colors cursor-pointer"
+                      >
+                        <Compass className="w-3.5 h-3.5" />
+                        <span>前往准备度审阅 (Readiness)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('documents')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-medium rounded-xl text-xs transition-colors cursor-pointer"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>查看开发蓝图 (Documents)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Collapsible Answered Decisions Drawer */}
                 {answeredQuestions.length > 0 && (
@@ -671,6 +924,7 @@ export const ChatView: React.FC = () => {
                           <QuestionCard
                             key={q.id}
                             question={q}
+                            projectId={activeProjectId || undefined}
                             onAnswerRecord={handleQuestionRecordAnswer}
                             onAnswerAndDiscover={handleQuestionAnswerAndDiscover}
                             onAnswerAsAssumption={handleQuestionAnswerAsAssumption}
@@ -712,68 +966,107 @@ export const ChatView: React.FC = () => {
         )}
 
         <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Sticky Bottom Chat Input Box */}
-      <div className="sticky bottom-0 pt-3 bg-[#FAF9F6] dark:bg-[#0C0D0F]">
-        {hasRestoredDraft && inputMessage && (
-          <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-orange-50 dark:bg-orange-950/40 border border-orange-200/80 dark:border-orange-900/60 text-xs text-orange-900 dark:text-orange-200 mb-2 shadow-2xs animate-in fade-in">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
-              <span>已为您恢复上次未发送的构思输入草稿</span>
+      {/* Docked Bottom Chat Input Box */}
+      <div className="shrink-0 border-t border-zinc-200 dark:border-zinc-800 bg-[#FAF9F6]/95 dark:bg-[#0C0D0F]/95 backdrop-blur-sm p-4 z-20">
+        <div className="max-w-3xl xl:max-w-4xl 2xl:max-w-5xl w-full mx-auto">
+          {hasRestoredDraft && inputMessage && (
+            <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-orange-50 dark:bg-orange-950/40 border border-orange-200/80 dark:border-orange-900/60 text-xs text-orange-900 dark:text-orange-200 mb-2 shadow-2xs animate-in fade-in">
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                <span>已为您恢复上次未发送的构思输入草稿</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setInputMessage('');
+                  setHasRestoredDraft(false);
+                  if (chatDraftKey) {
+                    try {
+                      localStorage.removeItem(chatDraftKey);
+                    } catch {}
+                  }
+                }}
+                className="text-xs underline hover:text-orange-800 dark:hover:text-orange-100 cursor-pointer"
+              >
+                清空草稿
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setInputMessage('');
-                setHasRestoredDraft(false);
-                if (chatDraftKey) {
-                  try {
-                    localStorage.removeItem(chatDraftKey);
-                  } catch {}
+          )}
+
+          <form
+            onSubmit={handleSendMessage}
+            className="p-3 rounded-2xl bg-surface-card border border-border-subtle shadow-elevation-card space-y-2"
+          >
+            <textarea
+              ref={chatInputRef}
+              rows={3}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                  e.preventDefault();
+                  handleSendMessage();
                 }
               }}
-              className="text-[11px] underline hover:text-orange-800 dark:hover:text-orange-100 cursor-pointer"
-            >
-              清空草稿
-            </button>
-          </div>
-        )}
+              placeholder="描述新增的功能需求、架构约束或业务边界 (Ctrl+Enter 发送)..."
+              disabled={isSending}
+              className="w-full p-2.5 rounded-xl text-xs bg-surface-subtle/50 border border-border-subtle focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all text-text-primary placeholder-text-muted leading-relaxed resize-none"
+            />
 
-        <form
-          onSubmit={handleSendMessage}
-          className="p-3 rounded-2xl bg-white dark:bg-[#17181D] border border-zinc-200/80 dark:border-zinc-800/80 shadow-md space-y-2"
-        >
-          <textarea
-            ref={chatInputRef}
-            rows={3}
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            placeholder="描述新增的功能需求、架构约束或业务边界 (Ctrl+Enter 发送)..."
-            disabled={isSending}
-            className="w-full p-2.5 rounded-xl text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 transition-all text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 leading-relaxed resize-none"
-          />
+            <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
+              <div className="flex items-center gap-1 bg-surface-subtle p-0.5 rounded-lg text-xs">
+                <button
+                  type="button"
+                  onClick={() => setIntensity('lite')}
+                  className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                    intensity === 'lite'
+                      ? 'bg-white dark:bg-zinc-700 text-orange-600 dark:text-orange-400 font-bold shadow-2xs'
+                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  }`}
+                  title="快速轻量 MVP：低问题预算，聚焦最小可行收敛"
+                >
+                  快速轻量
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIntensity('standard')}
+                  className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                    intensity === 'standard'
+                      ? 'bg-white dark:bg-zinc-700 text-orange-600 dark:text-orange-400 font-bold shadow-2xs'
+                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  }`}
+                  title="标准规范推演：平衡提问深度与决策收敛速度"
+                >
+                  标准推演
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIntensity('deep')}
+                  className={`px-2 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                    intensity === 'deep'
+                      ? 'bg-white dark:bg-zinc-700 text-orange-600 dark:text-orange-400 font-bold shadow-2xs'
+                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  }`}
+                  title="严苛审计：高问题预算，全面穷举潜在架构风险与冲突"
+                >
+                  严苛审计
+                </button>
+              </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-[11px] text-zinc-400 dark:text-zinc-500">
-              单轮结构化推演 · 严禁无授权自动写入
+              <button
+                type="submit"
+                disabled={isSending || !inputMessage.trim()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-xl shadow transition-colors cursor-pointer"
+              >
+                <span>{isSending ? '推演中...' : '发送并推演'}</span>
+                <Send className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <button
-              type="submit"
-              disabled={isSending || !inputMessage.trim()}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-xl shadow transition-colors cursor-pointer"
-            >
-              <span>{isSending ? '推演中...' : '发送并推演'}</span>
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
 
       {/* Conflict Modal */}

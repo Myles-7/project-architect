@@ -1,0 +1,110 @@
+{
+  "projectName": "Modern CLI Developer Tool",
+  "stage": "clarify",
+  "basis": {
+    "revision": 1,
+    "hash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4"
+  },
+  "approvedDecisions": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "风格",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    },
+    {
+      "id": "dec-preset-cli-01",
+      "area": "technical_boundary",
+      "statement": "支持 --json 格式化输出与管道输入 (stdin NDJSON) 组合使用。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "confirmedBy": "user",
+      "decisionKey": "pipe_friendly",
+      "rationale": "使工具不仅供人类阅读，亦可无缝无损地接入自动化流水线脚本。",
+      "affectedAreas": [
+        "technical_boundary",
+        "user_flows"
+      ],
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    },
+    {
+      "id": "dec-preset-cli-02",
+      "area": "user_flows",
+      "statement": "首发支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y)。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "confirmedBy": "user",
+      "decisionKey": "headless_ci_support",
+      "dependsOn": [
+        "dec-preset-cli-01"
+      ],
+      "rationale": "既能兼顾新手首次配置体验，又能确保无头 CI 环境零挂起。",
+      "affectedAreas": [
+        "user_flows",
+        "mvp_scope"
+      ],
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    }
+  ],
+  "blueprint": {
+    "schemaVersion": 1,
+    "blocks": [],
+    "stages": {
+      "product": "not-designed",
+      "technical": "not-designed",
+      "delivery": "not-designed"
+    },
+    "decisionBasisHash": "adec5cebd8b57c9305c87050dbc8544b6604c6de83f36cd6aca35309c2de3efe"
+  },
+  "decisionTopics": [
+    {
+      "key": "pipe_friendly",
+      "aliases": [],
+      "history": [
+        "dec-preset-cli-01"
+      ],
+      "effectiveDecisionId": "dec-preset-cli-01"
+    },
+    {
+      "key": "headless_ci_support",
+      "aliases": [],
+      "history": [
+        "dec-preset-cli-02"
+      ],
+      "effectiveDecisionId": "dec-preset-cli-02"
+    }
+  ],
+  "rawInputs": [],
+  "answers": [],
+  "materialIndex": [
+    {
+      "id": "input:inp-01",
+      "kind": "text",
+      "label": "Initial Idea Prompt",
+      "storageRef": "inputs/inp-01/source.txt",
+      "status": "ready",
+      "analysisAvailability": "available",
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "summary": "风格",
+      "contentHash": "1bfde6b7ea27c9b842be2221c325c64110c9ca591b46afe89faabdc32636f0cf"
+    }
+  ],
+  "deferredQuestions": [],
+  "unfinishedScopes": [],
+  "workerResults": {},
+  "currentIssues": [],
+  "approvedEvidence": [],
+  "knownEvidence": [],
+  "evidenceConflicts": []
+}

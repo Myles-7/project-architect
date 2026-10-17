@@ -40,14 +40,14 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-[#FAF9F6] dark:bg-[#0C0D0F] text-[#0F1115] dark:text-[#EDEDED]">
-          <div className="max-w-md w-full p-6 bg-white dark:bg-[#17181D] border border-red-200 dark:border-red-900/60 rounded-xl shadow-lg text-center space-y-4">
+        <div className="min-h-screen flex items-center justify-center p-6 bg-canvas text-text-primary">
+          <div className="max-w-md w-full p-6 bg-surface-overlay border border-red-200 dark:border-red-900/60 rounded-xl shadow-elevation-modal text-center space-y-4">
             <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/80 flex items-center justify-center mx-auto text-red-600 dark:text-red-400">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">界面出现异常</h2>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+              <h2 className="text-lg font-semibold text-text-primary">界面出现异常</h2>
+              <p className="text-sm text-text-secondary mt-1">
                 {this.state.errorMessage}
               </p>
             </div>

@@ -1,0 +1,511 @@
+Web application manifest - Progressive web apps | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ Progressive web apps 
+
+ Web app manifest 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ 正體中文 (繁體) 
+
+ Web application manifest
+
+ A web application manifest , defined in the Web Application Manifest specification, is a JSON text file that provides information about a web application.
+
+ The most common use for a web application manifest is to provide information that the browser needs to install a progressive web app (PWA) on a device, such as the app's name and icon.
+
+ A web application manifest contains a single JSON object where the top-level keys are called members .
+
+ In this article
+
+ Members 
+
+ Example manifest 
+
+ Deploying a manifest 
+
+ Splash screens 
+
+ Browser compatibility 
+
+ See also 
+
+ Members 
+
+ This section lists reference pages for manifest members that are documented on MDN.
+All members are optional in the specification, but some applications require some members to be present. For example, PWAs must provide certain manifest members .
+
+ *_localized 
+ background_color 
+ categories 
+ description 
+ display 
+ display_override 
+ file_handlers 
+ icons 
+ id 
+ launch_handler 
+ name 
+ note_taking 
+ orientation 
+ prefer_related_applications 
+ protocol_handlers 
+ related_applications 
+ scope 
+ scope_extensions 
+ screenshots 
+ serviceworker 
+ share_target 
+ short_name 
+ shortcuts 
+ start_url 
+ theme_color 
+
+ Note: 
+The dir , lang , and iarc_rating_id members are not implemented.
+
+ Example manifest 
+
+ json 
+ {
+ "short_name": "MDN",
+ "name": "MDN Web Docs",
+ "icons": [
+ {
+ "src": "/favicon-192x192.png",
+ "sizes": "192x192",
+ "type": "image/png"
+ },
+ {
+ "src": "/favicon-512x512.png",
+ "sizes": "512x512",
+ "type": "image/png"
+ }
+ ],
+ "start_url": ".",
+ "display": "standalone",
+ "theme_color": "black",
+ "background_color": "white"
+}
+
+ Deploying a manifest 
+
+ Web app manifests are deployed in your HTML pages using a <link> element in the <head> of a document:
+
+ html 
+ <link rel="manifest" href="manifest.json" />
+
+ The .webmanifest extension is specified in the Media type registration section of the specification (the response of the manifest file should return Content-Type: application/manifest+json ). Browsers generally support manifests with other appropriate extensions like .json ( Content-Type: application/json ).
+
+ If the manifest requires credentials to fetch, the crossorigin attribute must be set to use-credentials , even if the manifest file is in the same origin as the current page.
+
+ html 
+ <link rel="manifest" href="/app.webmanifest" crossorigin="use-credentials" />
+
+ Splash screens 
+
+ In some browsers and operating systems, a splash screen is displayed when an installed PWA is launched. This splash screen is automatically generated and its appearance is defined by members in the web app manifest, specifically:
+
+ name 
+
+ background_color 
+
+ icons 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ Progressive Web Apps (PWAs) 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Aug 8, 2025 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ Progressive web apps 
+ Guides 
+ What is a progressive web app? 
+ Installing and uninstalling web apps 
+ Making PWAs installable 
+ Offline and background operation 
+ Caching 
+ Best practices for PWAs 
+ Tutorials 
+ CycleTracker Base HTML and CSS 
+ Secure connection 
+ JavaScript functionality 
+ Manifest and iconography 
+ Offline support using service workers 
+
+ js13kGames PWA structure 
+ Offline support using service workers 
+ Making PWAs installable 
+ Using Notifications and Push APIs 
+ Progressive loading 
+
+ How to 
+ Trigger installation from your PWA 
+ Define your app icons 
+ Create a standalone app 
+ Customize colors of your app 
+ Display a badge on the app icon 
+ Expose common app actions as shortcuts 
+ Share data between apps 
+ Associate files with your PWA 
+ Localize an app manifest 
+ Reference 
+ Web app manifest 
+ Manifest members *_localized 
+ background_color 
+ categories 
+ description 
+ display 
+ display_override 
+ file_handlers 
+ icons 
+ id 
+ launch_handler 
+ name 
+ note_taking 
+ orientation 
+ prefer_related_applications 
+ protocol_handlers 
+ related_applications 
+ scope 
+ scope_extensions 
+ screenshots 
+ serviceworker 
+ share_target 
+ short_name 
+ shortcuts 
+ start_url 
+ theme_color 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

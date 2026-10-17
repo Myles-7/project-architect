@@ -1,0 +1,69 @@
+{
+  "blockers": [
+    "[受影响块: blk-tech-interface, blk-tech-error, blk-feat-reset, blk-flow-reset, blk-tech-data-model, blk-deliv-task-reset-workflow, blk-deliv-task-error-handling, blk-acc-reset, blk-deliv-acc-full-e2e] 依据: input:1488ed35-6288-4173-b10a-48bcd6cd16a4 (R5-B1) 与 MDN 官方文档 https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith。当前 ResetController.handleReset 实现中，在执行 oldNode.replaceWith 前便直接调用 DebounceScheduler.cancel() 并单调递增 inputGeneration++。当 replaceWith 发生 DOMException（如 HierarchyRequestError）或其他运行时异常时，oldNode 仍保留在 DOM 树中作为 activeInputNode 且保留用户输入，但其闭包内捕获的 bornGeneration 已落后于全局递增后的 inputGeneration。此时 oldNode 的后续所有事件（input、compositionstart/end）在闭包入口的代际核验中被直接丢弃，导致用户在清空失败后无法继续输入或触发 300ms 防抖调度，展示区永久卡死，直接违反了已确认决策 dec-failure-preserve-input（失败时保留输入）和 blk-tech-error E05（输入框保持可编辑供修改重试）。清空重置逻辑必须重构为具备事务回滚机制的状态事务：在节点物理替换成功提交之前，不得破坏旧代际与旧闭包的有效性；若替换前或替换中发生异常，必须完整保持或回滚旧节点、旧代际、旧草稿快照与调度任务，确保用户可继续编辑和重新触发防抖。",
+    "[受影响块: blk-tech-interface, blk-tech-error, blk-feat-reset, blk-flow-reset, blk-deliv-task-reset-workflow, blk-acc-reset, blk-deliv-acc-full-e2e] 依据: input:1488ed35-6288-4173-b10a-48bcd6cd16a4 (R5-B2) 与已批准决策 dec-failure-preserve-input。当前 ResetController.handleReset 在 oldNode.replaceWith(newNode) 成功后，若后续的 DisplayRenderer.renderPlaceholder、FeedbackBanner.clearInputError 或 focusInput 抛出异常，此时新节点 newNode 已经接入 DOM 树且 value 为空，而保存用户原输入的 oldNode 已被移出 DOM。catch 块中仅调用 FeedbackBanner.showGlobalError 弹出通知，并未对用户的草稿文本和会话执行恢复，导致用户既有输入丢失，与“任何失败场景绝不抹除用户已输入内容”的契约不符。必须定义明确的后阶段回滚与恢复机制：在替换前保存原输入文本与草稿快照，若呈现或焦点步骤异常，执行节点反向回滚（将旧节点移回或将原草稿赋给新节点），或者在错误横幅中明确呈现保留的原草稿供用户复制，绝不发生静默丢失输入。",
+    "材料证据 evidence-f4ad7eab-a57e-4075-9f0c-924675a71e33 没有有效注册来源。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "Element.replaceWith 异常抛出与节点替换失败防御依据",
+      "content": "Element: replaceWith() method - Web APIs | MDN. The Element.replaceWith() method replaces this Element in the children list of its parent with a set of Node objects or strings. Exceptions: HierarchyRequestError DOMException: Thrown when the node cannot be inserted at the specified point in the hierarchy.",
+      "hash": "2aae27198a28d84070b24d4428e06c1ac390eef3a6417a64dba20d4907da2ee8",
+      "id": "evidence-7fc79de9-07c0-43c1-b09d-641f14530819",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith",
+      "obtainedAt": "2026-10-05T00:40:44.515Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+    },
+    {
+      "applicability": "Node.isConnected 节点连接状态检测与回滚验证依据",
+      "content": "Node: isConnected property - Web APIs | MDN. The read-only isConnected property of the Node interface returns a boolean indicating whether the node is connected (directly or indirectly) to a Document object. Returns false when the node is detached from the document tree.",
+      "hash": "efc23d018757062e345938aca4cfdaaf3ad73cf4ecc99e7a0767cc3e0afb55a5",
+      "id": "evidence-6b1b2275-ff1a-4b49-bb31-827dd7eb8f8e",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected",
+      "obtainedAt": "2026-10-05T00:41:22.780Z",
+      "outcome": "not-applicable",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected"
+    },
+    {
+      "applicability": "清空操作事务边界与异常失败回滚契约要求",
+      "content": "自动质量验收反馈原文：R5-B1 指出 ResetController.handleReset 先 cancel 并 inputGeneration++，若 oldNode.replaceWith 抛错，旧输入框仍连接，但旧闭包 bornGeneration 已不匹配 inputGeneration，导致用户后续键入无法调度防抖；R5-B2 指出 replaceWith 成功后若后续操作抛错，新节点为空，原文本丢失。清空操作需定义为具备明确提交点与失败恢复的状态事务。",
+      "hash": "2c0eda907372d7e978b69ffd3e36db358330d605cd974557b96acaf5be97be06",
+      "id": "evidence-f4ad7eab-a57e-4075-9f0c-924675a71e33",
+      "kind": "material",
+      "location": "rawInputs[7]",
+      "obtainedAt": "2026-10-05T00:41:45.211Z",
+      "outcome": "not-applicable",
+      "source": "input:1488ed35-6288-4173-b10a-48bcd6cd16a4"
+    },
+    {
+      "applicability": "fixture.png 布局参考与色块空间排布证据",
+      "content": "调用 material_index 与 view_file 查验真实图像 fixture.png：白底背景，顶部居中偏左为黑色加粗大字“Q7M4-8261”，左下方为蓝色矩形色块，右下方为橙色圆形色块。原图中的示例文字“Q7M4-8261”仅作布局参考，不转为固定业务约束。",
+      "hash": "0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0",
+      "id": "evidence-44c8df59-a41e-4e7c-a414-0edb4b7d2269",
+      "kind": "material",
+      "location": "inputs/inp-1791129999124/fixture.png",
+      "obtainedAt": "2026-10-05T00:41:48.091Z",
+      "outcome": "not-applicable",
+      "source": "material:input:inp-1791129999124"
+    },
+    {
+      "applicability": "规划期容器环境限制记录与测试边界说明",
+      "content": "调用 environment_prepare 准备 node 容器环境，返回 status: unavailable，原因: failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified。当前规划运行环境未启动 Docker 守护进程，无法执行沙箱容器测试。该限制属于规划环境约束，非用户项目约束。",
+      "hash": "e838c3cd90f64a8094cdd18ac0b913cf",
+      "id": "evidence-docker-env-unavailable",
+      "kind": "experiment",
+      "location": "tools/experiments/prepare-e838c3cd-90f6-4a80-94cd-d18ac0b913cf.ndjson",
+      "obtainedAt": "2026-10-05T00:40:58.000Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-e838c3cd-90f6-4a80-94cd-d18ac0b913cf"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本规划工作者针对最新自动质量验收反馈（input:1488ed35-6288-4173-b10a-48bcd6cd16a4）开展了深入分析与官方标准查证：\\n1. 新增发现与异常反例定位：\\n   - R5-B1（替换前抛错导致旧节点闭包卡死）：在当前 blk-tech-interface 伪代码中，ResetController.handleReset 先执行 DebounceScheduler.cancel() 与 inputGeneration++，若后续 oldNode.replaceWith 抛出 DOMException（如 MDN 文档记录的 HierarchyRequestError）或属性克隆异常，旧输入框仍留在 DOM 树且为 activeInputNode，但其闭包 bornGeneration 已不匹配全局代际，导致后续所有键盘输入事件被入口守卫静默丢弃，输入框永久失效，直接违背 dec-failure-preserve-input 与 blk-tech-error E05。\\n   - R5-B2（替换后呈现抛错导致用户输入丢失）：若 replaceWith 成功后 DisplayRenderer.renderPlaceholder 或后续焦点操作抛出异常，此时新节点 value 为空已进入 DOM，旧节点已被移出，catch 仅提示错误横幅未做草稿恢复，造成用户既有输入丢失。\\n2. 适用范围与建议调整契约：\\n   - 将清空重置操作定义为严格的原子状态事务（Transactional State Transition），明确分为快照准备阶段、DOM 替换提交点（Commit Point）与错误回滚阶段。在替换提交成功前不提前自增全局代际；若替换发生异常完整保留或回滚旧代际与闭包；若替换后后续呈现操作异常，执行节点反向回滚或将已捕获草稿快照回填新节点，并在横幅中提供草稿内容与复制兜底。\\n   - 受影响块涵盖 blk-tech-interface、blk-tech-error、blk-feat-reset、blk-flow-reset、blk-tech-data-model、blk-deliv-task-reset-workflow、blk-deliv-task-error-handling、blk-acc-reset 与 blk-deliv-acc-full-e2e。\\n3. 保留基线与环境边界：\\n   - 保持 30 个稳定块 ID、历史证据对象完整性、即时单按钮清空、300ms 实时展示、手动删空清除旧结果、textContent 纯文本输出、标准经典脚本 defer 加载、本地固定端口 8080 与无服务端单页面边界不变。\\n   - 规划环境 Docker 容器不可用（unexecuted），测试边界严格限定为规范伪代码分支核验，原生浏览器与真实 IME 表现列为开发验证任务。本任务只输出证据与 blocker 建议，不生成完整设计蓝图或 groups，交由整合任务处理。"
+}

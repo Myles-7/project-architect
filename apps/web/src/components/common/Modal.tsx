@@ -8,6 +8,7 @@ export interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  closeLabel?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -17,10 +18,12 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   footer,
   maxWidth = 'md',
+  closeLabel = '关闭窗口',
 }) => {
   useEffect(() => {
+    if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape') {
         onClose();
       }
     };
@@ -40,43 +43,50 @@ export const Modal: React.FC<ModalProps> = ({
       : 'max-w-lg';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${maxWidthClass} bg-white dark:bg-[#17181D] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden transform transition-all z-10 flex flex-col max-h-[90vh]`}
+        className={`relative w-full ${maxWidthClass} bg-surface-overlay border border-border-default rounded-2xl shadow-elevation-modal overflow-hidden transform transition-all z-10 flex flex-col max-h-[90vh]`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800">
-          <h3 id="modal-title" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border-subtle">
+          <h3 id="modal-title" className="text-sm font-semibold text-text-primary">
             {title}
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-            aria-label="关闭窗口"
+            className="p-1 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors cursor-pointer"
+            aria-label={closeLabel}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-5 overflow-y-auto space-y-4 text-xs text-zinc-600 dark:text-zinc-300">
+        <div className="p-5 overflow-y-auto space-y-4 text-xs text-text-secondary">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="px-5 py-3 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2">
+          <div className="px-5 py-3 bg-surface-subtle/50 border-t border-border-subtle flex items-center justify-end gap-2">
             {footer}
           </div>
         )}

@@ -1,0 +1,11 @@
+{
+  "id": "evidence-8a8f5e50-6c7c-42a3-b2de-4a5590002daf",
+  "source": "https://www.w3.org/TR/uievents/",
+  "capturedAt": "2026-10-04T18:59:09.666Z",
+  "sha256": "376b5ce82c7f3868bd7b4913fa6faa75398003dd2da3c2d3669990d5078a5d29",
+  "scope": "适用于实时反馈输入模式下的 IME 输入法合成状态判断与跨操作系统输入兼容性设计。",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-67045f9a-4c95-4756-b449-fb72f37327b6\\tools\\evidence\\evidence-8a8f5e50-6c7c-42a3-b2de-4a5590002daf.json",
+  "approval": "candidate",
+  "content": "W3C UI Events 规范 §3.4.3.2 规定：InputEvent.isComposing 为只读布尔值，当事件在 dead key 序列期间或输入法（IME）处于激活状态（即正在派发 composition 事件）时为 true，否则为 false。§3.6 规定合成会话由 compositionstart、一次或多次 compositionupdate、以及 compositionend 组成；§3.6.5 说明合成期间派发的键盘事件必须将 isComposing 设为 true；§4.3.3 说明 IME 与按键非一对一映射，不同操作系统（如 macOS 取消时置空 data、Linux GTK 不支持 preventDefault 取消等）行为存在差异。",
+  "conclusion": "W3C UI Events 标准明确规定 InputEvent.isComposing 与 KeyboardEvent.isComposing 在 IME 合成期间为 true，并在 §3.6 及 §4.3.3 详细说明了输入法在 Windows、macOS 与 Linux/GTK 下的事件序列、选词 Accept 与取消行为差异。"
+}

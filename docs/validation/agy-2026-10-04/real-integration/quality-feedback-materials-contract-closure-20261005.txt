@@ -1,0 +1,11 @@
+自动独立质量验收反馈，不是真人新增需求、真人审阅或批准。来源是冻结的 flash-materials-final-consistency-20261005-10 第二个评审输入中的完整未批准候选（已包含成功revision），具体反例见其 independent-content-review.json。保持30个稳定块ID、原42条证据完整对象、8任务原DAG、真正无关16块及已正确公共契约；只修以下关联缺口，旧反馈中已修好的清空提交顺序与恢复规则保持。decisions保持空数组，普通实现细节由AI定，不新增用户选择题。
+
+M4：AppController.init 的“schedulerEpoch = 0，isInitialized = true”发生在节点绑定、reset监听、render、clear和focus之前，而这些步骤可能抛错。明确初始化事务阶段和ready提交点，全部装配成功后才ready=true；不仅处理缺依赖，还要覆盖绑定、监听注册、呈现和焦点失败。定义监听的注册句柄/解除责任、安全清理、重复init与失败后retry规则。失败不能清空已有草稿、重复监听、留下半初始化控制器；重试保留节点/文本及正确代际，不能把isInitialized早设true导致无法恢复。模块、公共接口、task所有字段和验收同步。
+
+M5：rollback(snapshot: ResetTransactionSnapshot, ...)要求非空，但blk-flow-reset的快照捕获失败分支传snapshot为null。定义统一合法分支：若captureSnapshot本身失败且尚无变更，直接可见报错并保持原节点/文本/代际/定时任务，不调用需要快照的rollback，也不谎称执行了回滚。若选择可空接口，必须明确可空分支的后置条件和无快照时如何证明不改动，不能空对象伪造快照。捕获快照置于真实异常边界内，保留已成功捕获后其他阶段的完整回滚与原延迟恢复契约。
+
+M6：产品承诺兜底缺失/呈现失败时明确可见报错，技术模块却只console输出草稿。定义用户可见失败通知通路与依赖、通知失败的诚实边界，以及完整草稿仍保留在哪里、如何在实际可用通路手动恢复。readonly textarea挂载成功才宣称可以复制；挂载失败不能声称草稿已呈现/复制。不要以console作为普通用户可见交互。保留主编辑器无法恢复时的诚实状态、禁止刷新和假复制。同步showSevereFallbackDraft返回/失败契约、showGlobalError责任及相关验收。
+
+只对真实关联块作必要同步，保留普通300ms输入、手动删空、空白原文、旧节点守卫、单橙色立即清空、textContent、自包含经典defer/IIFE、file与HTTP静态双启动等已正确内容。不要为保持错误文字而放行，也不要全面改写无关对象。
+
+独立评审须读取完整候选并逐项闭合异常分支，不能以blockers=[]或关键词存在当作通过。无新研究时 evidence=[]，复用旧不可变记录，不重造证据hash；引用仅来自正式证据或本候选完整evidence。目标程序未开发、Docker未就绪，真实IME/focus/平台/性能仍unexecuted，不误放当前followUp反复调用。产出pending，公开Core自动审批/开发包验证与真人审阅身份分开。

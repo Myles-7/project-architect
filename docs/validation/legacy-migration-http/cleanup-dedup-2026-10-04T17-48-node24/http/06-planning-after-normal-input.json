@@ -1,0 +1,201 @@
+{
+  "name": "planning-after-normal-input",
+  "method": "GET",
+  "route": "/api/projects/proj-legacy-planning-copy/planning",
+  "expectedStatus": 200,
+  "status": 200,
+  "response": {
+    "success": true,
+    "data": {
+      "sourceStateRevision": 2,
+      "canGenerateProduct": false,
+      "state": {
+        "schemaVersion": 1,
+        "blueprint": {
+          "schemaVersion": 1,
+          "blocks": [],
+          "stages": {
+            "product": "not-designed",
+            "technical": "not-designed",
+            "delivery": "not-designed"
+          },
+          "decisionBasisHash": "08d8c21b51f378f41c156b31e0ef3de67eb9173e7bd3c553c48f78071e8a4444"
+        },
+        "changeSets": [
+          {
+            "id": "legacy-cleanup-59cc11023ae8a06c",
+            "runId": "migration",
+            "stage": "feedback",
+            "basis": {
+              "revision": 1,
+              "hash": "59cc11023ae8a06cbb53bb8653f408e04b20b5badb8f083c6fd8949e11446288"
+            },
+            "summary": "审阅旧记录中可能误确认、重复或主题冲突的内容，选择需要退出当前方案的记录。",
+            "status": "stale",
+            "createdAt": "2026-10-04T17:49:02.054Z",
+            "approvals": [],
+            "evidence": [],
+            "groups": [
+              {
+                "id": "cleanup-legacy-linked",
+                "title": "数据保存在本地文件。",
+                "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                "dependsOn": [],
+                "blocks": [],
+                "removeBlockIds": [],
+                "decisions": [],
+                "rejectDecisionIds": [
+                  "legacy-linked"
+                ],
+                "status": "pending"
+              },
+              {
+                "id": "cleanup-legacy-locked",
+                "title": "数据使用远程服务。",
+                "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                "dependsOn": [],
+                "blocks": [],
+                "removeBlockIds": [],
+                "decisions": [],
+                "rejectDecisionIds": [
+                  "legacy-locked"
+                ],
+                "status": "pending"
+              },
+              {
+                "id": "cleanup-legacy-research-question",
+                "title": "有没有 GitHub 项目能实现？",
+                "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                "dependsOn": [],
+                "blocks": [],
+                "removeBlockIds": [],
+                "decisions": [],
+                "rejectDecisionIds": [
+                  "legacy-research-question"
+                ],
+                "status": "pending"
+              }
+            ]
+          },
+          {
+            "id": "legacy-cleanup-57429fd79fa4f6f1",
+            "runId": "migration",
+            "stage": "feedback",
+            "basis": {
+              "revision": 2,
+              "hash": "57429fd79fa4f6f196efc8e4a4516ffca8848740c9efba05cfb8fd931d53b25e"
+            },
+            "summary": "审阅旧记录中可能误确认、重复或主题冲突的内容，选择需要退出当前方案的记录。",
+            "status": "pending",
+            "createdAt": "2026-10-04T17:49:02.167Z",
+            "approvals": [],
+            "evidence": [],
+            "groups": [
+              {
+                "id": "cleanup-legacy-linked",
+                "title": "数据保存在本地文件。",
+                "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                "dependsOn": [],
+                "blocks": [],
+                "removeBlockIds": [],
+                "decisions": [],
+                "rejectDecisionIds": [
+                  "legacy-linked"
+                ],
+                "status": "pending"
+              },
+              {
+                "id": "cleanup-legacy-locked",
+                "title": "数据使用远程服务。",
+                "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                "dependsOn": [],
+                "blocks": [],
+                "removeBlockIds": [],
+                "decisions": [],
+                "rejectDecisionIds": [
+                  "legacy-locked"
+                ],
+                "status": "pending"
+              },
+              {
+                "id": "cleanup-legacy-research-question",
+                "title": "有没有 GitHub 项目能实现？",
+                "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                "dependsOn": [],
+                "blocks": [],
+                "removeBlockIds": [],
+                "decisions": [],
+                "rejectDecisionIds": [
+                  "legacy-research-question"
+                ],
+                "status": "pending"
+              }
+            ]
+          }
+        ],
+        "evidence": [],
+        "topics": [
+          {
+            "key": "storage:location",
+            "aliases": [],
+            "history": [
+              "legacy-linked",
+              "legacy-locked"
+            ],
+            "effectiveDecisionId": "legacy-locked"
+          },
+          {
+            "key": "research:alternatives",
+            "aliases": [],
+            "history": [
+              "legacy-research-question"
+            ],
+            "effectiveDecisionId": "legacy-research-question"
+          }
+        ],
+        "inputs": [
+          {
+            "id": "ba5edf4b-7fad-4f95-9904-fde0ec9b5a21",
+            "raw": "请检查历史方案中的冲突，暂时保留原记录。",
+            "kind": "statement",
+            "createdAt": "2026-10-04T17:49:02.054Z"
+          }
+        ],
+        "operations": [
+          {
+            "id": "legacy-normal-input",
+            "fingerprint": "8dd9f7ec60d2cb5c4ebc5d5e598d22476f86f8dd7af99e48ab45355dbd1b2f6b",
+            "revision": 2
+          }
+        ],
+        "diagnostics": [
+          "主题 storage:location 有多个有效旧决定，需审阅合并。",
+          "旧决定 legacy-research-question 可能把问题、委托或不确定表达当作事实，需审阅后清理。",
+          "旧决定 legacy-unlinked 缺少明确的问题或决策键关联，暂时保留原记录，需审阅后确认主题。"
+        ]
+      },
+      "runs": [],
+      "status": "方案可审阅",
+      "coverageIssues": [
+        "product 缺少具体的 target",
+        "product 缺少具体的 problem",
+        "product 缺少具体的 outcomes",
+        "product 缺少具体的 scope",
+        "product 缺少具体的 non_goals",
+        "product 缺少具体的 feature",
+        "product 缺少具体的 flow",
+        "product 缺少具体的 page",
+        "technical 缺少具体的 technology",
+        "technical 缺少具体的 module",
+        "technical 缺少具体的 data_model",
+        "technical 缺少具体的 interface",
+        "technical 缺少具体的 error",
+        "technical 缺少具体的 deployment",
+        "delivery 缺少具体的 task",
+        "delivery 缺少具体的 acceptance"
+      ]
+    },
+    "stateRevision": 2
+  },
+  "responseSha256": "c3b606d467e5511d56dab7c7ed187d48001a2f7eebd7f993c9df9df92d4a4780"
+}

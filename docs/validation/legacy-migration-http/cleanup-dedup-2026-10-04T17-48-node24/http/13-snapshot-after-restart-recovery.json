@@ -1,0 +1,514 @@
+{
+  "name": "snapshot-after-restart-recovery",
+  "method": "GET",
+  "route": "/api/projects/proj-legacy-planning-copy",
+  "expectedStatus": 200,
+  "status": 200,
+  "response": {
+    "success": true,
+    "data": {
+      "snapshot": {
+        "metadata": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "name": "旧项目迁移副本",
+          "tagline": "个人笔记",
+          "stage": "created",
+          "stateRevision": 4,
+          "projectTags": [
+            "Local-First"
+          ],
+          "inputRefs": [],
+          "updatedAt": "2026-10-04T17:49:02.514Z",
+          "createdAt": "2026-10-04T17:49:01.572Z"
+        },
+        "overview": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "sections": [
+            {
+              "id": "project_overview",
+              "title": "项目概述与愿景",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "target_user",
+              "title": "目标用户与痛点",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "mvp_scope",
+              "title": "MVP 范围与边界",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "core_features",
+              "title": "核心功能特性",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "user_flows",
+              "title": "主要用户旅程与流程",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "page_structure",
+              "title": "页面结构与信息架构",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "ux_ui_direction",
+              "title": "UX 体验与 UI 方向",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            },
+            {
+              "id": "technical_boundary",
+              "title": "技术底线与运行约束",
+              "kind": "fixed",
+              "maturity": "mostly-clear",
+              "itemRefs": [
+                "decision:legacy-linked",
+                "decision:legacy-unlinked"
+              ]
+            },
+            {
+              "id": "delivery_plan",
+              "title": "交付计划与阶段里程碑",
+              "kind": "fixed",
+              "maturity": "unexplored",
+              "itemRefs": []
+            }
+          ],
+          "updatedAt": "2026-10-04T17:49:02.514Z"
+        },
+        "decisions": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "items": [
+            {
+              "id": "legacy-linked",
+              "statement": "数据保存在本地文件。",
+              "area": "technical_boundary",
+              "status": "confirmed",
+              "origin": "user",
+              "confirmedBy": "user",
+              "evidenceRefs": [
+                "question:legacy-storage-question"
+              ],
+              "createdAt": "2026-10-01T00:00:00Z",
+              "updatedAt": "2026-10-01T00:00:00Z",
+              "decisionKey": "storage:location"
+            },
+            {
+              "id": "legacy-locked",
+              "statement": "数据使用远程服务。",
+              "area": "technical_boundary",
+              "status": "rejected",
+              "origin": "user",
+              "confirmedBy": "user",
+              "evidenceRefs": [],
+              "createdAt": "2026-10-01T00:00:00Z",
+              "updatedAt": "2026-10-04T17:49:02.513Z",
+              "decisionKey": "storage:location",
+              "rejectionReason": "approved-cleanup:legacy-cleanup-57429fd79fa4f6f1"
+            },
+            {
+              "id": "legacy-research-question",
+              "statement": "有没有 GitHub 项目能实现？",
+              "area": "technical_boundary",
+              "status": "rejected",
+              "origin": "user",
+              "confirmedBy": "user",
+              "evidenceRefs": [],
+              "createdAt": "2026-10-01T00:00:00Z",
+              "updatedAt": "2026-10-04T17:49:02.215Z",
+              "decisionKey": "research:alternatives",
+              "rejectionReason": "approved-cleanup:legacy-cleanup-57429fd79fa4f6f1"
+            },
+            {
+              "id": "legacy-unlinked",
+              "statement": "支持文件备份导出。",
+              "area": "technical_boundary",
+              "status": "confirmed",
+              "origin": "user",
+              "confirmedBy": "user",
+              "evidenceRefs": [],
+              "createdAt": "2026-10-01T00:00:00Z",
+              "updatedAt": "2026-10-01T00:00:00Z"
+            }
+          ],
+          "traces": [],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "assumptions": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "items": [],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "gaps": {
+          "schemaVersion": 2,
+          "projectId": "proj-legacy-planning-copy",
+          "gaps": [
+            {
+              "id": "legacy-storage-gap",
+              "area": "technical_boundary",
+              "decisionKey": "storage:location",
+              "severity": "high",
+              "reason": "需要选择保存位置",
+              "impact": "影响离线使用",
+              "shouldAskUser": true,
+              "status": "addressed",
+              "dependsOn": []
+            }
+          ],
+          "conflicts": [],
+          "tensions": [],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "risks": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "items": [],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "questions": {
+          "schemaVersion": 2,
+          "projectId": "proj-legacy-planning-copy",
+          "items": [
+            {
+              "id": "legacy-storage-question",
+              "issueRef": "gap:legacy-storage-gap",
+              "importance": "high",
+              "question": "笔记数据保存在哪里？",
+              "reason": "这会决定离线使用和部署方式。",
+              "recommendation": "本地保存",
+              "recommendationReason": "个人工具优先支持离线。",
+              "recommendedOptionKey": "local",
+              "options": [
+                {
+                  "key": "local",
+                  "label": "保存在本地",
+                  "approach": "笔记保存为设备上的文件。",
+                  "gain": "离线使用，备份简单。",
+                  "sacrifice": "跨设备需要手动导出。",
+                  "impact": "实现文件持久化和导出。",
+                  "reversibility": "moderate"
+                },
+                {
+                  "key": "remote",
+                  "label": "保存到远程服务",
+                  "approach": "笔记保存到自己部署的服务。",
+                  "gain": "可以跨设备访问。",
+                  "sacrifice": "需要部署并维护服务。",
+                  "impact": "增加服务和身份验证。",
+                  "reversibility": "hard"
+                }
+              ],
+              "allowFreeInput": true,
+              "selectionMode": "single",
+              "status": "answered",
+              "createdAt": "2026-10-04T00:00:00Z",
+              "answer": "保存到本地文件",
+              "answeredAt": "2026-10-01T00:00:00Z",
+              "decisionKey": "storage:location",
+              "dependsOn": [],
+              "batchId": "legacy",
+              "batchStage": "legacy",
+              "basisRevision": 1
+            }
+          ],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "readiness": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "current": {
+            "id": "legacy-ready",
+            "status": "ready",
+            "reviewedAt": "2026-10-04T17:49:01.572Z",
+            "basisRevision": 1,
+            "requiredAreas": [
+              "target_user",
+              "mvp_scope",
+              "core_features",
+              "user_flows",
+              "page_structure",
+              "ux_ui_direction",
+              "technical_boundary",
+              "delivery_plan"
+            ],
+            "warnings": [],
+            "issues": [],
+            "assumptionRefs": [],
+            "knownIssueAcknowledgements": [],
+            "criticalConflictAcknowledgements": [],
+            "userDisposition": "approved",
+            "credibilityScore": 100,
+            "coverage": {
+              "total": 6,
+              "satisfied": 6,
+              "ratio": 1
+            }
+          },
+          "history": [
+            {
+              "id": "legacy-ready",
+              "status": "ready",
+              "reviewedAt": "2026-10-04T17:49:01.572Z",
+              "basisRevision": 1,
+              "requiredAreas": [
+                "target_user",
+                "mvp_scope",
+                "core_features",
+                "user_flows",
+                "page_structure",
+                "ux_ui_direction",
+                "technical_boundary",
+                "delivery_plan"
+              ],
+              "warnings": [],
+              "issues": [],
+              "assumptionRefs": [],
+              "knownIssueAcknowledgements": [],
+              "criticalConflictAcknowledgements": [],
+              "userDisposition": "approved",
+              "credibilityScore": 100,
+              "coverage": {
+                "total": 6,
+                "satisfied": 6,
+                "ratio": 1
+              }
+            }
+          ],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "documents": {
+          "schemaVersion": 1,
+          "projectId": "proj-legacy-planning-copy",
+          "items": [
+            {
+              "id": "legacy-document",
+              "type": "project",
+              "path": "documents/OLD_PROJECT.md",
+              "title": "历史方案",
+              "status": "approved",
+              "generatedAt": "2026-10-01T00:00:00Z",
+              "sourceRevision": 1,
+              "contentHash": "b564317635e63437de238ff9b6e95ba15c6f7cdfc415e38e0c786ef3a419fd0a"
+            }
+          ],
+          "updatedAt": "2026-10-04T17:49:01.572Z"
+        },
+        "planning": {
+          "schemaVersion": 1,
+          "blueprint": {
+            "schemaVersion": 1,
+            "blocks": [],
+            "stages": {
+              "product": "not-designed",
+              "technical": "not-designed",
+              "delivery": "not-designed"
+            },
+            "decisionBasisHash": "c76674b2757dc892f84c4c5e102c3b48ac3660422a491c3849f635004dbd4e50",
+            "approvedInputHash": "4f7c155f2f6b9672bdd756c174bf6e12cd22fa772d9dd1e67f00895ca954ea51"
+          },
+          "changeSets": [
+            {
+              "id": "legacy-cleanup-59cc11023ae8a06c",
+              "runId": "migration",
+              "stage": "feedback",
+              "basis": {
+                "revision": 1,
+                "hash": "59cc11023ae8a06cbb53bb8653f408e04b20b5badb8f083c6fd8949e11446288"
+              },
+              "summary": "审阅旧记录中可能误确认、重复或主题冲突的内容，选择需要退出当前方案的记录。",
+              "status": "stale",
+              "createdAt": "2026-10-04T17:49:02.054Z",
+              "approvals": [],
+              "evidence": [],
+              "groups": [
+                {
+                  "id": "cleanup-legacy-linked",
+                  "title": "数据保存在本地文件。",
+                  "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                  "dependsOn": [],
+                  "blocks": [],
+                  "removeBlockIds": [],
+                  "decisions": [],
+                  "rejectDecisionIds": [
+                    "legacy-linked"
+                  ],
+                  "status": "pending"
+                },
+                {
+                  "id": "cleanup-legacy-locked",
+                  "title": "数据使用远程服务。",
+                  "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                  "dependsOn": [],
+                  "blocks": [],
+                  "removeBlockIds": [],
+                  "decisions": [],
+                  "rejectDecisionIds": [
+                    "legacy-locked"
+                  ],
+                  "status": "pending"
+                },
+                {
+                  "id": "cleanup-legacy-research-question",
+                  "title": "有没有 GitHub 项目能实现？",
+                  "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                  "dependsOn": [],
+                  "blocks": [],
+                  "removeBlockIds": [],
+                  "decisions": [],
+                  "rejectDecisionIds": [
+                    "legacy-research-question"
+                  ],
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "legacy-cleanup-57429fd79fa4f6f1",
+              "runId": "migration",
+              "stage": "feedback",
+              "basis": {
+                "revision": 4,
+                "hash": "e199b68d5cb4225165cdf89ca9cd3424e18d732551ff25c021c2e47e817c80a0"
+              },
+              "summary": "审阅旧记录中可能误确认、重复或主题冲突的内容，选择需要退出当前方案的记录。",
+              "status": "partially-approved",
+              "createdAt": "2026-10-04T17:49:02.214Z",
+              "approvals": [
+                {
+                  "operationId": "legacy-review-question",
+                  "groupIds": [
+                    "cleanup-legacy-research-question"
+                  ],
+                  "at": "2026-10-04T17:49:02.215Z",
+                  "revision": 3
+                },
+                {
+                  "operationId": "legacy-review-unlock",
+                  "groupIds": [
+                    "cleanup-legacy-locked"
+                  ],
+                  "at": "2026-10-04T17:49:02.513Z",
+                  "revision": 4
+                }
+              ],
+              "evidence": [],
+              "groups": [
+                {
+                  "id": "cleanup-legacy-linked",
+                  "title": "数据保存在本地文件。",
+                  "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                  "dependsOn": [],
+                  "blocks": [],
+                  "removeBlockIds": [],
+                  "decisions": [],
+                  "rejectDecisionIds": [
+                    "legacy-linked"
+                  ],
+                  "status": "pending"
+                },
+                {
+                  "id": "cleanup-legacy-locked",
+                  "title": "数据使用远程服务。",
+                  "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                  "dependsOn": [],
+                  "blocks": [],
+                  "removeBlockIds": [],
+                  "decisions": [],
+                  "rejectDecisionIds": [
+                    "legacy-locked"
+                  ],
+                  "status": "approved"
+                },
+                {
+                  "id": "cleanup-legacy-research-question",
+                  "title": "有没有 GitHub 项目能实现？",
+                  "impact": "批准此分组会移除此条有效决定并保留历史；拒绝分组表示保留该条原文，不再重复推送相同记录的清理。相关方案将待修订。",
+                  "dependsOn": [],
+                  "blocks": [],
+                  "removeBlockIds": [],
+                  "decisions": [],
+                  "rejectDecisionIds": [
+                    "legacy-research-question"
+                  ],
+                  "status": "approved"
+                }
+              ]
+            }
+          ],
+          "evidence": [],
+          "topics": [
+            {
+              "key": "storage:location",
+              "aliases": [],
+              "history": [
+                "legacy-linked",
+                "legacy-locked"
+              ],
+              "effectiveDecisionId": "legacy-linked"
+            },
+            {
+              "key": "research:alternatives",
+              "aliases": [],
+              "history": [
+                "legacy-research-question"
+              ]
+            }
+          ],
+          "inputs": [
+            {
+              "id": "ba5edf4b-7fad-4f95-9904-fde0ec9b5a21",
+              "raw": "请检查历史方案中的冲突，暂时保留原记录。",
+              "kind": "statement",
+              "createdAt": "2026-10-04T17:49:02.054Z"
+            }
+          ],
+          "operations": [
+            {
+              "id": "legacy-normal-input",
+              "fingerprint": "8dd9f7ec60d2cb5c4ebc5d5e598d22476f86f8dd7af99e48ab45355dbd1b2f6b",
+              "revision": 2
+            },
+            {
+              "id": "legacy-review-question",
+              "fingerprint": "62c1214a882259e3a3d4c7d327b8692136a821c3adc4fb87139d33b1a0d4aed8",
+              "revision": 3
+            },
+            {
+              "id": "legacy-review-unlock",
+              "fingerprint": "cbc0e3a3e1a7a55dd8d53301c392a092db681116a6d88a0e7937c7f2ec244903",
+              "revision": 4
+            }
+          ],
+          "diagnostics": [
+            "主题 storage:location 有多个有效旧决定，需审阅合并。",
+            "旧决定 legacy-research-question 可能把问题、委托或不确定表达当作事实，需审阅后清理。",
+            "旧决定 legacy-unlinked 缺少明确的问题或决策键关联，暂时保留原记录，需审阅后确认主题。"
+          ]
+        }
+      }
+    },
+    "stateRevision": 4
+  },
+  "responseSha256": "1601e98443924f5c01c72cb6ce0985bc49e63be5f0356272f737fd7a41731490"
+}

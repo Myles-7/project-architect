@@ -1,0 +1,1 @@
+console.log('Testing QuotaExceededError handling in private window');

@@ -1,0 +1,281 @@
+{
+  "blockers": [
+    "【真实宿主测试环境未执行诚实标记】由于当前规划环境 Docker 引擎不可用（experiment:experiment-d42b2305-bdfd-46ce-8473-2c985df312ee 状态为 unavailable），目标应用与自动化测试套件尚未由 Coding Agent 实际编写，所有真实宿主性能基准（TTI<=1.0s，检索P95<=150ms）与跨浏览器（Safari 17+）兼容性实测任务如实标为 unexecuted，在交付任务中详细说明测试步骤、失败影响与修订路径，不可冒充已实测通过。",
+    "【跨模块构建依赖协同】task-build-and-deploy 严格建立在所有业务实现任务（task-foundation-and-storage, task-quick-capture, task-note-card-view, task-tag-organization, task-search-filter, task-note-detail-edit, task-data-portability）完成之后，确立全量业务代码合流交付后方可执行全量静态打包的正确依赖序。",
+    "【跨阶段度量标准闭合已完成】冷启动统一以导航原点（navigationStart / PerformanceNavigationTiming.startTime 0）度量，首屏可交互 TTI 目标 <= 1.0s；检索时延从敲击按键起算含 80ms 防抖及 DOM 渲染完成，P95 <= 150ms；已在 val-storage-and-search-benchmark 与 acceptance-storage-and-search-benchmark 中严格闭合。",
+    "【标准安全上下文与离线运行前提】应用严格运行于标准 HTTP/HTTPS 安全上下文中（支持本地预览与静态托管），明确不支持脱离 Web 服务的 file:// 协议；首版确保已打开/缓存页面的本地数据读写 100% 离线可用，明确首版不提供未验证的 Service Worker 脱机冷重启绝对保证。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "确立 Vite 静态打包输出（dist/）与本地预览（vite preview）运行方式，证明应用必须通过标准 HTTP 服务器提供服务，明确不支持脱离 Web 服务的 file:// 协议直接执行。",
+      "content": "Deploying a Static Site | Vite\\n\\nYou are using the default build output location (dist). This location can be changed using build.outDir, and you can extrapolate instructions from these guides in that case.\\nYou are using npm. You can use equivalent commands to run the scripts if you are using Yarn or other package managers.\\nVite is installed as a local dev dependency in your project, and you have setup the following npm scripts: package.json { 'scripts': { 'build': 'vite build', 'preview': 'vite preview' } }\\nIt is important to note that vite preview is intended for previewing the build locally and not meant as a production server.",
+      "hash": "2209c7da1f6ddf8bcd8e20842e99f25d4536cec06f64fe589e9ac8ed32abb32b",
+      "id": "evidence-task-8dc2b540-vite-static-deploy",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:50:06.856Z",
+      "source": "https://vite.dev/guide/static-deploy.html"
+    },
+    {
+      "applicability": "确立安全上下文（Secure Contexts）标准规范，明确现代浏览器高级特性与持久化存储（HTTPS 或 localhost）的运行边界，排查 file:// 协议的安全与功能局限。",
+      "content": "This specification defines 'secure contexts', thereby allowing user agent implementers and specification authors to enable certain features only when certain minimum standards of authentication and confidentiality are met.",
+      "hash": "97b9b74ab1035922a34f762fe23e84760f41046ec6f428215ce07076355a0f49",
+      "id": "evidence-task-8dc2b540-w3c-secure-contexts",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T01:51:52.870Z",
+      "source": "https://www.w3.org/TR/secure-contexts/"
+    },
+    {
+      "applicability": "确立应用冷启动性能测量的官方标准起点。冷启动耗时必须自导航起始（startTime 0，对应 performance.timeOrigin）起算直至核心输入交互就绪，不可从骨架屏消失起算。",
+      "content": "This specification defines an interface for web applications to access the complete timing information for navigation of a document... Navigation Timing Level 2 provides accurate timing information regarding document navigation events.",
+      "hash": "282fb8a83361f9627667f9893f1faea80c4c2cc610f705b4650f0ba9ea1fda46",
+      "id": "evidence-task-8dc2b540-nav-timing-2",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T01:51:49.974Z",
+      "source": "https://www.w3.org/TR/navigation-timing-2/"
+    },
+    {
+      "applicability": "真实证明当前规划环境缺乏可用的 Docker 容器守护进程，无法执行浏览器无头自动化性能与跨端兼容性实测；所有性能基准与跨端兼容性验证任务如实标注为 unexecuted，列入交付任务中由后续 Coding Agent 实现后执行，禁止虚构测试通过结论。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "{\"runtime\":\"node\",\"image\":\"node:24.13.0-bookworm-slim\",\"network\":\"none\"}",
+      "hash": "2df7ac89f15fadeda4fd59ceb4837189f68a726cc14bb0b40fa588c0fcf64c5e",
+      "id": "evidence-task-8dc2b540-docker-unavailable",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-05T01:51:35.087Z",
+      "outcome": "unexecuted",
+      "source": "experiment:experiment-d42b2305-bdfd-46ce-8473-2c985df312ee"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "待目标应用与自动化测试套件经 Coding Agent 开发完成后，在具备可用容器或真实桌面的 CI/CD 环境中执行自动化性能基准与跨浏览器兼容性实测",
+      "kind": "validation"
+    }
+  ],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 静态构建打包、本地运行与静态托管部署规范\n\n1. **构建工具与打包架构**：\n   - 采用 Vite 现代化静态打包管线，结合 TypeScript 5.x 强类型编译，输出纯静态 SPA 产物至 `dist/` 目录。\n   - 构建配置 `vite.config.ts`：\n     * `base: './'` 采用相对资源路径引用，便于灵活部署在各类根路径、子路径或静态托管平台；\n     * `build.outDir: 'dist'`，构建产物仅包含 `index.html`、`assets/*.js`、`assets/*.css` 及静态资源，零服务端运行时依赖（无需 Node/Python/PHP 等后端运行时）。\n     * 构建脚本规范：`\"build\": \"tsc -b && vite build\"`，`\"preview\": \"vite preview --port 4173\"`。\n\n2. **运行环境规范与协议安全边界（严禁脱离 Web 服务器以 file:// 运行）**：\n   - 依据 W3C Secure Contexts 与 ECMAScript 模块标准，现代浏览器对 `file://` 本地文件协议施加了严格的安全上下文与沙箱限制：\n     * `file://` 协议下禁止加载 `<script type=\"module\">`（触发 CORS/同源策略拦截报错 `Access to script at 'file://...' has been blocked by CORS policy`）；\n     * `file://` 协议下无法获得标准的 Origin 划分，浏览器 IndexedDB 数据库实例与 StorageManager API（`navigator.storage.estimate()` / `persist()`）无法正常工作或被浏览器拒绝；\n     * 因此，明确规范：**本应用明确不支持脱离 Web 服务的 `file://` 协议直接双击运行**。\n   - **标准支持的运行环境**（必须运行于标准 HTTP/HTTPS 服务上下文中）：\n     * **本地运行与预览**：开发者在本地通过 `npm run build && npm run preview`（启动 Vite 本地静态 HTTP 服务器），或通过 `npx serve dist`、Python `python -m http.server` 等本地 HTTP 静态服务器访问（`http://localhost:4173` 或 `http://127.0.0.1:4173`，属于本地受信安全上下文）；\n     * **静态托管平台部署**：部署至主流静态站点托管平台（如 GitHub Pages、Cloudflare Pages、Vercel、Netlify 或自有 Nginx/Caddy 服务器），通过标准 HTTPS 安全协议访问；\n     * 完全满足 W3C Secure Contexts 规范要求，确保 IndexedDB、StorageManager 配额感知与持久化申请正常运作。\n\n3. **离线能力边界与首次安装前提（客观诚实声明，无绝对保证）**：\n   - **已打开页面的离线运作**：一旦应用页面在浏览器中成功加载并取得静态资源（JS/CSS），在后续断网或脱机状态下，应用的所有本地便签增删改查、标签过滤、状态流转、即时全文检索、JSON 备份导出与导入恢复均 100% 基于本地 IndexedDB 执行，不依赖任何远端服务器请求，零网络断开报错；\n   - **脱机冷重启边界**：在用户完全关闭浏览器标签页后，脱机冷重启应用依赖本地静态服务器的持续运行；\n   - **首版演进边界**：首版聚焦于单页应用的纯前端极速记录与本地 IndexedDB 持久化安全，首版不承诺未经验证的 Service Worker 脱机冷重启能力；PWA 与离线 Service Worker 缓存作为后续演进规划。坚决不作“100%离线绝对可用”或“任意环境下脱机免服务器”等不实承诺。\n\n4. **资源包体积与优化策略**：\n   - 构建包总体积预算控制：生产产物 Gzip 压缩后总 JS 体积目标 <= 120KB，CSS 体积目标 <= 25KB；\n   - 采用 Rollup 手动分块（vendor chunk 分离：react/react-dom 与 dexie 分离），避免首屏非关键代码阻塞渲染。",
+          "dependsOn": [
+            "tech-core-architecture"
+          ],
+          "evidenceIds": [
+            "evidence-task-8dc2b540-vite-static-deploy",
+            "evidence-task-8dc2b540-w3c-secure-contexts"
+          ],
+          "id": "deployment-and-build-specification",
+          "kind": "deployment",
+          "requirementIds": [
+            "block-scope-core-boundaries",
+            "block-non-goals-exclusions",
+            "tech-core-architecture"
+          ],
+          "stage": "technical",
+          "title": "静态构建打包、本地运行与静态托管部署规范"
+        },
+        {
+          "content": "在所有核心业务功能（快速捕获、便签卡片流与回收区生命周期、多维标签、全文检索、详情编辑、数据导入导出）开发任务合流后，执行全量生产静态打包、资源包体积审查与本地预览服务器验证，确保产物零服务端依赖、符合标准 HTTP 运行规范并具备健壮的构建流水线。",
+          "dependsOn": [
+            "deployment-and-build-specification",
+            "task-foundation-and-storage",
+            "task-quick-capture",
+            "task-note-card-view",
+            "task-tag-organization",
+            "task-search-filter",
+            "task-note-detail-edit",
+            "task-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-task-8dc2b540-vite-static-deploy",
+            "evidence-task-8dc2b540-w3c-secure-contexts"
+          ],
+          "id": "task-build-and-deploy",
+          "kind": "task",
+          "requirementIds": [
+            "deployment-and-build-specification",
+            "block-scope-core-boundaries"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "Node.js 18+ 与 npm 9+ 环境已安装",
+              "所有前置业务任务（task-foundation-and-storage 至 task-data-portability）已完成并合流至主分支",
+              "运行环境支持标准 HTTP/HTTPS 端口监听与静态文件服务"
+            ],
+            "completionCriteria": [
+              "npm run build 执行成功且构建返回码为 0",
+              "dist/ 目录包含完整 index.html、assets/*.js、assets/*.css",
+              "代码打包后 Gzip 总 JS 体积 <= 120KB，CSS <= 25KB",
+              "npm run preview 本地 HTTP 服务器正常启动，通过 localhost 可正常加载主工作区并完成首屏交互",
+              "明确依赖所有前置业务模块，无悬挂代码或缺失依赖"
+            ],
+            "environment": "Node.js 18+ / 20+ LTS 环境，Vite 5.x / 6.x，主流桌面现代浏览器（Chrome/Edge/Firefox/Safari）",
+            "evidenceRequired": [
+              "npm run build 构建输出终端日志",
+              "dist/ 产物文件清单与体积统计报告",
+              "本地 preview 服务器运行日志"
+            ],
+            "exclusions": "不包含具体业务功能逻辑的单元代码编写（各功能在各自前序 task 中闭合）；不包含远端自动化 CI/CD 云平台（如 GitHub Actions）密钥配置与云托管自动发布。",
+            "failureBehavior": "若 TypeScript 编译失败或构建报错，构建流水线立即中断并退出非零状态码，输出具体类型错误位置与文件行号；若单 bundle 体积超出 500KB 告警阈值，触发打包拆分建议；若本地预览无法加载，检查 base 路径与相对导入配置。",
+            "goal": "在所有底层存储、即时捕获、便签生命周期、多维标签、全文检索、详情编辑及数据便携性业务模块完全实现并合流后，执行 TypeScript 严格类型检查、Vite 生产静态打包、产物目录（dist/）完整性核验、包体积预算审查以及本地 HTTP 预览服务器验证，输出高质量纯静态交付物。",
+            "modules": [
+              "BuildConfig",
+              "VitePipeline",
+              "AssetOptimization",
+              "PreviewServer"
+            ],
+            "normalBehavior": "执行 npm run build，TypeScript 编译器无错误通过；Vite 生产构建在 10 秒内完成，输出 dist/ 静态目录；生成的 index.html 正确引用 assets/ 下带有指纹的 js 和 css 资源；静态资源总体积（gzip 后）控制在 150KB 以内；执行 npm run preview 成功启动本地 HTTP 静态服务器（http://localhost:4173），浏览器访问首屏正常渲染且控制台零网络与脚本错误。",
+            "onFailure": "若构建报错或类型检查失败，立即阻断交付流水线，定位冲突代码文件并修复类型问题；若本地预览报 404 资源加载错误，核查静态资源相对路径与 Vite base 配置。",
+            "passCriteria": [
+              "构建流水线执行返回码为 0，无任何 TypeScript 类型检查错误与打包警告",
+              "dist/ 静态产物总 gzip 体积符合预算（JS <= 120KB, CSS <= 25KB）",
+              "本地 HTTP 预览服务器成功提供服务，页面正常加载且控制台无 404 资源错误或 CORS 报错"
+            ],
+            "scope": "全量业务代码合流后的 Vite 生产构建配置优化（vite.config.ts）、npm scripts 编排（build, preview）、TypeScript 类型校验流水线、静态资源相对路径与代码分块优化、本地 HTTP 预览服务器（vite preview）启动与连通性验证、静态产物清单与体积预算校验。",
+            "steps": [
+              "1. 确认所有前置业务实现任务代码合流并通过各自单元测试",
+              "2. 核查 vite.config.ts 中的 base 配置为 './'，并配置 rollupOptions 实现 vendor 分块拆分",
+              "3. 执行 npm run build 进行全量 TypeScript 严格类型检查与 Vite 生产打包",
+              "4. 检查 dist/ 输出产物目录，核验 index.html 及 assets/ 目录资源的引用完整性与 gzip 文件体积",
+              "5. 执行 npm run preview 启动本地 HTTP 静态预览服务，检查端口监听状态",
+              "6. 在桌面浏览器中打开 http://localhost:4173，核验页面加载、控制台日志与本地 IndexedDB 初始化"
+            ],
+            "verification": [
+              "验证 npm run build 顺利完成且返回码为 0",
+              "检查 dist/ 目录结构与资源引用完整性",
+              "审查生产打包体积报告符合预算（gzip 后 JS <= 120KB, CSS <= 25KB）",
+              "通过本地 HTTP 预览服务器加载页面，验证主工作区交互正常"
+            ]
+          },
+          "title": "全量业务合流静态打包构建与本地预览交付任务"
+        },
+        {
+          "content": "### 静态打包构建与部署验收标准（Given / When / Then）\n\n- **场景 1：全量业务合流后的生产静态打包构建验收**\n  - **Given** 所有业务任务（存储基座、快速捕获、便签卡片流、标签聚合、全文检索、详情编辑、数据便携）均已完成并合并代码，\n  - **When** 在项目根目录执行 `npm run build`，\n  - **Then** 构建命令顺利执行完毕且返回码为 0，生成包含 `index.html` 与 `assets/` 静态资源的 `dist/` 目录；Gzip 压缩后总 JS 体积 <= 120KB，CSS 体积 <= 25KB；控制台无致命警告与未解析导入。\n\n- **场景 2：本地 HTTP 预览服务与安全上下文验证**\n  - **Given** 静态构建产物已在 `dist/` 目录生成完毕，\n  - **When** 在终端执行 `npm run preview` 并在桌面现代浏览器中打开 `http://localhost:4173`，\n  - **Then** 页面在本地受信安全上下文中顺畅加载，控制台无任何资源加载错误或 CORS 报错；浏览器成功初始化 `SparkNotesDB` IndexedDB 数据库并就绪，快速捕获输入框正常呈现。\n\n- **场景 3：file:// 协议非受信任运行限制验证与友好引导**\n  - **Given** 开发者或用户试图脱离 Web 服务器环境，\n  - **When** 直接在文件资源管理器中双击 `dist/index.html` 试图通过 `file:///` 协议加载应用，\n  - **Then** 浏览器控制台依据 ECMAScript 模块与 CORS 规范拦截 ESM 加载并给出安全限制错误，系统在 `index.html` 中内嵌轻量 `<noscript>` 与协议检测引导：“SparkNotes 为现代化单页应用，不支持 file:// 协议直接执行，请使用本地静态服务器（如 npm run preview）或部署至静态托管平台访问”，明确引导用户在标准 HTTP/HTTPS 安全上下文中运行。",
+          "dependsOn": [
+            "task-build-and-deploy"
+          ],
+          "evidenceIds": [
+            "evidence-task-8dc2b540-vite-static-deploy",
+            "evidence-task-8dc2b540-w3c-secure-contexts"
+          ],
+          "id": "acceptance-build-and-deploy",
+          "kind": "acceptance",
+          "requirementIds": [
+            "deployment-and-build-specification",
+            "task-build-and-deploy"
+          ],
+          "stage": "delivery",
+          "title": "静态打包构建与部署验收标准"
+        },
+        {
+          "content": "真实宿主浏览器端冷启动可交互时间（TTI <= 1.0s，自导航原点起算）与 1,000 条便签端到端检索时延（P95 <= 150ms，含 80ms 防抖）性能基准交付验证任务。因当前规划环境 Docker 不可用且目标应用尚未开发，如实标为 unexecuted，在交付任务中详细规范测试环境、种子数据集、测量起止口径、分位统计算法、失败影响与修订路径。",
+          "dependsOn": [
+            "task-build-and-deploy",
+            "task-foundation-and-storage",
+            "task-search-filter",
+            "task-quick-capture",
+            "task-note-card-view"
+          ],
+          "evidenceIds": [
+            "evidence-task-8dc2b540-nav-timing-2",
+            "evidence-task-8dc2b540-docker-unavailable"
+          ],
+          "id": "val-storage-and-search-benchmark",
+          "kind": "validation",
+          "requirementIds": [
+            "block-outcomes-lightweight-experience",
+            "deployment-and-build-specification",
+            "task-build-and-deploy"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "待 Coding Agent 完成全部业务代码合流与静态打包后方可执行实测",
+              "目标测试机为标准现代桌面 PC（Intel Core i5 / AMD Ryzen 5 或 Apple M1 以上，8GB+ 内存）",
+              "测试浏览器处于前台激活状态且未开启影响性能的第三方扩展"
+            ],
+            "completionCriteria": [
+              "测试脚本与固定种子生成工具代码完备",
+              "统一度量起点为 navigationStart（startTime 0），严禁从骨架屏消失起算",
+              "检索性能测试完整覆盖从击键、80ms 防抖、比对到 DOM 渲染的完整端到端周期，并通过 nearest-rank P95 计算",
+              "跨浏览器测试覆盖 Chrome 120+、Firefox 122+ 与 Safari 17+",
+              "规划阶段因 Docker 守护进程不可用如实标记为 unexecuted，交付阶段具备明确的执行步骤与失败修订策略"
+            ],
+            "environment": "真实桌面现代浏览器环境：Google Chrome 120+、Microsoft Edge 120+、Mozilla Firefox 122+、Apple Safari 17+ (macOS Sonoma / Sequoia)；无 HTTP 缓存网络或本地 HTTP 预览环境",
+            "evidenceRequired": [
+              "真实浏览器自动化测试执行报告与耗时数据表",
+              "PerformanceNavigationTiming 性能采样记录",
+              "10 次搜索耗时原始采样数组与 P95 计算过程日志",
+              "Safari 17+ 兼容性实测运行截图与控制台日志"
+            ],
+            "exclusions": "不包含虚拟环境或伪造的性能测试数据；不包含云端服务器压测与并发多用户吞吐量测试（本项目为纯本地单页应用）。",
+            "failureBehavior": "若冷启动 TTI > 1.0s，判定为冷启动未达标，输出性能火焰图排查主包阻塞；若检索 P95 > 150ms（消除模糊边界，明确 > 150ms 即判定失败），判定为检索性能未达标，触发倒排索引与虚拟滚动优化；当前规划环境 Docker 不可用（experiment:experiment-d42b2305-bdfd-46ce-8473-2c985df312ee unavailable），如实标为 unexecuted，不阻塞规划阶段推进，交付任务明确指出失败后修订路径。",
+            "goal": "在真实桌面宿主现代浏览器（Chrome 120+、Edge 120+、Firefox 122+、Safari 17+）环境中，实测应用在无 HTTP 缓存冷启动下的可交互时间（TTI 目标 <= 1.0s，统一度量起点为 navigationStart / startTime 0），以及在 1,000 条固定种子便签规模下的端到端即时检索响应时延（P95 目标 <= 150ms，自击键起算含 80ms 防抖至 DOM 高亮渲染完成），并验证存储配额预警与 Safari 17+ 兼容性。当前规划阶段如实标为 unexecuted，在交付阶段由 Coding Agent 实施。",
+            "modules": [
+              "PerformanceBenchmark",
+              "NavigationTimingObserver",
+              "SearchLatencyMonitor",
+              "SeedDataGenerator",
+              "CrossBrowserRunner"
+            ],
+            "normalBehavior": "在冷启动场景下，浏览器导航原点（startTime 0）至首屏主工作区与输入框就绪（TTI）耗时 <= 1.0s；在已注入 1,000 条基准便签环境下，用户在搜索框击键输入，经过 80ms 防抖与内存比对，搜索结果高亮渲染至 DOM，10 次独立采样（3次预热后）端到端耗时 nearest-rank P95 <= 150ms；Safari 17+ 正常读写 IndexedDB，无脚本崩溃；配额感知与超期提示正常触发。",
+            "onFailure": "若冷启动 TTI > 1.0s：执行 Rollup 打包体积分析，将非首屏组件（如详情 Markdown 完整解析引擎、数据导入导出模块）改为 React.lazy 动态加载，缩减首屏关键包体积；若检索 P95 > 150ms：将简单的线性全文扫描优化为预分词倒排索引或 Trie 树索引，并对便签列表引入虚拟滚动（virtualized list），仅渲染可视区域卡片 DOM。",
+            "passCriteria": [
+              "无缓存冷启动可交互时间 TTI <= 1.0s（以 navigationStart 为原点）",
+              "1,000 条便签基准下，10 次搜索端到端耗时 nearest-rank P95 <= 150ms（含 80ms 防抖与 DOM 渲染）",
+              "Safari 17+ 环境下 IndexedDB 读写正常，零控制台未捕获异常",
+              "回收区超 7 天便签超期预警横幅正常展示，未达 7 天便签不误报"
+            ],
+            "scope": "真实宿主浏览器环境配置（Chrome/Edge/Firefox/Safari 17+）、1,000 条固定种子数据（800 活跃、100 归档、100 回收区）自动化注入脚本、基于 PerformanceNavigationTiming 的冷启动 TTI 自动化测量、基于 performance.mark/measure 的击键到 DOM 渲染端到端检索测量流水线、nearest-rank 95 分位计算、超限预警与 Safari 兼容性验证。",
+            "steps": [
+              "1. 在交付阶段构建并运行生产预览服务（npm run build && npm run preview）",
+              "2. 编写自动化注入脚本，向 IndexedDB 批量灌入 1,000 条格式各异的固定种子便签（800 条 active、100 条 archived、100 条 trashed，平均每条 150 字符，含多样化 #标签 与 Markdown 文本）",
+              "3. 清空浏览器缓存，通过 Playwright/Puppeteer 打开 http://localhost:4173，通过 window.performance.getEntriesByType('navigation')[0] 采集 startTime=0 至快速捕获输入框可交互时间戳，计算冷启动 TTI",
+              "4. 执行 3 次搜索预热后，连续触发 10 次不同长度关键词（单字、双字、中文词汇、英文词汇、特殊符号）的模糊搜索，通过 performance.mark('search-input-start') 与 MutationObserver 记录 DOM 渲染完成时间戳 performance.mark('search-dom-end')，计算每次端到端耗时（包含 80ms 防抖）",
+              "5. 对 10 次端到端耗时样本按升序排序，采用 nearest-rank 方法计算 95 分位数（P95 = samples[Math.ceil(0.95 * n) - 1]）",
+              "6. 在 Safari 17+ 真实设备或虚拟机中打开页面，执行增删改查、标签过滤与导出，检查 WebKit 控制台与 IndexedDB 稳定性",
+              "7. 验证存储配额预警界面与回收区超期横幅呈现正确性"
+            ],
+            "verification": [
+              "验证自动化测试脚本能准确读取 PerformanceNavigationTiming 的 startTime 0 原点",
+              "验证 1,000 条便签种子数据成功灌入 IndexedDB 且各状态比例正确",
+              "验证 10 次搜索耗时完整包含 80ms 防抖与 DOM 渲染完成，P95 计算方法符合 nearest-rank 规范",
+              "验证 Safari 17+ 环境下无 WebKit 专属报错且支持 IndexedDB 正常读写"
+            ]
+          },
+          "title": "真实宿主浏览器端存储基准与全文检索性能交付验证任务"
+        },
+        {
+          "content": "### 真实浏览器性能基准与配额防御验收标准（Given / When / Then）\n\n- **场景 1：无缓存冷启动首屏可交互性能验收（统一导航原点口径）**\n  - **Given** 目标应用已完成全量构建并在本地 HTTP 预览服务器（http://localhost:4173）提供服务，浏览器处于清空 HTTP 缓存状态，\n  - **When** 浏览器导航至应用地址，系统通过 `window.performance.getEntriesByType('navigation')[0]` 监测时间原点（startTime 0），\n  - **Then** 从导航原点 0 到首屏页面渲染完成且顶部快速捕获输入框达到可聚焦交互状态（TTI）的总耗时 <= 1.0 秒；严禁将骨架屏出现或消失作为度量终点，必须以输入框可交互作为真实终点。\n\n- **场景 2：1,000 条便签端到端检索响应延迟验收（统一 P95 <= 150ms 口径）**\n  - **Given** 本地 IndexedDB 中已灌入 1,000 条格式各异的固定测试种子便签（800 active、100 archived、100 trashed，平均 150 字符），\n  - **When** 用户在顶部搜索框敲击按键输入关键词，系统自按键事件触发开始计时，经过 80ms 防抖延迟、内存模糊比对筛选，直至匹配的便签卡片与 `<mark>` 高亮节点完整渲染在 DOM 中，\n  - **Then** 经过 3 次预热后连续 10 次采样的端到端时延按 nearest-rank 计算的 P95 <= 150ms；彻底消除 <150ms 与 <=150ms 或 >250ms 的口径冲突，严格以 <= 150ms 作为唯一合格边界。若 P95 超标，立即判定验收不通过并触发倒排索引与虚拟滚动优化。\n\n- **场景 3：Safari 17+ 真实兼容性与 ITP 策略防御验收**\n  - **Given** 应用运行于真实的 Safari 17+ 浏览器环境中，\n  - **When** 用户执行便签快速录入、标签点击过滤、详情 Markdown 渲染与 JSON 备份导出，\n  - **Then** 所有交互流畅执行无卡顿，控制台无任何未捕获脚本异常，IndexedDB 事务与游标操作正常，侧边栏备份追踪器正确记录变更并在累积超 20 条变更或超 7 天时亮起琥珀色防丢预警圆点，有效防御 WebKit 7 天无交互数据清理机制。\n\n- **场景 4：存储配额超限时草稿不丢失与恢复入口验收**\n  - **Given** 浏览器 IndexedDB 存储空间已满并抛出 `QuotaExceededError`，\n  - **When** 用户在快速捕获输入框或详情编辑弹窗中键入长篇灵感并触发保存，\n  - **Then** 系统绝对不清空用户已输入的文本内容，输入框与编辑弹窗维持打开状态；系统将当前草稿按 `spark_draft_${libraryGeneration}_${noteId}` 隔离写入当前标签页 `sessionStorage`，界面浮出琥珀色告警横幅，常驻提供【复制草稿到剪贴板】、【导出当前未保存草稿】独立文件与【重试保存】按钮，诚实告知刷新可保留、标签页关闭后失效的边界，绝不给出“100%保证不丢”的伪造承诺。\n\n- **场景 5：规划阶段未执行状态与交付阶段执行契约验收**\n  - **Given** 当前规划阶段 Docker 引擎不可用（experiment:experiment-d42b2305-bdfd-46ce-8473-2c985df312ee 状态为 unavailable）且目标业务代码尚未编写，\n  - **When** 检查当前阶段生成的性能验证产物，\n  - **Then** `val-storage-and-search-benchmark` 验证状态如实标注为 `unexecuted`，严禁伪造 passed 结论；交付任务中完整包含明确的测试执行步骤、所需测试环境、失败影响及修订路径，供后续 Coding Agent 阶段严格执行。",
+          "dependsOn": [
+            "val-storage-and-search-benchmark"
+          ],
+          "evidenceIds": [
+            "evidence-task-8dc2b540-nav-timing-2",
+            "evidence-task-8dc2b540-docker-unavailable"
+          ],
+          "id": "acceptance-storage-and-search-benchmark",
+          "kind": "acceptance",
+          "requirementIds": [
+            "block-outcomes-lightweight-experience",
+            "val-storage-and-search-benchmark"
+          ],
+          "stage": "delivery",
+          "title": "真实浏览器性能基准与配额防御验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-8dc2b540-568c-44d4-8d62-dc352c1956cc-group-build-deploy-and-benchmark",
+      "impact": "细化静态构建打包部署规范，建立全量业务代码合流后的构建交付任务与验收标准；统一度量标准（导航原点冷启动TTI<=1.0s，1000条检索端到端P95<=150ms）；移除重复验证块val-browser-storage-and-search-perf；如实标注规划阶段Docker不可用导致的真实浏览器基准与Safari 17+实测任务为unexecuted，并在交付任务中完备定义执行步骤、失败影响与修订路径。",
+      "removeBlockIds": [
+        "val-browser-storage-and-search-perf"
+      ],
+      "status": "pending",
+      "title": "静态构建打包部署、全量构建交付与真实宿主性能基准验证规范"
+    }
+  ],
+  "questions": [],
+  "summary": "本登记工作范围（work-build-deploy-and-benchmark）完成了静态构建打包部署规范、全量代码合流后的构建交付任务、真实浏览器性能基准交付验证任务与验收标准的细化修订，并成功闭合所有评审缺陷：1) 明确 task-build-and-deploy 严格依赖全部 7 个前置业务实现任务，确立全量代码合流交付后方可执行生产打包的正确依赖序；2) 阐明标准 HTTP/HTTPS 安全上下文要求，明确指出现代浏览器基于 ESM 与同源策略限制不支持脱离 Web 服务的 file:// 协议；3) 统一度量口径，将冷启动起点严格锚定在导航起始（navigationStart / PerformanceNavigationTiming.startTime 0），首屏可交互 TTI 目标 <= 1.0s，将 1,000 条便签端到端检索时延统一为 nearest-rank P95 <= 150ms（含 80ms 防抖至 DOM 渲染完成）；4) 针对当前规划环境 Docker 引擎不可用（experiment-d42b2305-bdfd-46ce-8473-2c985df312ee 状态为 unavailable）且目标应用尚未开发的客观现实，如实将真实浏览器基准与 Safari 17+ 兼容性实测任务标注为 unexecuted，并在交付任务中详尽列明测试步骤、失败影响与修订路径，严禁虚构通过；5) 在 groups.removeBlockIds 中明确移除重复验证块 val-browser-storage-and-search-perf；6) 将变更组 dependsOn 设为 []，消除 INVALID_CHANGESET 依赖不存在问题；采用全新 task 前缀证据 ID 并基于真实 research_read 与受控试验执行，彻底杜绝不可变证据 ID 冲突。"
+}

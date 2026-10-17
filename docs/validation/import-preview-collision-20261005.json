@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-10-05T12:11:15.775Z",
+  "scope": "Specification-only counterexample; no target application execution, AI invocation or official State mutation",
+  "source": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-vague-contract-closure-20261005-11\\candidate-review-preview.json",
+  "sourceSha256": "d12f4bb8859a4fbd0be0a749c77f527a9ab3e24f9926829fe81cd765b973b318",
+  "operations": [
+    "Permanently delete the revision-1 trashed record",
+    "Create a new revision-1 note while the retained maximum updatedAt is still 2000"
+  ],
+  "before": [
+    {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "updatedAt": 1000,
+      "status": "trashed",
+      "content": "old"
+    },
+    {
+      "id": "20000000-0000-4000-8000-000000000002",
+      "revision": 5,
+      "updatedAt": 2000,
+      "status": "active",
+      "content": "retained"
+    }
+  ],
+  "after": [
+    {
+      "id": "20000000-0000-4000-8000-000000000002",
+      "revision": 5,
+      "updatedAt": 2000,
+      "status": "active",
+      "content": "retained"
+    },
+    {
+      "id": "30000000-0000-4000-8000-000000000003",
+      "revision": 1,
+      "updatedAt": 2000,
+      "status": "active",
+      "content": "new"
+    }
+  ],
+  "beforeSummary": {
+    "libraryGeneration": 1,
+    "notesCount": 2,
+    "sumRevision": 6,
+    "maxRevision": 5,
+    "lastUpdatedAt": 2000
+  },
+  "afterSummary": {
+    "libraryGeneration": 1,
+    "notesCount": 2,
+    "sumRevision": 6,
+    "maxRevision": 5,
+    "lastUpdatedAt": 2000
+  },
+  "sameSummary": true,
+  "changedIdentityAndData": true,
+  "conclusion": "Aggregate equality cannot prove that no write occurred after preview."
+}

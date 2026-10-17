@@ -1,4 +1,4 @@
-import type { ProjectSessionState, ProjectSessionAction } from '../types/session.js';
+import type { ProjectSessionState, ProjectSessionAction, ThemeMode } from '../types/session.js';
 import type { ProjectSnapshot, DiscoveryResult } from '@project-architect/contracts';
 
 /**
@@ -100,6 +100,22 @@ export function deriveDiscoveryResultFromSnapshot(snapshot: ProjectSnapshot): Di
   };
 }
 
+export const THEME_STORAGE_KEY = 'pa_theme_preference';
+
+export function getInitialTheme(): ThemeMode {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored === 'light' || stored === 'dark' || stored === 'system') {
+        return stored;
+      }
+    } catch {
+      // Ignore localStorage access failures
+    }
+  }
+  return 'dark';
+}
+
 export const initialProjectSessionState: ProjectSessionState = {
   activeProjectId: null,
   snapshot: null,
@@ -114,9 +130,9 @@ export const initialProjectSessionState: ProjectSessionState = {
     error: null,
   },
   uiState: {
-    theme: 'dark',
+    theme: getInitialTheme(),
     activeTab: 'chat',
-    isOverviewCollapsed: false,
+    isOverviewCollapsed: true,
     isLeftSidebarCollapsed: false,
     isSettingsOpen: false,
   },
@@ -144,11 +160,13 @@ export function projectSessionReducer(
         latestDiscoveryTimestamp: finalDiscovery ? new Date().toLocaleTimeString() : null,
         highlightTarget: null,
         requestState: { status: 'idle', error: null },
+        uiState: { ...state.uiState, activeTab: 'chat', isOverviewCollapsed: true },
       };
     }
 
     case 'UPDATE_SNAPSHOT': {
       const snapshot = action.payload.snapshot;
+      if (snapshot.metadata.projectId !== state.activeProjectId || snapshot.metadata.stateRevision < (state.stateRevision ?? 0)) return state;
       const currentDiscovery = state.latestDiscoveryResult;
       // If no discovery result existed yet, derive one from the authoritative snapshot
       const discovery = currentDiscovery || deriveDiscoveryResultFromSnapshot(snapshot);
@@ -189,6 +207,13 @@ export function projectSessionReducer(
       };
 
     case 'SET_THEME':
+      if (typeof window !== 'undefined' && window.localStorage) {
+        try {
+          window.localStorage.setItem(THEME_STORAGE_KEY, action.payload);
+        } catch {
+          // Ignore localStorage write failures
+        }
+      }
       return {
         ...state,
         uiState: {
@@ -202,7 +227,7 @@ export function projectSessionReducer(
         ...state,
         uiState: {
           ...state.uiState,
-          activeTab: action.payload,
+          activeTab: ['dag', 'diagrams', 'readiness', 'documents'].includes(action.payload) ? 'timeline' : action.payload,
         },
       };
 

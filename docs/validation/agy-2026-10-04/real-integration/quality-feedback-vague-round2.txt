@@ -1,0 +1,14 @@
+本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。通过draftChangeSetId修订 flash-vague-quality-resume-20261005-08 的未批准候选，原ChangeSet全部组仍未批准；不能先批准坏草案。上一轮宽QA的影响闭包确可达全44块，不用“必须至少留一块”作判据，但不能用闭包为无关痛点、约束、接口或验收丢失免责。请对照changeReviewBaseline中原正式批准正文和本轮冻结currentDraft，修复下列实际缺陷；AI处理普通细节，无需新选择题。
+
+已正确内容保留：只服务本人、页面焦点快捷键N/Ctrl或Cmd+Enter、常驻取消归档、触控多选标签AND过滤、七天回收需确认物理删除、IndexedDB不建boolean索引、schemaVersion:1、包装任务在全部业务实现之后、删除重复验证任务、检索1000条P95<=150ms含80ms、Safari真实验证未执行。保留稳定块ID与历史证据原文；技术/任务只改相关规则、不要简写替代原明确能力。
+
+1. 恢复原4个痛点，尤其“无序堆积导致灵感沉没与查找困难”、标签/模糊检索/状态标记及回顾价值，不能改成只有3痛点。恢复产品明确不做复杂树形文件夹/无限嵌套、重量级WYSIWYG排版编辑器。全字段提交快捷键统一Ctrl/Cmd+Enter，不写回车保存。保留AppMeta {key,value,updatedAt}、BackupTrackerMeta原有效数据、requestPersistence/isPersisted/detectPrivateMode/checkBackupReminderNeeded接口、Markdown显示与代码一键复制验收。原detectPrivateMode若无法可靠实现，需要明确能力限制/待验证与诚实状态，不能宣称能识别所有浏览器隐私模式，也不能静默删接口。
+2. IndexedDB保存契约：编辑现有note时expectedRevision必填且在同一个readwrite事务内get→比较→put，失败不写；不存在/已永久删除不得复活。新建采用独立create动作，不能用save的upsert隐式复活。force覆盖仍需用户明确操作，并以刚显示的当前revision再次CAS，期间再变报冲突。pin/favorite/archive/标签批量/还原/回收等任何修改都以当前实体版本进行同事务CAS并递增；批量原子/部分成功选定一种明确规则并闭合反馈。重复trash不得把previousStatus改成trash或重置deletedAt/到期；编辑和删除竞争不能无提示复活旧状态。
+3. 增加库代际/libraryGeneration；替换导入成功时本地单调更新代际而不是采用备份旧代际。所有旧编辑会话携带打开时代际，导入后失效，即使noteId/revision与备份一样也拒绝旧保存。合并导入的版本冲突/ID重合规则、取消前不写、事务失败全回滚、清理/导入/编辑竞争同步定义。不能直接把旧备份revision覆盖回去后允许陈旧编辑匹配。
+4. BackupPayload.notes/meta完整列明元数据字段及往返承诺，包括appMeta、backupTracker、tags和notes实体/回收字段。实现结构/类型/schemaVersion/ID唯一/枚举/时间戳/关联校验的具体失败规则，不只JSON.parse或Array.isArray；导出与校验器/导入一致。导入预览后明确替换或合并、取消无改动、失败不留半库。未保存草稿不在数据库备份中，不能声称数据库export能恢复该草稿；提供“导出当前未保存草稿”独立动作保留原文、noteId/状态/版本/代际等必要恢复信息，区分正式备份与草稿恢复文件。
+5. sessionStorage草稿必须按noteId/新建草稿ID和libraryGeneration隔离，防两记录互相覆盖。记录schema、savedAt、baseRevision及完整原文；打开匹配编辑器时明确提示恢复/丢弃，批准恢复仅载入编辑器并仍受CAS，不默默写数据库。set/get损坏或容量/访问失败有显式提示与手动草稿导出，不能假装自动恢复可靠。说明刷新可保留、标签页关闭可能丢失/浏览器策略差异，未保存工作不得被承诺跨关闭必恢复。
+6. 保留安全上下文部署要求：HTTPS或localhost受信任本地来源，不能泛称任意HTTP都支持SW；file://不支持该目标部署。已打开页面在离线使用与完全关闭后从SW缓存冷重启是两种状态，列前提/失败/未缓存时提示。首次安装和材料读取条件明确，不写100%离线绝对保证。
+7. 冷启动仍导航起始→首屏可交互<=1s，不能改成骨架屏消失以后起算。明确观测navigation/performance.now时间原点、应用可交互标记和验证操作。检索时延从实际输入动作起算，包含80ms防抖、筛选和DOM结果可见的观测终点，使用1000条固定种子数据、预热/重复次数、样本计算方法（nearest-rank P95、排序索引）、前台浏览器/实际设备与版本、原始样本及超标失败处理。冷启动与检索场景各自记录条件；不能由虚拟性能或AI评审声称目标已实测。原150ms边界不改。
+8. 七天规则形成具体Given/When/Then：删除并刷新/重开仍可还原；回收页停留跨到期自动标出待清理但不暗删；到期执行用户确认物理清理，取消不写；重复删除不延长七天；到期清理/还原/编辑并发版本冲突可见，永久删除之后旧编辑不得重新创建。定义七天毫秒区间、边界>=、本地时钟偏移限制并保留相关实测/失败策略，用户不用回答普通实现问题。
+9. 所有上述正文、data_model、interfaces、errors、flows、page states、task全部字段、validation、acceptance同步；不同文件不得相互矛盾。保留原明确接口与体验验收，并逐项列具体可观察行为。不要只在任务scope加一句而接口仍可选expectedRevision。不要新增与需求无关登录/数据库服务/云同步；该目标应用本身可用IndexedDB，不误套工作台自身禁止数据库规则。
+10. 评审接收完整当前候选与旧批准变更基线，核对上述缺陷及原无关内容是否保留，不能只blockers=[]。保存本轮建议为pending变更包；自动验收经公开Core审批和新的compiler导出，不冒称真人审阅。START_HERE/tasks.json/DEVELOPMENT_PLAN由真实DAG一致生成。目标应用和CodingAgent仍未开发，所有实际兼容性/性能/隐私检测验证任务继续unexecuted并说明失败后影响与修订路径。

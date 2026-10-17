@@ -52,17 +52,19 @@ describe('Server API Endpoints Tests', () => {
     expect(discRes.body.success).toBe(true);
     expect(discRes.body.stateRevision).toBe(2);
 
-    // 4. Lock Initial Decision
+    // 4. Explicitly approve the initial candidate before locking it.
     const decId = snapshot.decisions.items[0].id;
+    const confirmed=await request(app).post(`/api/projects/${projectId}/decisions/confirm`).send({targetRef:`decision:${decId}`,expectedRevision:2});
+    expect(confirmed.status).toBe(200);
     const lockRes = await request(app)
       .post(`/api/projects/${projectId}/decisions/lock`)
       .send({
         decisionRef: `decision:${decId}`,
-        expectedRevision: 2,
+        expectedRevision: 3,
       });
 
     expect(lockRes.status).toBe(200);
-    expect(lockRes.body.stateRevision).toBe(3);
+    expect(lockRes.body.stateRevision).toBe(4);
     expect(lockRes.body.data.snapshot.decisions.items[0].status).toBe('locked');
   });
 });

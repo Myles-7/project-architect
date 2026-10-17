@@ -10,3 +10,7 @@ export * from './runtime/AgentRuntimeProfile.js';
 export * from './runtime/AgentRuntimeRegistry.js';
 export * from './orchestrator/AIOrchestrator.js';
 
+export * from './tools/PlanningToolsService.js';
+export { planningReasoningEffort } from './provider/AntigravityCliProvider.js';
+export * from './tools/PlanningToolsMcpServer.js';
+export * from './tools/PlanningToolGate.js';

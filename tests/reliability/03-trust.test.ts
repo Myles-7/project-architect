@@ -89,18 +89,18 @@ describe('Reliability Suite 3: User Trust & Fact Grounding', () => {
     const s1 = await engine.getSnapshot(projectPath);
     await engine.addDecision(projectPath, 'mvp_scope', 'Local compiler', s1.metadata.stateRevision, 'confirmed');
 
-    // Move to readiness-review
+    // Read-only historical rendering fixture; no retired write is invoked.
     const s2 = await engine.getSnapshot(projectPath);
-    const sReview = await engine.evaluateReadiness(projectPath, s2.metadata.stateRevision);
+    const sReview = structuredClone(s2); sReview.metadata.stage = 'readiness-review';
     expect(sReview.metadata.stage).toBe('readiness-review');
     expect(sReview.readiness.current?.userDisposition).toBe('pending');
 
     // Compile attempt must throw
-    await expect(compiler.compile(projectPath, sReview)).rejects.toThrow(/requires explicit user approval/);
+    await expect(compiler.compile(projectPath, sReview, undefined, false)).rejects.toThrow(/requires explicit user approval/);
 
     // Stage must not change
     const afterAttempt = await engine.getSnapshot(projectPath);
-    expect(afterAttempt.metadata.stage).toBe('readiness-review');
+    expect(afterAttempt).toEqual(s2);
   });
 
   it('3. Fact Grounding in Generated Docs: Eliminates hallucinated facts, outputs explicit warning markers for missing areas', async () => {

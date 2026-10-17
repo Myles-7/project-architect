@@ -50,12 +50,12 @@ export class PromptLoader {
     }
 
     const mandatoryRules = [
-      'Single Agent Runtime: Single primary provider call per turn.',
+      'Registered Planning Tasks: Multiple recorded provider calls and independent review are permitted; never delegate unregistered work.',
       'Capability Before Mechanism: Focus on product capabilities, not concrete frameworks/databases.',
       'User Authorization SSOT: Only user confirmation makes facts authoritative.',
       'Locked Decision Protection: Never overwrite locked decisions without explicit user intervention.',
-      'B3 Adaptive Batch: Obey the runtime stage budget and return only mutually independent questions.',
-      'Stable Decision Keys: Every gap and question includes decision_key and depends_on.',
+      'B3 Adaptive Batch: At most three mutually independent questions with complete option tradeoffs.',
+      'Stable Decision Keys: Every production question includes decisionKey and dependsOn; do not repeat answered topics without a changed requirement.',
     ];
 
     const profile: PromptProfile = {

@@ -73,8 +73,20 @@ export interface ReadinessAreaView {
   areaId: string;                    // e.g. "target_user", "mvp_scope", "tech_boundary"
   title: string;
   isSatisfied: boolean;
+  statement?: string;                // Primary confirmed decision summary for this area
+  evidenceStatements?: string[];     // All confirmed decision statements in this area
+  activeAssumptions?: string[];      // Active assumptions associated with this area
+  recommendedFix?: string;           // Recommended suggestion/statement if area is unsatisfied
+  recommendedFixReason?: string;     // Rationale for the recommended fix
   decisionRef?: DecisionRef;
   blockingGapRefs: GapRef[];
+}
+
+export interface ReadinessScoreItem {
+  label: string;
+  score: number;
+  type: 'base' | 'bonus' | 'penalty';
+  description?: string;
 }
 
 export interface ReadinessIssueView {
@@ -103,11 +115,18 @@ export interface ReadinessView {
   areas: ReadinessAreaView[];
   actions: ReadinessActionView[];
 
+  // Enhanced one-click approval & health inspection fields
+  scoreBreakdown?: ReadinessScoreItem[];
+  recommendedDisposition?: UserDisposition;
+  canDirectlyApprove?: boolean;
+  approvalBlockers?: string[];
+
   // Compatibility fields
   sourceStateRevision: number;       // Explicit source version
   projectId: string;
   level: 1 | 2 | 3 | 4 | 5;          // Readiness score level (Level 1 to 5)
   score: number;                     // 0 to 100
+  overallScore?: number;             // SSOT alias strictly equal to score
   status: ReadinessStatus;           // 'ready' | 'ready-with-warnings' | 'not-ready'
   isReadyForDocs: boolean;
   userDisposition: UserDisposition;  // 'pending' | 'approved' | etc.
@@ -205,4 +224,26 @@ export interface DiscoveryProgressView {
   remainingBatchQuestionCount: number;
   canGenerateNextBatch: boolean;
   nextAction: 'answer' | 'dismiss' | 'organize' | 'review-readiness';
+}
+
+// ============================================================================
+// 6. Context Diagnostics View Model
+// ============================================================================
+
+export interface ContextItemTokenUsage {
+  id: string;
+  label: string;
+  kind: 'decision' | 'input' | 'assumption' | 'question' | 'system';
+  estimatedTokens: number;
+  percentage: number;
+  isExcluded?: boolean;
+}
+
+export interface ContextDiagnosticsView {
+  projectId: string;
+  sourceStateRevision: number;
+  totalEstimatedTokens: number;
+  contextLimitTokens: number;
+  tokenUtilizationPercent: number;
+  breakdown: ContextItemTokenUsage[];
 }

@@ -45,6 +45,7 @@ export const EditOverviewItemModal: React.FC<EditOverviewItemModalProps> = ({
       onClose={onClose}
       title={item ? `编辑 ${sectionTitle} 决策` : `添加 ${sectionTitle} 决策`}
       maxWidth="md"
+      closeLabel="关闭决策编辑弹窗"
       footer={
         <div className="flex items-center justify-between w-full">
           <div className="text-[11px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1">

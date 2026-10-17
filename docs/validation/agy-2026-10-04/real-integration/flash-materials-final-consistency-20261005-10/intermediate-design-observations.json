@@ -1,0 +1,29 @@
+{
+  "label": "flash-materials-final-consistency-20261005-10",
+  "checkedAt": "2026-10-05T09:59:29.396Z",
+  "scope": "Independent counterexamples in completed intermediate design only. Integration/review may repair these. This is not a final content verdict and does not edit any planning state.",
+  "status": "intermediate_findings",
+  "contentPassed": false,
+  "source": "D:\\Temp\\User\\pa-quality-copy-xb3uFL\\materials\\runtime\\planning\\run-74f4dbbe-386f-446e-ae39-69f23c31893a\\tasks\\task-47cc5d85-83e9-4fff-919a-1f54059a9fd2\\result.json",
+  "sourceSha256": "006d0add078c2a511716f74ad046d2f431d64dbeff99de50c6dc45a3ca7e5bde",
+  "runId": "run-74f4dbbe-386f-446e-ae39-69f23c31893a",
+  "taskId": "task-47cc5d85-83e9-4fff-919a-1f54059a9fd2",
+  "findings": [
+    {
+      "id": "design-M1",
+      "blocks": [
+        "blk-tech-module",
+        "blk-tech-interface"
+      ],
+      "finding": "AppController.init still sets isInitialized=true before binding, render and focus. The actual draft specifies only dependency-missing failure and forbids repeated calls; render/focus failure and safe initialization retry are not closed."
+    },
+    {
+      "id": "design-M2",
+      "blocks": [
+        "blk-tech-module",
+        "blk-tech-interface"
+      ],
+      "finding": "captureSnapshot failure now enters catch, but the public rollback signature accepts a non-null snapshot while handleReset promises to invoke it even when captureSnapshot has not returned. The sample handles null; the method contract still needs the same explicit no-snapshot branch."
+    }
+  ]
+}

@@ -96,7 +96,13 @@ export const AgentPromptModal: React.FC<AgentPromptModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="复制 Coding Agent 唤醒提示词" maxWidth="lg">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="复制 Coding Agent 唤醒提示词"
+      maxWidth="lg"
+      closeLabel="关闭提示词弹窗"
+    >
       <div className="space-y-4">
 
         <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">

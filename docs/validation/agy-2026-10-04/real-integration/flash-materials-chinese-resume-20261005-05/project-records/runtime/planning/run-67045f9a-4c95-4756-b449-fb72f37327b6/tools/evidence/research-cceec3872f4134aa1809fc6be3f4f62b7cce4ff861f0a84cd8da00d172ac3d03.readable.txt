@@ -1,0 +1,1405 @@
+Input Events Level 2 
+
+ Input Events Level 2
+
+ W3C Working Draft 01 May 2026 
+
+ More details about this document 
+
+ This version: 
+ https://www.w3.org/TR/2026/WD-input-events-2-20260501/ 
+
+ Latest published version: 
+ https://www.w3.org/TR/input-events-2/ 
+
+ Latest editor's draft: https://w3c.github.io/input-events/ 
+ History: 
+ https://www.w3.org/standards/history/input-events-2/ 
+
+ Commit history 
+
+ Editor:
+
+ Johannes Wilm ( Invited Expert )
+
+ Former editor:
+
+ Ben Peters ( Microsoft ) - Until 23 February 2015 
+
+ Feedback: 
+ GitHub w3c/input-events 
+ ( pull requests ,
+ new issue ,
+ open issues )
+ public-editing-tf@w3.org with subject line [input-events-2] … message topic … ( archives ) 
+
+ Latest published version by level 
+ Level 2 
+ Latest editor's draft by level 
+ Level 2 
+
+ Copyright 
+ ©
+ 2026
+
+ World Wide Web Consortium .
+ W3C ® 
+ liability ,
+ trademark and
+ permissive document license rules apply.
+
+ Abstract
+
+ This specification defines additions to events for text and related
+ input to allow for the monitoring and manipulation of default browser
+ behavior in the context of text editor applications and other
+ applications that deal with text input and text formatting. This
+ specification builds on the UI events spec [ UI-EVENTS ].
+
+ Status of This Document
+ This section describes the status of this
+ document at the time of its publication. A list of current W3C 
+ publications and the latest revision of this technical report can be found
+ in the
+ W3C standards and drafts index . 
+
+ Input Events Level 2 replaces the first version of Input Events
+ [ INPUT-EVENTS ] and includes:
+
+ Inputtypes for beforeinput events for the start and end of IME
+ compositions that allow isolation of the IME composition process.
+
+ More requirements for cancelability of beforeinput events, so that
+ all beforeinput events apart from those being emited within an IME
+ composition process are cancelable.
+
+ The test
+ suite and implementation
+ reports for the Input Events specification are still work in
+ progress.
+
+ This document was published by the Web Editing Working Group as
+ a Working Draft using the
+ Recommendation
+ track . 
+
+ Publication as
+ a Working Draft does not imply endorsement
+ by W3C and its Members. 
+
+ This is a draft document and may be updated, replaced, or obsoleted by other
+ documents at any time. It is inappropriate to cite this document as other
+ than a work in progress.
+
+ This document was produced by a group
+ operating under the
+ W3C Patent
+ Policy .
+
+ W3C maintains a
+ public list of any patent disclosures 
+ made in connection with the deliverables of
+ the group; that page also includes
+ instructions for disclosing a patent. An individual who has actual
+ knowledge of a patent that the individual believes contains
+ Essential Claim(s) 
+ must disclose the information in accordance with
+ section 6 of the W3C Patent Policy .
+
+ This document is governed by the
+ 18 August 2025 W3C Process Document .
+
+ Table of Contents
+ Abstract 
+ Status of This Document 
+ 1. 
+ Introduction
+
+ 2. Conformance 
+ 3. 
+ Definitions
+
+ 4. 
+ Problems solved
+
+ 5. 
+ Use cases
+
+ 6. 
+ Input Event Types
+ 6.1 
+ Interface InputEvent
+ 6.1.1 
+ Overview
+
+ 6.1.2 
+ Attributes
+
+ 6.1.3 
+ Methods
+
+ 6.2 
+ Event definitions
+
+ 7. 
+ Input Event Order During Composition
+
+ 8. 
+ Event order when using "insertFromPaste" 
+
+ 9. 
+ Privacy and security considerations
+
+ 10. 
+ Acknowledgements
+
+ A. References A.1 Normative references 
+ A.2 Informative references 
+
+ 1. 
+ Introduction
+
+ This document describes editing related additions to 2 events -
+ input 
+ and beforeinput which are
+ described in the UI events spec [ UI-EVENTS ]. The goal of these events
+ is to allow authors to understand and/or override default edit behavior
+ both before and after editing occurs.
+
+ 2. Conformance
+
+ As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.
+
+ The key words MAY , MUST , and MUST NOT in this document
+ are to be interpreted as described in
+ BCP 14 
+ [ RFC2119 ] [ RFC8174 ]
+ when, and only when, they appear in all
+ capitals, as shown here.
+
+ 3. 
+ Definitions
+
+ express intention 
+
+ A user can express an intention to
+ execute a specific editing operation by means of keyboard, IME,
+ speech, or similar method. Specific input actions are mapped to
+ intentions following platform-specific conventions.
+
+ kill buffer 
+
+ This definition is not normative. 
+
+A kill buffer is a in-memory store of richtext content
+ that is separate from the clipboard which allows for the temporal
+ storage of content that was deleted using specific deletion commands.
+ The user can replace the current selection with the content held in
+ the kill buffer by indicating an intention to yank the kill buffer.
+
+ 4. 
+ Problems solved
+
+ This section is not normative. 
+
+ Creating a webbased texteditor requires a considerable amount of
+ JavaScript on top of the browser code, among other things because:
+
+ Browsers do not handle all editing operations the same way.
+
+ Browsers are often buggy in the way they handle certain editing
+ operations.
+
+ Individual sites may have custom preferences for how they want to
+ handle certain editing operations.
+
+ The development of high-level text editing features in browsers has
+ not followed the principles laid out in the Extensible Web Manifesto in
+ that development of these features has not always been in coordination
+ with the needs of the web developer community.
+
+ This spec seeks to alleviate the problem by providing a simple way for
+ web developers to both override browser handling of all user input
+ related to text editing through the beforeinput event, and to
+ monitor what browsers have changed in the DOM due to user input through
+ the input event.
+
+ 5. 
+ Use cases
+
+ This section is not normative. 
+
+ Creating a JavaScript text editor in which the <strong>-tag
+ is used instead of the <b>-tag to mark text that the user marks
+ as bold, using any browser-builtin way to mark a text as bold, without
+ having access to all existing browsers.
+
+ Creating a JavaScript text editor which works with a data model in
+ the background where JavaScript takes care of rendering changes to the
+ edited text to the DOM.
+
+ Creating a JavaScript editor which only allows a subset of richtext
+ editing (for example: bold is allowed, but italic not).
+
+ Creating a collaborative editor in which JavaScript is used to
+ render changes to the DOM, based on user intentions with users using
+ different browsers with different ways of expressing specific
+ intentions.
+
+ Creating a JavaScript editor with different user access options,
+ where some users only can add or delete text and other users only can
+ add or remove certain types of formatting.
+
+ 6. 
+ Input Event Types
+
+ Input events are sent before (beforeinput event) and after (input
+ event) a user attempts to edit the markup. This includes insertion and
+ deletion of content, and formatting changes.
+
+ Input events are dispatched on elements that act as editing hosts , including elements with the contenteditable attribute set,
+ textarea elements, and input elements that permit text input.
+
+ 6.1 
+ Interface InputEvent
+
+ WebIDL partial interface InputEvent { 
+ readonly attribute DataTransfer ? dataTransfer ; 
+ sequence < StaticRange > getTargetRanges (); 
+}; 
+
+partial dictionary InputEventInit { 
+ DataTransfer ? dataTransfer = null; 
+ sequence < StaticRange > targetRanges = []; 
+}; 
+
+ The attributes inputType , dataTransfer and
+ targetRanges of InputEventInit 
+ initialize the corresponding attributes of the InputEvent object.
+
+ 6.1.1 
+ Overview
+
+ This section is not normative. 
+
+ The following table provides a summary of when the data and
+ dataTransfer attributes contain contents and when they are
+ null as well as when the getTargetRanges() method returns an
+ empty or non-empty Array, based on the inputType.
+
+ Editing host
+
+ inputType
+
+ data
+
+ dataTransfer
+
+ getTargetRanges()
+
+ Contenteditable
+
+ "insertText" ,
+ "insertCompositionText" ,
+ "formatSetBlockTextDirection" ,
+ "formatSetInlineTextDirection" ,
+ "formatBackColor" ,
+ "formatFontColor" ,
+ "formatFontName" , "insertLink" 
+
+ Yes
+
+ null
+
+ Non-empty Array
+
+ Contenteditable
+
+ "insertFromPaste" ,
+ "insertFromPasteAsQuotation" ,
+ "insertFromDrop" ,
+ "insertReplacementText" ,
+ "insertFromYank" 
+
+ null
+
+ Yes
+
+ Non-empty Array
+
+ <textarea> , <input
+ type="text"> 
+
+ "insertText" ,
+ "insertCompositionText" ,
+ "insertFromPaste" ,
+ "insertFromPasteAsQuotation" ,
+ "insertFromDrop" ,
+ "insertReplacementText" ,
+ "insertFromYank" ,
+ "formatSetBlockTextDirection" ,
+ "formatSetInlineTextDirection" ,
+ "formatBackColor" ,
+ "formatFontColor" ,
+ "formatFontName" , "insertLink" 
+
+ Yes
+
+ null
+
+ Empty Array
+
+ All
+
+ "historyUndo" , "historyRedo" 
+
+ null
+
+ null
+
+ Empty Array
+
+ Contenteditable
+
+ All Remaining
+
+ null
+
+ null
+
+ Non-empty Array
+
+ <textarea> , <input
+ type="text"> 
+
+ All Remaining
+
+ null
+
+ null
+
+ Empty Array
+
+ 6.1.2 
+ Attributes
+
+ The cancelability of the beforeinput event depends on the
+ inputType.
+
+ The inputType to be picked depends on the user's expression of intention , whether or not the
+ editing takes place during an IME composition and the state of the
+ selection.
+
+ This specification defines the inputType values as the values in
+ the inputType column of the following table.
+
+ inputType
+
+ User's expression of intention
+
+ Part of IME composition
+
+ beforeinput cancelable
+
+ State of selection
+
+ "insertText" 
+
+ insert typed plain text
+
+ No
+
+ Yes
+
+ Any
+
+ "insertReplacementText" 
+
+ insert or replace existing content by means of a spell
+ checker, auto-correct, writing suggestions or similar
+
+ No
+
+ Yes
+
+ Any
+
+ "insertLineBreak" 
+
+ insert a line break
+
+ No
+
+ Yes
+
+ Any
+
+ "insertParagraph" 
+
+ insert a paragraph break
+
+ No
+
+ Yes
+
+ Any
+
+ "insertOrderedList" 
+
+ insert a numbered list
+
+ No
+
+ Yes
+
+ Any
+
+ "insertUnorderedList" 
+
+ insert a bulleted list
+
+ No
+
+ Yes
+
+ Any
+
+ "insertHorizontalRule" 
+
+ insert a horizontal rule
+
+ No
+
+ Yes
+
+ Any
+
+ "insertFromYank" 
+
+ replace the current selection with content stored in a
+ kill buffer 
+
+ No
+
+ Yes
+
+ Any
+
+ "insertFromDrop" 
+
+ insert content by means of drop
+
+ No
+
+ Yes
+
+ Any
+
+ "insertFromPaste" 
+
+ paste content from clipboard or paste image from client
+ provided image library
+
+ No
+
+ Yes
+
+ Any
+
+ "insertFromPasteAsQuotation" 
+
+ paste content from the clipboard as a quotation
+
+ No
+
+ Yes
+
+ Any
+
+ "insertTranspose" 
+
+ transpose the last two grapheme cluster . that were
+ entered
+
+ No
+
+ Yes
+
+ Any
+
+ "insertCompositionText" 
+
+ replace the current composition string
+
+ Yes
+
+ No
+
+ Any
+
+ "insertLink" 
+
+ insert a link
+
+ No
+
+ Yes
+
+ Any
+
+ "deleteWordBackward" 
+
+ delete a word directly before the caret position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteWordForward" 
+
+ delete a word directly after the caret position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteSoftLineBackward" 
+
+ delete from the caret to the nearest visual line break before
+ the caret position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteSoftLineForward" 
+
+ delete from the caret to the nearest visual line break after
+ the caret position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteEntireSoftLine" 
+
+ delete from the nearest visual line break before the caret
+ position to the nearest visual line break after the caret
+ position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteHardLineBackward" 
+
+ delete from the caret to the nearest beginning of a block
+ element or br 
+ element before the caret position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteHardLineForward" 
+
+ delete from the caret to the nearest end of a block element
+ or br 
+ element after the caret position
+
+ No
+
+ Yes
+
+ Collapsed
+
+ "deleteByDrag" 
+
+ remove content from the DOM by means of drag
+
+ No
+
+ Yes
+
+ Any
+
+ "deleteByCut" 
+
+ remove the current selection as part of a cut
+
+ No
+
+ Yes
+
+ Any
+
+ "deleteContent" 
+
+ delete the selection without specifying the direction of the
+ deletion and this intention is not covered by another
+ inputType
+
+ No
+
+ Yes
+
+ Non-collapsed
+
+ "deleteContentBackward" 
+
+ delete the content directly before the caret position and
+ this intention is not covered by another inputType or delete
+ the selection with the selection collapsing to its start
+ after the deletion
+
+ No
+
+ Yes
+
+ Any
+
+ "deleteContentForward" 
+
+ delete the content directly after the caret position and this
+ intention is not covered by another inputType or delete the
+ selection with the selection collapsing to its end after the
+ deletion
+
+ No
+
+ Yes
+
+ Any
+
+ "historyUndo" 
+
+ undo the last editing action
+
+ No
+
+ Yes
+
+ Any
+
+ "historyRedo" 
+
+ to redo the last undone editing action
+
+ No
+
+ Yes
+
+ Any
+
+ "formatBold" 
+
+ initiate bold text
+
+ No
+
+ Yes
+
+ Any
+
+ "formatItalic" 
+
+ initiate italic text
+
+ No
+
+ Yes
+
+ Any
+
+ "formatUnderline" 
+
+ initiate underline text
+
+ No
+
+ Yes
+
+ Any
+
+ "formatStrikeThrough" 
+
+ initiate stricken through text
+
+ No
+
+ Yes
+
+ Any
+
+ "formatSuperscript" 
+
+ initiate superscript text
+
+ No
+
+ Yes
+
+ Any
+
+ "formatSubscript" 
+
+ initiate subscript text
+
+ No
+
+ Yes
+
+ Any
+
+ "formatJustifyFull" 
+
+ make the current selection fully justified
+
+ No
+
+ Yes
+
+ Any
+
+ "formatJustifyCenter" 
+
+ center align the current selection
+
+ No
+
+ Yes
+
+ Any
+
+ "formatJustifyRight" 
+
+ right align the current selection
+
+ No
+
+ Yes
+
+ Any
+
+ "formatJustifyLeft" 
+
+ left align the current selection
+
+ No
+
+ Yes
+
+ Any
+
+ "formatIndent" 
+
+ indent the current selection
+
+ No
+
+ Yes
+
+ Any
+
+ "formatOutdent" 
+
+ outdent the current selection
+
+ No
+
+ Yes
+
+ Any
+
+ "formatRemove" 
+
+ remove all formatting from the current selection
+
+ No
+
+ Yes
+
+ Any
+
+ "formatSetBlockTextDirection" 
+
+ set the text block direction
+
+ No
+
+ Yes
+
+ Any
+
+ "formatSetInlineTextDirection" 
+
+ set the text inline direction
+
+ No
+
+ Yes
+
+ Any
+
+ "formatBackColor" 
+
+ change the background color
+
+ No
+
+ Yes
+
+ Any
+
+ "formatFontColor" 
+
+ change the font color
+
+ No
+
+ Yes
+
+ Any
+
+ "formatFontName" 
+
+ change the font-family
+
+ No
+
+ Yes
+
+ Any
+
+ Note 
+
+ Other specifications may expand on this definition.
+
+ Note 
+
+ The existence of the above mentioned inputTypes does
+ not mean that any given implementation will support all of these.
+ But if a given browser supports an editing operation which
+ potentially leads to a change of the DOM, it MUST dispatch the
+ corresponding beforeinput and input 
+ events.
+
+ Note 
+
+ If the selection is collapsed, "deleteContentBackward" 
+ will be used both when the user asks for text deletion within a
+ text node, and when the user shows the intention to deletion of
+ more complex elements or merge paragraphs if the caret is at the
+ start of a text node.
+
+ Note 
+
+ If the selection is collapsed, "deleteContentForward" 
+ will be used both when the user asks for text deletion within a
+ text node, and when the user shows the intention to deletion of
+ more complex elements or merge paragraphs if the caret is at the
+ end of a text node.
+
+ data holds information plaintext data
+ related to what is to be added to the document.
+
+ inputType
+
+ Editing host
+
+ data
+
+ "insertText" or
+ "insertCompositionText" 
+
+ Any
+
+ the plain text string to be inserted
+
+ "insertFromPaste" ,
+ "insertFromPasteAsQuotation" ,
+ "insertFromDrop" ,
+ "insertTranspose" ,
+ "insertReplacementText" or
+ "insertFromYank" 
+
+ input or
+ textarea 
+
+ the plain text string to be inserted
+
+ "formatSetInlineTextDirection" or
+ "formatSetBlockTextDirection" 
+
+ Any
+
+ "ltr" , "rtl" , "auto" 
+ or "null" 
+
+ "formatBackColor" or
+ "formatFontColor" 
+
+ Any
+
+ a string containing a serialized CSS
+ component value [ CSSOM ] of the proposed color
+
+ "formatFontName" 
+
+ Any
+
+ the proposed value of the font-family CSS property
+
+ "insertLink" 
+
+ Any
+
+ the url of the proposed link
+
+ All remaining
+
+ Any
+
+ null
+
+ dataTransfer holds information
+ about richtext and plaintext data that is to be taken from or added
+ to the document in a DataTransfer object if there is relevant
+ data.
+
+ inputType
+
+ Editing host
+
+ dataTransfer
+
+ "insertFromPaste" ,
+ "insertFromPasteAsQuotation" ,
+ "insertFromDrop" ,
+ "insertTranspose" ,
+ "insertReplacementText" or
+ "insertFromYank" 
+
+ contenteditable 
+
+ A prepopulated DataTransfer object so that:
+
+ The DataTransfer object's drag data store is in
+ read-only 
+ mode. [ HTML ]
+
+ If the pasted content is a file, the DataTransfer 
+ object's drag data store
+ item list contains one entry with the drag data
+ item type string being the file's mime type , whose
+ kind is
+ File , and whose data is a File object corresponding to the
+ pasted file. [ HTML ]
+
+ The DataTransfer object's drag data store
+ item list contains one entry with the drag data
+ item type string "text/html" , whose
+ kind is
+ Plain Unicode string , and whose data is a HTML
+ representation of the content that is in the clipboard, or
+ in the kill buffer , to be dropped or otherwise the
+ content that is to be added. [ HTML ]
+
+ The DataTransfer object's drag data store
+ item list contains one entry with the drag data
+ item type string "text/plain" , whose
+ kind is
+ Plain Unicode string , and whose data is a plain text
+ representation of the content that is to be pasted, dropped
+ or otherwise added. [ HTML ]
+
+ If the content to be pasted is a link, the
+ DataTransfer object's drag data store
+ item list contains one entry with the drag data
+ item type string "text/uri-list" , whose
+ kind is
+ Plain Unicode string , and whose data is a plain text
+ representation of the link that is dropped or otherwise
+ added. [ HTML ]
+
+ All remaining
+
+ Any
+
+ null
+
+ getTargetRanges() returns an array of
+ StaticRanges representing the content that the event will
+ modify if it is not canceled if the editing host is a
+ contenteditable node, or the content that the browser assumes to be
+ affected by the event if the editing host is an EditContext
+ editing host . Otherwise this method returns an empty Array. The
+ returned StaticRanges MUST cover only the code points that the browser would normally
+ replace, even if they are only part of a grapheme cluster .
+
+ Note 
+
+ This note is not normative. 
+
+Depending on the script and the platform, deleting backward or
+ forward in a text node with a collapsed selection may affect one or
+ multiple code points or an entire
+ grapheme cluster . For example, deleting backward in a text node
+ containing “café” may remove either the acute accent or the entire
+ “é” character, depending on the script and the platform.
+
+ 6.1.3 
+ Methods
+
+ inputType
+
+ Editing host
+
+ Response of getTargetRanges() 
+
+ "historyUndo" or "historyRedo" 
+
+ Any
+
+ empty Array
+
+ All remaining
+
+ contenteditable 
+
+ an Array of StaticRanges [ DOM ]
+ associated with event
+
+ All remaining
+
+ input or
+ textarea 
+
+ an empty Array
+
+ returns , unless the inputType is "historyUndo" or
+ "historyRedo" or the editing host is not a
+ contenteditable element, in which case it returns an empty Array.
+
+ 6.2 
+ Event definitions
+
+ beforeinput 
+
+ Type
+
+ beforeinput 
+
+ Interface
+
+ InputEvent 
+
+ Sync / Async
+
+ Sync
+
+ Bubbles
+
+ Yes
+
+ Trusted Targets
+
+ Any Element that is an editing host .
+
+ Default
+ action [ UI-EVENTS ]
+
+ For contentEditable=typing editing hosts for
+ inputType "insertCompositionText" : 'Update
+ the DOM'.
+
+ For contentEditable="true" editing hosts for all inputTypes: 'Update the DOM'.
+
+ For 
+ EditContext editing hosts for 
+ EditContext-handled inputTypes : 
+ Handle input for EditContext given the editing host element.
+
+ None otherwise.
+
+ Context
+
+ (trusted events)
+
+ InputEvent.data : the string
+ containing the data that was added to the element,
+ which MAY be null if it doesn't apply.
+
+ InputEvent.dataTransfer :
+ richtext data added or removed from element, which MAY 
+ be null if it doesn't apply.
+
+ InputEvent.getTargetRanges() :
+ returns an array of StaticRanges which will be
+ affected by the change to the DOM if it is not
+ canceled.
+
+ A user agent MUST dispatch this event when the user has
+ attempted to input in a contenteditable element. It does not
+ necessarily mean the user agent will then update the DOM.
+
+ A user agent MUST NOT dispatch this event due to events
+ that are not caused by attempted user input, such as system
+ events.
+
+ input 
+
+ Type
+
+ input 
+
+ Interface
+
+ InputEvent 
+
+ Sync / Async
+
+ Sync
+
+ Bubbles
+
+ Yes
+
+ Trusted Targets
+
+ Any Element with contenteditable 
+ attribute enabled.
+
+ Default
+ action [ UI-EVENTS ]
+
+ None
+
+ Context
+
+ (trusted events)
+
+ InputEvent.data : the string
+ containing the data that was added to the element,
+ which MAY be null if it doesn't apply.
+
+ InputEvent.dataTransfer :
+ richtext data added or removed from element, which MAY 
+ be null if it doesn't apply.
+
+ A user agent MUST dispatch this event immediately after
+ the DOM has been updated due to user expressed intention to
+ change the document contents which the browser has handled. If
+ the browser makes no DOM change, either because the editing
+ host is an 
+ EditContext editing host (which does not do automatic DOM
+ changes) or because the user agent concludes that no DOM
+ change is needed, the user agent MUST NOT dispatch this event.
+
+ 7. 
+ Input Event Order During Composition
+
+ The start of a composition is marked by dispatching a
+ compositionstart 
+ event.
+
+ During a composition session, whenever a text composition system
+ updates its active text passage, a compositionupdate 
+ event is dispatched.
+
+ After each compositionupdate 
+ event, a pair of beforeinput and input events are dispatched.
+ The beforeinput and input events:
+
+ Are not cancellable
+
+ Have an inputType set to
+ "insertCompositionText" 
+
+ Have a data attribute equal to that of the compositionupdate 
+ event
+
+ Have a targetRange that surrounds the active text
+ passage of the composition
+
+ The DOM contents of the active text passage are updated after the
+ beforeinput event is dispatched and before the input event is
+ dispatched.
+
+ The end of a composition session is marked by dispatching a
+ compositionend 
+ event.
+
+ 8. 
+ Event order when using "insertFromPaste" 
+
+ When an "insertFromPaste" beforeinput event is
+ dispatched, it MUST be preceded by a paste 
+ [ CLIPBOARD-APIS ] event.
+
+ 9. 
+ Privacy and security considerations
+
+ This section is not normative. 
+
+ There are no known security or privacy impacts of this feature beyond
+ fingerprinting 
+ [ fingerprinting-guidance ] techniques that already are available
+ through existing events, such as the keydown and keypress [ UI-EVENTS ]
+ events.
+
+ If this feature replaces existing events, it MAY lead to a decline in
+ available fingerprinting 
+ [ fingerprinting-guidance ] techniques, as users' intentions are
+ recorded, and not the particular type of hardware they used to
+ express this intention.
+
+ 10. 
+ Acknowledgements
+
+ Thanks to: Michael Aufreiter, Adrian Bateman, Oliver Buchtala, Robin
+ Berjon, Enrica Casucci, Bo Cupp, Domenic Denicola, Emil Eklund, Olivier
+ Forget, Aryeh Gregor, Marijn Haverbeke, Yoshifumi Inoue, Koji Ishii,
+ Gary Kacmarcik, Ian Kilpatrick, Frederico Caldeira Knabben, Takayoshi
+ Kochi, Piotrek Koszuliński, Travis Leithead, Grisha Lyukshin, Miles
+ Maxfield, Chaals McCathie Nevile, Masayuki Nakano, Ryosuke Niwa, Julie
+ Parent, Ben Peters, Florian Rivoal, Morgan Smith, Hallvord R. M. Steen,
+ Johan Sörlin, Cristian Talau, Dave Tapuska, Ojan Vafai, Léonie Watson,
+ Xiaoqian Wu, Chong Zhang, Joanmarie, and everyone in the Editing
+ Taskforce for their input and feedback.
+
+ Permalink 
+
+ Referenced in: 
+
+ § 3. Definitions 
+
+ § 6.1.2 Attributes 
+
+ § 9. Privacy and security considerations 
+
+ Permalink 
+
+ Referenced in: 
+
+ § 3. Definitions 
+
+ § 6.1.2 Attributes (2) 
+
+ Permalink 
+ exported IDL 
+
+ Referenced in: 
+
+ § 6.1 Interface InputEvent 
+
+ Permalink 
+ exported IDL 
+
+ Referenced in: 
+
+ § 6.1 Interface InputEvent 
+
+ Permalink 
+
+ Referenced in: 
+
+ § 6.1.1 Overview 
+
+ § 6.2 Event definitions (2) 
+
+ § 7. Input Event Order During Composition 
+
+ Permalink 
+ exported IDL 
+
+ Referenced in: 
+
+ § 6.1 Interface InputEvent 
+
+ § 6.1.1 Overview 
+
+ § 6.2 Event definitions (2) 
+
+ Permalink 
+ exported IDL 
+
+ Referenced in: 
+
+ § 6.1 Interface InputEvent 
+
+ § 6.1.1 Overview 
+
+ § 6.2 Event definitions 
+
+ § 7. Input Event Order During Composition 
+
+ Permalink 
+
+ Referenced in: 
+
+ § 4. Problems solved 
+
+ § 7. Input Event Order During Composition (2) (3) 
+
+ § 8. Event order when using "insertFromPaste" 
+
+ Permalink 
+
+ Referenced in: 
+
+ § 4. Problems solved 
+
+ § 6. Input Event Types 
+
+ § 7. Input Event Order During Composition (2) (3) 
+
+ A. References
+
+ A.1 Normative references
+
+ [CLIPBOARD-APIS] 
+ Clipboard API and events . Rakesh Goulikar; Rohan Raja. W3C. 24 November 2025. W3C Working Draft. URL: https://www.w3.org/TR/clipboard-apis/ 
+ [CSSOM] 
+ CSS Object Model (CSSOM) . Daniel Glazman; Emilio Cobos Álvarez. W3C. 26 August 2021. W3C Working Draft. URL: https://www.w3.org/TR/cssom-1/ 
+ [DOM] 
+ DOM Standard . Anne van Kesteren. WHATWG. Living Standard. URL: https://dom.spec.whatwg.org/ 
+ [FileAPI] 
+ File API . Marijn Kruisselbrink. W3C. 3 December 2025. W3C Working Draft. URL: https://www.w3.org/TR/FileAPI/ 
+ [fingerprinting-guidance] 
+ Mitigating Browser Fingerprinting in Web Specifications . Nick Doty; Tom Ritter. W3C. 25 September 2025. W3C Working Group Note. URL: https://www.w3.org/TR/fingerprinting-guidance/ 
+ [HTML] 
+ HTML Standard . Anne van Kesteren; Domenic Denicola; Dominic Farolino; Ian Hickson; Philip Jägenstedt; Simon Pieters. WHATWG. Living Standard. URL: https://html.spec.whatwg.org/multipage/ 
+ [infra] 
+ Infra Standard . Anne van Kesteren; Domenic Denicola. WHATWG. Living Standard. URL: https://infra.spec.whatwg.org/ 
+ [mimesniff] 
+ MIME Sniffing Standard . Gordon P. Hemsley. WHATWG. Living Standard. URL: https://mimesniff.spec.whatwg.org/ 
+ [RFC2119] 
+ Key words for use in RFCs to Indicate Requirement Levels . S. Bradner. IETF. March 1997. Best Current Practice. URL: https://www.rfc-editor.org/rfc/rfc2119 
+ [RFC8174] 
+ Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words . B. Leiba. IETF. May 2017. Best Current Practice. URL: https://www.rfc-editor.org/rfc/rfc8174 
+ [UI-EVENTS] 
+ UI Events . Xiaoqian Wu. W3C. 21 February 2026. W3C Working Draft. URL: https://www.w3.org/TR/uievents/ 
+ [WEBIDL] 
+ Web IDL Standard . Edgar Chen; Timothy Gu. WHATWG. Living Standard. URL: https://webidl.spec.whatwg.org/ 
+
+ A.2 Informative references
+
+ [i18n-glossary] 
+ Internationalization Glossary . Richard Ishida; Addison Phillips. W3C. 17 October 2024. W3C Working Group Note. URL: https://www.w3.org/TR/i18n-glossary/ 
+ [INPUT-EVENTS] 
+ Input Events Level 2 . Johannes Wilm. W3C. 14 August 2025. W3C Working Draft. URL: https://www.w3.org/TR/input-events-2/ 
+
+ ↑

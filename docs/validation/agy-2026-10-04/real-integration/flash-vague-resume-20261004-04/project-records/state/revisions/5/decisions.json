@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1791125866356",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "我想做一个帮自己整理随手灵感的小工具。",
+      "status": "candidate",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "createdAt": "2026-10-04T14:57:46.356Z",
+      "updatedAt": "2026-10-04T14:57:46.356Z"
+    },
+    {
+      "id": "dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "area": "project_overview",
+      "decisionKey": "product.platform_form",
+      "statement": "这个随手灵感小工具的主要运行形态与使用场景偏向哪种？\n轻量 Web 单页应用（浏览器即开即用）：开发本地运行或静态托管的轻量 Web 应用，通过浏览器书签或常驻标签页随手记录与整理。",
+      "rationale": "技术选型将聚焦前端现代化轻量框架（如 React/Vite），数据优先存储于浏览器本地（IndexedDB/LocalStorage）或轻量本地后端。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-20261004-03-1791125950709",
+      "evidenceRefs": [
+        "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form"
+      ],
+      "createdAt": "2026-10-04T14:59:10.732Z",
+      "updatedAt": "2026-10-04T14:59:10.732Z",
+      "sourceArea": "product"
+    },
+    {
+      "id": "dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+      "area": "project_overview",
+      "decisionKey": "product.backup_restore_strategy",
+      "statement": "基于浏览器本地存储（IndexedDB）无服务端数据库的特性，您偏好哪种本地数据备份与导入恢复策略？\n标准 JSON 导入导出 + 温和防丢备份提醒（推荐）：提供标准的 JSON 导出与导入校验能力，同时在前端追踪自上次备份以来的新增/修改灵感数量与时间；当积累较多未备份内容（如新增超20条或超7天未备份）时，在侧边/底部状态栏温和显示‘未备份’状态点与一键导出快捷操作。",
+      "rationale": "需在持久化元数据中记录上次导出时间戳与变更计数，并在界面增加低侵入的状态提示。",
+      "status": "confirmed",
+      "origin": "user",
+      "confirmedBy": "user",
+      "approvalSource": "answer:simulated-answer-flash-vague-resume-20261004-04-1791127308730",
+      "evidenceRefs": [
+        "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy"
+      ],
+      "createdAt": "2026-10-04T15:21:48.751Z",
+      "updatedAt": "2026-10-04T15:21:48.751Z",
+      "sourceArea": "data_persistence"
+    }
+  ],
+  "traces": [
+    {
+      "id": "b9b499d6-3284-43e4-9ed3-6c83b796ac60",
+      "questionRef": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form",
+      "userAnswer": "轻量 Web 单页应用（浏览器即开即用）",
+      "decisionRef": "decision:dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+      "stateChanges": [
+        {
+          "ref": "question:run-c2d38ebc-b4ee-41c1-98cd-a4ab1be01fdf-delivery-0-q-platform-form",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-0b4e5bce-aff8-45b1-8491-8edf7c4b150d",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T14:59:10.732Z"
+    },
+    {
+      "id": "158fed9c-ea21-45fa-9f5d-b0c30f8fc8b4",
+      "questionRef": "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy",
+      "userAnswer": "标准 JSON 导入导出 + 温和防丢备份提醒（推荐）",
+      "decisionRef": "decision:dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+      "stateChanges": [
+        {
+          "ref": "question:run-b43fc7a4-b1c0-4938-a16a-87ed154de2c2-delivery-1-q-backup-restore-strategy",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-b17f49d8-86c3-4a74-baee-856b5d753129",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-10-04T15:21:48.751Z"
+    }
+  ],
+  "updatedAt": "2026-10-04T14:57:46.356Z"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "evidence-5dc0bdfa-cc23-440b-b96b-18936997bd60",
+  "source": "https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting",
+  "capturedAt": "2026-10-04T22:28:08.672Z",
+  "sha256": "839c33432fd0875634703550d14c36cce34ce86f0b006ec2c090919a21d74695",
+  "scope": "限定 textContent 的安全适用范围并澄清全应用 DOM XSS 的边界说明",
+  "path": "D:\\Temp\\User\\pa-real-integration-AiRDUO\\项目构思\\runtime\\planning\\run-17d98e59-12ea-4a62-8cdf-8b4e2911cd23\\tools\\evidence\\evidence-5dc0bdfa-cc23-440b-b96b-18936997bd60.json",
+  "approval": "candidate",
+  "content": "MDN 官方文档指出：跨站脚本（XSS）攻击依赖于站点接受未可信输入并将其未经适当处理即作为脚本执行。单一属性或节点的安全（如 Node.textContent 仅保证该节点内不解析 HTML/脚本标签）仅代表该特定数据汇点（sink）的安全，不能证明整个应用的所有 DOM 输入汇点、URL 处理与脚本执行均无 XSS 漏洞。因此旧证据适用范围中“从根本上杜绝 DOM 型 XSS”属于过度外推，当前有效适用范围严格限定为“用户项目名进入指定 textContent 文本节点时不被解析为 HTML/脚本”。",
+  "conclusion": "澄清单一节点 textContent 的安全边界，不将局部纯文本节点绑定外推为全应用 DOM XSS 的杜绝保证。"
+}

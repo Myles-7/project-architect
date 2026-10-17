@@ -1,0 +1,37 @@
+{
+  "label": "flash-materials-quality-20261005-01",
+  "kind": "Second-view refinement of the frozen eight-point review; not human approval or target execution",
+  "acceptance": "needs-repair",
+  "refines": "independent-content-review.json",
+  "sourceManifestSha256": "bf0ec1f2dd47f4eca0fc2c7764fb640c3e5a56562d6db142ba64f91c26ee49ee",
+  "sources": {
+    "quality-reviewed-development-package/TECHNICAL_GUIDE.md": "10021d96a03f32bbcb01ca64fe96cbd987a993c6b249b779253b630f1a2f8ff1",
+    "quality-reviewed-development-package/ACCEPTANCE.md": "6479fcf52e989e3cf5a569e7c0c41adfda90e69e38f57c830505aee8b5cbd2d4",
+    "quality-reviewed-development-package/tasks.json": "4d2e014c7918f3cebb1ef07a4335b034fbd3d82e220448ed6c00be07bf24ce60"
+  },
+  "refinedChecks": [
+    {
+      "id": 2,
+      "status": "needs-startup-command-repair",
+      "finding": "Current classic/IIFE organization and offline prerequisites are coherent, but TECHNICAL_GUIDE:130 and ACCEPTANCE:20 give npx serve . without selecting port 8080 while the subsequent address is fixed to localhost:8080. The actual launch command and documented address must agree. Optional npx first acquisition and installed-runtime/tool prerequisites must be explicit.",
+      "exactCommand": "python -m http.server 8080 或 npx serve .",
+      "exactAddress": "http://localhost:8080"
+    },
+    {
+      "id": 3,
+      "status": "needs-historical-evidence-boundary-repair",
+      "finding": "The current design restricts user-content safety to the text sink, but the exported appendix retains the old broad applicability claim for evidence-mdn-node-textcontent-official with outcome passed, without an explicit current replacement boundary. Preserve the historical evidence bytes, hash, time, source and result; add a traceable current explanation distinguishing that old extrapolation from the valid text-sink rule.",
+      "sourceLines": [161, 163],
+      "oldEvidenceIds": ["evidence-mdn-textcontent-xss-safety", "evidence-mdn-node-textcontent-official"],
+      "exactPassedScope": "规范项目名安全渲染，证实 Node.textContent 替换纯文本节点且不调用 HTML 解析器，从根本上防止 DOM 型 XSS 漏洞"
+    },
+    {
+      "id": 4,
+      "status": "needs-repair",
+      "additionalFinding": "The second view also found a task verification requiring the display to remain unrefreshed on empty input, conflicting with the formal removal of the old project result and placeholder restoration. See second-view-content-observation.json for the exact source and observable sequence."
+    }
+  ],
+  "finalRound2FeedbackSha256": "8873ff8aa1cf86dc7eab1b95fd333353e6666a9c411c2b8302fac1417783a3a5",
+  "preservedDraftHashes": ["3970690bea167143fb6f7c6bd16416132d6ed0e8266b506838c4bf975af1e875", "900a8aa7f31132bd8c76c28f4100513f44108f673b4fe27e90995629bbb080d1"],
+  "preservation": "All original round 1 manifest, model outputs, receipts, snapshots, documents and ZIPs and the initial eight-point feedback remain byte-identical. This addendum does not rewrite the earlier independent review."
+}

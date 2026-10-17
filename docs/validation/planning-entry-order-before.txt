@@ -1,0 +1,58 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ apps/server/tests/planning-package.test.ts (14 tests | 1 failed | 13 skipped) 990ms
+   ↓ Approved development package publication > blocks compilation until every feedback group is reviewed and preserves the approved subset
+   ↓ Approved development package publication > rejects 'a non-task-only cycle unreachable fro…' before publishing any package artifacts
+   ↓ Approved development package publication > rejects 'a missing dependency reference unreac…' before publishing any package artifacts
+   ↓ Approved development package publication > projects indirect approved blueprint prerequisites, stops at the first task, and shares the order across entry and plan
+   × Approved development package publication > does not tell a developer to run integration validation before its required implementation 989ms
+     → expected '# 笔记工具 — 开发入口\n\n版本：9；批准蓝图：1606ef3c00…' not to contain '先完成前置验证'
+   ↓ Approved development package publication > topologically orders shuffled inputs with deterministic multiple roots and a validation prerequisite
+   ↓ Approved development package publication > does not invent task edges from shared or task-valued requirementIds
+   ↓ Approved development package publication > keeps historical schemaVersion 1 bytes readable and does not upgrade an existing manifest
+   ↓ Approved development package publication > refuses to reissue an old approved blueprint after unreviewed input or material changes
+   ↓ Approved development package publication > compiles distinct documents, matching task data, hashes and actual ZIP
+   ↓ Approved development package publication > checks idempotent requests against revision and all file contents
+   ↓ Approved development package publication > recovers only verified artifacts after publication failure and permits a new operation
+   ↓ Approved development package publication > refuses damaged unpublished output without publishing half a package
+   ↓ Approved development package publication > invalidates exports when requirements change after approval
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  apps/server/tests/planning-package.test.ts > Approved development package publication > does not tell a developer to run integration validation before its required implementation
+AssertionError: expected '# 笔记工具 — 开发入口\n\n版本：9；批准蓝图：1606ef3c00…' not to contain '先完成前置验证'
+
+- Expected
++ Received
+
+- 先完成前置验证
++ # 笔记工具 — 开发入口
++
++ 版本：9；批准蓝图：1606ef3c0091a6c2e5352213520f2ef6b885bc0de5a3edb92185cc682067d219
++
++ 阅读 PROJECT → PRODUCT → USER_FLOWS → UX_UI_SPEC → TECHNICAL_GUIDE → DEVELOPMENT_PLAN → ACCEPTANCE → AGENTS。
++
++ 首个可执行任务：implement-notes — 实现笔记管理。按 tasks.json 和 DEVELOPMENT_PLAN 的共同顺序实施，先完成前置验证；未验证事项不能当作能力事实。实现失败时保留证据并向 Project Architect 反馈，修订相关方案后继续。
++
++ 任务依赖仅沿已批准蓝图的 dependsOn 穿过非任务块，遇到首个 task 或 validation 端点即停止；requirementIds 不推断前置。任务按稳定拓扑顺序排列，同时可执行的任务按 ID 排序。未登记的语义前置不会由导出补造，发现后应提交质量反馈并审阅修订。
++
++ 这是规划交付，不表示目标项目已经被开发或实测。
++
+
+ ❯ apps/server/tests/planning-package.test.ts:115:23
+    113|     const entry=await compiler.read(path,'START_HERE.md');
+    114|     expect(entry).toContain('首个可执行任务：implement-notes');
+    115|     expect(entry).not.toContain('先完成前置验证');
+       |                       ^
+    116|   });
+    117| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 skipped (14)
+   Start at  06:16:33
+   Duration  1.93s (transform 340ms, setup 0ms, collect 620ms, tests 990ms, environment 0ms, prepare 92ms)
+

@@ -1,0 +1,1721 @@
+{
+  "schemaVersion": 1,
+  "projectId": "proj-1787926467702",
+  "items": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "想做一个独属于我和对象的网站，可以进行实时的互动，想要实现以下功能\n双人虚拟同居室 (Live Chibi Room)，为我和她定制专属的形象，在自定义装扮的房间能够做很多事情，可以实时显示对方正在忙什么，比如我要去吃饭，就点击吃饭，我的形象人物就会到达餐厅显示吃饭的动作，在后期可以拓展更多的功能\n该功能为首要的，后面再逐个拓展功能（比如恋爱时光轴  双人交换日记  专属影像馆  同步观影/歌单  AI 记忆回顾等等）",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:14:27.702Z",
+      "updatedAt": "2026-08-28T14:14:27.702Z"
+    },
+    {
+      "id": "cand-mtd1a82r-ycpj",
+      "area": "core_features",
+      "statement": "实时状态展示以“无干扰陪伴”为主，不强制要求持续高频的网络同步，允许离线状态下的行为缓存。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "realtime_sync_presence",
+      "rationale": "作为情侣私密空间，陪伴感是核心，不应让网络连接状态破坏温馨的同居室氛围。本地优先（Local-First）保证了即使断网，本地依然可以进行装扮和查看历史状态。",
+      "createdAt": "2026-08-28T14:15:14.787Z",
+      "updatedAt": "2026-08-28T14:48:40.920Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd1a82r-70ax",
+      "area": "ux_ui_direction",
+      "statement": "房间装扮首期采用二维像素风（2D Pixel Art）或可爱插画风（Chibi 风格），支持点击拖拽布置家具。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "customization_scope",
+      "rationale": "2D/像素风对自定义素材的制作要求较低，开发成本小，且非常契合虚拟同居室的温馨可爱调性。",
+      "createdAt": "2026-08-28T14:15:14.787Z",
+      "updatedAt": "2026-08-28T14:16:10.096Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd1a82r-79sq",
+      "area": "technical_boundary",
+      "statement": "数据完全由用户本地掌控，支持一键备份为通用格式（如 JSON 包），并可由用户随时彻底销毁。",
+      "status": "candidate",
+      "origin": "agent",
+      "evidenceRefs": [],
+      "decisionKey": "data_portability_policy",
+      "rationale": "私密情侣应用对数据隐私要求极高，本地优先（Local-First）的核心优势是用户拥有数据所有权，提供导出与销毁机制能极大地建立产品信任。",
+      "createdAt": "2026-08-28T14:15:14.787Z",
+      "updatedAt": "2026-08-28T14:15:14.787Z"
+    },
+    {
+      "id": "dec-1787926591471-i0ne",
+      "area": "target_user",
+      "statement": "系统仅支持严格的“双人绑定”模式，不考虑多设备、多家庭或多人社交的扩展。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd1a82r-5ln9"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "initial_user_count",
+      "createdAt": "2026-08-28T14:16:31.471Z",
+      "updatedAt": "2026-08-28T14:16:31.471Z"
+    },
+    {
+      "id": "dec-1787926601266-u9ir",
+      "area": "page_structure",
+      "statement": "用户通过主流现代浏览器访问网站，不需要下载安装包。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd1a82r-o7z8"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "browser_based_access",
+      "createdAt": "2026-08-28T14:16:41.266Z",
+      "updatedAt": "2026-08-28T14:16:41.266Z"
+    },
+    {
+      "id": "dec-1787926617721-6uyx",
+      "area": "core_features",
+      "statement": "专属影像馆初期不提供云端大容量存储，以展示本地索引或链接外部媒体源为主。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd1a82r-dbus"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "media_storage_limit",
+      "createdAt": "2026-08-28T14:16:57.721Z",
+      "updatedAt": "2026-08-28T14:16:57.721Z"
+    },
+    {
+      "id": "dec-1787926701962",
+      "area": "target_user",
+      "statement": "仅用于个人使用，没有作为产品",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82q-l163"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:18:21.962Z",
+      "updatedAt": "2026-08-28T14:18:21.962Z"
+    },
+    {
+      "id": "dec-1787926815353",
+      "area": "mvp_scope",
+      "statement": "严格聚焦单一核心痛点闭环",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82q-7y1b"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:20:15.353Z",
+      "updatedAt": "2026-08-28T14:20:15.353Z"
+    },
+    {
+      "id": "dec-1787927683349",
+      "area": "ux_ui_direction",
+      "statement": "MVP版本先是系统内置，后期通过上传形象图生成不同动作切图",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82q-kv6k"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:34:43.349Z",
+      "updatedAt": "2026-08-28T14:34:43.349Z"
+    },
+    {
+      "id": "dec-1787927707969",
+      "area": "target_user",
+      "statement": "仅供我和对象两个人私密使用，是专属的情侣空间。不需要做多用户注册或外部社交系统，核心聚焦在我们两人的实时状态同步、形象动作与房间装扮互动。”",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82q-tsug"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:35:07.969Z",
+      "updatedAt": "2026-08-28T14:35:07.969Z"
+    },
+    {
+      "id": "dec-1787927766238",
+      "area": "technical_boundary",
+      "statement": "有没有能够实现的GitHub项目，可以进行数据无感传输",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82q-tty0"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:36:06.237Z",
+      "updatedAt": "2026-08-28T14:36:06.237Z"
+    },
+    {
+      "id": "dec-1787928007029",
+      "area": "core_features",
+      "statement": "接入主流大模型云端服务",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82r-9f26"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:40:07.029Z",
+      "updatedAt": "2026-08-28T14:40:07.029Z"
+    },
+    {
+      "id": "dec-1787928079080",
+      "area": "core_features",
+      "statement": "单人状态展示和双人交集的互动动作",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82r-w1de"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:41:19.080Z",
+      "updatedAt": "2026-08-28T14:41:19.080Z"
+    },
+    {
+      "id": "dec-1787928107126",
+      "area": "core_features",
+      "statement": "建议先用可验证的首发边界收敛“核心功能”，将非必要内容延后。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82r-wl2k"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:41:47.126Z",
+      "updatedAt": "2026-08-28T14:41:47.126Z"
+    },
+    {
+      "id": "dec-1787928287797",
+      "area": "user_flows",
+      "statement": "都支持",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82r-gerd"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:44:47.797Z",
+      "updatedAt": "2026-08-28T14:44:47.797Z"
+    },
+    {
+      "id": "dec-1787928299138",
+      "area": "ux_ui_direction",
+      "statement": "手机移动端网页优先",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd1a82r-e6yu"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:44:59.138Z",
+      "updatedAt": "2026-08-28T14:44:59.138Z"
+    },
+    {
+      "id": "cand-mtd2dmp0-cso0",
+      "area": "technical_boundary",
+      "statement": "采用无服务器的对等网络直连方式，在双方浏览器同时打开时进行实时状态同步。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "sync_topology",
+      "rationale": "用户要求数据无感传输且仅供两人私密使用，采用端到端直连无需购买和运维云端服务器，能最大化保障隐私并降低长期运行成本。",
+      "createdAt": "2026-08-28T14:45:53.316Z",
+      "updatedAt": "2026-08-28T14:47:57.255Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd2dmp0-04rk",
+      "area": "technical_boundary",
+      "statement": "支持将双人空间的互动数据、恋爱日记和时光轴一键导出为标准的 JSON 或 Markdown 文件包。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "local_export_format",
+      "rationale": "遵循本地优先原则，确保用户对两人的情感回忆数据拥有完全的所有权，即使网站不再运行，数据也可以在本地永久保存和阅读。",
+      "createdAt": "2026-08-28T14:45:53.316Z",
+      "updatedAt": "2026-08-28T14:48:30.259Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd2f6qa-5wun",
+      "area": "technical_boundary",
+      "statement": "基于用户无感传输的需求，首期可以选用基于 WebSocket 连接的轻量 Node.js 服务器作为中转站，配合 SQLite 或 LocalForage 进行本地数据缓存与快速还原。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "local_first_sync_tech",
+      "rationale": "Node.js + WebSocket 能支持实时的双向数据推送，满足“点击动作对方立即看到”的需求；而本地存储如 LocalForage 可以作为 Local-First 的基础，在离线时保存用户的房间布置。",
+      "createdAt": "2026-08-28T14:47:05.938Z",
+      "updatedAt": "2026-08-28T14:48:21.574Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd2f6qa-72m0",
+      "area": "technical_boundary",
+      "statement": "为了在公网环境下保持私密，网站首期不引入繁琐的用户账号注册系统，而是通过统一的预共享安全令牌 (Pre-Shared Token) 或访问密码来进行设备的首次双人绑定。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "authentication_mechanism",
+      "rationale": "这既符合“仅供两人私密使用，无需多用户注册”的设定，又可以用最少的开发成本提供极高的公网访问防盗安全性。",
+      "createdAt": "2026-08-28T14:47:05.938Z",
+      "updatedAt": "2026-08-28T14:48:10.683Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1787928542659-3liz",
+      "area": "ux_ui_direction",
+      "statement": "界面默认语言为简体中文。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2dmp0-1alu"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "default_language",
+      "createdAt": "2026-08-28T14:49:02.659Z",
+      "updatedAt": "2026-08-28T14:49:02.659Z"
+    },
+    {
+      "id": "dec-1787928556815-zezz",
+      "area": "ux_ui_direction",
+      "statement": "假设首个版本内置的像素风家具素材直接使用开源免费或免版税的素材包（如 Itch.io 上的像素风资源），而不是自己从零绘制。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2f6qa-lnau"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "initial_furniture_asset_source",
+      "createdAt": "2026-08-28T14:49:16.815Z",
+      "updatedAt": "2026-08-28T14:49:16.815Z"
+    },
+    {
+      "id": "dec-1787928560841-bgs3",
+      "area": "ux_ui_direction",
+      "statement": "默认采用温馨、暖色调的可爱插画或像素色系。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2dmp0-fiql"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "default_theme_color",
+      "createdAt": "2026-08-28T14:49:20.841Z",
+      "updatedAt": "2026-08-28T14:49:20.841Z"
+    },
+    {
+      "id": "cand-mtd2j21i-ouuf",
+      "area": "technical_boundary",
+      "statement": "使用轻量 WebSocket 中转服务进行数据转发，配合本地缓存来实现双人无感状态同步。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "mvp_sync_mechanism",
+      "rationale": "基于用户对于“无感数据传输”的需求，使用轻量中转服务器可以在其中一方不在线时暂存其最后的离线状态。这样，当另一方打开网页时，能立刻获取到最新的陪伴状态，用户体验优于纯 P2P 浏览器直连。",
+      "createdAt": "2026-08-28T14:50:06.485Z",
+      "updatedAt": "2026-08-28T15:11:27.374Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1787928810533",
+      "area": "delivery_plan",
+      "statement": "(推荐) 实时状态同步闭环：两台手机成功绑定后，一人改变状态动作（如点击吃饭），另一人的手机网页上能即时同步更新对应的形象动作。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mtd2j21h-5afn"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-28T14:53:30.533Z",
+      "updatedAt": "2026-08-28T14:53:30.533Z"
+    },
+    {
+      "id": "cand-mtd2r6uh-f2vd",
+      "area": "technical_boundary",
+      "statement": "首期采用基于 WebSocket 连接的轻量 Node.js 服务器作为信令与状态中转站。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "p2p_signaling_server",
+      "rationale": "WebSocket中转服务器能够低延迟地在双方浏览器之间传输状态和家具位置，开发复杂度低，且能很好地支持双人绑定暗号校验。",
+      "createdAt": "2026-08-28T14:56:25.961Z",
+      "updatedAt": "2026-08-28T14:57:04.377Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd2r6uh-yy7z",
+      "area": "technical_boundary",
+      "statement": "本地数据存储采用 SQLite 或 LocalForage 进行缓存，并支持一键导出为 JSON/Markdown 文件包。",
+      "status": "candidate",
+      "origin": "agent",
+      "evidenceRefs": [],
+      "decisionKey": "local_first_storage",
+      "rationale": "确保数据完全属于用户自己，符合 Local-First 的设计标签，且无需维护复杂的云端数据库。",
+      "createdAt": "2026-08-28T14:56:25.961Z",
+      "updatedAt": "2026-08-28T14:56:25.961Z"
+    },
+    {
+      "id": "cand-mtd2r6uh-z0dm",
+      "area": "technical_boundary",
+      "statement": "双人绑定采用预共享安全令牌 (Pre-Shared Token) 或访问密码，代替注册系统。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "pre_shared_token_auth",
+      "rationale": "网站仅供两人私密使用，无注册系统可最大化保护隐私并简化开发。",
+      "createdAt": "2026-08-28T14:56:25.961Z",
+      "updatedAt": "2026-08-28T14:56:59.033Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd2w8bs-7mvx",
+      "area": "technical_boundary",
+      "statement": "首期前端动画与房间装扮交互框架建议采用轻量级的 Canvas 渲染库（如 PixiJS）或直接使用原生 DOM 拖拽与 CSS 动画。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "chibi_animation_engine",
+      "rationale": "鉴于 2D 像素风及拖拽需求，PixiJS 提供了良好的性能和拖拽支持，但原生 DOM 对于首期极简的家具（5-10件）而言开发成本更低且更易维护。",
+      "createdAt": "2026-08-28T15:00:21.160Z",
+      "updatedAt": "2026-08-28T15:11:17.501Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1787929909202-nhuy",
+      "area": "ux_ui_direction",
+      "statement": "MVP 首期仅提供 1 个默认房间布局和 5-10 件基础像素家具，暂不支持多房间切换。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2j21i-zwbv"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "default_room_layout",
+      "createdAt": "2026-08-28T15:11:49.202Z",
+      "updatedAt": "2026-08-28T15:11:49.202Z"
+    },
+    {
+      "id": "dec-1787929917067-q309",
+      "area": "technical_boundary",
+      "statement": "假设双方的浏览器均支持现代 Web API（如 WebSocket、LocalStorage/IndexedDB）。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2r6uh-orzo"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "network_environment",
+      "createdAt": "2026-08-28T15:11:57.067Z",
+      "updatedAt": "2026-08-28T15:11:57.067Z"
+    },
+    {
+      "id": "dec-1787929920564-mgcz",
+      "area": "target_user",
+      "statement": "假设该项目在生命周期内完全不考虑商业化、多用户注册及外部社交功能扩展。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2r6uh-1wz1"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "no_commercial_scaling",
+      "createdAt": "2026-08-28T15:12:00.564Z",
+      "updatedAt": "2026-08-28T15:12:00.564Z"
+    },
+    {
+      "id": "dec-1787929924926-kv27",
+      "area": "technical_boundary",
+      "statement": "假设只需兼容支持标准 HTML5 Drag and Drop API 和 WebSocket 协议的现代主流移动及桌面浏览器（如 Chrome、Safari、Edge），不考虑旧版浏览器的兼容。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2f6qa-8836"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "browser_compatibility",
+      "createdAt": "2026-08-28T15:12:04.926Z",
+      "updatedAt": "2026-08-28T15:12:04.926Z"
+    },
+    {
+      "id": "dec-1787929929563-oldl",
+      "area": "technical_boundary",
+      "statement": "假设只需兼容支持标准 HTML5 Drag and Drop API 和 WebSocket 协议的现代主流浏览器。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd2w8bs-pwsd"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "browser_compatibility",
+      "createdAt": "2026-08-28T15:12:09.563Z",
+      "updatedAt": "2026-08-28T15:12:09.563Z"
+    },
+    {
+      "id": "cand-mtd3cjey-maee",
+      "area": "ux_ui_direction",
+      "statement": "当其中一方离线（断开网络或关闭网页）时，另一方房间中的对应形象自动切换为挂机动画状态（如在床上睡觉或坐在沙发上发呆），而不是从房间中直接消失或保持离线前的动作不动。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "offline_avatar_behavior",
+      "rationale": "这既能维持双人同居室温馨的无干扰陪伴氛围，又能清晰直观地让对方知道自己当前不在线，避免误导。",
+      "createdAt": "2026-08-28T15:13:02.026Z",
+      "updatedAt": "2026-08-31T11:13:10.386Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3cjey-i4na",
+      "area": "core_features",
+      "statement": "双人交换日记功能采用双方轮流编写、写完并“寄出”后对方才能解锁查看的交换模式。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "exchange_diary_flow",
+      "rationale": "这种模式极具现实中情侣交换日记的拆信期待感与仪式感，且在技术上天然规避了双方同时编辑同一天记录时的冲突合并难题，开发极其轻量。",
+      "createdAt": "2026-08-28T15:13:02.026Z",
+      "updatedAt": "2026-08-31T11:13:01.574Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3cjey-gv8l",
+      "area": "technical_boundary",
+      "statement": "首次建立双人连接时，不使用任何注册流程，而是由双方在各自的设备上输入相同的“自定义暗号”（如纪念日或悄悄话）来完成安全通道的建立与绑定。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "device_binding_method",
+      "rationale": "该方案符合情侣专属的私密浪漫调性，支持异地快速配对，省去了复制、跨应用发送和扫描随机配对码的复杂交互步骤。",
+      "createdAt": "2026-08-28T15:13:02.026Z",
+      "updatedAt": "2026-08-31T11:12:53.956Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3cjey-j8iz",
+      "area": "ux_ui_direction",
+      "statement": "首期 MVP 版本的系统内置形象直接提供 4-6 套已经绘制好的可爱 Chibi 完整角色形象供双方选择，暂不支持精细的发型、五官和服饰拆分拼装。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "avatar_customization_granularity",
+      "rationale": "由于首期专注于核心的实时状态同步，限制内置形象的拼接复杂度能大幅缩短美术切图与前端动画渲染的开发周期，确保高质快速交付。",
+      "createdAt": "2026-08-28T15:13:02.026Z",
+      "updatedAt": "2026-08-31T11:12:46.285Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3dday-ji58",
+      "area": "ux_ui_direction",
+      "statement": "当对方离线时，其形象在房间内自动切换为睡觉或在沙发上发呆的挂机动画。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "offline_avatar_behavior_candidate",
+      "rationale": "既能表明在线状态变化，又能保持同居室温馨有爱的陪伴氛围，避免人物生硬地卡住或突兀地消失。",
+      "createdAt": "2026-08-28T15:13:40.762Z",
+      "updatedAt": "2026-08-31T11:12:39.520Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3dday-1e9n",
+      "area": "mvp_scope",
+      "statement": "首期仅提供 1 个默认房间布局和 5-10 件基础像素家具，暂不支持多房间切换。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "mvp_room_decoration_scope_candidate",
+      "rationale": "降低初始交互与数据同步逻辑的复杂度，缩短首期交付周期，快速验证核心实时互动功能。",
+      "createdAt": "2026-08-28T15:13:40.762Z",
+      "updatedAt": "2026-08-31T11:12:30.677Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3dday-k6yo",
+      "area": "ux_ui_direction",
+      "statement": "首期角色形象直接提供 4-6 套绘制好的完整 Chibi 形象，不支持发型和衣服的自由拆装。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "mvp_character_customization_candidate",
+      "rationale": "避免复杂的动态拼装拼积木算法和繁琐的美术图层拆分，快速跑通核心的动作状态同步。",
+      "createdAt": "2026-08-28T15:13:40.762Z",
+      "updatedAt": "2026-08-31T11:12:27.068Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mtd3dday-0v85",
+      "area": "technical_boundary",
+      "statement": "默认数据备份为手动导出 JSON/Markdown，首期不提供自动云端备份。",
+      "status": "candidate",
+      "origin": "agent",
+      "evidenceRefs": [],
+      "decisionKey": "data_backup_policy_candidate",
+      "rationale": "在 Local-First 架构下以最简方式实现，且完全保证隐私与零云端存储开销。",
+      "createdAt": "2026-08-28T15:13:40.762Z",
+      "updatedAt": "2026-08-28T15:13:40.762Z"
+    },
+    {
+      "id": "dec-1788174812279-mew0",
+      "area": "ux_ui_direction",
+      "statement": "首个版本内置的像素风家具与角色素材直接使用开源免费或免版税的素材包。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mtd3dday-2ddo"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "built_in_assets_assumption",
+      "createdAt": "2026-08-31T11:13:32.279Z",
+      "updatedAt": "2026-08-31T11:13:32.279Z"
+    },
+    {
+      "id": "cand-mth5603x-qwa2",
+      "area": "ux_ui_direction",
+      "statement": "首期内置的 4-6 套 Chibi 形象将配备基础的动态动作帧序列图（Spritesheet，即包含人物连续动作的一整张图），直接以动画帧循环播放实现动效。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "spritesheet_source_mvp",
+      "rationale": "配合 CSS 动画或 Canvas 渲染，帧序列图是像素风游戏和网页动效最通用、最省性能的实现手段。",
+      "createdAt": "2026-08-31T11:15:01.004Z",
+      "updatedAt": "2026-08-31T11:58:19.600Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1788174997705",
+      "area": "project_overview",
+      "statement": "应用管理格式 (SQLite) 并提供完整导出",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5603v-9esw"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:16:37.705Z",
+      "updatedAt": "2026-08-31T11:16:37.705Z"
+    },
+    {
+      "id": "dec-1788175018679",
+      "area": "technical_boundary",
+      "statement": "本地优先为主，可选端到端加密同步服务",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5603v-81uw"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:16:58.679Z",
+      "updatedAt": "2026-08-31T11:16:58.679Z"
+    },
+    {
+      "id": "dec-1788175034491",
+      "area": "core_features",
+      "statement": "提供 5-6 种常见生活动作（发呆、吃饭、学习工作、洗澡、睡觉、出门）",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5603w-w1jo"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:17:14.491Z",
+      "updatedAt": "2026-08-31T11:17:14.491Z"
+    },
+    {
+      "id": "dec-1788175096215",
+      "area": "user_flows",
+      "statement": "首发优先实现基础双人在线状态与单向高频动作广播“核心流程”，暂不做复杂物理碰撞与链式互动。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5603w-9nlg"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:18:16.215Z",
+      "updatedAt": "2026-08-31T11:18:16.215Z"
+    },
+    {
+      "id": "cand-mth5aqmx-yxum",
+      "area": "ux_ui_direction",
+      "statement": "使用 HTML5 Canvas 或轻量级 2D 渲染库（如 PixiJS）来绘制像素房间和角色动作。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "use_webgl_or_canvas",
+      "rationale": "相比直接用 DOM 节点拼接，Canvas 能够提供更流畅的拖拽家具体验和更方便的动作帧播放，同时保持手机端高性能。",
+      "createdAt": "2026-08-31T11:18:42.009Z",
+      "updatedAt": "2026-08-31T11:58:32.382Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mth5aqmx-khvm",
+      "area": "technical_boundary",
+      "statement": "在本地数据发生变更（如新增日记）时，自动触发 WebSocket 增量同步，并在后台生成一份待导出的 JSON 包。",
+      "status": "candidate",
+      "origin": "agent",
+      "evidenceRefs": [],
+      "decisionKey": "data_sync_trigger",
+      "rationale": "这符合“数据无感传输”的要求，同时确保本地随时有一份最新备份，防止因浏览器意外清空缓存而丢失数据。",
+      "createdAt": "2026-08-31T11:18:42.009Z",
+      "updatedAt": "2026-08-31T11:18:42.009Z"
+    },
+    {
+      "id": "dec-1788175247236",
+      "area": "project_overview",
+      "statement": "单屏自由工作台 (Canvas/Dashboard)",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5aqmw-pdti"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:20:47.236Z",
+      "updatedAt": "2026-08-31T11:20:47.236Z"
+    },
+    {
+      "id": "dec-1788175333293",
+      "area": "ux_ui_direction",
+      "statement": "播放行走或滑行路径动画",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5aqmx-h50y"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:22:13.293Z",
+      "updatedAt": "2026-08-31T11:22:13.293Z"
+    },
+    {
+      "id": "cand-mth5g554-suhs",
+      "area": "core_features",
+      "statement": "AI记忆回顾功能将放在第二阶段（二期）进行开发与对接",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "ai_memory_retrieval_stage",
+      "rationale": "首期需要全力聚焦于无干扰陪伴小人状态与装扮的同步，防止功能蔓延导致交付延期。",
+      "createdAt": "2026-08-31T11:22:54.088Z",
+      "updatedAt": "2026-08-31T11:59:50.104Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mth5g554-1dmd",
+      "area": "technical_boundary",
+      "statement": "离线编辑的时光轴和日记在联网后，以生成时间戳为准自动双向合并，如有同一天的日记则并列显示",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "offline_conflict_resolution",
+      "rationale": "作为 Local-First（本地优先）应用，自动合并可以实现完全无感的同步体验，无需用户手动干预解决冲突。",
+      "createdAt": "2026-08-31T11:22:54.088Z",
+      "updatedAt": "2026-08-31T11:59:42.428Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1788175387721",
+      "area": "mvp_scope",
+      "statement": "中等丰富预设（3-5套可选形象，6-8个日常与娱乐动作）",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5g554-lgve"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:23:07.721Z",
+      "updatedAt": "2026-08-31T11:23:07.721Z"
+    },
+    {
+      "id": "dec-1788175429087",
+      "area": "project_overview",
+      "statement": "Web 浏览器网页端",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5g554-07hj"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:23:49.087Z",
+      "updatedAt": "2026-08-31T11:23:49.087Z"
+    },
+    {
+      "id": "dec-1788175475486",
+      "area": "core_features",
+      "statement": "(Recommended) 最终一致性（最后释放拖拽的玩家位置为最终状态）",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5g554-38vd"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:24:35.486Z",
+      "updatedAt": "2026-08-31T11:24:35.486Z"
+    },
+    {
+      "id": "dec-1788175490482",
+      "area": "ux_ui_direction",
+      "statement": "直线滑行/行走动画（形象从旧位置直线走到新位置，再切换动作）",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5g554-dwtw"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:24:50.482Z",
+      "updatedAt": "2026-08-31T11:24:50.482Z"
+    },
+    {
+      "id": "cand-mth5jkd0-8zw5",
+      "area": "core_features",
+      "statement": "当双方不在线时，暂时缓存在本地，并在双方同时在线时通过 WebSocket 自动增量对齐同步状态与家具布置。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "offline_sync_strategy",
+      "rationale": "支持无干扰陪伴，允许离线状态下的行为缓存，同时保证在双方都打开网页时，数据能够恢复一致。",
+      "createdAt": "2026-08-31T11:25:33.780Z",
+      "updatedAt": "2026-08-31T12:00:10.366Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mth5jkd0-gcyz",
+      "area": "technical_boundary",
+      "statement": "利用双人绑定直连的特性，在设备连接时自动比对并补全双方本地数据，建立双机互备机制防范浏览器缓存清理风险。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "local_backup_redundancy",
+      "rationale": "在不引入中心化云端数据库和账号系统的私密前提下，极大降低单侧浏览器缓存被系统自动清理而导致的数据丢失概率。",
+      "createdAt": "2026-08-31T11:25:33.780Z",
+      "updatedAt": "2026-08-31T12:00:06.709Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1788175790663",
+      "area": "technical_boundary",
+      "statement": "【支持个人第三方网盘备份】允许绑定自己的 WebDAV（如坚果云）或云存储，静默将本地数据库上传到自己的云盘中。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5jkd0-qccd"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:29:50.663Z",
+      "updatedAt": "2026-08-31T11:29:50.663Z"
+    },
+    {
+      "id": "dec-1788175838104",
+      "area": "core_features",
+      "statement": "【离线缓存与自动同步】允许离线进行装扮或更改状态，数据暂存在浏览器。一旦双方连接建立，自动以最新的时间戳对齐，合并双方的修改。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5jkd0-oa6t"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:30:38.104Z",
+      "updatedAt": "2026-08-31T11:30:38.104Z"
+    },
+    {
+      "id": "dec-1788175846980",
+      "area": "delivery_plan",
+      "statement": "【动作同步 + 房间家具保存 + 时光轴日志】除了核心同步和家具保存外，系统还要能生成当天的动作日志（如“对方下午学习了两小时”）。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5jkd0-3lpu"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:30:46.980Z",
+      "updatedAt": "2026-08-31T11:30:46.980Z"
+    },
+    {
+      "id": "cand-mth5qyw6-oxsp",
+      "area": "technical_boundary",
+      "statement": "本地数据持久化在前端首选 LocalForage，Node.js 服务端暂存数据则选用 SQLite。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "database_choice",
+      "rationale": "LocalForage 在浏览器端对 IndexedDB 进行了友好封装，拥有极佳的兼容性；SQLite 作为服务端单文件数据库，能够完美契合 Local-First（本地优先）且轻量免运维的需求。",
+      "createdAt": "2026-08-31T11:31:19.206Z",
+      "updatedAt": "2026-08-31T11:59:27.382Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "cand-mth5qyw6-t54y",
+      "area": "ux_ui_direction",
+      "statement": "形象动作切图在前端采用精灵图（Sprite Sheets）方式打包与加载。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "avatar_asset_format",
+      "rationale": "像素风或可爱插画风的角色动画通常由多帧图片轮播构成。采用精灵图（Sprite Sheets）技术可以将所有动画帧合并为单张图片，有效减少网络请求并确保动画帧加载同步。",
+      "createdAt": "2026-08-31T11:31:19.206Z",
+      "updatedAt": "2026-08-31T11:59:10.822Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1788176026346",
+      "area": "technical_boundary",
+      "statement": "(推荐) 直接由双方在网页端的设置面板中手动输入各自的 API Key，保存在本地浏览器中",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5qyw5-um9k"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:33:46.346Z",
+      "updatedAt": "2026-08-31T11:33:46.346Z"
+    },
+    {
+      "id": "dec-1788176058970",
+      "area": "technical_boundary",
+      "statement": "虽然不注册账号，但由中转 Node.js 服务器在后台自动保存一份经过预共享令牌加密的双人数据副本",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5qyw5-kd8q"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:34:18.970Z",
+      "updatedAt": "2026-08-31T11:34:18.970Z"
+    },
+    {
+      "id": "cand-mth5vxib-uxe9",
+      "area": "core_features",
+      "statement": "在首期虚拟同居室上线并稳定后，再逐步引入恋爱时光轴、双人交换日记、专属影像馆、同步观影/歌单以及 AI 记忆回顾等功能。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "future_expansion_plan",
+      "rationale": "基于用户希望“首期专注虚拟同居室，后面再逐个拓展功能”的原则，这能确保项目前期轻量快速交付，同时保留未来的丰富扩展性。",
+      "createdAt": "2026-08-31T11:35:10.691Z",
+      "updatedAt": "2026-08-31T11:59:17.151Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1788176195153",
+      "area": "technical_boundary",
+      "statement": "统一配置在部署网站的云端服务器环境变量中",
+      "status": "rejected",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5vxib-fndm"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:36:35.153Z",
+      "updatedAt": "2026-09-25T01:23:54.038Z",
+      "rejectionReason": "retracted_by_user"
+    },
+    {
+      "id": "dec-1788176202328",
+      "area": "delivery_plan",
+      "statement": "除了动作同步外，还需包含至少 5 种可拖拽布置并同步的家具才能验收",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "question:q-mth5vxib-hx4c"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-08-31T11:36:42.328Z",
+      "updatedAt": "2026-08-31T11:36:42.328Z"
+    },
+    {
+      "id": "cand-mth5z6pl-l657",
+      "area": "ux_ui_direction",
+      "statement": "首期采用预设的像素动作序列，用户通过选择不同的衣服颜色或发型来进行基础的形象定制。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "decisionKey": "avatar_customization_approach",
+      "rationale": "在系统内置形象的基础上，通过调色板（Palette Swapping）或组合图层的方式实现个性化定制，相比重新绘制一整套新形象，能大幅降低首期美术工作量。",
+      "createdAt": "2026-08-31T11:37:42.585Z",
+      "updatedAt": "2026-08-31T11:58:49.425Z",
+      "confirmedBy": "user"
+    },
+    {
+      "id": "dec-1788177632889-huog",
+      "area": "ux_ui_direction",
+      "statement": "首期虚拟同居室采用固定大小的单房间网格布局，不提供多房间或超大地图滚动。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5aqmx-ivwq"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "default_room_size",
+      "createdAt": "2026-08-31T12:00:32.889Z",
+      "updatedAt": "2026-08-31T12:00:32.889Z"
+    },
+    {
+      "id": "dec-1788177646738-u8ud",
+      "area": "ux_ui_direction",
+      "statement": "暂定默认：当一方在后台或锁屏状态时，网站的实时消息与互动通知机制尚未明确。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-auto-mth5qyw6-wsx"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "background_notifications",
+      "createdAt": "2026-08-31T12:00:46.738Z",
+      "updatedAt": "2026-08-31T12:00:46.738Z"
+    },
+    {
+      "id": "dec-1788177654529-i2gw",
+      "area": "ux_ui_direction",
+      "statement": "暂定默认：尚未明确在一方锁屏或切后台时，如何同步或通知对方的消息与状态。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-auto-mth5z6pl-sw6"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "background_notifications",
+      "createdAt": "2026-08-31T12:00:54.529Z",
+      "updatedAt": "2026-08-31T12:00:54.529Z"
+    },
+    {
+      "id": "dec-1788177679844-1j42",
+      "area": "technical_boundary",
+      "statement": "双人进行实时互动时，两台设备均处于可用 Internet 的网络环境中，不考虑完全离线的局域网直连。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5z6pl-yp0m"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "internet_dependency",
+      "createdAt": "2026-08-31T12:01:19.844Z",
+      "updatedAt": "2026-08-31T12:01:19.844Z"
+    },
+    {
+      "id": "dec-1788177699894-qxhe",
+      "area": "ux_ui_direction",
+      "statement": "优先适配移动端浏览器，确保随时随地可以方便地更新状态，同时兼容桌面端浏览器的正常访问。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5vxib-qa96"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "device_adaptation_priority",
+      "createdAt": "2026-08-31T12:01:39.894Z",
+      "updatedAt": "2026-08-31T12:01:39.894Z"
+    },
+    {
+      "id": "dec-1788177707438-h3ol",
+      "area": "ux_ui_direction",
+      "statement": "MVP 版本内置的虚拟形象动作动画以简单的 2D 序列帧或静态切图形式存在，通过替换图片源实现状态切换。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5jkd0-8uuv"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "avatar_sprite_format",
+      "createdAt": "2026-08-31T12:01:47.438Z",
+      "updatedAt": "2026-08-31T12:01:47.438Z"
+    },
+    {
+      "id": "dec-1788177713252-5iqg",
+      "area": "ux_ui_direction",
+      "statement": "移动端网页主要采用竖屏交互布局。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5qyw6-2lqf"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "screen_orientation",
+      "createdAt": "2026-08-31T12:01:53.252Z",
+      "updatedAt": "2026-08-31T12:01:53.252Z"
+    },
+    {
+      "id": "dec-1788177721190-tkza",
+      "area": "technical_boundary",
+      "statement": "实时状态同步采用标准的 WebSocket 协议进行全双工通信。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5qyw6-5s3h"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "network_protocol",
+      "createdAt": "2026-08-31T12:02:01.190Z",
+      "updatedAt": "2026-08-31T12:02:01.190Z"
+    },
+    {
+      "id": "dec-1788177732029-6ubx",
+      "area": "ux_ui_direction",
+      "statement": "当其中一方离线（关闭网页或断网）时，其虚拟形象在对方屏幕上自动切换为睡觉或在沙发上发呆的挂机动画。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5603x-0nh0"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "offline_visual_state",
+      "createdAt": "2026-08-31T12:02:12.029Z",
+      "updatedAt": "2026-08-31T12:02:12.029Z"
+    },
+    {
+      "id": "dec-1788177740260-89mc",
+      "area": "core_features",
+      "statement": "接入的主流大模型云端服务由用户自行提供 API Key，系统本身不内置付费的大模型额度。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5aqmx-89ma"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "cloud_model_cost",
+      "createdAt": "2026-08-31T12:02:20.260Z",
+      "updatedAt": "2026-08-31T12:02:20.260Z"
+    },
+    {
+      "id": "dec-1788177753472-defs",
+      "area": "ux_ui_direction",
+      "statement": "首发内置 2-3 套精美默认形象与“UX/UI 方向”素材，暂缓自由文件上传与复杂编辑器。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-1788175269895-9txq"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "character_movement_style",
+      "createdAt": "2026-08-31T12:02:33.472Z",
+      "updatedAt": "2026-08-31T12:02:33.472Z"
+    },
+    {
+      "id": "dec-1788177759415-l68l",
+      "area": "technical_boundary",
+      "statement": "由于采用轻量 WebSocket 服务器或 WebRTC 直连，双方在不同网络环境下的实时状态同步延迟可以容忍在数秒之内。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5jkd0-u12i"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "public_network_latency",
+      "createdAt": "2026-08-31T12:02:39.415Z",
+      "updatedAt": "2026-08-31T12:02:39.415Z"
+    },
+    {
+      "id": "dec-1788177765880-3g26",
+      "area": "ux_ui_direction",
+      "statement": "首个版本内置的像素风家具与角色素材直接使用开源免费或免版税的素材包。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "assumption:asm-mth5603x-10yo"
+      ],
+      "confirmedBy": "user",
+      "decisionKey": "licensed_assets_use",
+      "createdAt": "2026-08-31T12:02:45.880Z",
+      "updatedAt": "2026-08-31T12:02:45.880Z"
+    }
+  ],
+  "traces": [
+    {
+      "id": "trace-1787926701962",
+      "questionRef": "question:q-mtd1a82q-l163",
+      "userAnswer": "仅用于个人使用，没有作为产品",
+      "decisionRef": "decision:dec-1787926701962",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82q-l163",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787926701962",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-chk-target_user-univ-target-user",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:18:21.962Z"
+    },
+    {
+      "id": "trace-1787926815353",
+      "questionRef": "question:q-mtd1a82q-7y1b",
+      "userAnswer": "严格聚焦单一核心痛点闭环",
+      "decisionRef": "decision:dec-1787926815353",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82q-7y1b",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787926815353",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-chk-mvp_scope-univ-mvp-boundary",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:20:15.353Z"
+    },
+    {
+      "id": "trace-1787927683349",
+      "questionRef": "question:q-mtd1a82q-kv6k",
+      "userAnswer": "MVP版本先是系统内置，后期通过上传形象图生成不同动作切图",
+      "decisionRef": "decision:dec-1787927683349",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82q-kv6k",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787927683349",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-ux_ui_direction-a82c",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:34:43.349Z"
+    },
+    {
+      "id": "trace-1787927707969",
+      "questionRef": "question:q-mtd1a82q-tsug",
+      "userAnswer": "仅供我和对象两个人私密使用，是专属的情侣空间。不需要做多用户注册或外部社交系统，核心聚焦在我们两人的实时状态同步、形象动作与房间装扮互动。”",
+      "decisionRef": "decision:dec-1787927707969",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82q-tsug",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787927707969",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-01",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:35:07.969Z"
+    },
+    {
+      "id": "trace-1787927766238",
+      "questionRef": "question:q-mtd1a82q-tty0",
+      "userAnswer": "有没有能够实现的GitHub项目，可以进行数据无感传输",
+      "decisionRef": "decision:dec-1787927766238",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82q-tty0",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787927766238",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-technical_boundary-a82c",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:36:06.237Z"
+    },
+    {
+      "id": "trace-1787928007029",
+      "questionRef": "question:q-mtd1a82r-9f26",
+      "userAnswer": "接入主流大模型云端服务",
+      "decisionRef": "decision:dec-1787928007029",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82r-9f26",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787928007029",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-core_features-a82c",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:40:07.029Z"
+    },
+    {
+      "id": "trace-1787928079080",
+      "questionRef": "question:q-mtd1a82r-w1de",
+      "userAnswer": "单人状态展示和双人交集的互动动作",
+      "decisionRef": "decision:dec-1787928079080",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82r-w1de",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787928079080",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-08-28T14:41:19.080Z"
+    },
+    {
+      "id": "trace-1787928107126",
+      "questionRef": "question:q-mtd1a82r-wl2k",
+      "userAnswer": "建议先用可验证的首发边界收敛“核心功能”，将非必要内容延后。",
+      "decisionRef": "decision:dec-1787928107126",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82r-wl2k",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787928107126",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-08-28T14:41:47.126Z"
+    },
+    {
+      "id": "trace-1787928287797",
+      "questionRef": "question:q-mtd1a82r-gerd",
+      "userAnswer": "都支持",
+      "decisionRef": "decision:dec-1787928287797",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82r-gerd",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787928287797",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-user_flows-a82c",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:44:47.797Z"
+    },
+    {
+      "id": "trace-1787928299138",
+      "questionRef": "question:q-mtd1a82r-e6yu",
+      "userAnswer": "手机移动端网页优先",
+      "decisionRef": "decision:dec-1787928299138",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd1a82r-e6yu",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787928299138",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-08-28T14:44:59.138Z"
+    },
+    {
+      "id": "trace-1787928810533",
+      "questionRef": "question:q-mtd2j21h-5afn",
+      "userAnswer": "(推荐) 实时状态同步闭环：两台手机成功绑定后，一人改变状态动作（如点击吃饭），另一人的手机网页上能即时同步更新对应的形象动作。",
+      "decisionRef": "decision:dec-1787928810533",
+      "stateChanges": [
+        {
+          "ref": "question:q-mtd2j21h-5afn",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1787928810533",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-delivery_plan-j21h",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-28T14:53:30.533Z"
+    },
+    {
+      "id": "trace-1788174997705",
+      "questionRef": "question:q-mth5603v-9esw",
+      "userAnswer": "应用管理格式 (SQLite) 并提供完整导出",
+      "decisionRef": "decision:dec-1788174997705",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5603v-9esw",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788174997705",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-chk-project_overview-localfirst-ownership",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:16:37.705Z"
+    },
+    {
+      "id": "trace-1788175018679",
+      "questionRef": "question:q-mth5603v-81uw",
+      "userAnswer": "本地优先为主，可选端到端加密同步服务",
+      "decisionRef": "decision:dec-1788175018679",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5603v-81uw",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175018679",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-chk-technical_boundary-localfirst-zero-server-dependency",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:16:58.679Z"
+    },
+    {
+      "id": "trace-1788175034491",
+      "questionRef": "question:q-mth5603w-w1jo",
+      "userAnswer": "提供 5-6 种常见生活动作（发呆、吃饭、学习工作、洗澡、睡觉、出门）",
+      "decisionRef": "decision:dec-1788175034491",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5603w-w1jo",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175034491",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-core_features-603s",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:17:14.491Z"
+    },
+    {
+      "id": "trace-1788175096215",
+      "questionRef": "question:q-mth5603w-9nlg",
+      "userAnswer": "首发优先实现基础双人在线状态与单向高频动作广播“核心流程”，暂不做复杂物理碰撞与链式互动。",
+      "decisionRef": "decision:dec-1788175096215",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5603w-9nlg",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175096215",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-user_flows-603t",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:18:16.215Z"
+    },
+    {
+      "id": "trace-1788175247236",
+      "questionRef": "question:q-mth5aqmw-pdti",
+      "userAnswer": "单屏自由工作台 (Canvas/Dashboard)",
+      "decisionRef": "decision:dec-1788175247236",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5aqmw-pdti",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175247236",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-chk-project_overview-univ-primary-flow",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:20:47.236Z"
+    },
+    {
+      "id": "trace-1788175333293",
+      "questionRef": "question:q-mth5aqmx-h50y",
+      "userAnswer": "播放行走或滑行路径动画",
+      "decisionRef": "decision:dec-1788175333293",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5aqmx-h50y",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175333293",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-ux_ui_direction-aqmq",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:22:13.293Z"
+    },
+    {
+      "id": "trace-1788175387721",
+      "questionRef": "question:q-mth5g554-lgve",
+      "userAnswer": "中等丰富预设（3-5套可选形象，6-8个日常与娱乐动作）",
+      "decisionRef": "decision:dec-1788175387721",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5g554-lgve",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175387721",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-mvp_scope-g553",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:23:07.721Z"
+    },
+    {
+      "id": "trace-1788175429087",
+      "questionRef": "question:q-mth5g554-07hj",
+      "userAnswer": "Web 浏览器网页端",
+      "decisionRef": "decision:dec-1788175429087",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5g554-07hj",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175429087",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-chk-project_overview-univ-platform-choice",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:23:49.087Z"
+    },
+    {
+      "id": "trace-1788175475486",
+      "questionRef": "question:q-mth5g554-38vd",
+      "userAnswer": "(Recommended) 最终一致性（最后释放拖拽的玩家位置为最终状态）",
+      "decisionRef": "decision:dec-1788175475486",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5g554-38vd",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175475486",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-core_features-g553",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:24:35.486Z"
+    },
+    {
+      "id": "trace-1788175490482",
+      "questionRef": "question:q-mth5g554-dwtw",
+      "userAnswer": "直线滑行/行走动画（形象从旧位置直线走到新位置，再切换动作）",
+      "decisionRef": "decision:dec-1788175490482",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5g554-dwtw",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175490482",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-ux_ui_direction-g553",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:24:50.482Z"
+    },
+    {
+      "id": "trace-1788175790663",
+      "questionRef": "question:q-mth5jkd0-qccd",
+      "userAnswer": "【支持个人第三方网盘备份】允许绑定自己的 WebDAV（如坚果云）或云存储，静默将本地数据库上传到自己的云盘中。",
+      "decisionRef": "decision:dec-1788175790663",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5jkd0-qccd",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175790663",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-technical_boundary-jkd0",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:29:50.663Z"
+    },
+    {
+      "id": "trace-1788175838104",
+      "questionRef": "question:q-mth5jkd0-oa6t",
+      "userAnswer": "【离线缓存与自动同步】允许离线进行装扮或更改状态，数据暂存在浏览器。一旦双方连接建立，自动以最新的时间戳对齐，合并双方的修改。",
+      "decisionRef": "decision:dec-1788175838104",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5jkd0-oa6t",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175838104",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-core_features-jkd0",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:30:38.104Z"
+    },
+    {
+      "id": "trace-1788175846980",
+      "questionRef": "question:q-mth5jkd0-3lpu",
+      "userAnswer": "【动作同步 + 房间家具保存 + 时光轴日志】除了核心同步和家具保存外，系统还要能生成当天的动作日志（如“对方下午学习了两小时”）。",
+      "decisionRef": "decision:dec-1788175846980",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5jkd0-3lpu",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788175846980",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-delivery_plan-jkd0",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:30:46.980Z"
+    },
+    {
+      "id": "trace-1788176026346",
+      "questionRef": "question:q-mth5qyw5-um9k",
+      "userAnswer": "(推荐) 直接由双方在网页端的设置面板中手动输入各自的 API Key，保存在本地浏览器中",
+      "decisionRef": "decision:dec-1788176026346",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5qyw5-um9k",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788176026346",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-technical_boundary-qyw5",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:33:46.346Z"
+    },
+    {
+      "id": "trace-1788176058970",
+      "questionRef": "question:q-mth5qyw5-kd8q",
+      "userAnswer": "虽然不注册账号，但由中转 Node.js 服务器在后台自动保存一份经过预共享令牌加密的双人数据副本",
+      "decisionRef": "decision:dec-1788176058970",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5qyw5-kd8q",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788176058970",
+          "action": "decision-created"
+        }
+      ],
+      "createdAt": "2026-08-31T11:34:18.970Z"
+    },
+    {
+      "id": "trace-1788176195153",
+      "questionRef": "question:q-mth5vxib-fndm",
+      "userAnswer": "统一配置在部署网站的云端服务器环境变量中",
+      "decisionRef": "decision:dec-1788176195153",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5vxib-fndm",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788176195153",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-technical_boundary-vxib",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:36:35.153Z"
+    },
+    {
+      "id": "trace-1788176202328",
+      "questionRef": "question:q-mth5vxib-hx4c",
+      "userAnswer": "除了动作同步外，还需包含至少 5 种可拖拽布置并同步的家具才能验收",
+      "decisionRef": "decision:dec-1788176202328",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5vxib-hx4c",
+          "action": "question-answered"
+        },
+        {
+          "ref": "decision:dec-1788176202328",
+          "action": "decision-created"
+        },
+        {
+          "ref": "gap:gap-ai-delivery_plan-vxib",
+          "action": "gap-addressed"
+        }
+      ],
+      "createdAt": "2026-08-31T11:36:42.328Z"
+    },
+    {
+      "id": "trace-retract-1790299434038",
+      "questionRef": "question:q-mth5vxib-fndm",
+      "userAnswer": "[Retracted]",
+      "decisionRef": "decision:dec-1788176195153",
+      "stateChanges": [
+        {
+          "ref": "question:q-mth5vxib-fndm",
+          "action": "question-retracted"
+        }
+      ],
+      "createdAt": "2026-09-25T01:23:54.038Z"
+    }
+  ],
+  "updatedAt": "2026-09-25T01:23:54.038Z"
+}

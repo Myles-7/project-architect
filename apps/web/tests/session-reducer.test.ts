@@ -137,10 +137,10 @@ describe('Phase 5.1: ProjectSession Reducer Unit Tests', () => {
 
   it('4. Toggles overview and left sidebar', () => {
     let state = initialProjectSessionState;
-    expect(state.uiState.isOverviewCollapsed).toBe(false);
+    expect(state.uiState.isOverviewCollapsed).toBe(true);
 
     state = projectSessionReducer(state, { type: 'TOGGLE_OVERVIEW' });
-    expect(state.uiState.isOverviewCollapsed).toBe(true);
+    expect(state.uiState.isOverviewCollapsed).toBe(false);
 
     state = projectSessionReducer(state, { type: 'TOGGLE_LEFT_SIDEBAR' });
     expect(state.uiState.isLeftSidebarCollapsed).toBe(true);

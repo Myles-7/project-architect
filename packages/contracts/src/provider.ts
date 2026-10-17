@@ -1,11 +1,11 @@
 import type { QuestionImportance } from './questions.js';
 import type { SeverityLevel } from './gaps.js';
 
-export type TaskMode = 'discovery-turn' | 'readiness-review' | 'document-plan';
+export type TaskMode = 'discovery-turn' | 'readiness-review' | 'document-plan' | 'planning-task';
 
 /**
- * Product-level capability requested from the single Agent. These modes guide
- * local prompt/context selection; they do not permit extra provider calls.
+ * Product-level capability used for local prompt/context selection. PlanningRuntime
+ * registers and schedules every provider invocation separately.
  */
 export type AgentMode =
   | 'idea-analysis'
@@ -25,6 +25,14 @@ export interface AIProviderRequest {
   schemaPath: string;
   contextText: string;
   timeoutMs?: number;
+  model?: string;
+  reasoningEffort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+  /** Isolated task workspace; never the authoritative project-state directory. */
+  cwd?: string;
+  /** Append-only stream record owned by the registered task. */
+  logPath?: string;
+  /** Explicit MCP tool names for the confined planning-worker profile. */
+  allowedTools?: string[];
   /** Allows local background jobs to stop a no-longer-relevant provider run. */
   abortSignal?: AbortSignal;
 }

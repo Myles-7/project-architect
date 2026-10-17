@@ -1,0 +1,1 @@
+console.error("intentional failure check");process.exit(7)

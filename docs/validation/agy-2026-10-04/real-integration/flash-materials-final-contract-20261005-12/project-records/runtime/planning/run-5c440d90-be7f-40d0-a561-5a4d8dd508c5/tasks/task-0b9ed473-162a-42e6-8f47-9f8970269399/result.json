@@ -1,0 +1,49 @@
+{
+  "blockers": [
+    "[M4缺口/受影响块: blk-tech-module, blk-tech-interface, blk-deliv-task-reset-workflow, blk-acc-reset] AppController.init 提前设置 ready 状态且缺少监听句柄清理机制：原草案在完成输入节点绑定、清空事件监听、初始占位渲染与焦点设置前即设置 isInitialized=true，若装配过程抛错将使控制器永久锁定为半初始化态；且依据 MDN addEventListener 规范（evidence-6d118422-17c4-43b7-a3cb-b1c410af556d），匿名/箭头函数重复注册会导致监听器累加。依据材料 input:a8c5e2fa-9643-9e9b-6522-78d749826df4 M4，需定义具备准备校验、装配绑定与原子就绪提交的初始化事务，失败保留草稿并支持安全重试。交付登记整合任务处理。",
+    "[M5缺口/受影响块: blk-flow-reset, blk-tech-interface, blk-tech-module, blk-tech-error] 快照捕获失败异常分支与 rollback(snapshot) 非空契约冲突：blk-flow-reset 在 captureSnapshot 失败时试图调用 rollback 并传入 null，违背 rollback 强依赖快照对象的接口签名。依据材料 input:a8c5e2fa-9643-9e9b-6522-78d749826df4 M5，快照捕获发生在任何 DOM 与调度器突变前，其自身失败时界面与内存状态未发生任何改动，应定义统一分支直接呈现可见错误并保持原节点/文本/代际/定时任务，不调用 rollback。交付登记整合任务处理。",
+    "[M6缺口/受影响块: blk-tech-interface, blk-tech-module, blk-tech-error, blk-deliv-task-error-handling, blk-acc-reset, blk-deliv-acc-full-e2e] 严重回滚失败草稿兜底使用 console 输出违背普通用户可见交互承诺：当节点替换后回滚 DOM 回插失败时，草稿仅通过 console 输出，普通用户在界面无法感知与复制。依据材料 input:a8c5e2fa-9643-9e9b-6522-78d749826df4 M6 及已批准决策 dec-fcedd2b3-d7d7-449a-8492-e4eec298f862，必须规范 showSevereFallbackDraft 通过 DOM 挂载独立 readonly textarea 原样逐字符回显完整草稿（保留所有空格与换行）供手动选中复制，挂载成功前不虚假声明可复制，主编辑器未恢复时诚实报告并不刷新页面。交付登记整合任务处理。",
+    "材料证据 evidence-aec79f01-0714-47f5-9f38-51324e7ee3dc 没有有效注册来源。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "适用于 AppController.init 显式初始化事件绑定、重复注册防范与失败重试时的监听器清理规范。证实具名函数或静态引用可防范重复监听累加，而匿名函数每次生成新引用会导致事件被多次调度。",
+      "content": "The method addEventListener() works by adding a function, or an object that implements a handleEvent() function, to the list of event listeners for the specified event type on the EventTarget on which it's called. If the function or object is already in the list of event listeners for this target, the function or object is not added a second time. Note: If a particular anonymous function is in the list of event listeners registered for a certain target, and then later in the code, an identical anonymous function is given in an addEventListener call, the second function will also be added to the list of event listeners for that target. Indeed, anonymous functions are not identical even if defined using the same unchanging source-code called repeatedly, even if in a loop. Repeatedly defining the same unnamed function in such cases can be problematic.",
+      "hash": "3737257c165014e504d8a18e42b0eeeaa1f47090db5151098af68d8f46121d39",
+      "id": "evidence-6d118422-17c4-43b7-a3cb-b1c410af556d",
+      "kind": "official-source",
+      "location": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener",
+      "obtainedAt": "2026-10-05T11:37:08.563Z",
+      "outcome": "passed",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener"
+    },
+    {
+      "applicability": "规划期受控试验容器环境（Docker Desktop Linux Engine）不可用性验证。证实自动化容器环境无法连接，所有真实桌面浏览器环境与目标应用验证属于规划期工具限制，须如实标为 unexecuted 并保留给具备真实环境的开发阶段执行。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified. Container execution is unavailable.",
+      "environment": "node:24.13.0-bookworm-slim (Docker Desktop Linux Engine)",
+      "hash": "9ba43184a9ea7b8cc952e1689da046081d82aa872469517385523f8136e48e8a",
+      "id": "evidence-752d75ed-1991-449e-8a80-b6d7264463bb",
+      "kind": "experiment",
+      "location": "D:\\Temp\\User\\pa-quality-copy-RJKkqZ\\materials\\runtime\\planning\\run-5c440d90-be7f-40d0-a561-5a4d8dd508c5\\tools\\experiments\\prepare-26822005-a4ed-4e22-96b0-13af70edbede.ndjson",
+      "obtainedAt": "2026-10-05T11:37:56.602Z",
+      "outcome": "unexecuted",
+      "source": "experiment:prepare-26822005-a4ed-4e22-96b0-13af70edbede"
+    },
+    {
+      "applicability": "反馈阶段质量验收缺口核对与异常场景契约依据：针对 M4 初始化提前就绪与重复监听风险、M5 快照捕获失败分支与 rollback 非空契约冲突、M6 严重回滚失败草稿可见性与复制兜底机制的权威质量反馈依据。",
+      "content": "自动独立质量验收反馈，不是真人新增需求、真人审阅或批准。M4：AppController.init 的 schedulerEpoch = 0, isInitialized = true 发生在节点绑定、reset监听、render、clear和focus之前，而这些步骤可能抛错。明确初始化事务阶段和ready提交点，全部装配成功后才ready=true；定义监听的注册句柄/解除责任、安全清理、重复init与失败后retry规则。M5：rollback(snapshot: ResetTransactionSnapshot, ...)要求非空，但blk-flow-reset的快照捕获失败分支传snapshot为null。若captureSnapshot本身失败且尚无变更，直接可见报错并保持原节点/文本/代际/定时任务，不调用需要快照的rollback。M6：产品承诺兜底缺失/呈现失败时明确可见报错，技术模块却只console输出草稿。定义用户可见失败通知通路与依赖，readonly textarea挂载成功才宣称可以复制。同步showSevereFallbackDraft返回/失败契约与showGlobalError责任。",
+      "hash": "d61a2713020a1dc1174f6b3d0de57a8478830995fbdec2b7d367ca24b6f7406b",
+      "id": "evidence-aec79f01-0714-47f5-9f38-51324e7ee3dc",
+      "kind": "material",
+      "location": "materials/runtime/planning/run-5c440d90-be7f-40d0-a561-5a4d8dd508c5/tools/evidence/evidence-aec79f01-0714-47f5-9f38-51324e7ee3dc.json",
+      "obtainedAt": "2026-10-05T11:38:13.696Z",
+      "outcome": "passed",
+      "source": "input:a8c5e2fa-9643-9e9b-6522-78d749826df4"
+    }
+  ],
+  "followUp": [],
+  "groups": [],
+  "questions": [],
+  "summary": "本任务独立查证了项目材料约束、图像像素证据、异常边界及可行性风险。主要发现与分析如下：1. 材料与原图基准：根据 material:input:inp-01 文本说明与原生 view_file 对 fixture.png（SHA256: 0e4b4b8fa59957ba9320f18df50383c59f4ad40978b0cba304d20c0f85bb14a0）的真实像素查验，原图仅作白底居中与按钮相对布局参考，示例文本“Q7M4-8261”不构成固定业务需求；已批准决策明确支持桌面优先、无服务端业务的纯前端单页面架构，采用 300ms 防抖实时反馈与单清空按钮布局。2. 异常使用场景与契约风险查证：依据最新质量验收反馈（input:a8c5e2fa-9643-9e9b-6522-78d749826df4），识别并核对三项待闭合契约缺口：(1) M4 缺口：AppController.init 存在提前设置就绪态与重复注册监听风险，经官方查证 MDN addEventListener（evidence-6d118422-17c4-43b7-a3cb-b1c410af556d），必须采用静态具名引用或状态门禁防范重复累加，并确保全部 DOM/渲染/焦点装配成功后才提交 ready=true；(2) M5 缺口：captureSnapshot 自身在任何变更前抛错时，界面和调度器完全未受污染，不能向强依赖非空快照的 rollback 传入 null，而应直接报错并保持原状态；(3) M6 缺口：严重回滚失败草稿取回不能仅依赖 console，必须通过 DOM 显式挂载 readonly textarea 原样逐字符回显供用户手动选中复制。3. 规划环境与实测限制：受控试验环境准备（environment_prepare）证实 Docker Desktop Linux Engine 当前不可用（evidence-752d75ed-1991-449e-8a80-b6d7264463bb，outcome: unexecuted），此属于规划期宿主工具限制而非项目约束；多浏览器真机兼容性、原生 IME 重定向及性能实测须如实标为 unexecuted 并保留给具备真实环境的开发验证任务。相关设计修订建议已通过 blockers 明晰受影响区块 ID 与依据，交由登记整合任务统一处理。"
+}

@@ -1,0 +1,790 @@
+contenteditable HTML global attribute - HTML | MDN 
+
+ Skip to main content 
+
+ Skip to search 
+
+ HTML 
+
+ HTML: Markup language 
+
+ HTML reference 
+
+ Elements 
+
+ Global attributes 
+
+ Attributes 
+
+ See all… 
+
+ HTML guides 
+
+ Responsive images 
+
+ HTML cheatsheet 
+
+ Date & time formats 
+
+ See all… 
+
+ Markup languages 
+
+ SVG 
+
+ MathML 
+
+ XML 
+
+ CSS 
+
+ CSS: Styling language 
+
+ CSS reference 
+
+ Properties 
+
+ Selectors 
+
+ At-rules 
+
+ Values 
+
+ See all… 
+
+ CSS guides 
+
+ Box model 
+
+ Animations 
+
+ Flexbox 
+
+ Colors 
+
+ See all… 
+
+ Layout cookbook 
+
+ Column layouts 
+
+ Centering an element 
+
+ Card component 
+
+ See all… 
+
+ JavaScript JS 
+
+ JavaScript: Scripting language 
+
+ JS reference 
+
+ Standard built-in objects 
+
+ Expressions & operators 
+
+ Statements & declarations 
+
+ Functions 
+
+ See all… 
+
+ JS guides 
+
+ Control flow & error handling 
+
+ Loops and iteration 
+
+ Working with objects 
+
+ Using classes 
+
+ See all… 
+
+ Web APIs 
+
+ Web APIs: Programming interfaces 
+
+ Web API reference 
+
+ File system API 
+
+ Fetch API 
+
+ Geolocation API 
+
+ HTML DOM API 
+
+ Push API 
+
+ Service worker API 
+
+ See all… 
+
+ Web API guides 
+
+ Using the Web animation API 
+
+ Using the Fetch API 
+
+ Working with the History API 
+
+ Using the Web speech API 
+
+ Using web workers 
+
+ All 
+
+ All web technology 
+
+ Technologies 
+
+ Accessibility 
+
+ HTTP 
+
+ URI 
+
+ Web extensions 
+
+ WebAssembly 
+
+ WebDriver 
+
+ See all… 
+
+ Topics 
+
+ Media 
+
+ Performance 
+
+ Privacy 
+
+ Security 
+
+ Progressive web apps 
+
+ Learn 
+
+ Learn web development 
+
+ Frontend developer course 
+
+ Getting started modules 
+
+ Core modules 
+
+ MDN Curriculum 
+
+ Check out the video course from Scrimba, our partner 
+
+ Learn HTML 
+
+ Structuring content with HTML module 
+
+ Learn CSS 
+
+ CSS styling basics module 
+
+ CSS layout module 
+
+ Learn JavaScript 
+
+ Dynamic scripting with JavaScript module 
+
+ Tools 
+
+ Discover our tools
+
+ Playground 
+
+ HTTP Observatory 
+
+ Border-image generator 
+
+ Border-radius generator 
+
+ Box-shadow generator 
+
+ Color format converter 
+
+ Color mixer 
+
+ Shape generator 
+
+ About 
+
+ Get to know MDN better
+
+ About MDN 
+
+ Advertise with us 
+
+ Community 
+
+ MDN on GitHub 
+
+ Blog 
+
+ Toggle sidebar
+
+ Web 
+
+ HTML 
+
+ Reference 
+
+ Global attributes 
+
+ contenteditable 
+
+ Theme 
+
+ OS default
+
+ Light
+
+ Dark
+
+ English (US) 
+
+ Remember language 
+
+ Learn more 
+
+ Deutsch 
+
+ English (US) 
+
+ Español 
+
+ Français 
+
+ 日本語 
+
+ 한국어 
+
+ Português (do Brasil) 
+
+ Русский 
+
+ 中文 (简体) 
+
+ contenteditable HTML global attribute
+
+ Baseline
+
+ Widely available
+
+ *
+
+ This feature is well established and works across many devices and browser versions. It’s been available across browsers since July 2015.
+
+ * Some parts of this feature may have varying levels of support.
+
+ See full compatibility
+
+ Learn more
+
+ The contenteditable global attribute is an enumerated attribute indicating if the element should be editable by the user. If so, the browser modifies its widget to allow editing.
+
+ In this article
+
+ Try it 
+
+ Value 
+
+ Examples 
+
+ Specifications 
+
+ Browser compatibility 
+
+ See also 
+
+ Try it 
+
+ <blockquote contenteditable="true">
+ <p>Edit this content to add your own quote</p>
+</blockquote>
+
+<cite contenteditable="true">-- Write your own name here</cite>
+
+ blockquote {
+ background: #eeeeee;
+ border-radius: 5px;
+ margin: 16px 0;
+}
+
+blockquote p {
+ padding: 15px;
+}
+
+cite {
+ margin: 16px 32px;
+ font-weight: bold;
+}
+
+blockquote p::before {
+ content: "\201C";
+}
+
+blockquote p::after {
+ content: "\201D";
+}
+
+[contenteditable="true"] {
+ caret-color: red;
+}
+
+ Value 
+
+ The attribute must take one of the following values:
+
+ true or an empty string , which indicates that the element is editable.
+
+ false , which indicates that the element is not editable.
+
+ plaintext-only , which indicates that the element's raw text is editable, but rich text formatting is disabled.
+
+ If the attribute is given without a value, like <label contenteditable>Example Label</label> , its value is treated as an empty string.
+
+ If this attribute is missing or its value is invalid, its value is inherited from its parent element: so the element is editable if its parent is editable.
+
+ Note that although its allowed values include true and false , this attribute is an enumerated one and not a Boolean one.
+
+ You can set the color used to draw the text insertion caret with the CSS caret-color property.
+
+ Elements that are made editable, and therefore interactive, by using the contenteditable attribute can be focused. They participate in sequential keyboard navigation. However, elements with the contenteditable attribute nested within other contenteditable elements are not added to the tabbing sequence by default. You can add the nested contenteditable elements to the keyboard navigation sequence by specifying the tabindex value ( tabindex="0" ).
+
+ If content is pasted into an element with contenteditable="true" , all formatting is retained. If content is pasted into an element with contenteditable="plaintext-only" , all formatting is removed.
+
+ Examples 
+
+ Pasting content into contenteditable 
+
+ This example has two <div> elements with contenteditable , the first with the value true and the second with the value plaintext-only . Copy the content below and paste it into each div to see their effects.
+
+ HTML
+
+ <h2>Content to copy</h2>
+<p class="instructions">
+ Copy all the text in the block below and paste it into each of the
+ contenteditable blocks to compare the results.
+</p>
+<section class="copying">
+ <div class="copy">
+ <p>
+ This is a paragraph containing <strong>Bold</strong>, <em>Italic</em>, and
+ <span class="red">red</span> text, followed by an ordered list:
+ </p>
+ <ol>
+ <li>Step one</li>
+ <li>Step two</li>
+ <li>Step three</li>
+ </ol>
+ </div>
+</section>
+
+ html 
+ <h2>Pasting areas</h2>
+<section class="pasting">
+ <div class="wrapper">
+ <h3>contenteditable="true"</h3>
+ <div contenteditable="true"></div>
+ </div>
+ <div class="wrapper">
+ <h3>contenteditable="plaintext-only"</h3>
+ <div contenteditable="plaintext-only"></div>
+ </div>
+</section>
+
+ h2 {
+ margin-bottom: 0;
+}
+.copying {
+ font-family: "Georgia", serif;
+ margin: 1rem;
+ padding: 1rem;
+ border: solid black 1px;
+}
+.red {
+ color: red;
+}
+.pasting {
+ display: flex;
+ flex-direction: row;
+ gap: 1rem;
+ width: 100%;
+ .wrapper {
+ flex: 1 1;
+ margin: 0;
+ padding: 0;
+ }
+ h3 {
+ font-family: monospace;
+ }
+ [contenteditable] {
+ min-height: 3rem;
+ border: solid 1px;
+ padding: 0.5rem;
+ background-color: whitesmoke;
+ }
+ [contenteditable="true"] {
+ caret-color: blue;
+ }
+ [contenteditable="plaintext-only"] {
+ caret-color: red;
+ }
+}
+
+ Specifications 
+
+ Specification
+
+ HTML 
+# attr-contenteditable 
+
+ Browser compatibility 
+
+ Enable JavaScript to view this browser compatibility table. 
+
+ See also 
+
+ All global attributes 
+
+ HTMLElement.contentEditable and HTMLElement.isContentEditable 
+
+ The CSS caret-color property
+
+ HTMLElement input event 
+
+ Help improve MDN
+
+ Was this page helpful to you?
+
+ Yes
+
+ No
+
+ Learn how to contribute 
+ This page was last modified on Apr 17, 2026 by MDN contributors .
+
+ View this page on GitHub • Report a problem with this content 
+
+ Filter sidebar 
+
+ Clear filter input 
+
+ HTML 
+ Guides Cheatsheet 
+ Comments 
+ Constraint validation 
+ Content categories 
+ Date and time formats 
+ Microdata 
+ Microformats 
+ Quirks and standards modes 
+ Responsive images 
+
+ How to 
+ Define terms with HTML 
+ Use data attributes 
+ Use cross-origin images 
+ Add a hitmap on top of an image 
+ Author fast-loading HTML pages 
+ Add JavaScript 
+ Reference 
+ Elements <a> 
+ <abbr> 
+ <acronym> 
+ <address> 
+ <area> 
+ <article> 
+ <aside> 
+ <audio> 
+ <b> 
+ <base> 
+ <bdi> 
+ <bdo> 
+ <big> 
+ <blockquote> 
+ <body> 
+ <br> 
+ <button> 
+ <canvas> 
+ <caption> 
+ <center> 
+ <cite> 
+ <code> 
+ <col> 
+ <colgroup> 
+ <data> 
+ <datalist> 
+ <dd> 
+ <del> 
+ <details> 
+ <dfn> 
+ <dialog> 
+ <dir> 
+ <div> 
+ <dl> 
+ <dt> 
+ <em> 
+ <embed> 
+ <fencedframe> 
+ <fieldset> 
+ <figcaption> 
+ <figure> 
+ <font> 
+ <footer> 
+ <form> 
+ <frame> 
+ <frameset> 
+ <geolocation> 
+ <h1>–<h6> 
+ <head> 
+ <header> 
+ <hgroup> 
+ <hr> 
+ <html> 
+ <i> 
+ <iframe> 
+ <img> 
+ <input> 
+ <ins> 
+ <kbd> 
+ <label> 
+ <legend> 
+ <li> 
+ <link> 
+ <main> 
+ <map> 
+ <mark> 
+ <marquee> 
+ <menu> 
+ <meta> 
+ <meter> 
+ <nav> 
+ <nobr> 
+ <noembed> 
+ <noframes> 
+ <noscript> 
+ <object> 
+ <ol> 
+ <optgroup> 
+ <option> 
+ <output> 
+ <p> 
+ <param> 
+ <picture> 
+ <plaintext> 
+ <pre> 
+ <progress> 
+ <q> 
+ <rb> 
+ <rp> 
+ <rt> 
+ <rtc> 
+ <ruby> 
+ <s> 
+ <samp> 
+ <script> 
+ <search> 
+ <section> 
+ <select> 
+ <selectedcontent> 
+ <slot> 
+ <small> 
+ <source> 
+ <span> 
+ <strike> 
+ <strong> 
+ <style> 
+ <sub> 
+ <summary> 
+ <sup> 
+ <table> 
+ <tbody> 
+ <td> 
+ <template> 
+ <textarea> 
+ <tfoot> 
+ <th> 
+ <thead> 
+ <time> 
+ <title> 
+ <tr> 
+ <track> 
+ <tt> 
+ <u> 
+ <ul> 
+ <var> 
+ <video> 
+ <wbr> 
+ <xmp> 
+
+ Attributes accept 
+ autocomplete 
+ capture 
+ content 
+ crossorigin 
+ dirname 
+ disabled 
+ elementtiming 
+ fetchpriority 
+ for 
+ form 
+ integrity 
+ max 
+ maxlength 
+ min 
+ minlength 
+ multiple 
+ pattern 
+ placeholder 
+ readonly 
+ rel 
+ required 
+ size 
+ step 
+
+ Global attributes accesskey 
+ anchor 
+ autocapitalize 
+ autocorrect 
+ autofocus 
+ class 
+ contenteditable 
+ data-* 
+ dir 
+ draggable 
+ enterkeyhint 
+ exportparts 
+ headingoffset 
+ headingreset 
+ hidden 
+ id 
+ inert 
+ inputmode 
+ is 
+ itemid 
+ itemprop 
+ itemref 
+ itemscope 
+ itemtype 
+ lang 
+ nonce 
+ part 
+ popover 
+ slot 
+ spellcheck 
+ style 
+ tabindex 
+ title 
+ translate 
+ virtualkeyboardpolicy 
+ writingsuggestions 
+
+ Attributes by element <input type> <input type="button"> 
+ <input type="checkbox"> 
+ <input type="color"> 
+ <input type="date"> 
+ <input type="datetime-local"> 
+ <input type="email"> 
+ <input type="file"> 
+ <input type="hidden"> 
+ <input type="image"> 
+ <input type="month"> 
+ <input type="number"> 
+ <input type="password"> 
+ <input type="radio"> 
+ <input type="range"> 
+ <input type="reset"> 
+ <input type="search"> 
+ <input type="submit"> 
+ <input type="tel"> 
+ <input type="text"> 
+ <input type="time"> 
+ <input type="url"> 
+ <input type="week"> 
+
+ <script type> importmap 
+ speculationrules 
+
+ <meta name> color-scheme 
+ referrer 
+ responsive-embedded-sizing 
+ robots 
+ text-scale 
+ theme-color 
+ viewport 
+
+ <meta http-equiv> 
+
+ Attribute values <link rel> keywords alternate stylesheet 
+ compression-dictionary 
+ dns-prefetch 
+ manifest 
+ me 
+ modulepreload 
+ noopener 
+ noreferrer 
+ preconnect 
+ prefetch 
+ preload 
+ prerender 
+
+ Your blueprint for a better internet.
+
+ MDN 
+
+ About
+
+ Blog
+
+ Mozilla careers
+
+ Advertise with us
+
+ MDN Plus
+
+ Product help
+
+ Contribute 
+
+ MDN Community
+
+ Community resources
+
+ Writing guidelines
+
+ MDN Discord
+
+ MDN on GitHub
+
+ Developers 
+
+ Web technologies
+
+ Learn web development
+
+ Guides
+
+ Tutorials
+
+ Glossary
+
+ Hacks blog
+
+ Website Privacy Notice 
+
+ Telemetry Settings 
+
+ Legal 
+
+ Community Participation Guidelines 
+
+ Portions of this content are ©1998–2026 by individual mozilla.org contributors. Content available under a Creative Commons license .

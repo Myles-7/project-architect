@@ -1,0 +1,473 @@
+{
+  "projectName": "Modern CLI Developer Tool",
+  "stage": "clarify",
+  "basis": {
+    "revision": 1,
+    "hash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4"
+  },
+  "approvedDecisions": [
+    {
+      "id": "dec-01",
+      "area": "project_overview",
+      "statement": "风格",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [
+        "input:inp-01"
+      ],
+      "confirmedBy": "user",
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    },
+    {
+      "id": "dec-preset-cli-01",
+      "area": "technical_boundary",
+      "statement": "支持 --json 格式化输出与管道输入 (stdin NDJSON) 组合使用。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "confirmedBy": "user",
+      "decisionKey": "pipe_friendly",
+      "rationale": "使工具不仅供人类阅读，亦可无缝无损地接入自动化流水线脚本。",
+      "affectedAreas": [
+        "technical_boundary",
+        "user_flows"
+      ],
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    },
+    {
+      "id": "dec-preset-cli-02",
+      "area": "user_flows",
+      "statement": "首发支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y)。",
+      "status": "confirmed",
+      "origin": "user",
+      "evidenceRefs": [],
+      "confirmedBy": "user",
+      "decisionKey": "headless_ci_support",
+      "dependsOn": [
+        "dec-preset-cli-01"
+      ],
+      "rationale": "既能兼顾新手首次配置体验，又能确保无头 CI 环境零挂起。",
+      "affectedAreas": [
+        "user_flows",
+        "mvp_scope"
+      ],
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "updatedAt": "2026-10-05T14:23:25.402Z"
+    }
+  ],
+  "blueprint": {
+    "schemaVersion": 1,
+    "blocks": [],
+    "stages": {
+      "product": "not-designed",
+      "technical": "not-designed",
+      "delivery": "not-designed"
+    },
+    "decisionBasisHash": "adec5cebd8b57c9305c87050dbc8544b6604c6de83f36cd6aca35309c2de3efe"
+  },
+  "blueprintContext": {
+    "kind": "approved-blocks-with-candidate-overrides-omitted",
+    "source": "Core approved blueprint; original full state retained in this run basis.json",
+    "candidateStatus": "pending-user-approval",
+    "shadowedApprovedBlocks": []
+  },
+  "decisionTopics": [
+    {
+      "key": "pipe_friendly",
+      "aliases": [],
+      "history": [
+        "dec-preset-cli-01"
+      ],
+      "effectiveDecisionId": "dec-preset-cli-01"
+    },
+    {
+      "key": "headless_ci_support",
+      "aliases": [],
+      "history": [
+        "dec-preset-cli-02"
+      ],
+      "effectiveDecisionId": "dec-preset-cli-02"
+    }
+  ],
+  "rawInputs": [],
+  "answers": [],
+  "materialIndex": [
+    {
+      "id": "input:inp-01",
+      "kind": "text",
+      "label": "Initial Idea Prompt",
+      "storageRef": "inputs/inp-01/source.txt",
+      "status": "ready",
+      "analysisAvailability": "available",
+      "createdAt": "2026-10-05T14:23:25.402Z",
+      "summary": "风格",
+      "contentHash": "1bfde6b7ea27c9b842be2221c325c64110c9ca591b46afe89faabdc32636f0cf"
+    }
+  ],
+  "deferredQuestions": [],
+  "unfinishedScopes": [],
+  "workerResults": {},
+  "currentDraft": {
+    "blockers": [
+      "用户证据 evidence-2b976bc1-e54d-4d97-bddd-0f16ad7dbc54 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。",
+      "用户证据 evidence-6ea55b06-5ec7-445a-b9cd-e5192086a1e5 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。"
+    ],
+    "clarification": {
+      "constraints": "必须支持 --json 格式化输出与 stdin NDJSON 管道输入；首发必须支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y) 以兼容无头 CI 环境。",
+      "delegated": [],
+      "outcomes": "",
+      "problem": "",
+      "scope": "",
+      "target": "面向使用终端与命令行进行日常开发及脚本自动化的现代软件工程师与 DevOps/CI 环境维护者。"
+    },
+    "evidence": [
+      {
+        "applicability": "用户初始输入与核心主题需求定义",
+        "content": "风格",
+        "hash": "1bfde6b7ea27c9b842be2221c325c64110c9ca591b46afe89faabdc32636f0cf",
+        "id": "evidence-2b976bc1-e54d-4d97-bddd-0f16ad7dbc54",
+        "kind": "user",
+        "location": "inputs/inp-01/source.txt",
+        "obtainedAt": "2026-10-17T05:01:16.951Z",
+        "outcome": "not-applicable",
+        "source": "input:inp-01"
+      },
+      {
+        "applicability": "项目既定技术约束与管道集成契约",
+        "content": "支持 --json 格式化输出与管道输入 (stdin NDJSON) 组合使用。首发支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y)。",
+        "hash": "3483c9cb4838d8ca3fb989047603049ee525cb976b4c34699737e51067848483",
+        "id": "evidence-6ea55b06-5ec7-445a-b9cd-e5192086a1e5",
+        "kind": "user",
+        "location": "approvedDecisions",
+        "obtainedAt": "2026-10-17T05:01:46.006Z",
+        "outcome": "not-applicable",
+        "source": "project:idea/constraints"
+      }
+    ],
+    "followUp": [
+      {
+        "goal": "在技术设计阶段对选定 CLI 终端交互样式（如动效组件库与跨平台 TTY 渲染能力）进行官方支持与生态查证",
+        "kind": "research"
+      },
+      {
+        "goal": "在技术验证阶段测试终端 stdin NDJSON 与 --json 流式管道在无头 CI 环境下的静默执行与退出码规范",
+        "kind": "validation"
+      }
+    ],
+    "groups": [],
+    "questions": [
+      {
+        "allowFreeInput": true,
+        "area": "product_scope",
+        "createdAt": "2026-10-17T12:59:20.000Z",
+        "decisionKey": "cli_domain_scope",
+        "dependsOn": [],
+        "id": "q-cli-domain-scope",
+        "importance": "critical",
+        "issueRef": "issue-cli-domain-scope",
+        "options": [
+          {
+            "approach": "提供现代项目结构初始化、技术栈模板套用、规范配置（TypeScript/ESLint/Prettier/Git Hooks）一键生成及配置更新功能。",
+            "gain": "使用频次明确，能充分结合交互式多选配置与 CI 自动化脚本，用户体验感最强。",
+            "impact": "MVP 聚焦于工程模板渲染、依赖探测与规则文件生成。",
+            "key": "opt-domain-scaffold",
+            "label": "现代工程脚手架与规范生成器 (Project Scaffolder & Linter Setup)",
+            "reversibility": "moderate",
+            "sacrifice": "模板维护和生态演进成本较高，需要持续更新最佳实践模板。"
+          },
+          {
+            "approach": "基于轻量配置文件或流水线语法，统一管理多仓库/多包的构建、测试、部署等并行与串行开发任务。",
+            "gain": "贯穿整个开发周期日常高频使用，与 stdin/stdout 管道数据及 CI 流水线深度契合。",
+            "impact": "MVP 聚焦于任务依赖图解析、多进程并发执行与终端流式输出捕获。",
+            "key": "opt-domain-task-runner",
+            "label": "本地多任务编排与脚本工作流工具 (Task Runner & Workflow Orchestrator)",
+            "reversibility": "moderate",
+            "sacrifice": "对并发任务调度、输出流隔离与进程退出的稳定性要求极高。"
+          },
+          {
+            "approach": "自动化检测开发者本地工具链版本、环境依赖、网络连通性与配置冲突，并给出修复建议或自动修复。",
+            "gain": "排障价值立竿见影，新成员入职与跨团队环境对齐极为实用。",
+            "impact": "MVP 聚焦于系统环境探测、规则匹配树与诊断报告格式化呈现。",
+            "key": "opt-domain-doctor",
+            "label": "本地开发环境与依赖健康诊断工具 (Environment Doctor & Diagnostics)",
+            "reversibility": "easy",
+            "sacrifice": "日常使用频率较低，主要集中在环境初始化与排障时段。"
+          }
+        ],
+        "question": "本项目当前命名为 Modern CLI Developer Tool 且输入仅为“风格”，请问该 CLI 工具主要解决哪类开发场景的核心痛点？",
+        "reason": "用户原始输入仅包含“风格”，尚未定义该现代 CLI 工具的具体业务领域与解决的核心问题，这直接决定了 MVP 范围与功能流程。",
+        "recommendation": "推荐聚焦于“现代工程脚手架与规范初始化工具”，可充分展现现代 CLI 交互风格与管道自动化优势。",
+        "recommendationReason": "脚手架工具兼具丰富的交互式引导体验（模板选择、特性开关）与 CI 无头自动化场景（静默生成），能最直观地体现现代 CLI 的设计美感与规范约束。",
+        "recommendedOptionKey": "opt-domain-scaffold",
+        "selectionMode": "single",
+        "status": "proposed"
+      },
+      {
+        "allowFreeInput": true,
+        "area": "user_experience",
+        "createdAt": "2026-10-17T12:59:20.000Z",
+        "decisionKey": "terminal_presentation_style",
+        "dependsOn": [],
+        "id": "q-cli-presentation-style",
+        "importance": "high",
+        "issueRef": "issue-cli-presentation-style",
+        "options": [
+          {
+            "approach": "采用现代终端设计语言，包含优雅的高亮色彩、加载动画、步骤折叠与高密度摘要卡片，并在非 TTY 管道模式下自动降级。",
+            "gain": "视觉现代高级，操作反馈明确，新手友好度高。",
+            "impact": "UI 层引入轻量终端渲染适配器，需实现完整的 TTY 感知与降级策略。",
+            "key": "opt-style-modern-rich",
+            "label": "现代渐进高表现力 (Modern Rich CLI: 动效 Spinner、彩色卡片与步骤条)",
+            "reversibility": "moderate",
+            "sacrifice": "需要处理不同终端仿真器（Windows Terminal、iTerm、Linux 控制台）的 ANSI 转义与字符宽度兼容。"
+          },
+          {
+            "approach": "遵循经典 Unix 哲学，仅输出必要信息，严禁使用阻塞性动效或复杂颜色，强调极致轻量与即时流式输出。",
+            "gain": "兼容性最高，执行开销极低，输出零干扰，非常适合极客与重度管道集成。",
+            "impact": "终端输出仅依赖标准 stdout/stderr 格式化，完全移除动画与复杂 TUI 依赖。",
+            "key": "opt-style-minimal-posix",
+            "label": "极简纯净 Unix 风格 (Minimalist POSIX: 纯文本流、零花哨动效、纯粹紧凑)",
+            "reversibility": "easy",
+            "sacrifice": "缺少交互趣味与直观的进度引导，对新手略显冰冷生硬。"
+          },
+          {
+            "approach": "以规整对齐的 ASCII/Unicode 表格、键值卡片和状态指示标签呈现信息，侧重数据密度与结果概览。",
+            "gain": "信息层级清晰，结构整洁严谨，适合大量结构化状态的快速比对与阅读。",
+            "impact": "重点构建自适应终端宽度的表格与列对齐引擎。",
+            "key": "opt-style-structured-dashboard",
+            "label": "结构化仪表盘风格 (Structured Tables & Status Matrix: 紧凑表格与状态矩阵)",
+            "reversibility": "moderate",
+            "sacrifice": "在窄屏终端或移动端 SSH 会话中可能存在折行溢出或表格错位。"
+          }
+        ],
+        "question": "基于您提出的“风格”要求，本 CLI 工具在终端交互与界面视觉呈现上偏向哪种风格？",
+        "reason": "用户原始输入明确提出了“风格”，终端交互的视觉设计风格直接决定组件库选型、动效复杂度、信息密度与用户第一印象。",
+        "recommendation": "推荐采用“现代化高表现力交互风格 (Rich TUI / Modern CLI)”，兼具直观视觉与优雅反馈。",
+        "recommendationReason": "在现代终端中提供平滑的 Spinner 动效、柔和高对比度着色、步骤指示器与表格卡片，能给开发者带来现代化的工具质感，且在非 TTY 管道环境中自动优雅降级为纯文本/JSON。",
+        "recommendedOptionKey": "opt-style-modern-rich",
+        "selectionMode": "single",
+        "status": "proposed"
+      },
+      {
+        "allowFreeInput": true,
+        "area": "user_experience",
+        "createdAt": "2026-10-17T12:59:20.000Z",
+        "decisionKey": "command_hierarchy_model",
+        "dependsOn": [],
+        "id": "q-cli-command-model",
+        "importance": "normal",
+        "issueRef": "issue-cli-command-model",
+        "options": [
+          {
+            "approach": "主命令作为统一调度入口，各业务功能拆分为独立子命令（如 init, create, inspect 等），各自具备独立的参数与帮助文档。",
+            "gain": "结构清晰，命名空间明确，易于随着工具功能演进持续拓展新命令而不产生冲突。",
+            "impact": "需建立标准化的子命令注册、路由分发与独立的子命令上下文机制。",
+            "key": "opt-cmd-git-style",
+            "label": "分层子命令体系 (Git-style: tool <subcommand> [flags])",
+            "reversibility": "moderate",
+            "sacrifice": "命令层级较深，单次简单调用的输入按键数略多。"
+          },
+          {
+            "approach": "无复杂子命令，主命令即为唯一执行入口，通过选项标志（flags）和输入参数组合控制具体行为（类似 ripgrep、curl）。",
+            "gain": "调用极为敏捷，命令动线直接，特别适合高频单点任务与 Shell 管道组合。",
+            "impact": "命令解析集中在主命令参数解析器，配置项通过 options 驱动。",
+            "key": "opt-cmd-single-purpose",
+            "label": "专注单命令与组合式参数 (Single-purpose Utility: tool [inputs] [flags])",
+            "reversibility": "hard",
+            "sacrifice": "未来若新增正交功能，容易导致参数标志膨胀或语义冲突，横向扩展性受限。"
+          }
+        ],
+        "question": "在命令调用形态与命令行动线上，倾向于采用哪种命令组织模式？",
+        "reason": "命令架构直接决定用户的使用心智模型、参数解析规则以及未来功能的扩展模式，与具体业务领域完全解耦且互不依赖。",
+        "recommendation": "推荐采用“Git 风格的分层子命令体系 (Multi-command Workspace)”。",
+        "recommendationReason": "多子命令结构具备极强的扩展性与清晰的职责边界（如 init, check, run），便于未来平滑扩展新功能而不破坏向后兼容性。",
+        "recommendedOptionKey": "opt-cmd-git-style",
+        "selectionMode": "single",
+        "status": "proposed"
+      }
+    ],
+    "summary": "已全面检视项目初始输入材料、预设已批准决定及约束契约，并逐项核对并解决 currentIssues。针对原证据记录未严格对应实际原文的问题，重新登记并生成了合规的用户证据记录：包含指向 input:inp-01 的真实原文“风格”（evidence-2b976bc1-e54d-4d97-bddd-0f16ad7dbc54）以及指向 project:idea/constraints 的已批准预设约束原文（evidence-6ea55b06-5ec7-445a-b9cd-e5192086a1e5），清除了旧草案中残留的证据阻塞项。当前项目定位为面向开发者的 Modern CLI Developer Tool，已确定支持 --json/stdin NDJSON 管道集成与交互式/无头 CI 双模参数。针对用户输入关键词“风格”，提取了受众与技术约束；鉴于具体业务痛点领域、视觉呈现范式及顶层命令架构仍存在重大未决取舍，提出了 3 道相互独立的待批准澄清选择题，并规划了后续技术阶段的研究与验证任务。"
+  },
+  "currentIssues": [
+    "用户证据 evidence-2b976bc1-e54d-4d97-bddd-0f16ad7dbc54 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。",
+    "用户证据 evidence-6ea55b06-5ec7-445a-b9cd-e5192086a1e5 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。"
+  ],
+  "taskHistory": [
+    {
+      "taskId": "task-b41273ff-b319-4b49-b1e3-cc5004f005ee",
+      "kind": "clarification",
+      "basisHash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4",
+      "findingIds": [
+        "finding:f8dba44af61ece6c83802346c6b049b8c4ae194651601c50e9dbecbddfc51b17",
+        "finding:663504b58063f3b5eae345d86a06a61ec2110df4f47d192d1bc51fa3d57ae918"
+      ],
+      "followUp": [
+        {
+          "goal": "在技术设计阶段对选定 CLI 终端交互样式（如动效组件库与跨平台 TTY 渲染能力）进行官方支持与生态查证",
+          "kind": "research"
+        },
+        {
+          "goal": "在技术验证阶段测试终端 stdin NDJSON 与 --json 流式管道在无头 CI 环境下的静默执行与退出码规范",
+          "kind": "validation"
+        }
+      ],
+      "clarification": {
+        "constraints": "必须支持 --json 格式化输出与 stdin NDJSON 管道输入；首发必须支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y) 以兼容无头 CI 环境。",
+        "delegated": [],
+        "outcomes": "",
+        "problem": "",
+        "scope": "",
+        "target": "面向使用终端与命令行进行日常开发及脚本自动化的现代软件工程师与 DevOps/CI 环境维护者。"
+      },
+      "summary": "已全面检视项目初始输入材料、预设已批准决定及约束契约。当前项目定位为面向开发者的 Modern CLI Developer Tool，且已确定支持 --json/stdin NDJSON 管道集成与交互式/无头 CI 双模参数。针对用户输入关键词“风格”，完成了目标受众与技术约束的澄清提取；鉴于具体业务痛点领域、视觉呈现范式及顶层命令架构仍存在重大未决取舍，提出了 3 道相互独立的待批准澄清选择题，并梳理了后续技术阶段的调研建议。"
+    },
+    {
+      "taskId": "task-46ac2690-056e-4f2c-88bb-7e60835dcef5",
+      "kind": "revision",
+      "basisHash": "06a211d32e20b985b60d0fef799a3b370a1229253554358b37248695b7577ef4",
+      "findingIds": [
+        "finding:362c49dc0b886850b1b90a8c33811b9e11f0a15c3b5c8b1138ce4d5142975ce8",
+        "finding:40313e34870516e262811f966c47ca296cfbc9323b1bf7aa7b5104a79f8b73a8"
+      ],
+      "followUp": [
+        {
+          "goal": "在技术设计阶段对选定 CLI 终端交互样式（如动效组件库与跨平台 TTY 渲染能力）进行官方支持与生态查证",
+          "kind": "research"
+        },
+        {
+          "goal": "在技术验证阶段测试终端 stdin NDJSON 与 --json 流式管道在无头 CI 环境下的静默执行与退出码规范",
+          "kind": "validation"
+        }
+      ]
+    }
+  ],
+  "historicalFindings": [
+    {
+      "id": "finding:f8dba44af61ece6c83802346c6b049b8c4ae194651601c50e9dbecbddfc51b17",
+      "text": "用户证据 evidence-91ec2afe-1a39-410e-b146-3d5e6a237311 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。",
+      "status": "historical-observation",
+      "sources": [
+        {
+          "taskId": "task-b41273ff-b319-4b49-b1e3-cc5004f005ee",
+          "kind": "clarification"
+        }
+      ]
+    },
+    {
+      "id": "finding:663504b58063f3b5eae345d86a06a61ec2110df4f47d192d1bc51fa3d57ae918",
+      "text": "用户证据 evidence-67fd806b-da27-40e5-b354-42a11c155ced 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。",
+      "status": "historical-observation",
+      "sources": [
+        {
+          "taskId": "task-b41273ff-b319-4b49-b1e3-cc5004f005ee",
+          "kind": "clarification"
+        }
+      ]
+    },
+    {
+      "id": "finding:362c49dc0b886850b1b90a8c33811b9e11f0a15c3b5c8b1138ce4d5142975ce8",
+      "text": "用户证据 evidence-2b976bc1-e54d-4d97-bddd-0f16ad7dbc54 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。",
+      "status": "historical-observation",
+      "sources": [
+        {
+          "taskId": "task-46ac2690-056e-4f2c-88bb-7e60835dcef5",
+          "kind": "revision"
+        }
+      ]
+    },
+    {
+      "id": "finding:40313e34870516e262811f966c47ca296cfbc9323b1bf7aa7b5104a79f8b73a8",
+      "text": "用户证据 evidence-6ea55b06-5ec7-445a-b9cd-e5192086a1e5 必须指向实际原文 input:<id>、question:<id> 或 project:idea/constraints。",
+      "status": "historical-observation",
+      "sources": [
+        {
+          "taskId": "task-46ac2690-056e-4f2c-88bb-7e60835dcef5",
+          "kind": "revision"
+        }
+      ]
+    }
+  ],
+  "historicalReviewFindings": [],
+  "approvedEvidence": [],
+  "knownEvidence": [
+    {
+      "record": {
+        "applicability": "用户初始输入与澄清阶段项目范围定义",
+        "content": "用户初始输入仅提供关键词“风格”，项目名称设定为“Modern CLI Developer Tool”。",
+        "hash": "9076a118033c0b7c1a7824f53d0b324751337954dee226cd7236a330a33d98fa",
+        "id": "evidence-91ec2afe-1a39-410e-b146-3d5e6a237311",
+        "kind": "user",
+        "location": "inputs/inp-01/source.txt",
+        "obtainedAt": "2026-10-17T04:59:16.224Z",
+        "outcome": "not-applicable",
+        "source": "input:inp-01"
+      },
+      "sources": [
+        {
+          "taskId": "task-b41273ff-b319-4b49-b1e3-cc5004f005ee",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "record": {
+        "applicability": "项目既定技术约束与管道集成契约",
+        "content": "已批准预设约束：支持 --json 格式化输出与 stdin NDJSON 管道输入，首发支持交互式引导与 --yes/-y 静默标志以适配 CI 环境。",
+        "hash": "436685cebfa62efc9067413a534195c986cb85993c7d8b31a30e733c71fc0490",
+        "id": "evidence-67fd806b-da27-40e5-b354-42a11c155ced",
+        "kind": "user",
+        "location": "approvedDecisions",
+        "obtainedAt": "2026-10-17T04:59:20.529Z",
+        "outcome": "not-applicable",
+        "source": "project:idea/constraints"
+      },
+      "sources": [
+        {
+          "taskId": "task-b41273ff-b319-4b49-b1e3-cc5004f005ee",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "record": {
+        "applicability": "用户初始输入与核心主题需求定义",
+        "content": "风格",
+        "hash": "1bfde6b7ea27c9b842be2221c325c64110c9ca591b46afe89faabdc32636f0cf",
+        "id": "evidence-2b976bc1-e54d-4d97-bddd-0f16ad7dbc54",
+        "kind": "user",
+        "location": "inputs/inp-01/source.txt",
+        "obtainedAt": "2026-10-17T05:01:16.951Z",
+        "outcome": "not-applicable",
+        "source": "input:inp-01"
+      },
+      "sources": [
+        {
+          "taskId": "task-46ac2690-056e-4f2c-88bb-7e60835dcef5",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "record": {
+        "applicability": "项目既定技术约束与管道集成契约",
+        "content": "支持 --json 格式化输出与管道输入 (stdin NDJSON) 组合使用。首发支持交互式引导 (Interactive Prompt) 与免提示静默标志 (--yes / -y)。",
+        "hash": "3483c9cb4838d8ca3fb989047603049ee525cb976b4c34699737e51067848483",
+        "id": "evidence-6ea55b06-5ec7-445a-b9cd-e5192086a1e5",
+        "kind": "user",
+        "location": "approvedDecisions",
+        "obtainedAt": "2026-10-17T05:01:46.006Z",
+        "outcome": "not-applicable",
+        "source": "project:idea/constraints"
+      },
+      "sources": [
+        {
+          "taskId": "task-46ac2690-056e-4f2c-88bb-7e60835dcef5",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "evidenceConflicts": []
+}

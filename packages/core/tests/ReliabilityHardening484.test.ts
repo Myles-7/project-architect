@@ -110,27 +110,27 @@ describe('Phase 4.8.4 Reliability Hardening: Gap Precision, Readiness Gate & Gro
     const s1 = await stateEngine.getSnapshot(projectPath);
     await stateEngine.addDecision(projectPath, 'mvp_scope', 'Core local features', s1.metadata.stateRevision, 'confirmed');
 
-    // 2. Evaluate readiness (transitions stage to readiness-review, disposition is pending)
+    // Historical fixture stays in memory; the legacy write API is retired.
     const s2 = await stateEngine.getSnapshot(projectPath);
-    const s3 = await stateEngine.evaluateReadiness(projectPath, s2.metadata.stateRevision);
+    await expect(stateEngine.evaluateReadiness(projectPath, s2.metadata.stateRevision)).rejects.toMatchObject({ code: 'LEGACY_WORKFLOW_RETIRED' });
+    const s3 = structuredClone(s2); s3.metadata.stage = 'readiness-review';
     expect(s3.metadata.stage).toBe('readiness-review');
     expect(s3.readiness.current?.userDisposition).toBe('pending');
 
     // 3. Attempt compile without user approval -> MUST FAIL
-    await expect(compiler.compile(projectPath, s3)).rejects.toThrow(
+    await expect(compiler.compile(projectPath, s3, undefined, false)).rejects.toThrow(
       /Project is under readiness review and requires explicit user approval/
     );
 
     // 4. Stage must NOT have been changed to documents-generated
     const sAfterFail = await stateEngine.getSnapshot(projectPath);
-    expect(sAfterFail.metadata.stage).toBe('readiness-review');
+    expect(sAfterFail).toEqual(s2);
 
     // 5. If user disposition is return-to-discovery -> MUST ALSO FAIL
-    await stateEngine.setUserDisposition(projectPath, 'return-to-discovery', sAfterFail.metadata.stateRevision);
-    const sReturned = await stateEngine.getSnapshot(projectPath);
-    expect(sReturned.metadata.stage).toBe('broad-pass');
+    await expect(stateEngine.setUserDisposition(projectPath, 'return-to-discovery', sAfterFail.metadata.stateRevision)).rejects.toMatchObject({ code: 'LEGACY_WORKFLOW_RETIRED' });
+    const sReturned = structuredClone(s3); sReturned.readiness.current!.userDisposition = 'return-to-discovery';
 
-    await expect(compiler.compile(projectPath, sReturned)).rejects.toThrow(
+    await expect(compiler.compile(projectPath, sReturned, undefined, false)).rejects.toThrow(
       /User disposition returned project to discovery/
     );
   });
@@ -167,23 +167,19 @@ describe('Phase 4.8.4 Reliability Hardening: Gap Precision, Readiness Gate & Gro
     const s3 = await stateEngine.getSnapshot(projectPath);
 
     // Attempt compile -> MUST FAIL
-    await expect(compiler.compile(projectPath, s3)).rejects.toThrow(
+    await expect(compiler.compile(projectPath, s3, undefined, false)).rejects.toThrow(
       /unresolved critical conflict/
     );
 
-    // Now user explicitly approves with critical conflict acknowledgement
-    await stateEngine.setUserDisposition(
-      projectPath,
-      'approved-with-critical-conflicts',
-      s3.metadata.stateRevision,
-      { criticalConflicts: ['conf-critical-01'] }
-    );
-
-    const sApproved = await stateEngine.getSnapshot(projectPath);
+    // Only an in-memory historical fixture can exercise the retired rendering gate.
+    const sApproved = structuredClone(s3);
+    sApproved.readiness.current!.userDisposition = 'approved-with-critical-conflicts';
+    sApproved.readiness.current!.basisRevision = sApproved.metadata.stateRevision;
+    sApproved.readiness.current!.criticalConflictAcknowledgements = ['conflict:conf-critical-01'];
     expect(sApproved.readiness.current?.userDisposition).toBe('approved-with-critical-conflicts');
 
     // Compile must now succeed
-    const result = await compiler.compile(projectPath, sApproved);
+    const result = await compiler.compile(projectPath, sApproved, undefined, false);
     expect(result.manifest.items.length).toBeGreaterThan(0);
   });
 

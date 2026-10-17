@@ -1,0 +1,38 @@
+
+ RUN  v3.2.7 D:/桌面/项目构思
+
+ ❯ packages/core/tests/ProjectExportImportService.test.ts (5 tests | 1 failed) 1219ms
+   ✓ ProjectExportImportService Unit Tests > exports one Core snapshot while a concurrent formal commit waits for archive reading  315ms
+   ✓ ProjectExportImportService Unit Tests > rejects a project link before reading files outside the archive tree 55ms
+   × ProjectExportImportService Unit Tests > round-trips nested project.json and same-named historical commit records without treating them as the root 68ms
+     → expected undefined to be '{"ordinaryEvidence":"staging"}' // Object.is equality
+   ✓ ProjectExportImportService Unit Tests > exports and imports a full project archive accurately without loss 293ms
+   ✓ ProjectExportImportService Unit Tests > P0-5: detects collision and renames imported project safely with timestamp suffix when same project exists  487ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/core/tests/ProjectExportImportService.test.ts > ProjectExportImportService Unit Tests > round-trips nested project.json and same-named historical commit records without treating them as the root
+AssertionError: expected undefined to be '{"ordinaryEvidence":"staging"}' // Object.is equality
+
+- Expected: 
+"{\"ordinaryEvidence\":\"staging\"}"
+
++ Received: 
+undefined
+
+ ❯ packages/core/tests/ProjectExportImportService.test.ts:81:128
+     79|     const internal = service as unknown as { extractZip(buffer: Buffer…
+     80|     const entries = internal.extractZip(archive.zipBuffer);
+     81|     for (const [name, content] of Object.entries(records)) expect(entr…
+       |                                                                                                                                ^
+     82|     expect(entries.some(entry => entry.path.startsWith('state/.commit_…
+     83|     const imported = await service.importProject(archive.zipBuffer, jo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  07:15:13
+   Duration  1.88s (transform 218ms, setup 0ms, collect 340ms, tests 1.22s, environment 0ms, prepare 104ms)
+

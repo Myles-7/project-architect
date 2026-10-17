@@ -1,0 +1,1651 @@
+Navigation Timing Level 2 
+
+ Navigation Timing Level 2
+
+ W3C Working Draft ,
+ 1 September 2026 
+
+ More details about this document 
+
+ This version:
+ https://www.w3.org/TR/2026/WD-navigation-timing-2-20260901/ 
+ Latest published version:
+ https://www.w3.org/TR/navigation-timing-2/ 
+ Editor's Draft:
+ https://w3c.github.io/navigation-timing/ 
+ Previous Versions:
+ https://www.w3.org/TR/2026/WD-navigation-timing-2-20260225/ 
+ History:
+ https://www.w3.org/standards/history/navigation-timing-2/ 
+ Feedback:
+ public-web-perf@w3.org with subject line “ [navigation-timing-2] … message topic … ” ( archives ) 
+ GitHub 
+ Test Suite:
+ https://wpt.fyi/navigation-timing/ 
+ Editors:
+ Yoav Weiss ( Shopify )
+ Noam Rosenthal ( Google )
+ Former Editors:
+ Ilya Grigorik ( Google )
+ Tobin Titus ( Microsoft Corp. )
+ Jatinder Mann ( Microsoft Corp. )
+ Arvind Jain ( Google Inc. )
+
+ Copyright © 2026 World Wide Web Consortium . W3C ® liability , trademark and permissive document license rules apply.
+
+ Abstract 
+
+ This specification defines an interface for web applications to access the complete timing information for navigation of a document.
+
+ Status of this document 
+
+ This section describes the status of this document at the time of its publication.
+ A list of current W3C publications
+ and the latest revision of this technical report
+ can be found in the W3C standards and drafts index. 
+
+ This document was published
+ by the Web Performance Working Group 
+ as a Working Draft using the Recommendation
+ track .
+ Publication as a Working Draft
+ does not imply endorsement by
+ W3C and its Members.
+
+ This is a draft document
+ and may be updated, replaced
+ or obsoleted by other documents at any time.
+ It is inappropriate to cite this document as other than a work in progress.
+
+ GitHub Issues are preferred for discussion of this specification.
+
+ This document is governed by the
+ 18 August 2025 W3C Process Document .
+
+ This document was produced by a group operating under the
+ W3C Patent Policy .
+ W3C maintains a
+ public list of any patent disclosures 
+ made in connection with the deliverables of the group;
+ that page also includes instructions for disclosing a patent.
+ An individual who has actual knowledge of a patent that the individual believes
+ contains Essential Claim(s) 
+ must disclose the information in accordance with
+ section 6 of the W3C Patent Policy .
+
+ Navigation Timing 2 replaces the first version of [NAVIGATION-TIMING] 
+and includes the following changes:
+
+ the definition of Performance interface was moved to
+ [PERFORMANCE-TIMELINE-2] ;
+ builds on top of [RESOURCE-TIMING-2] ;
+ support for [PERFORMANCE-TIMELINE-2] ;
+ support for [HR-TIME-2] ;
+ exposes number of redirects 
+since the last non-redirect navigation;
+ exposes next
+hop network protocol ;
+ exposes transfer ,
+ encoded
+body and decoded
+body size information;
+ secureConnectionStart attribute is now mandatory.
+
+ Table of Contents
+
+ 1 Introduction 
+ 2 Terminology 
+
+ 3 Navigation Timing 
+
+ 3.1 Relation to the PerformanceEntry interface 
+ 3.2 Relation to the PerformanceResourceTiming interface 
+
+ 3.3 
+ The PerformanceNavigationTiming interface
+
+ 3.3.1 The NavigationTimingType enum 
+ 3.3.2 The PerformanceTimingConfidence interface 
+ 3.3.3 The PerformanceTimingConfidenceValue enum 
+
+ 4 Process 
+
+ 4.1 Processing Model 
+
+ 5 Creating a navigation timing entry 
+
+ 6 Privacy Considerations 
+
+ 6.1 Information disclosure 
+ 6.2 Cross-directory access 
+
+ 7 Security Considerations 
+
+ 7.1 Detecting proxy servers 
+
+ 8 Obsolete 
+
+ 8.1 
+ The PerformanceTiming interface
+
+ 8.2 
+ The PerformanceNavigation interface
+
+ 8.3 
+ Extensions to the Performance interface
+
+ 9 Acknowledgments 
+
+ Conformance 
+
+ Document conventions 
+ Conformant Algorithms 
+
+ Index 
+
+ Terms defined by this specification 
+ Terms defined by reference 
+
+ References 
+
+ Normative References 
+ Non-Normative References 
+
+ IDL Index 
+
+ 1. Introduction 
+
+ This section is non-normative. 
+
+ Accurately measuring performance characteristics of web applications is
+an important aspect of making web applications faster. While
+JavaScript-based mechanisms, such as the one described in
+ [JSMEASURE] , can provide comprehensive instrumentation for user
+latency measurements within an application, in many cases, they are
+unable to provide a complete or detailed end-to-end latency picture.
+For example, the following JavaScript shows a naive attempt to measure
+the time it takes to fully load a page:
+
+ < html > 
+ < head > 
+ < script type = "text/javascript" > 
+ var start = new Date (). getTime (); 
+ function onLoad () { 
+ var now = new Date (). getTime (); 
+ var latency = now - start ; 
+ alert ( "page loading time: " + latency ); 
+ } 
+ </ script > 
+ </ head > 
+ < body onload = "onLoad()" > 
+ <!- Main page body goes from here. --> 
+ </ body > 
+ </ html > 
+
+ The above script calculates the time it takes to load the page
+ after the first bit of JavaScript in the head is executed, but
+it does not give any information about the time it takes to get the
+page from the server, or the initialization lifecycle of the page.
+
+ This specification defines the PerformanceNavigationTiming 
+interface which participates in the [PERFORMANCE-TIMELINE-2] to store
+and retrieve high resolution performance metric data related to the
+navigation of a document. As the PerformanceNavigationTiming 
+interface uses [HR-TIME] , all time values are measured with respect
+to the time origin of the entry’s
+ relevant settings object .
+
+ For example, if we know that the response end occurs 100ms after the
+start of navigation, the PerformanceNavigationTiming data could
+look like so:
+
+ startTime: 0.000 // start time of the navigation request
+responseEnd: 100.000 // high resolution time of last received byte
+
+ The following script shows how a developer can use the
+ PerformanceNavigationTiming interface to obtain accurate timing
+data related to the navigation of the document:
+
+ < script > 
+ function showNavigationDetails () { 
+ // Get the first entry 
+ const [ entry ] = performance . getEntriesByType ( "navigation" ); 
+ // Show it in a nice table in the developer console 
+ console . table ( entry . toJSON ()); 
+ } 
+ </ script > 
+ < body onload = "showNavigationDetails()" > 
+
+ 2. Terminology 
+
+ The construction "a Foo object", where Foo is
+actually an interface, is sometimes used instead of the more accurate
+"an object implementing the interface Foo ".
+
+ The term current document refers to the document associated
+with the Window object’s newest
+Document object .
+
+ Throughout this work, all time values are measured in milliseconds
+since the start of navigation of the document. For example, the start
+of navigation of the document occurs at time 0. The term current
+time refers to the number of milliseconds since the start of
+navigation of the document until the current moment in time. This
+definition of time is based on [HR-TIME] specification.
+
+ 3. Navigation Timing 
+
+ 3.1. Relation to the PerformanceEntry interface 
+
+ PerformanceNavigationTiming interface extends the following
+attributes of PerformanceEntry interface:
+
+ The entryType 
+ getter step is to return the DOMString " navigation ".
+
+ The startTime 
+ getter step is to return a DOMHighResTimeStamp 
+ with a time value of 0.
+
+ The duration 
+ getter step is to return a DOMHighResTimeStamp equal to the
+ difference between loadEventEnd and this ’s startTime .
+
+ A user agent implementing PerformanceNavigationTiming would need
+ to include "navigation" in
+ supportedEntryTypes 
+ for Window 
+ contexts. This allows developers to detect support for Navigation
+ Timing.
+
+ 3.2. Relation to the PerformanceResourceTiming interface 
+
+ PerformanceNavigationTiming interface extends the following
+attributes of the PerformanceResourceTiming 
+interface:
+
+ The redirectStart getter steps are to perform the following steps:
+
+ If this ’s redirect count is 0, return 0.
+
+ Otherwise return this ’s redirectStart .
+
+ The redirectEnd getter steps are to perform the following steps:
+
+ If this ’s redirect count is 0, return 0.
+
+ Otherwise return this ’s redirectEnd .
+
+ Though `redirectStart` and `redirectEnd` are exposed in PerformanceResourceTiming , they
+ have a different meaning in Navigation Timing, where they return zero for navigations with
+ cross-origin redirects.
+
+ The workerStart getter steps are to perform the following steps:
+
+ Let workerTiming be this ’s service worker timing .
+
+ If workerTiming is null, then return this ’s prototype’s `workerStart`.
+
+ Return workerTiming ’s start time .
+
+ Though `workerStart` is exposed in PerformanceResourceTiming , it
+ has a different meaning in Navigation Timing, as unlike subresources, a navigation may 
+ trigger the activation or running of a service worker.
+ In the context of Navigation Timing, `workerStart` returns the timestamp measured
+ just before the worker has been activated or started. See [service-workers] for
+ a precise definition.
+
+ The fetchStart getter steps are to perform the following steps:
+
+ Let workerTiming be this ’s service worker timing .
+
+ If workerTiming is null, then return this ’s prototype’s `fetchStart`.
+
+ Return workerTiming ’s fetch event dispatch time .
+
+ When a service worker is used as part of the navigation, The `fetchStart` overload
+ holds a different meaning than the meaning in
+ PerformanceResourceTiming .
+ It returns the timestamp measured right before the FetchEvent is dispatched for
+ the service worker . The time difference between `workerStart` and `fetchStart` in
+ the document’s navigation timing entry can be used to determine roughly how long it
+ took for the worker to be initialized or activated. See [service-workers] for
+ a precise definition.
+
+ Only the current document resource is included in the
+ performance timeline; there is only one
+ PerformanceNavigationTiming object in the performance timeline.
+
+ 3.3. 
+ The PerformanceNavigationTiming interface
+
+ Checking and retrieving contents from the
+ HTTP cache [RFC9111] is
+ part of the fetching process .
+ It’s covered by the
+ requestStart ,
+ responseStart and
+ responseEnd attributes.
+
+ [ Exposed = Window ]
+ interface PerformanceNavigationTiming : PerformanceResourceTiming {
+ readonly attribute DOMHighResTimeStamp unloadEventStart ;
+ readonly attribute DOMHighResTimeStamp unloadEventEnd ;
+ readonly attribute DOMHighResTimeStamp domInteractive ;
+ readonly attribute DOMHighResTimeStamp domContentLoadedEventStart ;
+ readonly attribute DOMHighResTimeStamp domContentLoadedEventEnd ;
+ readonly attribute DOMHighResTimeStamp domComplete ;
+ readonly attribute DOMHighResTimeStamp loadEventStart ;
+ readonly attribute DOMHighResTimeStamp loadEventEnd ;
+ readonly attribute NavigationTimingType type ;
+ readonly attribute unsigned short redirectCount ;
+ readonly attribute DOMHighResTimeStamp criticalCHRestart ;
+ readonly attribute NotRestoredReasons ? notRestoredReasons ;
+ readonly attribute PerformanceTimingConfidence confidence ;
+ [ Default ] object toJSON ();
+};
+
+ A PerformanceNavigationTiming has an associated
+ document load timing info document load timing .
+
+ A PerformanceNavigationTiming has an associated
+ document unload timing info previous document unload timing .
+
+ A PerformanceNavigationTiming has an associated
+number redirect count .
+
+ A PerformanceNavigationTiming has an associated
+ NavigationTimingType navigation type .
+
+ A PerformanceNavigationTiming has an associated
+ DOMHighResTimeStamp `Critical-CH` restart time .
+
+ A PerformanceNavigationTiming has an associated
+ NotRestoredReasons not restored reasons .
+
+ A PerformanceNavigationTiming has an associated
+ PerformanceTimingConfidence confidence value .
+
+ A PerformanceNavigationTiming has an associated real number
+ randomized trigger rate 
+which is implementation-defined .
+
+ A PerformanceNavigationTiming has an associated PerformanceTimingConfidenceValue 
+ underlying confidence value 
+which is implementation-defined .
+
+ A PerformanceNavigationTiming has an associated null or service worker timing info 
+ service worker timing .
+
+ The unloadEventStart getter steps are to return this ’s
+ previous document unload timing ’s unload event start time .
+
+ If the previous document and the current document have the same
+ origin , this timestamp is measured immediately
+ before the user agent starts the unload 
+ event
+ of the previous document. If there is no previous document or the
+ previous document has a different origin than the current document, this attribute will return
+ zero.
+
+ The unloadEventEnd getter steps are to return this ’s
+ previous document unload timing ’s
+ unload event end time .
+
+ If the previous document and the current document have the same
+ origin , this timestamp is measured immediately
+ after the user agent handles the unload 
+ event
+ of the previous document. If there is no previous document or the
+ previous document has a different origin than the current document, this attribute will return
+ zero.
+
+ The domInteractive getter steps are to return
+ this ’s document load timing ’s DOM interactive time .
+
+ This timestamp is measured before the user agent sets the
+ current document readiness to
+ "interactive" .
+
+ The domContentLoadedEventStart getter steps are to return this ’s
+ document load timing ’s
+ DOM content loaded event start time .
+
+ This timestamp is measured before the user agent dispatches the
+ DOMContentLoaded 
+ event.
+
+ The domContentLoadedEventEnd getter steps are to return
+ this ’s document load timing ’s
+ DOM content loaded event end time .
+
+ This timestamp is measured after the user agent completes handling of the
+ DOMContentLoaded 
+ event.
+
+ The domComplete getter steps are to return
+ this ’s document load timing ’s DOM complete time .
+
+ This timestamp is measured before the user agent sets the
+ current document readiness to
+ "complete" . See document readiness for a precise
+ definition.
+
+ The loadEventStart getter steps are to return
+ this ’s document load timing ’s load event start time .
+
+ This timestamp is measured before the user agent dispatches the
+ load event for the document.
+
+ The loadEventEnd getter steps are to return
+ this ’s document load timing ’s load event end time .
+
+ This timestamp is measured after the user agent completes handling the
+ load event for the document.
+
+ The type getter steps are to run the this ’s navigation type .
+
+ Client-side redirects, such as those using the Refresh pragma
+ directive , are not considered HTTP redirects by this spec. In those
+ cases, the type 
+ attribute SHOULD return appropriate value, such as
+ reload if reloading the
+ current page, or navigate if
+ navigating to a new URL.
+
+ The redirectCount getter steps are to return this ’s
+ redirect count .
+
+ The criticalCHRestart getter steps are to return this ’s
+ `Critical-CH` restart time .
+
+ If criticalCHRestart is not 0 it will be before all other timestamps except for
+ navigationStart , unloadEventStart , and unloadEventEnd . This is because it marks
+ the moment the redirection part of the navigation was restarted.
+
+ The notRestoredReasons getter steps are to return this ’s
+ not restored reasons .
+
+ The confidence getter steps are to run these steps:
+
+ If this ’s document load timing ’s
+ DOM interactive time is 0, return null.
+ If this ’s confidence value is not null,
+ return it.
+ Let confidence be a new PerformanceTimingConfidence object created in
+ this ’s relevant settings object ’s relevant realm .
+ Set confidence ’s randomizedTriggerRate to
+ this ’s randomized trigger rate .
+
+ Set confidence ’s value as determined by the following algorithm:
+
+ Let p be confidence ’s randomizedTriggerRate .
+ Let underlying be this ’s underlying confidence value , a
+ PerformanceTimingConfidenceValue .
+ Let r be a real number drawn uniformly at random from the interval [0, 1).
+ If r > or equal p , return underlying .
+
+ Otherwise:
+
+ Let s be an integer drawn uniformly at random from the set {0, 1}.
+ If s equals 0, return high .
+ Otherwise, return low .
+
+ Return confidence .
+
+ These values should be set once, and not change for the lifetime of this .
+
+ This section is intended to help RUM providers and developers interpret
+ confidence . Since the randomized trigger rate can vary across records,
+ per-record weighting is needed to recover unbiased aggregates. The procedure
+ below illustrates how weighting based on value 
+ can be applied before computing summary statistics.
+
+ To compute debiased means for both high and low :
+
+ For each record:
+
+ Let p be the record’s randomizedTriggerRate .
+ Let c be the record’s value .
+ Let R be 1 when c is high , otherwise 0.
+
+ Compute per-record weight w based on c :
+
+ For estimating the high mean: w = (R - (p / 2)) / (1 - p) .
+ For estimating the low mean: w = ((1 - R) - (p / 2)) / (1 - p) .
+
+ Note that w may be negative for some records; keep every record.
+
+ Let weighted_duration = duration * w .
+
+ Let total_weighted_duration be the sum of weighted_duration values across all records.
+ Let sum_weights be the sum of w values across all records.
+ Let debiased_mean = total_weighted_duration / sum_weights , provided sum_weights is not near zero.
+
+ To compute debiased percentiles for both high and low :
+
+ Follow the same steps as computing the debiased mean to compute a per-record weight w .
+ Let sum_weights be the sum of w values across all records.
+ Let sorted_records be all records sorted by duration in ascending order.
+ For a desired percentile (0-100), compute q = percentile / 100.0 
+
+ Walk sorted_records and for each record:
+
+ Compute cumulative weight cw per-record: cw = sum_{i: duration_i <= duration_j} w_i .
+ Compute debiased cumulative distribution function per-record: cdf = cw / sum_weights 
+
+ Find the first index idx with cdf >= q .
+
+ If idx is 0, return duration for sorted_records [0].
+ If no such idx exists, return duration for sorted_records [n].
+
+ Compute interpolation fraction:
+
+ Let lower_cdf be cdf for sorted_records [idx-1]
+ Let upper_cdf be cdf for sorted_records [idx]
+ if lower_cdf = upper_cdf , return duration for sorted_records [idx].
+
+ Otherwise:
+
+ Let ifrac = ( q - lower_cdf ) / ( upper_cdf - lower_cdf ) 
+ Let lower_duration be duration for sorted_records [idx-1]
+ Let upper_duration be duration for sorted_records [idx]
+ return lower_duration + (upper_duration - lower_duration) * ifrac
+
+ The toJSON() method runs the default toJSON steps for this .
+
+ 3.3.1. The NavigationTimingType enum 
+
+ enum NavigationTimingType {
+ "navigate" ,
+ "reload" ,
+ "back_forward" 
+};
+
+ The values are defined as follows:
+
+ navigate 
+
+ Navigation where the
+ history handling behavior 
+ is set to
+ "default" 
+ or "replace" .
+
+ reload 
+
+ Navigation where the navigable was reloaded .
+
+ back_forward 
+
+ Navigation that’s applied from history .
+
+ The format of the above enumeration value is inconsistent with the
+ WebIDL recommendation for
+ formatting of enumeration values . Unfortunately, we are unable
+ to change it due to backwards compatibility issues with shipped
+ implementations. [WebIDL] 
+
+ 3.3.2. The PerformanceTimingConfidence interface 
+
+ [ Exposed = Window ]
+ interface PerformanceTimingConfidence {
+ readonly attribute double randomizedTriggerRate ;
+ readonly attribute PerformanceTimingConfidenceValue value ;
+ object toJSON ();
+};
+
+ randomizedTriggerRate , of type double , readonly 
+
+ This attribute must return a real number the interval [0, 1),
+ indicating how often noise is applied when exposing the
+ confidence value .
+
+ value , of type PerformanceTimingConfidenceValue , readonly 
+
+ This attribute must return a PerformanceTimingConfidenceValue .
+
+ toJSON() 
+
+ This method runs the default toJSON steps for this .
+
+ 3.3.3. The PerformanceTimingConfidenceValue enum 
+
+ enum PerformanceTimingConfidenceValue {
+ "high" ,
+ "low" 
+};
+
+ The values are defined as follows:
+
+ high 
+
+ The user agent considers the navigation metrics to be
+ representative on the current user’s device.
+
+ low 
+
+ The navigation metrics may not be representative of the current
+ user’s device. The user agent may consider the state of the
+ machine, or user configuration.
+
+ When determining the underlying confidence value , user agents
+ MUST only base their decision on transient runtime
+ conditions , such as user agent startup, temporarily high CPU
+ usage, temporary memory pressure, or other short-lived
+ considerations.
+
+ User agents MUST NOT base the underlying confidence value on
+ permanent device or profile characteristics. Examples of prohibited
+ factors include the amount of physical RAM on the device, the
+ number of CPU cores, the number of installed extensions, or other
+ static environment settings.
+
+ Confidence is intended to reflect runtime variability rather than
+ system capabilities.
+
+ 4. Process 
+
+ 4.1. Processing Model 
+
+ This figure illustrates the timing attributes defined by the
+ PerformanceNavigationTiming interface. Attributes in
+ parenthesis indicate that they may not be available for navigations
+ involving documents from different origins .
+
+ 5. Creating a navigation timing entry 
+
+ Each document has an associated navigation timing entry , initially unset.
+
+ To create the navigation timing entry for Document document ,
+given a fetch timing info fetchTiming , a number redirectCount , a
+ NavigationTimingType navigationType , a null or service worker timing info serviceWorkerTiming ,
+a DOMString cacheMode , a DOMHighResTimeStamp criticalCHRestart , and a response body info bodyInfo , do the following:
+
+ Let global be document ’s relevant global object .
+ Let navigationTimingEntry be a new PerformanceNavigationTiming object in global ’s
+ realm .
+
+ Setup the resource
+ timing entry for navigationTimingEntry given " navigation ", document ’s
+ URL , fetchTiming , cacheMode , and bodyInfo .
+
+ Set navigationTimingEntry ’s document load
+ timing to document ’s load timing info 
+
+ Set navigationTimingEntry ’s previous
+ document unload timing to document ’s previous document unload timing .
+
+ Set navigationTimingEntry ’s redirect
+ count to redirectCount .
+
+ Set navigationTimingEntry ’s navigation
+ type to navigationType .
+
+ Set navigationTimingEntry ’s service worker timing 
+ to serviceWorkerTiming .
+
+ Set document ’s navigation timing entry to navigationTimingEntry .
+
+ Set navigationTimingEntry ’s `Critical-CH` restart time 
+ to criticalCHRestart .
+
+ Set navigationTimingEntry ’s not restored reasons 
+ to the result of creating a
+ NotRestoredReasons object given document ’s not restored reasons .
+ add navigationTimingEntry to global ’s
+ performance entry buffer .
+
+ To queue the navigation timing entry for Document document ,
+ queue document ’s
+ navigation timing entry .
+
+ 6. Privacy Considerations 
+
+ This section is non-normative. 
+
+ 6.1. Information disclosure 
+
+ There is the potential for disclosing an end-user’s browsing and
+activity history by using carefully crafted timing attacks. For
+instance, the unloading time reveals how long the previous page takes
+to execute its unload handler, which could be used to infer the
+user’s login status. These attacks have been mitigated by enforcing
+the same origin check algorithm when unloading a document, as detailed in
+ the HTML spec .
+
+ The relaxed same
+origin policy doesn’t provide sufficient protection against
+unauthorized visits across documents. In shared hosting, an untrusted
+third party is able to host an HTTP server at the same IP address but
+on a different port.
+
+ 6.2. Cross-directory access 
+
+ Different pages sharing one host name, for example contents from
+different authors hosted on sites with user generated content are
+considered from the same origin because there is no feature to
+restrict the access by pathname. Navigating between these pages
+allows a latter page to access timing information of the previous
+one, such as timing regarding redirection and unload event.
+
+ 7. Security Considerations 
+
+ This section is non-normative. 
+
+ The PerformanceNavigationTiming interface exposes timing
+information about the previous document to the current document .
+To limit the access to PerformanceNavigationTiming attributes which
+include information on the previous document, the
+ previous document
+unloading algorithm enforces the same origin policy 
+and attributes related to the previous document are set to zero.
+
+ 7.1. Detecting proxy servers 
+
+ In case a proxy is deployed between the user agent and the web
+server, the time interval between the
+ connectStart 
+and the
+ connectEnd 
+attributes indicates the delay between the user agent and the proxy
+instead of the web server. With that, web server can potentially
+infer the existence of the proxy. For SOCKS proxy, this time interval
+includes the proxy authentication time and time the proxy takes to
+connect to the web server, which obfuscate the proxy detection. In
+case of an HTTP proxy, the user agent might not have any knowledge
+about the proxy server at all so it’s not always feasible to mitigate
+this attack.
+
+ 8. Obsolete 
+
+ This section defines attributes and interfaces previously introduced in
+ [NAVIGATION-TIMING] Level 1 and are kept here for backwards
+compatibility. Authors should not use the following interfaces and are
+ strongly advised to use the new
+ PerformanceNavigationTiming interface—see summary
+of changes and improvements .
+
+ 8.1. 
+ The PerformanceTiming interface
+
+ [ Exposed = Window ]
+ interface PerformanceTiming {
+ readonly attribute unsigned long long navigationStart ;
+ readonly attribute unsigned long long unloadEventStart ;
+ readonly attribute unsigned long long unloadEventEnd ;
+ readonly attribute unsigned long long redirectStart ;
+ readonly attribute unsigned long long redirectEnd ;
+ readonly attribute unsigned long long fetchStart ;
+ readonly attribute unsigned long long domainLookupStart ;
+ readonly attribute unsigned long long domainLookupEnd ;
+ readonly attribute unsigned long long connectStart ;
+ readonly attribute unsigned long long connectEnd ;
+ readonly attribute unsigned long long secureConnectionStart ;
+ readonly attribute unsigned long long requestStart ;
+ readonly attribute unsigned long long responseStart ;
+ readonly attribute unsigned long long responseEnd ;
+ readonly attribute unsigned long long domLoading ;
+ readonly attribute unsigned long long domInteractive ;
+ readonly attribute unsigned long long domContentLoadedEventStart ;
+ readonly attribute unsigned long long domContentLoadedEventEnd ;
+ readonly attribute unsigned long long domComplete ;
+ readonly attribute unsigned long long loadEventStart ;
+ readonly attribute unsigned long long loadEventEnd ;
+ [ Default ] object toJSON ();
+};
+
+ All time values defined in this section are measured in milliseconds
+ since midnight of January 1, 1970
+ (UTC) .
+
+ navigationStart 
+
+ This attribute must return the time immediately after the user
+ agent finishes prompting
+ to unload the previous document. If there is no previous
+ document, this attribute must return the time the current
+ document is created.
+
+ This attribute is not defined for
+ PerformanceNavigationTiming . Instead, authors can use
+ timeOrigin to obtain an equivalent timestamp.
+
+ unloadEventStart 
+
+ If the previous document and the current document have the same
+ origin , this attribute
+ must return the time immediately before the user agent starts the
+ unload event
+ of the previous document. If there is no previous document or the
+ previous document has a different origin than the current document, this
+ attribute must return zero.
+
+ unloadEventEnd 
+
+ If the previous document and the current document have the same
+ same origin , this attribute
+ must return the time immediately after the user agent finishes
+ the unload event
+ of the previous document. If there is no previous document or the
+ previous document has a different origin than the current document or the
+ unload is not yet completed, this attribute must return zero.
+
+ If there are HTTP
+ redirects when navigating and not all the redirects are from
+ the same origin , both
+ unloadEventStart and
+ unloadEventEnd must return zero.
+
+ redirectStart 
+
+ If there are HTTP
+ redirects when navigating and if all the redirects are from
+ the same origin , this
+ attribute must return the starting time of the fetch 
+ that initiates the redirect. Otherwise, this attribute must
+ return zero.
+
+ redirectEnd 
+
+ If there are HTTP
+ redirects when navigating and all redirects are from the same
+ origin , this attribute
+ must return the time immediately after receiving the last byte of
+ the response of the last redirect. Otherwise, this attribute must
+ return zero.
+
+ fetchStart 
+
+ If the new resource is to be fetched 
+ using a "GET" request
+ method , fetchStart must return the time immediately before
+ the user agent starts checking the
+ HTTP cache [RFC9111] . Otherwise, it must
+ return the time when
+ the user agent starts fetching the
+ resource.
+
+ domainLookupStart 
+
+ This attribute must return the time immediately before the user
+ agent starts the domain name lookup for the current document. If
+ a persistent connection 
+ [RFC9112] is used or the current document is retrieved from the
+ HTTP cache [RFC9111] or local resources,
+ this attribute must return the same value as
+ fetchStart .
+
+ domainLookupEnd 
+
+ This attribute must return the time immediately after the user
+ agent finishes the domain name lookup for the current document.
+ If a persistent connection 
+ [RFC9112] is used or the current document is retrieved from the
+ HTTP cache [RFC9111] or local resources,
+ this attribute must return the same value as
+ fetchStart .
+
+ Checking and retrieving contents from the
+ HTTP cache [RFC9111] is part of the
+ fetching process . It’s covered by the
+ requestStart ,
+ responseStart and
+ responseEnd attributes.
+
+ In case where the user agent already has the domain information
+ in cache, domainLookupStart and domainLookupEnd represent the
+ times when the user agent starts and ends the domain data
+ retrieval from the cache.
+
+ connectStart 
+
+ This attribute must return the time immediately before the user
+ agent start establishing the connection to the server to retrieve
+ the document. If a persistent
+ connection [RFC9112] is used or the current document is
+ retrieved from the HTTP cache [RFC9111] or
+ local resources, this attribute must return value of
+ domainLookupEnd .
+
+ connectEnd 
+
+ This attribute must return the time immediately after the user
+ agent finishes establishing the connection to the server to
+ retrieve the current document. If a
+ persistent connection 
+ [RFC9112] is used or the current document is retrieved from the
+ HTTP cache [RFC9111] or local resources,
+ this attribute must return the value of
+ domainLookupEnd .
+
+ If the transport connection fails and the user agent reopens a
+ connection, connectStart and
+ connectEnd should return the corresponding
+ values of the new connection.
+
+ connectEnd must include the time interval
+ to establish the transport connection as well as other time
+ interval such as SSL handshake and SOCKS authentication.
+
+ secureConnectionStart 
+
+ This attribute is optional. User agents that don’t have this
+ attribute available must set it as undefined. When this attribute
+ is available, if the scheme [URL] of the current page
+ is "https", this attribute must return the time immediately
+ before the user agent starts the handshake process to secure the
+ current connection. If this attribute is available but HTTPS is
+ not used, this attribute must return zero.
+
+ requestStart 
+
+ This attribute must return the time immediately before the user
+ agent starts requesting the current document from the server, or
+ HTTP cache [RFC9111] or from local
+ resources.
+
+ If the transport connection fails after a request is sent and the
+ user agent reopens a connection and resend the request,
+ requestStart should return the
+ corresponding values of the new request.
+
+ This interface does not include an attribute to represent the
+ completion of sending the request, e.g., requestEnd.
+
+ Completion of sending the request from the user agent does
+ not always indicate the corresponding completion time in the
+ network transport, which brings most of the benefit of having
+ such an attribute.
+
+ Some user agents have high cost to determine the actual
+ completion time of sending the request due to the HTTP layer
+ encapsulation.
+
+ responseStart 
+
+ This attribute must return the time immediately after the user
+ agent receives the first byte of the response from the server, or
+ HTTP cache [RFC9111] or from local
+ resources.
+
+ responseEnd 
+
+ This attribute must return the time immediately after the user
+ agent receives the last byte of the current document or
+ immediately before the transport connection is closed, whichever
+ comes first. The document here can be received either from the
+ server, the HTTP cache [RFC9111] or from
+ local resources.
+
+ domLoading 
+
+ This attribute must return the time immediately before the user
+ agent sets the current document
+ readiness to "loading" .
+
+ Due to differences in when a Document object is created in
+ existing user agents, the value returned by the
+ domLoading is implementation specific and should not
+ be used in meaningful metrics.
+
+ domInteractive 
+
+ This attribute must return the time immediately before the user
+ agent sets the current document
+ readiness to "interactive" .
+
+ domContentLoadedEventStart 
+
+ This attribute must return the time immediately before the user
+ agent fires the
+ DOMContentLoaded event at the Document .
+
+ domContentLoadedEventEnd 
+
+ This attribute must return the time immediately after the
+ document’s DOMContentLoaded event completes.
+
+ domComplete 
+
+ This attribute must return the time immediately before the user
+ agent sets the current document
+ readiness to "complete" .
+
+ If the current document
+ readiness changes to the same state multiple times,
+ domLoading ,
+ domInteractive ,
+ domContentLoadedEventStart ,
+ domContentLoadedEventEnd and
+ domComplete must return the time of the
+ first occurrence of the corresponding document readiness 
+ change.
+
+ loadEventStart 
+
+ This attribute must return the time immediately before the load
+ event of the current document is fired. It must return zero when
+ the load event is not fired yet.
+
+ loadEventEnd 
+
+ This attribute must return the time when the load event of the
+ current document is completed. It must return zero when the load
+ event is not fired or is not completed.
+
+ toJSON() 
+
+ Runs the default toJSON steps for this .
+
+ 8.2. 
+ The PerformanceNavigation interface
+
+ [ Exposed = Window ]
+ interface PerformanceNavigation {
+ const unsigned short TYPE_NAVIGATE = 0;
+ const unsigned short TYPE_RELOAD = 1;
+ const unsigned short TYPE_BACK_FORWARD = 2;
+ const unsigned short TYPE_RESERVED = 255;
+ readonly attribute unsigned short type ;
+ readonly attribute unsigned short redirectCount ;
+ [ Default ] object toJSON ();
+};
+
+ TYPE_NAVIGATE 
+
+ Navigation where the
+ history handling behavior 
+ is set to
+ "default" or
+ "replace" .
+
+ TYPE_RELOAD 
+
+ Navigation where the
+ history handling behavior 
+ is set to
+ "reload" .
+
+ TYPE_BACK_FORWARD 
+
+ Navigation where the
+ history handling behavior 
+ is set to
+ "entry update" .
+
+ TYPE_RESERVED 
+
+ Any navigation types not defined by values above.
+
+ type 
+
+ This attribute must return the type of the last non-redirect
+ navigation .
+ It must have one of the following navigation type values.
+
+ Client-side redirects, such as those using the Refresh
+ pragma directive , are not considered HTTP redirects by this spec. In those
+ cases, the type 
+ attribute should return appropriate value, such as
+ TYPE_RELOAD if reloading the current page, or
+ TYPE_NAVIGATE if navigating to a new URL.
+
+ redirectCount 
+
+ This attribute must return the number of redirects since the last
+ non-redirect navigation. If there is no redirect or there is any
+ redirect that is not from the
+ same origin as the
+ destination document, this attribute must return zero.
+
+ toJSON() 
+
+ Runs the default toJSON steps for this .
+
+ 8.3. 
+ Extensions to the Performance interface
+
+ [ Exposed = Window ]
+ partial interface Performance {
+ [ SameObject ]
+ readonly attribute PerformanceTiming timing ;
+ [ SameObject ]
+ readonly attribute PerformanceNavigation navigation ;
+};
+
+ The Performance interface is defined in
+ [PERFORMANCE-TIMELINE-2] .
+
+ timing 
+
+ The timing attribute represents the timing
+ information since the last non-redirect navigation.
+ This attribute is defined by the
+ PerformanceTiming interface.
+
+ navigation 
+
+ The navigation attribute is defined by the
+ PerformanceNavigation interface.
+
+ 9. Acknowledgments 
+
+ Thanks to Anne Van Kesteren, Arvind Jain, Boris Zbarsky, Jason Weber,
+Jonas Sicking, James Simonsen, Karen Anderson, Nic Jansma, Philippe Le
+Hegaret, Steve Souders, Todd Reifsteck, Tony Gentilcore, William Chan
+and Zhiheng Wang for their contributions to this work.
+
+ Conformance 
+
+ Document conventions 
+
+ Conformance requirements are expressed
+ with a combination of descriptive assertions
+ and RFC 2119 terminology.
+ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL”
+ in the normative parts of this document
+ are to be interpreted as described in RFC 2119.
+ However, for readability,
+ these words do not appear in all uppercase letters in this specification.
+
+ All of the text of this specification is normative
+ except sections explicitly marked as non-normative, examples, and notes. [RFC2119] 
+
+ Examples in this specification are introduced with the words “for example”
+ or are set apart from the normative text
+ with class="example" ,
+ like this:
+
+ This is an example of an informative example.
+
+ Informative notes begin with the word “Note”
+ and are set apart from the normative text
+ with class="note" ,
+ like this:
+
+ Note, this is an informative note.
+
+ Conformant Algorithms 
+
+ Requirements phrased in the imperative as part of algorithms
+ (such as "strip any leading space characters"
+ or "return false and abort these steps")
+ are to be interpreted with the meaning of the key word
+ ("must", "should", "may", etc)
+ used in introducing the algorithm.
+
+ Conformance requirements phrased as algorithms or specific steps
+ can be implemented in any manner,
+ so long as the end result is equivalent.
+ In particular, the algorithms defined in this specification
+ are intended to be easy to understand
+ and are not intended to be performant.
+ Implementers are encouraged to optimize.
+
+ Index 
+
+ Terms defined by this specification 
+
+ "back_forward" , in § 3.3.1 
+ back_forward , in § 3.3.1 
+ confidence , in § 3.3 
+ confidence value , in § 3.3 
+
+ connectEnd
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ connectStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ create the navigation timing entry , in § 5 
+ criticalCHRestart , in § 3.3 
+ `Critical-CH` restart time , in § 3.3 
+ current document , in § 2 
+ document load timing , in § 3.3 
+
+ domainLookupEnd
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ domainLookupStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ domComplete
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ domContentLoadedEventEnd
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ domContentLoadedEventStart
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ domInteractive
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ domLoading
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ fetchStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ "high" , in § 3.3.3 
+ high , in § 3.3.3 
+
+ loadEventEnd
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ loadEventStart
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ "low" , in § 3.3.3 
+ low , in § 3.3.3 
+ "navigate" , in § 3.3.1 
+ navigate , in § 3.3.1 
+
+ navigation
+
+ attribute for Performance , in § 8.3 
+ dfn for Performance , in § 8.3 
+
+ navigationStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ navigation timing entry , in § 5 
+ NavigationTimingType , in § 3.3.1 
+ navigation type , in § 3.3 
+ not restored reasons , in § 3.3 
+ notRestoredReasons , in § 3.3 
+ Performance , in § 8.3 
+
+ PerformanceNavigation
+
+ (interface) , in § 8.2 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ PerformanceNavigationTiming
+
+ (interface) , in § 3.3 
+ dfn for PerformanceNavigationTiming , in § 3.3 
+
+ PerformanceTiming
+
+ (interface) , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ PerformanceTimingConfidence , in § 3.3.2 
+ PerformanceTimingConfidenceValue , in § 3.3.3 
+ previous document unload timing , in § 3.3 
+ queue the navigation timing entry , in § 5 
+ randomized trigger rate , in § 3.3 
+ randomizedTriggerRate , in § 3.3.2 
+ redirect count , in § 3.3 
+
+ redirectCount
+
+ attribute for PerformanceNavigation , in § 8.2 
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ redirectEnd
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ redirectStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ "reload" , in § 3.3.1 
+ reload , in § 3.3.1 
+
+ requestStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ responseEnd
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ responseStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ secureConnectionStart
+
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ service worker timing , in § 3.3 
+
+ timing
+
+ attribute for Performance , in § 8.3 
+ dfn for Performance , in § 8.3 
+
+ toJSON()
+
+ dfn for PerformanceNavigation , in § 8.2 
+ dfn for PerformanceNavigationTiming , in § 3.3 
+ dfn for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTimingConfidence , in § 3.3.2 
+ method for PerformanceNavigation , in § 8.2 
+ method for PerformanceNavigationTiming , in § 3.3 
+ method for PerformanceTiming , in § 8.1 
+ method for PerformanceTimingConfidence , in § 3.3.2 
+
+ type
+
+ attribute for PerformanceNavigation , in § 8.2 
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ TYPE_BACK_FORWARD
+
+ const for PerformanceNavigation , in § 8.2 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ TYPE_NAVIGATE
+
+ const for PerformanceNavigation , in § 8.2 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ TYPE_RELOAD
+
+ const for PerformanceNavigation , in § 8.2 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ TYPE_RESERVED
+
+ const for PerformanceNavigation , in § 8.2 
+ dfn for PerformanceNavigation , in § 8.2 
+
+ underlying confidence value , in § 3.3 
+
+ unloadEventEnd
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ unloadEventStart
+
+ attribute for PerformanceNavigationTiming , in § 3.3 
+ attribute for PerformanceTiming , in § 8.1 
+ dfn for PerformanceTiming , in § 8.1 
+
+ value , in § 3.3.2 
+
+ Terms defined by reference 
+
+ [DOM] defines the following terms:
+
+ Document 
+ URL 
+ document 
+
+ [FETCH] defines the following terms:
+
+ concept-request-method 
+ fetch 
+ fetch timing info 
+ redirect status 
+ response body info 
+
+ [HR-TIME] defines the following terms:
+
+ DOMHighResTimeStamp 
+ Performance 
+ timeOrigin 
+
+ [HTML] defines the following terms:
+
+ NotRestoredReasons 
+ apply the history step 
+ associated Document 
+ create a notrestoredreasons object 
+ current document readiness 
+ document load timing info 
+ document unload timing info 
+ DOM complete time 
+ DOM content loaded event end time 
+ DOM content loaded event start time 
+ DOM interactive time 
+ DOMContentLoaded 
+ fetching resources 
+ hh-default 
+ hh-entry-update 
+ hh-reload 
+ hh-replace 
+ history handling behavior 
+ load event end time 
+ load event start time 
+ load timing info 
+ not restored reasons 
+ previous document unload timing 
+ prompt to unload a document 
+ queue a navigation performanceentry 
+ realm 
+ Refresh pragma directive 
+ relaxing the same-origin restriction 
+ relevant global object 
+ relevant realm 
+ relevant settings object 
+ the end 
+ time origin 
+ unload a document 
+ unload event end time 
+ unload event start time 
+ unloading documents 
+ update the session history with the new page 
+ Window 
+
+ [INFRA] defines the following terms:
+
+ implementation-defined 
+
+ [PERFORMANCE-TIMELINE-2] defines the following terms:
+
+ PerformanceEntry 
+ duration 
+ performance entry buffer 
+ startTime 
+ supportedEntryTypes 
+
+ [RESOURCE-TIMING-2] defines the following terms:
+
+ PerformanceResourceTiming 
+ connectEnd 
+ connectStart 
+ fetchStart 
+ redirectEnd 
+ redirectStart 
+ requestStart 
+ responseEnd 
+ responseStart 
+ setup the resource timing entry 
+ workerStart 
+
+ [SERVICE-WORKERS] defines the following terms:
+
+ FetchEvent 
+ fetch event dispatch time 
+ service worker 
+ service worker timing info 
+ start time 
+
+ [URL] defines the following terms:
+
+ concept-url-scheme 
+
+ [WebIDL] defines the following terms:
+
+ DOMString 
+ Default 
+ Exposed 
+ SameObject 
+ default toJSON steps 
+ double 
+ enumeration 
+ object 
+ this 
+ unsigned long long 
+ unsigned short 
+
+ References 
+
+ Normative References 
+
+ [DOM]
+ Anne van Kesteren. DOM Standard . Living Standard. URL: https://dom.spec.whatwg.org/ 
+ [FETCH]
+ Anne van Kesteren. Fetch Standard . Living Standard. URL: https://fetch.spec.whatwg.org/ 
+ [HR-TIME]
+ Yoav Weiss. High Resolution Time . 24 March 2026. WD. URL: https://www.w3.org/TR/hr-time-3/ 
+ [HTML]
+ Anne van Kesteren; et al. HTML Standard . Living Standard. URL: https://html.spec.whatwg.org/multipage/ 
+ [INFRA]
+ Anne van Kesteren; Domenic Denicola. Infra Standard . Living Standard. URL: https://infra.spec.whatwg.org/ 
+ [PERFORMANCE-TIMELINE-2]
+ Nicolas Pena Moreno. Performance Timeline . 21 May 2025. CRD. URL: https://www.w3.org/TR/performance-timeline/ 
+ [RESOURCE-TIMING-2]
+ Yoav Weiss; Noam Rosenthal. Resource Timing . 20 April 2026. CRD. URL: https://www.w3.org/TR/resource-timing/ 
+ [RFC2119]
+ S. Bradner. Key words for use in RFCs to Indicate Requirement Levels . March 1997. Best Current Practice. URL: https://datatracker.ietf.org/doc/html/rfc2119 
+ [RFC9111]
+ R. Fielding, Ed.; M. Nottingham, Ed.; J. Reschke, Ed.. HTTP Caching . June 2022. Internet Standard. URL: https://httpwg.org/specs/rfc9111.html 
+ [RFC9112]
+ R. Fielding, Ed.; M. Nottingham, Ed.; J. Reschke, Ed.. HTTP/1.1 . June 2022. Internet Standard. URL: https://httpwg.org/specs/rfc9112.html 
+ [SERVICE-WORKERS]
+ Monica CHINTALA; Yoshisato Yanagisawa. Service Workers Nightly . 12 August 2026. CRD. URL: https://www.w3.org/TR/service-workers/ 
+ [URL]
+ Anne van Kesteren. URL Standard . Living Standard. URL: https://url.spec.whatwg.org/ 
+ [WebIDL]
+ Edgar Chen; Timothy Gu. Web IDL Standard . Living Standard. URL: https://webidl.spec.whatwg.org/ 
+
+ Non-Normative References 
+
+ [HR-TIME-2]
+ Ilya Grigorik. High Resolution Time Level 2 . 21 November 2019. REC. URL: https://www.w3.org/TR/hr-time-2/ 
+ [JSMEASURE]
+ Ramakrishnan Rajamony; Mootaz Elnozahy. Measuring Client-Perceived Response Times on the WWW . March 2001. The Proceedings of the 3rd USENIX Symposium on Internet Technologies and Systems (USITS). URL: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.69.7329&rep=rep1&type=pdf 
+ [NAVIGATION-TIMING]
+ Zhiheng Wang. Navigation Timing . 17 December 2012. REC. URL: https://www.w3.org/TR/navigation-timing/ 
+
+ IDL Index 
+
+ [ Exposed = Window ]
+ interface PerformanceNavigationTiming : PerformanceResourceTiming {
+ readonly attribute DOMHighResTimeStamp unloadEventStart ;
+ readonly attribute DOMHighResTimeStamp unloadEventEnd ;
+ readonly attribute DOMHighResTimeStamp domInteractive ;
+ readonly attribute DOMHighResTimeStamp domContentLoadedEventStart ;
+ readonly attribute DOMHighResTimeStamp domContentLoadedEventEnd ;
+ readonly attribute DOMHighResTimeStamp domComplete ;
+ readonly attribute DOMHighResTimeStamp loadEventStart ;
+ readonly attribute DOMHighResTimeStamp loadEventEnd ;
+ readonly attribute NavigationTimingType type ;
+ readonly attribute unsigned short redirectCount ;
+ readonly attribute DOMHighResTimeStamp criticalCHRestart ;
+ readonly attribute NotRestoredReasons ? notRestoredReasons ;
+ readonly attribute PerformanceTimingConfidence confidence ;
+ [ Default ] object toJSON ();
+};
+
+ enum NavigationTimingType {
+ "navigate" ,
+ "reload" ,
+ "back_forward" 
+};
+
+[ Exposed = Window ]
+ interface PerformanceTimingConfidence {
+ readonly attribute double randomizedTriggerRate ;
+ readonly attribute PerformanceTimingConfidenceValue value ;
+ object toJSON ();
+};
+
+ enum PerformanceTimingConfidenceValue {
+ "high" ,
+ "low" 
+};
+
+[ Exposed = Window ]
+ interface PerformanceTiming {
+ readonly attribute unsigned long long navigationStart ;
+ readonly attribute unsigned long long unloadEventStart ;
+ readonly attribute unsigned long long unloadEventEnd ;
+ readonly attribute unsigned long long redirectStart ;
+ readonly attribute unsigned long long redirectEnd ;
+ readonly attribute unsigned long long fetchStart ;
+ readonly attribute unsigned long long domainLookupStart ;
+ readonly attribute unsigned long long domainLookupEnd ;
+ readonly attribute unsigned long long connectStart ;
+ readonly attribute unsigned long long connectEnd ;
+ readonly attribute unsigned long long secureConnectionStart ;
+ readonly attribute unsigned long long requestStart ;
+ readonly attribute unsigned long long responseStart ;
+ readonly attribute unsigned long long responseEnd ;
+ readonly attribute unsigned long long domLoading ;
+ readonly attribute unsigned long long domInteractive ;
+ readonly attribute unsigned long long domContentLoadedEventStart ;
+ readonly attribute unsigned long long domContentLoadedEventEnd ;
+ readonly attribute unsigned long long domComplete ;
+ readonly attribute unsigned long long loadEventStart ;
+ readonly attribute unsigned long long loadEventEnd ;
+ [ Default ] object toJSON ();
+};
+
+[ Exposed = Window ]
+ interface PerformanceNavigation {
+ const unsigned short TYPE_NAVIGATE = 0;
+ const unsigned short TYPE_RELOAD = 1;
+ const unsigned short TYPE_BACK_FORWARD = 2;
+ const unsigned short TYPE_RESERVED = 255;
+ readonly attribute unsigned short type ;
+ readonly attribute unsigned short redirectCount ;
+ [ Default ] object toJSON ();
+};
+
+[ Exposed = Window ]
+ partial interface Performance {
+ [ SameObject ]
+ readonly attribute PerformanceTiming timing ;
+ [ SameObject ]
+ readonly attribute PerformanceNavigation navigation ;
+};

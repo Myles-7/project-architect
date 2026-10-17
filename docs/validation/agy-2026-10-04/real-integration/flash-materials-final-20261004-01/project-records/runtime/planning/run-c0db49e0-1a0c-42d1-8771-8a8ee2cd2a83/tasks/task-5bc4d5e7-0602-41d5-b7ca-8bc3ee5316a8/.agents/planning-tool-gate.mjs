@@ -1,0 +1,8 @@
+import {readFileSync,appendFileSync,realpathSync} from 'node:fs';
+import {isAbsolute} from 'node:path';
+const event=JSON.parse(readFileSync(0,'utf8')); const call=event.toolCall||{}; const args=call.args||{};
+const server=args.ServerName??args.serverName??args.server_name; const tool=args.ToolName??args.toolName??args.tool_name;
+let image=null; const requested=args.AbsolutePath??args.Path??args.path; if(call.name==='view_file'&&typeof requested==='string'&&isAbsolute(requested)){try{const actual=realpathSync(requested); if(["D:\\Temp\\User\\pa-quality-publish-N6k3tL\\projects\\proj-1791129999032\\inputs\\inp-1791129999124\\fixture.png"].includes(actual))image=actual;}catch{}}
+const allow=call.name==='finish'||!!image||(call.name==='call_mcp_tool'&&server==='project_architect'&&["material_index","material_read","material_image","research_read","evidence_record","environment_prepare","experiment_run"].includes(tool));
+const result={decision:allow?'allow':'deny',reason:allow?'Registered controlled planning tool':'Native commands, unregistered file access, writes, delegation, and unregistered MCP servers are disabled for this task',...(allow&&call.name==='call_mcp_tool'?{permissionOverrides:['mcp('+server+'/'+tool+')']}:image?{permissionOverrides:['read_file('+image+')']}: {})};
+appendFileSync("D:\\Temp\\User\\pa-quality-publish-N6k3tL\\projects\\proj-1791129999032\\runtime\\planning\\run-c0db49e0-1a0c-42d1-8771-8a8ee2cd2a83\\tasks\\task-5bc4d5e7-0602-41d5-b7ca-8bc3ee5316a8\\.agents\\tool-gate.ndjson",JSON.stringify({at:new Date().toISOString(),toolCall:call,decision:result.decision,stepIdx:event.stepIdx,imagePath:image})+'\n'); process.stdout.write(JSON.stringify(result));

@@ -205,7 +205,139 @@
       "status": "identified",
       "createdAt": "2026-08-28T15:13:40.762Z",
       "updatedAt": "2026-08-28T15:13:40.762Z"
+    },
+    {
+      "id": "rsk-mth5603x-tfi4",
+      "riskKey": "animation_asset_scarcity",
+      "area": "ux_ui_direction",
+      "statement": "由于首期内置素材基于开源/免版税素材包，可能难以完美匹配用户想要的特定动作或自定义角色外貌。",
+      "description": "由于首期内置素材基于开源/免版税素材包，可能难以完美匹配用户想要的特定动作或自定义角色外貌。",
+      "severity": "medium",
+      "impact": "可能导致初始版本的角色外观及动作选择受限，降低个性化程度。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:15:01.004Z",
+      "updatedAt": "2026-08-31T11:15:01.004Z"
+    },
+    {
+      "id": "rsk-mth5603x-f5vh",
+      "riskKey": "websocket_connection_instability",
+      "area": "technical_boundary",
+      "statement": "在公网环境下，没有常驻的云端长连接保障，WebSocket 信令中转可能因网络波动或手机浏览器后台休眠而频繁断连。",
+      "description": "在公网环境下，没有常驻的云端长连接保障，WebSocket 信令中转可能因网络波动或手机浏览器后台休眠而频繁断连。",
+      "severity": "medium",
+      "impact": "实时状态更新可能存在几秒的延迟，或者需要刷新页面才能重新同步。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:15:01.004Z",
+      "updatedAt": "2026-08-31T11:15:01.004Z"
+    },
+    {
+      "id": "rsk-mth5aqmx-6yjw",
+      "riskKey": "private_data_security",
+      "area": "technical_boundary",
+      "statement": "网站部署在公网且没有复杂的账户系统，仅靠预共享令牌或访问密码保护，存在被第三方通过撞库或密码泄露访问的风险。",
+      "description": "网站部署在公网且没有复杂的账户系统，仅靠预共享令牌或访问密码保护，存在被第三方通过撞库或密码泄露访问的风险。",
+      "severity": "medium",
+      "impact": "你们两人的私密照片、日记和状态信息可能会被未授权的第三方看到。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:18:42.009Z",
+      "updatedAt": "2026-08-31T11:18:42.009Z"
+    },
+    {
+      "id": "rsk-mth5aqmx-ns1g",
+      "riskKey": "local_storage_loss",
+      "area": "technical_boundary",
+      "statement": "数据以 LocalForage 或 SQLite 保存在浏览器本地或轻量服务器上，如果清理浏览器缓存、更换手机或服务器故障，可能导致数据丢失。",
+      "description": "数据以 LocalForage 或 SQLite 保存在浏览器本地或轻量服务器上，如果清理浏览器缓存、更换手机或服务器故障，可能导致数据丢失。",
+      "severity": "high",
+      "impact": "如果未定期手动导出 JSON 或 Markdown 备份，恋爱日记和时光轴等珍贵记忆数据将无法恢复。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:18:42.009Z",
+      "updatedAt": "2026-08-31T11:18:42.009Z"
+    },
+    {
+      "id": "rsk-mth5g554-i6sp",
+      "riskKey": "p2p_nat_traversal_failure",
+      "area": "technical_boundary",
+      "statement": "在复杂的蜂窝网络或多重 NAT 环境下，P2P (对等直连) 可能会因为打洞失败而无法建立连接",
+      "description": "在复杂的蜂窝网络或多重 NAT 环境下，P2P (对等直连) 可能会因为打洞失败而无法建立连接",
+      "severity": "high",
+      "impact": "这会导致双方无法直接实现数据传输，需要自动且无感地降级为通过 WebSocket 服务器进行数据中转。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:22:54.088Z",
+      "updatedAt": "2026-08-31T11:22:54.088Z"
+    },
+    {
+      "id": "rsk-mth5jkd0-ni86",
+      "riskKey": "browser_storage_eviction",
+      "area": "technical_boundary",
+      "statement": "移动端浏览器（特别是 iOS Safari）在系统存储空间不足时，可能会静默清理 IndexedDB/LocalStorage 本地存储，导致日记和时间轴数据意外丢失。",
+      "description": "移动端浏览器（特别是 iOS Safari）在系统存储空间不足时，可能会静默清理 IndexedDB/LocalStorage 本地存储，导致日记和时间轴数据意外丢失。",
+      "severity": "high",
+      "impact": "用户保存的情侣时光轴、交换日记等重要回忆数据被浏览器自动擦除，无法找回。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:25:33.780Z",
+      "updatedAt": "2026-08-31T11:25:33.780Z"
+    },
+    {
+      "id": "rsk-mth5jkd0-rot9",
+      "riskKey": "network_connectivity_limit",
+      "area": "technical_boundary",
+      "statement": "若采用 P2P 直连（WebRTC）而没有服务器中转，在复杂的对称型 NAT（如同处某些校园网或公司内网）环境下，可能导致双方无法成功建立直连通道。",
+      "description": "若采用 P2P 直连（WebRTC）而没有服务器中转，在复杂的对称型 NAT（如同处某些校园网或公司内网）环境下，可能导致双方无法成功建立直连通道。",
+      "severity": "medium",
+      "impact": "双方处于异地时，虚拟同居室的实时状态和形象动作无法同步，导致陪伴功能失效。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:25:33.780Z",
+      "updatedAt": "2026-08-31T11:25:33.780Z"
+    },
+    {
+      "id": "rsk-mth5qyw6-ngtr",
+      "riskKey": "network_connectivity",
+      "area": "technical_boundary",
+      "statement": "在双方处于不同网络环境下，WebSocket 服务器可能因公网连接不稳定导致状态同步延迟或失败。",
+      "description": "在双方处于不同网络环境下，WebSocket 服务器可能因公网连接不稳定导致状态同步延迟或失败。",
+      "severity": "medium",
+      "impact": "导致实时状态显示不准确，形象动作不同步，影响“无干扰陪伴”的沉浸感。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:31:19.206Z",
+      "updatedAt": "2026-08-31T11:31:19.206Z"
+    },
+    {
+      "id": "rsk-mth5vxib-i7zu",
+      "riskKey": "state_desync_risk",
+      "area": "core_features",
+      "statement": "由于采用低频同步与本地行为缓存，若双方长时间离线或浏览器缓存异常清理，可能导致双方看到的虚拟房间状态或对方动作不一致。",
+      "description": "由于采用低频同步与本地行为缓存，若双方长时间离线或浏览器缓存异常清理，可能导致双方看到的虚拟房间状态或对方动作不一致。",
+      "severity": "medium",
+      "impact": "可能短暂破坏“共同生活在同一房间”的沉浸感，需要通过轻量级的状态重置或手动同步功能来修复。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:35:10.691Z",
+      "updatedAt": "2026-08-31T11:35:10.691Z"
+    },
+    {
+      "id": "rsk-mth5z6pl-0apt",
+      "riskKey": "p2p_connection_instability",
+      "area": "technical_boundary",
+      "statement": "若后期完全依赖 P2P（WebRTC）对等直连，在无中转服务器（TURN）的情况下，处于对称型 NAT 后或不同运营商网络下的手机浏览器可能无法建立连接。",
+      "description": "若后期完全依赖 P2P（WebRTC）对等直连，在无中转服务器（TURN）的情况下，处于对称型 NAT 后或不同运营商网络下的手机浏览器可能无法建立连接。",
+      "severity": "high",
+      "impact": "会导致双方在不同地点时无法实时同步虚拟房间的状态与行为动作。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:37:42.585Z",
+      "updatedAt": "2026-08-31T11:37:42.585Z"
+    },
+    {
+      "id": "rsk-mth5z6pl-269s",
+      "riskKey": "browser_storage_cleared",
+      "area": "technical_boundary",
+      "statement": "手机浏览器在存储空间不足或长时间未访问时，可能会自动清理本地 IndexedDB 或 LocalStorage 缓存。",
+      "description": "手机浏览器在存储空间不足或长时间未访问时，可能会自动清理本地 IndexedDB 或 LocalStorage 缓存。",
+      "severity": "medium",
+      "impact": "如果没有及时导出备份，可能导致储存在本地的恋爱日记、时光轴等私密数据丢失。",
+      "status": "identified",
+      "createdAt": "2026-08-31T11:37:42.585Z",
+      "updatedAt": "2026-08-31T11:37:42.585Z"
     }
   ],
-  "updatedAt": "2026-08-28T15:13:40.773Z"
+  "updatedAt": "2026-08-31T11:37:42.598Z"
 }

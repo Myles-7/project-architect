@@ -1,0 +1,179 @@
+{
+  "blockers": [],
+  "clarification": null,
+  "evidence": [],
+  "followUp": [],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 本地数据备份导出、恢复、导入凭证校验与防丢提醒功能规范\n\n1. **一键全量导出为结构化 JSON 备份（符合 BackupPayload 规范并含回收区策略）**：\n   - 依据决策与规范定义，系统支持将当前客户端本地持久化的全部便签数据一键打包导出为符合标准规范的 JSON 备份文件。\n   - **顶层单一载荷结构（`BackupPayload`）**：\n     * `schemaVersion: 1`：备份标准协议版本号，固定为数值 1（与记录 revision 严格区分）；\n     * `app: 'SparkNotes'`：应用标识符，固定为 `'SparkNotes'`；\n     * `exportedAt: number`：导出毫秒时间戳（非负安全整数）；\n     * `notesCount: number`：包含便签总数，严格与 `notes.length` 相等；\n     * `notes: Note[]`：全量便签实体数组，完整保留每条便签的 `id`（UUID v4）、`content`、`tags`（小写数组）、`isPinned`、`isFavorite`、`status`、`previousStatus`、`createdAt`、`updatedAt`、`trashedAt`、`revision` 与 `schemaVersion: 1`；\n     * `meta: BackupMetaPayload`：包含唯一的备份追踪元数据 `backupTracker`（`lastBackupAt`, `unbackedChangesCount`）、有效标签快照 `tags` 以及应用偏好配置 `appSettings`（`layoutMode`），拒绝非规范未知字段与重复字段。\n   - **默认策略与可控排除**：默认导出包含处于回收区（`status === 'trashed'`）的便签，完整保留其 `trashedAt` 移入时间戳、`previousStatus` 与关联标签；在数据管理面板的导出设置中提供【排除回收区便签】复选框，允许用户按需仅导出活跃与归档便签。\n   - 导出的文件名遵循规则：`spark-notes-backup-YYYY-MM-DD.json`。\n\n2. **Markdown 格式导出归档支持**：\n   - 支持将所有活跃与归档便签批量导出为整理好的 Markdown 汇总文件或压缩包，标签转换为 YAML FrontMatter 格式。\n   - 处于回收区的便签默认不混入正常 Markdown 导出中，保障阅读归档的纯粹性。\n\n3. **未保存会话草稿独立导出机制（SessionDraft Rescue Export）**：\n   - 明确边界：未保存草稿暂存在浏览器的 `sessionStorage` 中，**不属于数据库正式备份**，数据库全量备份导出（`exportFullBackupJSON`）仅导出已提交落盘的便签。\n   - 为防御极端情况（如存储配额溢出、编辑器异常、浏览器关闭前警告），在编辑器界面提供独立的【导出当前未保存草稿】操作。\n   - 独立草稿导出文件名遵循规则：`spark-notes-draft-{noteId}-{YYYYMMDD-HHmmss}.json`。\n   - 草稿文件载荷独立声明：包含 `schemaVersion: 1`、`type: 'SparkNotesSessionDraft'`、`noteId`、`libraryGeneration`、`baseRevision`、`content` 与 `savedAt`。\n   - 严格区分正式备份与草稿恢复文件：独立草稿文件仅供文本安全抢救与载入编辑器，不可作为整库备份导入恢复。\n\n4. **备份文件深度强类型校验（Deep Schema Validation）**：\n   - 用户拖拽上传或通过文件选择器选择外部备份文件后，系统执行强类型校验，绝不只检查 `JSON.parse` 或 `Array.isArray`：\n     * **格式与版本校验**：严格校验 `schemaVersion === 1` 且 `app === 'SparkNotes'`，版本不符直接拦截；\n     * **计数一致性校验**：严格校验 `notesCount === notes.length`；\n     * **实体字段逐项强校验**：遍历校验单条便签，`id` 必须为合法 UUID v4 且文件内全局唯一；`content` 必须为字符串；`tags` 必须为小写字符串数组；`isPinned` 与 `isFavorite` 必须为布尔值；`status` 必须为 `'active' | 'archived' | 'trashed'` 枚举；`previousStatus` 在 trashed 状态下必须为 `'active' | 'archived'`，非 trashed 状态下必须为 `null`；`trashedAt` 在 trashed 状态下必须为合法时间戳数值，非 trashed 状态下必须为 `null`；`revision` 必须为正整数（>= 1）；\n     * **元数据形状强校验**：严格校验 `meta.backupTracker`、`meta.tags` 与 `meta.appSettings` 字段类型与结构。\n   - 校验失败拦截：若任一规则未通过，立即抛出 `InvalidBackupPayloadError` 并显示具体错误字段路径与原因，强行阻断写入，本地现有数据保持 100% 完整无损。\n\n5. **导入预览工单凭证（ImportPreview Ticket）与写版本并发防御**：\n   - 强类型校验通过后，在前端服务内存中生成唯一的 `ImportPreview` 凭证：\n     * `ticketId`：唯一标识 UUID v4；\n     * `fileSignature`：导入文件字节内容的不可变 SHA-256 签名；\n     * `payload`：已冻结的完整 `BackupPayload` 对象；\n     * `summary`：便签总数与分类统计（活跃、归档、回收区）；\n     * `targetState`：捕获生成预览那一瞬间的本地数据库快照依据 `{ libraryGeneration: number, databaseWriteVersion: number }`；\n     * `previewedAt`：预览生成时间戳。\n   - 导入预览卡片呈现：在弹窗中展示待导入便签数量、统计分布、导出时间，并提供【全量覆盖恢复】与【智能增量合并】两种操作选项。\n   - 导入执行前原子并发比对：在提交执行导入的同一个只读写事务内，读取本地 `db.meta` 中的当前库代际 `libraryGeneration` 与单调写版本 `databaseWriteVersion`：\n     * 若当前本地值与凭证中的 `targetState` 不一致（说明生成预览后，本地其他标签页或后台发生了写事务或代际变动），系统立即拒绝执行（零改动），抛出 `ImportPreviewExpiredError`；\n     * 界面弹出琥珀色提示横幅：“导入预览已失效：本地数据在预览期间已发生更新，请重新生成预览后操作”，彻底解决并发写覆盖与状态依据碰撞漏洞。\n\n6. **全量覆盖恢复与增量合并冲突消解规则**：\n   - **全量覆盖恢复（Overwrite）**：\n     * 用户需进行二次确认以防误操作；\n     * 在同一个原子读写事务 `[db.notes, db.meta]` 内执行：\n       1) 核验凭证 `targetState` 与本地当前状态一致；\n       2) 清空本地 `db.notes` 现有全部记录；\n       3) 批量写入备份载荷中的全部便签记录；\n       4) 更新本地元数据：本地库代际单调递增 `libraryGeneration = curGen + 1`（**绝不采用备份文件的旧代际**）；本地单调写版本递增 `databaseWriteVersion = curWriteVer + 1`；恢复备份中的 `backupTracker` 并重置 `unbackedChangesCount = 0`；恢复 `appSettings`；\n       5) 事务原子提交，触发界面重渲染；\n       6) **代际失效隔离**：所有已打开的旧编辑会话（持有旧代际编号）后续执行 CAS 保存时均抛出 `LibraryGenerationMismatchError` 并被拦截，彻底杜绝陈旧会话复活已覆盖记录；\n       7) **超期即时感知**：若恢复的便签中存在驻留超 7 天的回收区便签（`Date.now() - trashedAt >= 604,800,000`），提交后立即激活左侧边栏【回收区】入口的琥珀色预警点并在回收区顶部展示常驻横幅。\n   - **智能增量合并（Merge）**：\n     * 在同一个原子读写事务 `[db.notes, db.meta]` 内执行：\n       1) 核验凭证 `targetState`；\n       2) **ID 冲突消解规则**：若导入的便签 ID 在本地已存在，**明确保留本地当前记录**（忽略备份中同 ID 的冲突记录，不更新其 revision，不让旧会话产生意外覆盖），统计为 `skippedConflictCount`；\n       3) 对于本地不存在的新 ID 便签，按原字段直接插入写入；\n       4) 更新本地元数据：本地代际 `libraryGeneration` 保持不变；本地单调写版本递增 `databaseWriteVersion = curWriteVer + 1`；\n       5) 事务原子提交，弹出通知：“数据合并完成：新增 X 条，保留本地冲突 Y 条”；\n       6) 若合并入库的便签中含有超 7 天回收便签，立即激活回收区过期预警。\n   - **取消导入**：\n     * 用户点击取消直接销毁内存凭证，不产生任何读写事务，本地数据完全保持原样。\n   - **原子性与事务回滚保障**：\n     * 全流程基于 Dexie/IndexedDB 原生事务，任何环节异常或存储配额溢出，由数据库底层原生机制完整回滚，绝不残留半库数据，绝不使用临时内存快照回写。\n\n7. **温和防丢备份提醒状态机（依据已确认决策）**：\n   - 本地元数据实体维护 `lastBackupAt` 与 `unbackedChangesCount`。便签的每次新增、编辑、归档、移入回收区、还原及物理删除均在同一个 CAS 事务内自增计数 1。\n   - 触发条件：累计达到 `unbackedChangesCount >= 20`，或距离上次备份超过 7 天（`Date.now() - lastBackupAt >= 604,800,000` 且 `unbackedChangesCount > 0`）。\n   - 视觉形态：侧边栏底部设置入口旁温和点亮琥珀色提示圆点，并展示微文案“有未备份灵感 [立即导出]”，非侵入、无模态打断。\n   - 快速导出与复位：点击微文案中的“立即导出”直接触发全量 JSON 备份下载；成功后在同事务内重置 `unbackedChangesCount = 0`，更新 `lastBackupAt = Date.now()`，侧边栏提示圆点与微文案立即复位隐藏。\n\n8. **适用状态覆盖**：\n   - **正常态（Normal）**：数据管理面板清晰展示上次备份时间、未备份变更数、导出选项与导入拖拽区；\n   - **校验与预览态（Previewing）**：展示上传文件的解析进度、Schema 校验结果与只读冻结的预览工单凭证；\n   - **并发冲突/失效态（ExpiredPreview）**：本地并发写入后凭证失效，明确醒目提示重新预览，阻断写入；\n   - **错误态（ErrorState）**：格式损坏或配额超限时弹窗指明错误原因与具体字段路径，阻断写入，数据零丢失；\n   - **离线态（Offline）**：纯前端基于 Blob 与本地 IndexedDB 完成，完全断网状态下导出与导入恢复功能 100% 可用。",
+          "dependsOn": [
+            "page-main-workspace"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form",
+            "evidence-c6993bbe-7ff2-4381-81dc-f2ff5195709e",
+            "evidence-6ddb77ee-acc4-4ae3-a560-e67f902a47ad",
+            "evidence-file-api",
+            "evidence-mdn-storage-eviction-01",
+            "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-af1dd771-ece0-428f-8f91-91f8e2dc0b79"
+          ],
+          "id": "feature-data-portability",
+          "kind": "feature",
+          "requirementIds": [
+            "block-scope-core-boundaries"
+          ],
+          "stage": "product",
+          "title": "本地数据备份导出、恢复、导入凭证校验与防丢提醒功能"
+        },
+        {
+          "content": "### 数据备份导出、导入预览凭证核对、冲突消解、草稿独立导出与防丢提醒交互流\n\n1. **步骤 0（变更追踪与温和提醒激活流）**：\n   - 用户在主工作区执行便签新增、编辑保存、归档、移入回收区、从回收区还原或物理删除操作；\n   - 底层存储层在完成业务写事务的同时，于同事务内将本地元数据中的 `unbackedChangesCount` 递增 1；\n   - 前端响应式监听元数据变化，当 `unbackedChangesCount >= 20` 或 `Date.now() - lastBackupAt >= 604,800,000` 且存在未备份修改时，侧边栏底部设置入口旁温和点亮琥珀色小圆点，并伴随展示微文案“有未备份灵感 [立即导出]”；界面不弹出任何模态框，不打断用户当前的浏览或书写。\n\n2. **步骤 1（唤出数据管理与本地备份面板）**：\n   - 用户点击顶部导航栏右侧的“设置/数据”图标（或点击侧边栏温和提醒文案），界面平滑唤出“数据管理与本地备份”模态面板；\n   - 面板展示当前本地便签总数分布（活跃、归档、回收区）、上次备份时间及未备份变更计数。\n\n3. **步骤 2（全量 JSON 备份导出流）**：\n   - 界面展示导出配置选项，包含【包含回收区便签】复选框（默认处于勾选状态）；\n   - 用户点击【导出全量 JSON 备份】按钮；\n   - 系统异步读取本地数据，根据勾选配置决定是否包含 `status === 'trashed'` 便签；组装标准 `BackupPayload`（包含 `schemaVersion: 1`, `app: 'SparkNotes'`, `exportedAt`, `notesCount`, `notes`, `meta`）；\n   - 通过 `Blob([jsonString], { type: 'application/json' })` 生成不可变二进制对象，配合 `URL.createObjectURL` 与动态 `a.download` 触发浏览器下载，文件名遵循 `spark-notes-backup-YYYY-MM-DD.json`；\n   - 下载成功触发后，系统在同事务内重置 `unbackedChangesCount = 0` 并更新 `lastBackupAt = Date.now()`，侧边栏防丢提示圆点与微文案立即复位隐藏，面板弹出轻量提示“备份文件已成功导出”；\n   - 若浏览器下载策略受阻，保持面板展开并提供备用文本框供用户一键复制 JSON 全量字符串。\n\n4. **步骤 3（Markdown 批量归档导出流）**：\n   - 用户在数据面板中点击【导出 Markdown 归档】按钮；\n   - 系统提取所有活跃与归档状态便签，转换为携带 YAML FrontMatter 标签元数据的 Markdown 文本包；回收区便签默认不混入；\n   - 触发浏览器下载归档文本包，操作完成后不重置 JSON 备份防丢计数。\n\n5. **步骤 4（未保存 SessionDraft 独立导出流）**：\n   - 当用户在便签详情编辑弹窗中编辑长文，遇到配额告警或关闭前欲单独抢救文本时，点击编辑器底部【导出当前草稿】操作按钮；\n   - `SessionDraftManager` 从内存或当前会话直接提取草稿，生成独立载荷 `SparkNotesSessionDraft`（包含 `noteId`, `libraryGeneration`, `baseRevision`, `content`, `savedAt`）；\n   - 触发浏览器下载 `spark-notes-draft-{noteId}-{YYYYMMDD-HHmmss}.json`；\n   - 提示用户草稿已独立保存至本地磁盘，明确该文件为草稿抢救载荷，与数据库全量恢复文件隔离。\n\n6. **步骤 5（备份文件拖拽/选择与强类型 Schema 校验流）**：\n   - 用户将本地 `.json` 文件拖入数据面板的拖拽区，或点击文件选择器选中文件；\n   - `BackupManager` 异步读取文件字节，执行深度强类型校验：\n     * 校验 JSON 语法、`schemaVersion === 1`、`app === 'SparkNotes'`；\n     * 校验 `notesCount === notes.length`；\n     * 逐条检验 Note 数组：UUID v4 格式校验、文件内 ID 唯一性校验、status/previousStatus/trashedAt 状态机一致性约束校验、小写标签数组格式校验；\n     * 校验 `meta` 单一规范形状与已知偏好字段；\n   - 若校验失败：立即抛出 `InvalidBackupPayloadError`，面板展开红色错误信息，详细指明出错字段路径与原因（如 `notes[3].id 不是合法的 UUID v4`），绝对不修改本地数据库，完全阻断写入；\n   - 若校验通过：进入导入预览流程。\n\n7. **步骤 6（生成导入预览凭证工单流）**：\n   - 校验通过后，系统计算文件 SHA-256 签名，读取本地当前的 `libraryGeneration` 与单调 `databaseWriteVersion` 作为 `targetState` 快照凭证，生成内存冻结工单 `ImportPreview`；\n   - 数据面板进入预览状态，展示待导入便签统计卡片（活跃数、归档数、回收区数、是否含有超期便签），并醒目提供【全量覆盖恢复】与【智能增量合并】两个操作按钮。\n\n8. **步骤 7（全量覆盖恢复交互流）**：\n   - 用户点击【全量覆盖恢复】；\n   - 系统弹出高风险二次确认对话框，告知“覆盖恢复将清空本地全部现有数据，并使其他已打开的编辑会话失效”；\n   - 用户确认后，系统在单个只读写事务 `[db.notes, db.meta]` 内执行：\n     1) 比对本地当前的代际与写版本是否与凭证 `targetState` 完全一致；若不一致抛出 `ImportPreviewExpiredError`，中止写入并提示用户重新预览；\n     2) 清空本地 `db.notes`；\n     3) 批量写入备份载荷中全部便签；\n     4) 本地库代际单调递增 `libraryGeneration = curGen + 1`，写版本递增 `databaseWriteVersion = curWriteVer + 1`，恢复 `backupTracker` 并重置 `unbackedChangesCount = 0`；\n     5) 提交事务，刷新工作区列表；\n     6) 任何旧编辑会话若尝试提交，其携带的旧代际均被 CAS 拦截拒绝；\n     7) 若恢复的数据包含已移入回收区超 7 天的便签，侧边栏回收区入口立即点亮琥珀色预警圆点，用户切入回收区视图时展示常驻过期横幅。\n\n9. **步骤 8（智能增量合并交互流）**：\n   - 用户点击【智能增量合并】；\n   - 系统在单个只读写事务 `[db.notes, db.meta]` 内执行：\n     1) 比对凭证 `targetState` 与本地当前状态；若不一致拦截并提示重新预览；\n     2) 逐条比对便签 ID：若本地已存在同 ID 记录，**严格保留本地当前记录**（忽略备份中同 ID 的冲突记录，不修改其版本），累计 `skippedConflictCount`；\n     3) 若本地不存在该 ID，将备份便签直接新增插入；\n     4) 本地代际 `libraryGeneration` 保持不变，本地写版本递增 `databaseWriteVersion = curWriteVer + 1`；\n     5) 提交事务，面板弹出提示：“数据合并完成：新增 X 条，保留本地冲突 Y 条”；\n     6) 若合并入库的新便签中含有超 7 天回收便签，即刻激活回收区过期预警。\n\n10. **步骤 9（取消导入与事务异常回滚流）**：\n    - 用户在预览阶段点击【取消】按钮，系统立即销毁内存中的 `ImportPreview` 凭证，关闭模态面板，本地数据零修改；\n    - 若导入写入过程中发生浏览器存储配额不足或底层 I/O 异常，Dexie 原生只读写事务全额回滚，本地数据保持导入前状态不变，面板展示明确错误原因与重试引导。",
+          "dependsOn": [
+            "feature-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form",
+            "evidence-c6993bbe-7ff2-4381-81dc-f2ff5195709e",
+            "evidence-6ddb77ee-acc4-4ae3-a560-e67f902a47ad",
+            "evidence-file-api",
+            "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-af1dd771-ece0-428f-8f91-91f8e2dc0b79"
+          ],
+          "id": "flow-data-portability",
+          "kind": "flow",
+          "requirementIds": [
+            "feature-data-portability"
+          ],
+          "stage": "product",
+          "title": "数据备份导出、导入预览凭证核对、冲突消解、草稿独立导出与防丢提醒交互流"
+        },
+        {
+          "content": "### 数据备份导出、强类型校验、导入预览凭证、覆盖/合并冲突恢复、草稿独立导出与防丢提醒开发任务\n\n1. **BackupManager 导出核心与格式规范实现**：\n   - 实现 `exportFullBackupJSON({ includeTrash?: boolean })`，组装符合 `BackupPayload` 规范的单一数据载荷；\n   - 默认导出包含处于回收区（`status === 'trashed'`）的便签，保留其 `trashedAt` 移入时间戳、`previousStatus` 与标签，并提供排除回收区选项；\n   - 规范文件名生成 `spark-notes-backup-YYYY-MM-DD.json`，基于 Blob 与 Object URL 触发下载；\n   - 实现 `exportMarkdownArchive()`，支持活跃与归档便签的批量 Markdown 格式导出，标签转换为 YAML FrontMatter。\n\n2. **SessionDraftManager 独立草稿导出与抢救模块实现**：\n   - 实现 `exportDraftToFile(noteId, currentLibraryGeneration, fallbackContent?)`；\n   - 将内存或 `sessionStorage` 中暂存的未保存草稿独立导出为 `spark-notes-draft-{noteId}-{YYYYMMDD-HHmmss}.json`；\n   - 声明 `SparkNotesSessionDraft` 独立 Schema，与数据库全量恢复文件严格区分，为配额满载或会话冲突提供安全抢救途径。\n\n3. **深度强类型 JSON Schema 校验器实现**：\n   - 实现 `validateBackupFile(file: File): Promise<ValidationResult>`；\n   - 校验 `schemaVersion === 1`、`app === 'SparkNotes'` 与 `notesCount === notes.length`；\n   - 逐条检验 Note 数组：UUID v4 格式校验、文件内 ID 唯一性校验、status/previousStatus/trashedAt 一致性校验、小写标签数组格式校验、revision 正整数校验；\n   - 校验 `meta.backupTracker`、`meta.tags` 与 `meta.appSettings` 字段类型；\n   - 校验失败抛出 `InvalidBackupPayloadError`，给出具体字段路径明细，拦截写入。\n\n4. **导入预览工单（ImportPreview）与写版本并发防御机制开发**：\n   - 实现 `previewImport(file: File): Promise<ImportPreview>`；\n   - 计算文件 SHA-256 签名，读取本地当前的 `libraryGeneration` 与 `databaseWriteVersion` 作为 `targetState` 快照依据；\n   - 在导入执行前同事务比对本地代际与写版本，变动时抛出 `ImportPreviewExpiredError`，零改动拒绝执行，要求用户重新预览。\n\n5. **覆盖与合并恢复原子事务开发**：\n   - 实现 `executeImportOverwrite(preview: ImportPreview): Promise<ImportResult>`：同一原子事务 `[db.notes, db.meta]` 内核验凭证、清空便签、批量写入、本地代际单调自增 `libraryGeneration = curGen + 1`、写版本自增 `databaseWriteVersion = curWriteVer + 1`，阻断陈旧会话；\n   - 实现 `executeImportMerge(preview: ImportPreview): Promise<ImportResult>`：同一事务内核验凭证、比对 ID、**明确保留本地同 ID 记录**、插入新 ID 记录、写版本自增；\n   - 超期回收便签即时感知：导入成功后若包含超 7 天回收便签，立即激活回收区侧边栏过期预警红点与常驻横幅。\n\n6. **温和防丢备份提醒状态机与界面集成**：\n   - 实体变更写事务中同步自增 `unbackedChangesCount`；\n   - 实现 `checkBackupReminderNeeded()`，依据 20 次变更或 7 天阈值计算提醒状态；\n   - 在侧边栏与数据管理模态面板中完整集成防丢提醒圆点、微文案与导出复位逻辑。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "feature-data-portability",
+            "flow-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form",
+            "evidence-c6993bbe-7ff2-4381-81dc-f2ff5195709e",
+            "evidence-6ddb77ee-acc4-4ae3-a560-e67f902a47ad",
+            "evidence-file-api",
+            "evidence-mdn-storage-eviction-01",
+            "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-af1dd771-ece0-428f-8f91-91f8e2dc0b79"
+          ],
+          "id": "task-data-portability",
+          "kind": "task",
+          "requirementIds": [
+            "feature-data-portability",
+            "flow-data-portability",
+            "interface-service-contracts",
+            "error-architecture-and-recovery"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "宿主浏览器支持标准 File, Blob, URL.createObjectURL 与 FileReader API",
+              "宿主浏览器 IndexedDB 事务支持原生原子回滚机制",
+              "本地时钟在单机环境下无剧烈大幅回拨（防御时钟异常保留在回收区）"
+            ],
+            "completionCriteria": [
+              "BackupPayload 往返测试通过率 100%（导出再导入无任何数据丢失与字段变形）",
+              "深度强类型校验拦截非法备份用例覆盖率 100%，无任何脏数据写入本地",
+              "导入预览凭证并发比对测试 100% 通过（代际或写版本变动零修改拒绝）",
+              "覆盖导入后旧代际会话保存拦截率 100%",
+              "合并导入保留本地同 ID 记录且计数准确测试通过",
+              "未保存草稿独立导出与防丢提醒状态机集成测试全部通过"
+            ],
+            "environment": "Chrome / Edge / Firefox 桌面及移动端现代浏览器，Node.js 18+ 开发构建环境",
+            "exclusions": "不搭建远程云端中心化存储同步，不将未保存草稿混入数据库正式备份，不使用临时内存快照代替持久化事务回滚，不将备份中的旧代际直接覆盖本地代际",
+            "failureBehavior": "上传损坏或非法备份文件由强校验器 100% 拦截并返回具体字段错误路径，本地数据保持不变；导入前写版本或代际变动抛出 ImportPreviewExpiredError 强行阻断并提示重新预览；事务执行异常由 Dexie 读写事务原生完整回滚，绝无半库残留；导出下载受阻时提供备用文本复制面板；sessionStorage 受限时自动提示手动草稿导出",
+            "goal": "交付符合强类型规范的标准 JSON/Markdown 备份导出（含回收区数据策略）、未保存草稿独立导出抢救、BackupPayload 深度强类型校验、基于单调 databaseWriteVersion 与 libraryGeneration 的导入预览凭证机制、原子性全量覆盖与增量合并恢复事务、超期回收便签即时警示及温和防丢提醒全套功能。",
+            "modules": [
+              "BackupManager",
+              "SessionDraftManager",
+              "DataManagementModal",
+              "StorageService",
+              "WorkspaceUI"
+            ],
+            "normalBehavior": "点击导出全量 JSON 备份生成规范 BackupPayload 并触发本地下载，未备份计数归零；支持排除回收区；未保存草稿可一键导出为独立草稿文件；导入文件强校验通过后生成只读 ImportPreview 凭证工单；覆盖恢复递增本地库代际使旧会话失效；合并恢复保留本地同 ID 并插入新记录；超 7 天回收便签导入即时激活过期横幅；累计 20 条变更侧边栏温和点亮防丢提示，导出后清零复位。",
+            "onFailure": "若导出 Blob 下载被浏览器拦截，在弹窗中直接提供格式化 JSON 文本供手动复制；若导入校验失败，高亮展示具体错误字段路径并保持本地数据完好；若凭证过期引导用户重新生成预览",
+            "passCriteria": [
+              "导出的 JSON 完全符合 BackupPayload 强类型 Schema，包含 trashedAt 与 previousStatus",
+              "自导出合法备份文件通过校验并能 100% 无损重新导入（Round-trip 通过）",
+              "覆盖恢复后本地 libraryGeneration 单调递增且旧会话保存被拒绝",
+              "合并恢复中同 ID 记录保留本地版本且新记录顺利写入",
+              "导入超期回收便签后立即激活侧边栏过期预警红点与常驻横幅",
+              "累计 20 次变更或 7 天未备份触发温和提示，导出后计数复位清零"
+            ],
+            "scope": "BackupManager 核心服务开发、SessionDraftManager 独立草稿导出模块开发、DataManagementModal 交互界面与状态机、深度强类型 Schema 校验器实现、导入预览凭证生成与并发写版本核验、覆盖与合并冲突原子事务实现、超期回收便签感知联动、未备份变更追踪器与温和防丢提醒状态机。",
+            "steps": [
+              "1. 编写 BackupManager 模块，实现 BackupPayload 组装、包含/排除回收区选项及 JSON/Markdown 导出逻辑",
+              "2. 开发 SessionDraftManager 独立草稿导出功能，提供 spark-notes-draft-{noteId}-{timestamp}.json 安全抢救通道",
+              "3. 实现深度强类型 Schema 校验器，涵盖版本、字段类型、UUID v4、status 枚举与时间戳合法性强校验",
+              "4. 实现 previewImport 预览凭证工单逻辑，绑定文件签名与本地代际及写版本快照凭证 targetState",
+              "5. 实现 executeImportOverwrite 与 executeImportMerge 原子读写事务，完成凭证比对、代际单调递增、同 ID 本地保留与 Dexie 原生事务回滚保证",
+              "6. 接入导入后超期回收便签即时感知逻辑，联动侧边栏过期红点与回收区常驻横幅展示",
+              "7. 开发 DataManagementModal 界面，集成导出配置、导入拖拽、预览卡片、覆盖/合并选择与错误明细面板",
+              "8. 接入未备份变更追踪状态机与温和防丢提醒圆点微文案，补充端到端单元测试与集成测试覆盖"
+            ],
+            "verification": [
+              "单元测试：BackupPayload 深度强类型 Schema 校验器（正例、缺字段、非法 UUID、未知扩展字段、非法 status、反向时间戳、标签非法等 100% 拦截）",
+              "单元测试：自导出 JSON 文件 100% 通过导入校验器，实现完备往返（Round-trip）",
+              "单元测试：覆盖导入事务测试（旧数据清空、新数据写入、本地 libraryGeneration 单调递增 +1、databaseWriteVersion 自增 +1、陈旧会话 expectedLibraryGeneration CAS 保存被拒绝）",
+              "单元测试：合并导入冲突测试（本地同 ID 记录严格保留、新 ID 记录正常插入、不更新已存在记录的 revision）",
+              "单元测试：导入预览凭证过期拦截测试（预览生成后本地执行一次 writeNote，随后 executeImportOverwrite 抛出 ImportPreviewExpiredError 并零修改）",
+              "单元测试：超 7 天回收便签导入即时激活侧边栏过期预警状态与回收区常驻横幅",
+              "单元测试：未保存草稿独立导出格式与恢复隔离性测试",
+              "单元测试：防丢提醒计数状态机（20 次变更 / 7 天未备份触发，导出后归零）"
+            ]
+          },
+          "title": "数据备份导出、强类型校验、导入预览凭证、覆盖/合并冲突恢复、草稿独立导出与防丢提醒开发任务"
+        },
+        {
+          "content": "### 数据备份导出、强类型校验、导入快照凭证与防丢提醒验收标准（Given / When / Then）\n\n- **场景 1：标准 JSON 全量导出包含回收区便签与排除选项往返一致性**\n  - **Given** 本地数据库存有 15 条活跃便签、5 条归档便签以及 5 条处于回收区的便签（其中完整包含有效的 `trashedAt` 移入时间戳与 `previousStatus`），\n  - **When** 用户打开数据管理面板并点击“导出全量 JSON 备份”（保持默认勾选“包含回收区便签”），\n  - **Then** 系统生成符合 `BackupPayload` 规范且 `schemaVersion` 固定为 1 的 JSON 文件并触发下载，文件内包含全部 25 条记录与完整的元数据快照；若用户取消勾选该项后导出，产物中仅包含 20 条活跃与归档便签，回收区便签被彻底排除。导出的备份文件重新执行导入强校验，校验器 100% 通过且字段无损还原，达成完备往返（Round-trip）一致性。\n\n- **场景 2：非法/畸形备份文件深度强类型 Schema 校验拦截防污染**\n  - **Given** 用户尝试上传一份篡改过的备份文件（例如缺失 `schemaVersion`、单条记录 `id` 非标准 UUID v4、`status` 包含未知枚举、或 `trashedAt` 字段类型为非法非数字），\n  - **When** 系统执行 `validateBackupFile(file)` 强类型校验，\n  - **Then** 系统立即抛出 `InvalidBackupPayloadError`，弹窗明确呈现红色错误信息及具体的错误字段路径，底层持久化层绝对不开启写事务，本地现有便签数据完整无损。\n\n- **场景 3：导入预览凭证生成与本地并发写版本变更过期防御**\n  - **Given** 用户上传一份合法的备份文件，系统校验通过并生成包含 `fileSignature` 与快照 `targetState: { libraryGeneration: 1, databaseWriteVersion: 10 }` 的 `ImportPreview` 凭证；在用户审阅预览期间，另一个标签页或主界面触发了一次便签创建使得本地 `databaseWriteVersion` 递增至 11，\n  - **When** 用户在预览面板点击确认执行导入（无论覆盖或合并），\n  - **Then** 在导入读写事务中比对快照发现 `curWriteVer (11) !== targetState.databaseWriteVersion (10)`，系统立即终止事务并抛出 `ImportPreviewExpiredError`，弹窗提示“导入预览已失效：本地数据在预览期间已发生更新，请重新生成预览后操作”，本地数据库保持零修改。\n\n- **场景 4：全量覆盖导入原子事务与本地库代际单调递增失效隔离**\n  - **Given** 用户本地数据库存在 10 条旧便签（本地库代际 `libraryGeneration = 1`），且后台有一个正打开编辑便签 A 的旧编辑会话（持有代际 1 与 `expectedRevision = 2`）；用户导入一份包含 20 条新便签的合法备份并确认执行全量覆盖恢复，\n  - **When** 系统执行 `executeImportOverwrite` 事务，\n  - **Then** 同一读写事务 `[db.notes, db.meta]` 内原数据全部清空并写入 20 条新便签，本地库代际单调递增至 `libraryGeneration = 2`（绝不使用备份中的旧代际），`databaseWriteVersion` 递增 1；当旧编辑会话尝试提交保存便签 A 时，存储层比对代际发现不匹配，坚决拒绝保存并抛出 `LibraryGenerationMismatchError`，旧编辑会话绝无法以旧 revision 复活已覆盖记录。\n\n- **场景 5：智能增量合并保留本地同 ID 冲突记录与新记录插入**\n  - **Given** 本地存在便签 B（ID 为 uuid-b，内容为本地最新修改版），上传的备份文件中同样包含 ID 为 uuid-b 的记录（内容为旧版）以及一条全新便签 C（ID 为 uuid-c），\n  - **When** 用户选择“智能增量合并”并确认执行，\n  - **Then** 事务提交后，本地便签 B 的内容与 revision 完整保留不变，跳过备份中同 ID 的冲突记录（`skippedConflictCount = 1`）；新便签 C 被顺利插入库中；界面提示“数据合并完成：新增 1 条，保留本地冲突 1 条”。\n\n- **场景 6：导入超 7 天回收便签即时激活侧边栏过期预警与常驻横幅**\n  - **Given** 用户执行增量合并导入，备份文件中包含 2 条处于回收区且 `Date.now() - trashedAt >= 604,800,000`（超 7 天）的便签记录，\n  - **When** 合并事务成功提交，\n  - **Then** 系统在事务提交后立即执行超期检测，主工作区侧边栏【回收区】入口即刻点亮琥珀色过期预警圆点；用户切入回收区视图时，顶部常驻琥珀色横幅醒目提示“有 2 条便签已超过 7 天保留期限”，提供清空操作。\n\n- **场景 7：未保存会话草稿独立导出抢救与会话隔离**\n  - **Given** 用户在详情编辑器中输入了长文本灵感但尚未点击保存，因配额满载或意外冲突导致无法存入数据库，\n  - **When** 用户点击编辑器底部的【导出当前草稿】独立操作，\n  - **Then** 系统直接从内存或 `sessionStorage` 读取当前草稿并触发下载 `spark-notes-draft-{noteId}-{timestamp}.json` 文件；该文件独立包含草稿原文、noteId、libraryGeneration 与 baseRevision，供用户手动抢救，不属于数据库备份，亦不会与数据库全量恢复格式相混淆。\n\n- **场景 8：累计 20 次变更或 7 天未备份温和防丢提醒与一键导出清零**\n  - **Given** 用户累计执行了 20 次便签新增、编辑、归档或移入回收区操作，使得元数据 `unbackedChangesCount` 达到 20，\n  - **When** 第 20 次写操作事务提交完成，\n  - **Then** 侧边栏底部温和点亮琥珀色小圆点并展示微文案“有未备份灵感 [立即导出]”，不弹出任何打断式模态框；用户点击“立即导出”后直接触发全量 JSON 备份下载，下载成功后同事务内将 `unbackedChangesCount` 复位为 0 并更新 `lastBackupAt = Date.now()`，侧边栏提示点与微文案立即复位隐藏。",
+          "dependsOn": [
+            "task-data-portability"
+          ],
+          "evidenceIds": [
+            "evidence-platform-form",
+            "evidence-file-api",
+            "evidence-6ddb77ee-acc4-4ae3-a560-e67f902a47ad",
+            "evidence-c6993bbe-7ff2-4381-81dc-f2ff5195709e",
+            "evidence-cdc2a53a-bffa-464b-8462-2e4714cea48d",
+            "evidence-f54d9512-0313-47b4-b89b-a75fa782b2be",
+            "evidence-af1dd771-ece0-428f-8f91-91f8e2dc0b79"
+          ],
+          "id": "acceptance-data-portability",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-data-portability",
+            "flow-data-portability"
+          ],
+          "stage": "delivery",
+          "title": "数据备份导出、强类型校验、导入快照凭证与防丢提醒验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [
+        "work-item-core-architecture-and-contracts",
+        "work-item-note-cards-and-trash-lifecycle"
+      ],
+      "id": "task-5d884b34-43a6-40b8-82e1-93255743d763-data-portability-and-backup",
+      "impact": "完善纯前端单页应用的数据安全闭环，建立强类型 BackupPayload 往返保证与导入预览快照凭证机制，严格通过本地库代际（libraryGeneration）单调递增与写版本（databaseWriteVersion）CAS 防御并发写覆盖与陈旧编辑会话复活，明确同 ID 合并保留本地冲突规则，提供未保存草稿独立导出抢救通道与非侵入式温和防丢提醒，彻底杜绝数据脏写与意外丢失。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "本地数据备份导出、恢复凭证校验、草稿独立导出与防丢提醒设计规范"
+    }
+  ],
+  "questions": [],
+  "summary": "完成了本地数据便携性与备份恢复分区的全套设计与契约细化。基于最新自动质量验收反馈，严格定义了强类型 BackupPayload 结构与往返一致性保证（支持完整往返 notes/appMeta/backupTracker/tags/回收字段）；设计了基于本地单调 databaseWriteVersion 与 libraryGeneration 的导入预览工单（ImportPreview）快照凭证机制，有效防止并发写覆盖并杜绝状态依据碰撞；明确了全量覆盖恢复自增本地库代际以失效陈旧编辑会话的隔离机制、增量合并中同 ID 冲突明确保留本地版本的规则、未保存会话草稿（SessionDraft）独立导出抢救通道、超期回收便签即时警示联动，以及累计 20 次变更或 7 天未备份的温和防丢提醒状态机，全套交付任务与可观测验收标准（Given/When/Then）均已闭合。",
+  "workItems": []
+}

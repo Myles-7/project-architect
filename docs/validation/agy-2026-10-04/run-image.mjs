@@ -1,0 +1,12 @@
+import { resolve } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { AntigravityCliProvider } from '../../../packages/agent/dist/provider/AntigravityCliProvider.js';
+import { preparePlanningWorkspace } from '../../../packages/agent/dist/tools/PlanningToolsMcpServer.js';
+const root=resolve('docs/validation/agy-2026-10-04');
+const cwd=resolve(root,'worker'); const materials=resolve(root,'materials');
+await preparePlanningWorkspace({materialRoots:[materials],materials:[{id:'input-01',path:resolve(materials,'fixture.png'),mimeType:'image/png'}],experimentRoot:resolve(root,'experiments'),evidenceRoot:resolve(root,'evidence')},cwd);
+const schema=resolve(root,'image.schema.json');
+await writeFile(schema,JSON.stringify({type:'object',properties:{text:{type:'string'},left_shape:{type:'string'},right_shape:{type:'string'}},required:['text','left_shape','right_shape'],additionalProperties:false}));
+const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),120000);
+const result=await new AntigravityCliProvider().complete({requestId:'actual-image-2026-10-04',task:'planning-task',model:'gemini-3.1-pro-high',reasoningEffort:'high',cwd,logPath:resolve(root,'image-stream.ndjson'),schemaPath:schema,prompt:'Use material_image on registered input-01. Inspect the actual image pixels. Return the text exactly and identify the left and right shapes and colors. Do not infer from filenames; the path names carry no answer. Call the tool before answering.',contextText:'Registered material index: input-01 (PNG). This is an isolated capability test with synthetic public data.',abortSignal:controller.signal});
+clearTimeout(timer); await writeFile(resolve(root,'image-result.json'),JSON.stringify(result,null,2)); console.log(JSON.stringify(result,null,2));

@@ -1,0 +1,250 @@
+{
+  "blockers": [
+    "【痛点4缺失缺口】先前草案在 block-problem-fragmented-ideas 中仅保留了3个痛点，丢失了原正式批准的核心痛点“无序堆积导致灵感沉没与查找困难”，影响到标签过滤、全文检索与置顶收藏的价值闭环依据。依据：feedback 输入 11aa9e60-8bcb-4731-b3b3-79511d6ae147 第1项明确要求恢复4个痛点。受影响块 ID：block-problem-fragmented-ideas，留待 product-foundation 范围独立处理。",
+    "【非目标界定与快捷键统一缺口】block-non-goals-exclusions 需明确界定“不做复杂树形文件夹/无限层级嵌套”与“不做重量级 WYSIWYG 富文本排版编辑器”；受影响块 ID：block-non-goals-exclusions 留待 product-foundation 范围处理。本范围已完全落实全字段提交快捷键统一为 Ctrl/Cmd+Enter，消除回车直接保存。",
+    "【接口定义与元数据完整性缺口】interface-service-contracts 缺少 requestPersistence()、isPersisted()、detectPrivateMode()、checkBackupReminderNeeded() 契约；缺少 AppMeta {key, value, updatedAt} 与 libraryGeneration 结构定义；saveNote 需强制必填 expectedRevision，在同事务 CAS（get→比较→put）中执行，且对新创建与编辑更新进行严格方法分离（独立 createNote 动作，禁止 upsert 隐式复活已删除便签）。受影响块 ID：interface-service-contracts, data-model-core-entities, task-foundation-and-storage, acceptance-foundation-and-storage，留待 tech-and-storage 范围处理。",
+    "【隐私模式探测的客观技术边界】detectPrivateMode 在现代浏览器（Chrome/Safari/Firefox）中缺乏标准 Web API 支持，属于启发式尽力探测（best-effort heuristic detection）与待验证能力，不能宣称能 100% 识别所有浏览器隐私模式。受影响块 ID：interface-service-contracts, acceptance-foundation-and-storage, val-storage-and-search-benchmark，留待 tech-and-storage 与 benchmark 范围处理。",
+    "【备份往返与草稿隔离契约缺口】BackupPayload 需完整列明元数据字段（appMeta, backupTracker, libraryGeneration, tags, notes）及各字段严格类型校验规则；需提供独立的“导出当前未保存草稿”动作；sessionStorage 需按 spark_draft_${libraryGeneration}_${noteId} 进行隔离，并诚实说明其在标签页彻底关闭后无法恢复的平台限制。受影响块 ID：feature-data-portability, flow-data-portability, task-data-portability, acceptance-data-portability, error-architecture-and-recovery，留待 data-portability 范围处理。",
+    "【回收区 7 天到期规则的精确判定与 Given/When/Then 细化】需以 RETENTION_MS = 604,800,000 ms（>= 边界）定义超期判定；跨到期停留自动标注超期但严禁暗删；清理需二次确认后物理删除；重复删除不得重置 trashedAt；并发竞争禁止复活已删除便签。受影响块 ID：feature-note-card-view, flow-note-card-actions, task-note-card-view, acceptance-note-card-view，留待 feed-and-lifecycle 范围处理。",
+    "【冷启动与检索时延度量标准闭合】冷启动必须统一度量起点为导航起始（navigationStart / PerformanceNavigationTiming.startTime 0），首屏可交互 TTI 目标 <= 1.0s，不能从骨架屏消失起算；检索必须从敲击开始含 80ms 防抖及 DOM 渲染完成，P95 <= 150ms。受影响块 ID：block-outcomes-lightweight-experience, tech-storage-and-search, val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark，留待 tech-and-storage 与 benchmark 范围处理。",
+    "【验证任务状态诚实化】当前规划环境 Docker 不可用（experiment:experiment-b9b1a21e-9aab-4135-8bb0-2c8df23bc5b0 / experiment-c122c3c2-4830-486d-853c-5cfd6083dd52 状态为 unavailable），目标应用及 CodingAgent 尚未开发，所有性能基准、跨浏览器（Safari 17+）兼容性及隐私模式实测任务必须如实标为 unexecuted，在交付任务中说明失败后影响与修订路径，不可冒充已实测通过。受影响块 ID：val-storage-and-search-benchmark, acceptance-storage-and-search-benchmark，留待 benchmark 范围处理。"
+  ],
+  "clarification": null,
+  "evidence": [
+    {
+      "applicability": "证明用户原始需求为个人随手记录与整理小工具，不包含团队协作、云端数据库或系统全局唤起等扩张范围。",
+      "content": "我想做一个帮自己整理随手灵感的小工具。",
+      "hash": "45c08b7f2b5c515d8c6b0ef80008a07ae6cd96861d4442b60f14b59e76dff25a",
+      "id": "evidence-raw-input-inp-01",
+      "kind": "material",
+      "obtainedAt": "2026-10-05T01:46:52.979Z",
+      "source": "material:input:inp-01"
+    },
+    {
+      "applicability": "MDN KeyboardEvent 官方规范，用于规范详情弹窗内的键盘交互、Escape 拦截与 Ctrl/Cmd+S / Ctrl/Cmd+Enter 组合快捷键监听。",
+      "content": "The KeyboardEvent interface provides information about the keyboard events that occur when users interact with keyboards. key returns a string representing the key value; ctrlKey and metaKey indicate whether modifier keys are active.",
+      "hash": "09400264cd4765c6dd4000ceb7d9f74e8ad621447268dad8b15568ebbee75ab6",
+      "id": "evidence-mdn-keyboard-event",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T01:47:25.502Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent"
+    },
+    {
+      "applicability": "MDN Clipboard.writeText API 规范，用于规范便签详情中 Markdown 代码块的一键复制能力与权限受限时的降级策略。",
+      "content": "The writeText() method of the Clipboard interface writes the specified text string to the system clipboard, returning a Promise that resolves once the clipboard's contents have been updated.",
+      "hash": "74e65b4f74d40384b532ad4c3e879a4435b21f92e46be941adbe065ef732119b",
+      "id": "evidence-mdn-clipboard-writetext",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T01:47:36.840Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText"
+    },
+    {
+      "applicability": "MDN XSS 安全防护规范，为便签详情中引入 marked 解析配合 DOMPurify 进行 HTML 白名单消毒（防范恶意脚本注入）提供权威安全依据。",
+      "content": "Cross-site scripting (XSS) is a security vulnerability allowing attackers to inject malicious scripts into trusted websites. Sanitizing user input and escaping characters helps mitigate XSS risks.",
+      "hash": "b395f74705378800d7ce1b04764a48b9b2d57d049e00f22d1fb14f9dbc45c1c2",
+      "id": "evidence-mdn-cross-site-scripting",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-05T01:47:43.672Z",
+      "source": "https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting"
+    },
+    {
+      "applicability": "W3C IndexedDB 规范，确立在同事务（readwrite transaction）内进行 get->比较->put 的 CAS 乐观并发控制机制，为详情保存时的 expectedRevision 冲突检测提供规范依据。",
+      "content": "This document defines APIs for a database of records holding simple values and hierarchical objects. Each record consists of a key and some value... An application developer directly uses an API to locate records either by their key or by using an index.",
+      "hash": "c3a5c1e003fc2f7fa8d27ea2dc6b2e2e097b49aa81d8b138543c8725004e8536",
+      "id": "evidence-w3c-indexeddb-spec",
+      "kind": "official-source",
+      "obtainedAt": "2026-10-04T23:48:50.348Z",
+      "source": "https://www.w3.org/TR/IndexedDB/"
+    },
+    {
+      "applicability": "真实证明当前规划环境 Docker 守护进程不可用，目标前端应用与无头浏览器测试尚未开发，详情模态弹窗与多标签页并发冲突自动化测试必须实事求是标为 unexecuted，列入交付验证任务。",
+      "content": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+      "environment": "{\"runtime\":\"node\",\"image\":\"node:24.13.0-bookworm-slim\",\"network\":\"none\"}",
+      "hash": "05c493ae223c763264c8c108dac11103935f47ed7d712aca45bfd1b7d827a9ef",
+      "id": "evidence-experiment-docker-unavailable",
+      "kind": "experiment",
+      "obtainedAt": "2026-10-05T01:47:55.435Z",
+      "outcome": "unexecuted",
+      "source": "experiment:experiment-b9b1a21e-9aab-4135-8bb0-2c8df23bc5b0"
+    }
+  ],
+  "followUp": [
+    {
+      "goal": "在交付阶段通过真实浏览器自动化测试验证 DOMPurify 对复杂 SVG/HTML5 XSS 向量的完全过滤，以及 Prism 代码块一键复制在不同浏览器权限模型下的兼容性。",
+      "kind": "validation"
+    }
+  ],
+  "groups": [
+    {
+      "blocks": [
+        {
+          "content": "### 便签详情模态展示与 Markdown 实时编辑功能（回收区只读保护、并发冲突消解与明确保存/放弃拦截）\n\n1. **沉浸式居中模态弹窗排版**：\n   - 用户在主工作区（全部/收藏/归档）或回收区卡片流中点击卡片主体，平滑展开居中模态弹窗（桌面端适配宽度 720px，移动端宽度 95vw，最大高度 85vh）。\n   - 顶部工具栏展示便签创建时间与最后更新时间戳（精确至分），右侧常驻【置顶】、【加星收藏】、【阅读/编辑模式切换】按钮及右上角显式【关闭 (×)】按钮。\n   - 快捷键体系：全字段提交快捷键统一为 `Ctrl/Cmd + S` 或 `Ctrl/Cmd + Enter`（消除回车直接保存，避免换行误触）；按键 `Escape` 触发关闭逻辑。\n\n2. **严格禁止所有关闭动作一律静默自动保存（脏数据拦截机制）**：\n   - 彻底废除任何点击遮罩或关闭按钮时的静默自动保存行为。\n   - 当用户触发关闭操作（点击右上角 `×`、按下键盘 `Escape`、或点击弹窗背景遮罩 Backdrop）时，系统自动执行脏数据比对（比对当前编辑器正文与打开时的基准正文 `initialContent` 是否一致）：\n     * **若无修改（未发生任何编辑）**：直接平滑关闭模态弹窗，不产生任何数据写入，不递增 revision；\n     * **若存在修改（存在未保存脏数据）**：系统立即拦截关闭动作，阻断弹出居中模态二次确认对话框：“当前便签有未保存的修改，是否确定放弃？”，提供三项明确操作：\n       1. **【保存并退出】**：立即调用 `saveNote` 发起 CAS 保存，成功后关闭弹窗；若保存失败则弹窗保持开启并保留草稿；\n       2. **【放弃修改并退出】**：确认丢弃本次编辑，清除当前便签在 sessionStorage 的临时隔离草稿，弹窗关闭，底层数据库记录保持原有内容与版本不变；\n       3. **【继续编辑】**：关闭拦截确认对话框，模态弹窗保持开启，光标保持在编辑器原位，继续编辑。\n\n3. **回收区便签强制只读保护（Read-only Protection）**：\n   - 若当前打开的便签处于回收区（`status === 'trashed'`），弹窗强制以只读预览模式展示，严禁任何形式的编辑与状态篡改：\n     * 正文 Textarea 完全隐藏或渲染为只读锁定状态（`readOnly={true}`），标签输入栏禁用；\n     * Markdown 预览中的 GFM 任务清单复选框（`<input type=\"checkbox\">`）强制置灰禁用（`disabled={true}`），禁止任何点击勾选交互；\n     * 弹窗顶部常驻展示醒目的琥珀色警示横幅：“当前便签处于回收区，仅供只读预览，无法直接编辑。”；\n     * 底部工具栏隐藏【保存】按钮，替换为明确的【还原便签】与【彻底删除】两个操作：点击【还原便签】调用 `restoreNote(id, expectedRevision)` 按 `previousStatus` 恢复；点击【彻底删除】弹出二次确认对话框，确认后在单原子事务中物理永久删除。\n\n4. **多标签页并发版本冲突检测与三向消解横幅（Concurrent Conflict Handling）**：\n   - 保存时严格携带 `expectedRevision` 与当前会话绑定的 `sessionGeneration`。\n   - 若底层存储检测到 `db.revision !== expectedRevision`（其他标签页已修改并提交了该便签）：\n     * 编辑模态弹窗绝对不关闭，正文与标签 100% 完整保留在编辑框内，禁止脏覆盖写入；\n     * 弹窗顶部浮出黄色并发冲突警示横幅：“检测到此便签已在其他标签页被修改（当前最新版本 v{currentRevision}，本地基准版本 v{expectedRevision}）”，横幅内提供三项明确消解分支：\n       1. **【强制覆盖】（Force Overwrite）**：弹出二次确认警告“覆盖将丢失其他标签页保存的内容”，用户确认后，以刚获取的最新 `currentRevision` 再次执行 CAS 保存，若期间又被修改则再次报冲突拦截；\n       2. **【放弃修改加载最新】（Discard and Reload）**：丢弃本地修改草稿，将编辑器内容更新为数据库最新正文，并将本地 expectedRevision 更新为最新 revision；\n       3. **【另存为新便签（保留副本）】（Save as Copy）**：保留当前用户编辑的正文草稿，调用 `createNote` 独立新建便签（生成全新 UUID，revision=1，status='active'），原便签保持数据库当前最新内容不变，保存成功后关闭弹窗并 Toast 提示“已另存为新便签副本”。\n   - 若保存时检测到 `sessionGeneration !== currentLibraryGeneration`（说明其他标签页执行了全量覆盖导入或清库）：\n     * 弹窗顶部浮出红色警示横幅：“检测到本地数据库已在其他标签页被全量导入覆盖，当前编辑会话已失效”，严格拦截写入，提供【导出当前草稿为文件】与【关闭】入口。\n   - 若保存时遇到 `NoteNotFoundError`（说明便签已在其他标签页被彻底物理删除）：\n     * 严禁通过 upsert 方式隐式复活！提示“该便签已被彻底删除”，保留当前文本，提供【另存为新便签】与【导出草稿为文件】入口。\n\n5. **Markdown 安全渲染、任务清单复选框交互与 Prism 代码块一键复制**：\n   - 采用 marked 解析 Markdown 语法，配合 DOMPurify 执行白名单消毒，彻底过滤 `<script>`, `onerror`, `javascript:` 等恶意 XSS 脚本注入。\n   - **GFM 任务清单交互（仅限活跃与归档便签）**：在阅读模式下点击任务清单复选框，直接识别并反转对应行 Markdown 语法（`- [ ]` 与 `- [x]`），在单事务 CAS 中自增更新（校验 `expectedRevision`，`revision += 1`，`updatedAt = Date.now()`）；若发生并发冲突同样触发冲突横幅。\n   - **Prism 代码块高亮与复制**：自动高亮常见编程语言（JavaScript, TypeScript, Python, HTML, CSS, JSON, Markdown, Bash 等），代码块右上角浮动提供【复制】按钮，点击调用 `navigator.clipboard.writeText` 写入剪贴板，按钮瞬时反馈“已复制 ✓”并在 2000ms 后复位；权限受限时降级为选中全部代码文本。\n\n6. **存储配额满载降级与会话草稿保护**：\n   - 若保存时抛出 `StorageQuotaExceededError`（配额满或写入异常）：\n   - 编辑弹窗绝对不关闭，正文与标签 100% 完整保留在编辑框中，光标与滚动位置不重置；\n   - 本地自动将草稿按 `spark_draft_${libraryGeneration}_${noteId}` 隔离暂存至当前标签页 `sessionStorage`；\n   - 弹窗顶部浮出琥珀色告警横幅，提供【复制草稿到剪贴板】、【导出当前未保存草稿】独立文件（`.sparkdraft.json`）与【重试保存】入口；\n   - 诚实界定平台生命周期边界：`sessionStorage` 仅保障当前会话与刷新，标签页完全关闭后不可恢复，绝不作“100%保证不丢”的夸大承诺，引导用户手动导出草稿。",
+          "dependsOn": [
+            "page-main-workspace",
+            "feature-quick-capture"
+          ],
+          "evidenceIds": [
+            "evidence-raw-input-inp-01",
+            "evidence-mdn-cross-site-scripting",
+            "evidence-mdn-clipboard-writetext",
+            "evidence-mdn-keyboard-event",
+            "evidence-w3c-indexeddb-spec"
+          ],
+          "id": "feature-note-detail-edit",
+          "kind": "feature",
+          "requirementIds": [
+            "block-scope-core-boundaries"
+          ],
+          "stage": "product",
+          "title": "便签详情模态展示与 Markdown 实时编辑功能（回收区只读保护）"
+        },
+        {
+          "content": "### 详情浏览、Markdown 解析、保存与放弃拦截及并发冲突消解交互流\n\n1. **展开详情模态弹窗交互**：\n   - 用户在主工作区（全部/收藏/归档）或回收区卡片流中，点击任意便签卡片主体区域；\n   - 系统捕获便签 ID，从本地状态/IndexedDB 读取便签实体，挂载详情弹窗组件；记录当前打开时的 `initialContent = note.content`，基准版本号 `baseRevision = note.revision`，绑定当前库代际 `sessionGeneration`；\n   - 判断 `note.status`：\n     * 若 `note.status === 'trashed'`：进入**只读预览模式**，隐藏编辑输入框，禁用任务清单复选框，顶部显示回收区警示横幅，底部展示【还原便签】与【彻底删除】；\n     * 若 `note.status !== 'trashed'`：根据用户偏好或便签长度默认进入阅读模式或实时分栏/编辑模式，支持自由切换。\n\n2. **Markdown 渲染、代码复制与任务勾选交互流**：\n   - 文本经 marked 编译后由 DOMPurify 白名单过滤输出安全 HTML；\n   - 若包含代码块，Prism.js 高亮渲染并在块右上角悬浮【复制】按钮；用户点击【复制】触发 `navigator.clipboard.writeText`，按钮文字变为“已复制 ✓”，2000ms 后恢复；\n   - 用户在阅读模式下点击任务清单复选框 `[ ]`：\n     * 系统更新当前行 Markdown 标记为 `[x]`（或反之）；\n     * 自动发起带 `expectedRevision = baseRevision` 的单事务 CAS 保存；\n     * 保存成功：`baseRevision` 递增 +1，UI 呈现勾选状态，未备份计数 +1；\n     * 若检测到冲突：弹窗阻断，浮出黄色冲突横幅供消解。\n\n3. **编辑内容与显式保存交互流**：\n   - 用户在编辑框输入或修改文字，实时提取 `#标签`；\n   - 用户按下快捷键 `Ctrl/Cmd + S` 或 `Ctrl/Cmd + Enter`，或点击弹窗底部【保存并退出】按钮：\n     * 前端校验输入非空（若为空提示“便签内容不能为空”并抖动）；\n     * 发起调用 `IStorageService.saveNote(note, baseRevision, sessionGeneration)`；\n     * **分支 A（保存成功）**：写入 IndexedDB 成功，更新 `updatedAt = Date.now()`, `revision = baseRevision + 1`；清空 sessionStorage 中对应的临时草稿，关闭详情弹窗，主工作区卡片流响应式刷新；\n     * **分支 B（并发版本冲突）**：`conflict: true`，弹窗保持开启，文字不丢失，顶部浮出黄色并发冲突横幅，提供三项消解分支：\n       - 点击【强制覆盖】：弹出二次确认，确认后以 `currentNote.revision` 再次执行 CAS 保存；\n       - 点击【放弃修改加载最新】：清空本地未保存修改，重新载入数据库最新记录，更新 `baseRevision`；\n       - 点击【另存为新便签】：调用 `createNote` 独立创建新便签，原便签保持不变，保存成功后关闭弹窗并提示副本已创建；\n     * **分支 C（代际失效）**：`generationMismatch: true`，弹窗保持开启，浮出红色代际失效横幅，禁止写入，提供【导出当前草稿为文件】与【关闭】；\n     * **分支 D（便签已被物理删除）**：抛出 `NoteNotFoundError`，禁止 upsert 复活，提示“便签已被彻底删除”，提供【另存为新便签】与【导出草稿为文件】；\n     * **分支 E（配额超限/写入失败）**：弹窗绝对不关闭，文字 100% 保留，草稿按 `spark_draft_${sessionGeneration}_${noteId}` 隔离暂存至 sessionStorage，弹出琥珀色告警并提供【复制草稿到剪贴板】、【导出当前未保存草稿】与【重试保存】。\n\n4. **关闭与退出交互流（严格禁止静默自动保存）**：\n   - 用户点击右上角 `×`、按下键盘 `Escape`、或点击背景遮罩层（Backdrop）：\n     * 系统比对 `currentContent === initialContent` 且标签未变：\n       - 若无修改：直接平滑关闭模态弹窗，无任何额外弹窗；\n       - 若存在修改（脏数据）：**立即拦截关闭**，弹出居中二次确认对话框：“当前便签有未保存的修改，是否确定放弃？”：\n         * 点击【放弃修改】：丢弃所有修改，清除当前草稿缓存，弹窗关闭，数据库数据完好无损；\n         * 点击【继续编辑】：关闭确认框，焦点重回编辑器，保留全部修改内容；\n         * 点击【保存并退出】：触发保存交互流（步骤 3）。\n\n5. **回收区只读状态流转交互流**：\n   - 在回收区便签详情弹窗中：\n     * 点击【还原便签】：调用 `restoreNote(note.id, baseRevision)`，便签按 `previousStatus` 恢复至主工作区（活跃或归档），清空 `trashedAt`，关闭详情弹窗并 Toast 提示“已成功还原”；\n     * 点击【彻底删除】：弹出阻断式二次确认弹窗“彻底删除后无法恢复，确定删除？”，用户点击确认后调用 `hardDeleteNote(note.id)` 执行物理删除并关闭弹窗；用户点击取消则保持只读弹窗开启。",
+          "dependsOn": [
+            "feature-note-detail-edit",
+            "page-main-workspace"
+          ],
+          "evidenceIds": [
+            "evidence-raw-input-inp-01",
+            "evidence-mdn-cross-site-scripting",
+            "evidence-mdn-clipboard-writetext",
+            "evidence-mdn-keyboard-event",
+            "evidence-w3c-indexeddb-spec"
+          ],
+          "id": "flow-note-detail-edit",
+          "kind": "flow",
+          "requirementIds": [
+            "feature-note-detail-edit"
+          ],
+          "stage": "product",
+          "title": "详情浏览、Markdown 解析与编辑保存交互流"
+        },
+        {
+          "content": "开发并落地便签详情居中模态弹窗（NoteDetailModal）、轻量 Markdown 渲染器（marked + DOMPurify 安全白名单消毒）、Prism.js 代码块语法高亮与一键复制功能；严格实现禁止任何关闭动作一律静默自动保存，提供明确的保存并退出、放弃修改（二次确认拦截）与继续编辑；落地回收区便签强制只读预览保护与任务清单复选框禁用；实现基于 expectedRevision 与 libraryGeneration 的同事务 CAS 多标签页并发冲突拦截与三向消解横幅（强制覆盖二次确认、放弃修改加载最新、另存为新便签副本）；实现便签已被物理删除时的防 upsert 复活拦截；落地配额超限时的 sessionStorage 隔离暂存与独立草稿导出入口。",
+          "dependsOn": [
+            "task-foundation-and-storage",
+            "feature-note-detail-edit",
+            "flow-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-raw-input-inp-01",
+            "evidence-mdn-cross-site-scripting",
+            "evidence-mdn-clipboard-writetext",
+            "evidence-mdn-keyboard-event",
+            "evidence-w3c-indexeddb-spec",
+            "evidence-experiment-docker-unavailable"
+          ],
+          "id": "task-note-detail-edit",
+          "kind": "task",
+          "requirementIds": [
+            "feature-note-detail-edit",
+            "flow-note-detail-edit",
+            "interface-service-contracts",
+            "data-model-core-entities"
+          ],
+          "stage": "delivery",
+          "task": {
+            "assumptions": [
+              "运行环境支持标准 DOM 与 ES2022+ 特性",
+              "现代浏览器支持 navigator.clipboard.writeText（非安全上下文自动降级）",
+              "marked 与 DOMPurify 依赖包已正确安装且体积优化控制在轻量基准"
+            ],
+            "completionCriteria": [
+              "DOMPurify 安全白名单 XSS 过滤防护通过率 100%",
+              "有未保存修改时关闭拦截二次确认率 100%，无修改直接关闭无阻断",
+              "回收区便签详情只读保护符合率 100%，任务复选框禁用率 100%",
+              "多标签页 revision 并发冲突检测拦截率 100%，三向消解分支交互完整闭环",
+              "便签被删除时禁止 upsert 隐式复活测试通过率 100%",
+              "配额满时文字草稿 100% 留存，弹窗不关闭且 sessionStorage 隔离暂存"
+            ],
+            "environment": "Chrome 120+ / Edge 120+ / Firefox 122+ / Safari 17+ 桌面浏览器环境，Node 18+ / Vitest 测试环境",
+            "evidenceRequired": [
+              "Vitest 组件单元与集成测试报告",
+              "DOMPurify XSS 注入防御测试日志",
+              "并发冲突三向消解交互测试日志"
+            ],
+            "exclusions": "不包含外部全量 JSON 导入导出与防丢提醒面板（由 DataPortability 模块负责），不包含全局标签侧边栏多选面板（由 TagOrganization 模块负责），不包含桌面/系统级脱离浏览器的全局快捷键实现。",
+            "failureBehavior": "保存时遇到 revision 不一致立即返回 conflict 拦截脏写，弹窗保持开启且正文文字 100% 完整保留，浮出黄色冲突横幅提供强制覆盖、放弃加载最新与另存为新便签；遇到代际不匹配拦截写入并提示全量导入代际失效；便签在数据库中不存在时禁止 upsert 隐式复活并提示彻底删除；配额超限时弹窗不关闭，正文暂存至 sessionStorage 并弹出复制与导出草稿入口；代码复制权限被拒绝时降级为选中全部代码文本。",
+            "goal": "开发并落地便签详情居中模态弹窗（NoteDetailModal）、轻量 Markdown 渲染器（marked + DOMPurify 安全白名单消毒）、Prism.js 代码块语法高亮与一键复制功能；严格实现禁止任何关闭动作一律静默自动保存，提供明确的保存并退出、放弃修改（二次确认拦截）与继续编辑；落地回收区便签强制只读预览保护与任务清单复选框禁用；实现基于 expectedRevision 与 libraryGeneration 的同事务 CAS 多标签页并发冲突拦截与三向消解横幅（强制覆盖二次确认、放弃修改加载最新、另存为新便签副本）；实现便签已被物理删除时的防 upsert 复活拦截；落地配额超限时的 sessionStorage 隔离暂存与独立草稿导出入口。",
+            "modules": [
+              "NoteDetailModal",
+              "MarkdownRenderer",
+              "PrismCodeBlock",
+              "UnsavedChangesDialog",
+              "ConcurrentConflictBanner",
+              "SessionDraftService"
+            ],
+            "normalBehavior": "点击便签卡片展开居中沉浸式模态弹窗；Markdown 经 marked 解析与 DOMPurify 严格过滤后安全渲染；代码块高亮显示并提供一键复制，点击后 2000ms 呈现已复制反馈；活跃与归档便签的 GFM 任务清单复选框支持点击切换，并在单事务 CAS 中自增更新；全字段统一 Ctrl/Cmd+S 或 Ctrl/Cmd+Enter 触发保存；内容未变时点击关闭直接退出；存在修改时点击关闭弹出二次确认拦截对话框；回收区便签强制以只读预览展示，禁用编辑与任务勾选，顶部展示只读警示横幅并提供还原与彻底删除；保存时校验 expectedRevision 与 libraryGeneration，版本一致时正常写入并自增 revision。",
+            "onFailure": "当组件测试或并发拦截测试未通过时，检查基准版本号 baseRevision 传递、同事务 CAS 比较逻辑或 DOMPurify 配置，修复后重新运行 Vitest 验证套件。",
+            "passCriteria": [
+              "Markdown 解析与 XSS 过滤测试全部通过",
+              "关闭拦截二次确认逻辑测试全部通过",
+              "回收区只读保护与任务复选框禁用测试全部通过",
+              "CAS 并发冲突横幅展现与三向消解测试全部通过",
+              "便签已被物理删除时禁止 upsert 隐式复活测试通过",
+              "配额满时正文不丢与草稿暂存测试全部通过"
+            ],
+            "scope": "编写 NoteDetailModal 模态弹窗组件、MarkdownRenderer 渲染组件、PrismCodeBlock 代码高亮组件、TaskCheckbox 任务复选框交互逻辑、UnsavedChangesDialog 脏修改二次确认拦截弹窗、ConcurrentConflictBanner 并发冲突消解横幅、GenerationMismatchBanner 代际失效横幅、ReadOnlyTrashBanner 回收区只读横幅及快捷键监听器（Ctrl/Cmd+S, Ctrl/Cmd+Enter, Escape）。",
+            "steps": [
+              "1. 安装 marked、dompurify 与 prismjs 及其 TypeScript 类型定义声明",
+              "2. 封装 MarkdownRenderer 组件，配置 marked GFM 选项，挂载 DOMPurify sanitize 白名单过滤，集成 Prism.js 语法着色与浮动复制按钮",
+              "3. 封装 NoteDetailModal 模态弹窗组件，实现阅读模式与实时编辑模式双向切换，绑定打开时的 initialContent 与 baseRevision 及 sessionGeneration",
+              "4. 实现 GFM 任务清单复选框交互，点击时反转 Markdown 语法并在同事务 CAS 中更新 revision 与 updatedAt",
+              "5. 编写全字段快捷键监听逻辑（Ctrl/Cmd+S, Ctrl/Cmd+Enter 触发保存，Escape 触发关闭脏检查）",
+              "6. 编写 UnsavedChangesDialog 二次确认拦截组件，严格拦截带脏修改时的任意关闭触发，提供保存并退出、放弃修改与继续编辑三分支",
+              "7. 接入回收区状态判断：当 status==='trashed' 时强制切换为只读预览模式，禁用 Textarea 与复选框，挂载 ReadOnlyTrashBanner 横幅及还原/彻底删除操作",
+              "8. 接入 saveNote 并发冲突响应：捕获 conflict 时浮出 ConcurrentConflictBanner，实现强制覆盖、放弃加载最新与另存为新便签三项消解逻辑",
+              "9. 接入代际失效与 NoteNotFoundError 处理：禁止 upsert 复活，提供导出草稿与另存为入口",
+              "10. 接入配额超限异常处理：保持弹窗开启，文字隔离暂存 sessionStorage 并提供复制与导出草稿文件入口",
+              "11. 编写 Vitest 与 React Testing Library 自动化测试用例，覆盖 XSS 消毒、关闭拦截、回收区只读、并发冲突与配额恢复"
+            ],
+            "verification": [
+              "单元测试：验证 DOMPurify 对 <script> 与 onerror 恶意 XSS 向量的完全过滤",
+              "单元测试：验证代码块一键复制调用 navigator.clipboard.writeText 及 2000ms 状态复位",
+              "组件测试：验证在有未保存修改时点击关闭/按下 Escape 弹出二次确认拦截框，绝不静默自动保存",
+              "组件测试：验证内容未修改时点击关闭/按下 Escape 直接平滑退出",
+              "组件测试：验证回收区便签打开时强制只读，编辑框隐藏/禁用，任务清单复选框 disabled",
+              "并发测试：模拟 saveNote 发生 revision 冲突，验证黄色冲突横幅展现及三向消解操作（强制覆盖、放弃加载最新、另存为新便签）",
+              "并发测试：模拟便签已被物理删除，验证 saveNote 禁止 upsert 隐式复活",
+              "代际测试：模拟 libraryGeneration 不匹配，验证写入拦截与草稿保留",
+              "配额测试：模拟 QuotaExceededError，验证弹窗保持开启、正文不丢、sessionStorage 隔离暂存及导出当前草稿入口"
+            ]
+          },
+          "title": "详情模态弹窗与 Markdown 编辑器开发任务（回收区只读保护）"
+        },
+        {
+          "content": "### 便签详情与 Markdown 编辑验收标准（Given / When / Then）\n\n- **场景 1：无修改时点击关闭或按 Escape 直接退出**\n  - **Given** 用户打开任意便签的详情弹窗，且未对正文和标签进行任何输入或修改，\n  - **When** 用户点击右上角【关闭 (×)】按钮、按下键盘 `Escape` 键、或点击弹窗背景遮罩，\n  - **Then** 模态弹窗直接平滑关闭，无二次确认弹窗打扰，底层数据库不产生任何写入，`revision` 与 `updatedAt` 保持不变。\n\n- **场景 2：存在未保存修改时点击关闭/按 Escape 触发二次确认拦截（禁止静默自动保存）**\n  - **Given** 用户在便签详情编辑框中输入了新的字符或删改了正文（存在未保存脏数据），\n  - **When** 用户点击右上角【关闭 (×)】按钮、按下键盘 `Escape` 键、或点击背景遮罩，\n  - **Then** 系统立即拦截关闭行为，严禁静默自动保存，居中弹出阻断式二次确认对话框：“当前便签有未保存的修改，是否确定放弃？”；\n    * 当用户点击【放弃修改并退出】时，弹窗关闭，丢弃全部修改，清除该便签在 sessionStorage 的临时草稿，数据库原记录保持不变；\n    * 当用户点击【继续编辑】时，确认框关闭，模态弹窗保持开启，光标保持在编辑器原位；\n    * 当用户点击【保存并退出】时，系统触发 `saveNote` CAS 保存，成功后关闭弹窗。\n\n- **场景 3：回收区便签强制以只读预览模式展示并禁用编辑与任务复选框**\n  - **Given** 某便签处于回收区（`status === 'trashed'`），\n  - **When** 用户在回收区视图中点击该便签卡片打开详情弹窗，\n  - **Then** 弹窗强制以只读预览模式呈现，正文编辑框完全隐藏或只读锁定，标签输入栏禁用；\n  - **And** Markdown 预览区域中的所有 GFM 任务清单复选框均渲染为禁用状态（`disabled={true}`），用户点击复选框无任何勾选反应；\n  - **And** 弹窗顶部常驻展示琥珀色警示横幅：“当前便签处于回收区，仅供只读预览，无法直接编辑。”；\n  - **And** 底部操作栏隐藏保存按钮，仅提供【还原便签】与【彻底删除】按钮。\n\n- **场景 4：多标签页并发版本冲突检测与三向消解横幅**\n  - **Given** 客户端在标签页 A 中打开了便签 \\\"note-1\\\" 进行编辑（打开时基准版本为 v1），此时标签页 B 已经修改了该便签并成功保存至数据库（当前数据库版本更新为 v2），\n  - **When** 用户在标签页 A 中点击【保存并退出】或按快捷键 `Ctrl/Cmd + S`，\n  - **Then** `IStorageService.saveNote` 在单原子事务内检测到 `cur.revision (2) !== expectedRevision (1)`，写入被严格拦截，返回 `conflict: true`；\n  - **And** 标签页 A 详情弹窗保持开启，用户输入的正文文字 100% 完整保留，顶部浮出黄色并发冲突警示横幅：“检测到此便签已在其他标签页被修改（当前最新版本 v2，本地基准版本 v1）”；\n  - **And** 横幅内提供三项消解分支：\n    * 当用户点击【强制覆盖】时，弹出二次确认，确认后以最新版本 v2 再次执行 CAS 更新覆盖；\n    * 当用户点击【放弃修改加载最新】时，清空本地未保存修改，重新载入数据库最新正文并将基准版本更新为 v2；\n    * 当用户点击【另存为新便签】时，调用 `createNote` 独立新建便签，原便签保持 v2 不变，保存成功后关闭弹窗并 Toast 提示“已另存为新便签副本”。\n\n- **场景 5：便签已在其他标签页被彻底物理删除时禁止 upsert 隐式复活**\n  - **Given** 客户端在标签页 A 中打开了便签 \\\"note-del\\\" 进行编辑，随后标签页 B 在回收区彻底物理清空或删除了该便签，\n  - **When** 用户在标签页 A 中点击保存，\n  - **Then** 存储服务检测到记录不存在，抛出 `NoteNotFoundError`，严禁通过 upsert 方式重新创建或复活该记录；\n  - **And** 详情弹窗保持开启，正文文字完整保留，提示“该便签已被彻底删除，无法更新原记录”，提供【另存为新便签】与【导出草稿为文件】。\n\n- **场景 6：库代际失效（libraryGeneration）时拦截保存并保留草稿**\n  - **Given** 客户端在标签页 A 中打开了编辑会话（持有库代际 1），随后标签页 B 执行了全量覆盖导入，库代际自增为 2，\n  - **When** 用户在标签页 A 中尝试提交保存，\n  - **Then** 存储服务比对 `sessionGeneration (1) !== currentLibraryGeneration (2)`，写入被严格拦截；\n  - **And** 弹窗浮出红色横幅提示代际失效，正文文字 100% 保留，提供【导出当前草稿为文件】与【关闭】入口。\n\n- **场景 7：Markdown 解析、DOMPurify XSS 消毒与 Prism 代码块一键复制**\n  - **Given** 便签正文中包含 `<script>alert('xss')</script><img src=x onerror=alert(1)>` 恶意注入代码以及 JavaScript 代码块：\\n```js\\nconst greeting = 'hello world';\\n```\\n  - **When** 详情弹窗以阅读/预览模式渲染该便签，\n  - **Then** DOMPurify 彻底过滤 `<script>` 与 `onerror` 属性，绝不执行任何未授权脚本；\n  - **And** 代码块经 Prism.js 正确语法着色，代码块右上角悬浮【复制】按钮；\n  - **When** 用户点击【复制】按钮，\n  - **Then** 系统调用 `navigator.clipboard.writeText` 成功将代码写入剪贴板，按钮文本即时变为“已复制 ✓”，并在 2000ms 后自动复位为“复制”。\n\n- **场景 8：GFM 任务清单复选框交互与同事务 CAS 自动保存**\n  - **Given** 活跃便签详情处于阅读模式，正文包含 `- [ ] 完成规划设计` 任务项，且当前版本为 v1，\n  - **When** 用户点击该任务项前的复选框，\n  - **Then** 正文中的 `- [ ]` 瞬间切换为 `- [x]`，系统在同事务 CAS 中更新便签，`expectedRevision = 1`，数据库中 `revision` 更新为 2，`updatedAt` 刷新为当前时间戳，未备份变更计数 +1。\n\n- **场景 9：存储配额超限（QuotaExceededError）时弹窗保持开启与草稿暂存隔离**\n  - **Given** 用户在详情弹窗编辑了长文本，但当前浏览器存储配额已满，\n  - **When** 用户点击保存并退出，底层抛出 `StorageQuotaExceededError`，\n  - **Then** 详情模态弹窗绝对不关闭，编辑框中的文字与标签 100% 完整保留；\n  - **And** 草稿按 `spark_draft_${sessionGeneration}_${noteId}` 隔离暂存至当前标签页 `sessionStorage`；\n  - **And** 弹窗顶部浮出琥珀色告警横幅：“本地存储空间已满，草稿已暂存至当前会话”，提供【复制草稿到剪贴板】、【导出当前未保存草稿】与【重试保存】按钮。",
+          "dependsOn": [
+            "task-note-detail-edit"
+          ],
+          "evidenceIds": [
+            "evidence-raw-input-inp-01",
+            "evidence-mdn-cross-site-scripting",
+            "evidence-mdn-clipboard-writetext",
+            "evidence-mdn-keyboard-event",
+            "evidence-w3c-indexeddb-spec"
+          ],
+          "id": "acceptance-note-detail-edit",
+          "kind": "acceptance",
+          "requirementIds": [
+            "feature-note-detail-edit",
+            "flow-note-detail-edit",
+            "task-note-detail-edit"
+          ],
+          "stage": "delivery",
+          "title": "便签详情与 Markdown 编辑验收标准"
+        }
+      ],
+      "decisions": [],
+      "dependsOn": [],
+      "id": "task-8801eb91-ae77-4a7f-a719-383671596eb5-group-detail-and-edit",
+      "impact": "细化便签详情模态沉浸展示、Markdown排版与Prism代码高亮复制；严格实施无脏数据直接关闭、有脏数据阻断拦截二次确认（彻底杜绝关闭静默暗存）；严格实现回收区便签只读预览保护与任务复选框禁用；落地基于expectedRevision与libraryGeneration的CAS多标签页并发冲突黄色横幅及三向消解（强制覆盖二次确认、放弃加载最新、另存为新便签副本）；杜绝已删除便签upsert隐式复活；落地配额超限草稿sessionStorage隔离暂存与手动草稿导出。",
+      "rejectDecisionIds": [],
+      "removeBlockIds": [],
+      "status": "pending",
+      "title": "便签详情模态展示、Markdown实时编辑、并发冲突消解与验收标准"
+    }
+  ],
+  "questions": [],
+  "summary": "本任务作为 Project Architect 的登记规划工作者，针对 feedback 质量验收反馈与本工作范围（work-detail-and-edit）的职责边界，完成了便签详情模态展示、Markdown 实时编辑、交互流程、开发任务与验收标准（feature-note-detail-edit, flow-note-detail-edit, task-note-detail-edit, acceptance-note-detail-edit）的全部细化修订：1) 彻底废除关闭操作一律静默自动保存的行为，明确无修改直接退出、有修改阻断弹出二次确认（保存并退出、放弃修改丢弃草稿、继续编辑保留光标）；2) 回收区便签强制以只读预览模式展示，编辑框隐藏/只读锁定，GFM 任务清单复选框禁用，顶部悬挂回收区只读警示横幅并提供还原与彻底删除入口；3) 严格遵循同事务 CAS 规则，基于 expectedRevision 与 libraryGeneration 实现多标签页并发冲突检测，冲突时弹窗不关闭且正文 100% 保留，浮出黄色横幅提供强制覆盖（需再次 CAS）、放弃修改加载最新与另存为新便签三项消解分支；4) 便签已彻底删除时严格禁止 upsert 隐式复活；5) 落地 marked + DOMPurify 安全白名单 XSS 过滤、Prism.js 代码块一键复制（含 2000ms 状态复位）及 GFM 任务清单复选框同事务自增保存；6) 配额超限时弹窗不关闭，草稿按 noteId 与 libraryGeneration 隔离暂存 sessionStorage 并提供手动导出草稿；7) 所有证据均通过真实的 research_read、material_read 与 experiment_run 工具获取，不捏造任何未注册证据。"
+}

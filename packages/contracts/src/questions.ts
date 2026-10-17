@@ -2,10 +2,12 @@ import type { TypedRef } from './refs.js';
 
 export type QuestionImportance = 'normal' | 'high' | 'critical';
 export type QuestionBatchStage = 'initial' | 'explore' | 'converge' | 'readiness' | 'legacy';
+export type QuestionAnswerKind = 'selection' | 'custom' | 'delegate' | 'defer';
 
 export interface QuestionOption {
   key: string;
   label: string;
+  approach?: string;
   gain?: string;
   sacrifice?: string;
   impact: string;
@@ -30,6 +32,8 @@ export interface QuestionItem {
   recommendedOptionKey?: string;    // Key of the recommended option
   options: QuestionOption[];
   allowFreeInput: true;             // Always true
+  selectionMode?: 'single' | 'multiple';
+  reopenReason?: string;
   /** Stable B3 decision topic used for exact Gap/Question matching and deduplication. */
   decisionKey?: string;
   /** Decision topics that must already be confirmed or locked before this question is shown. */
@@ -38,8 +42,13 @@ export interface QuestionItem {
   batchId?: string;
   batchStage?: QuestionBatchStage;
   basisRevision?: number;
+  basisHash?: string;
   status: 'proposed' | 'shown' | 'answered' | 'dismissed' | 'superseded';
   answer?: string;
+  /** Explicit submitted intent; absent on historical answers and never inferred from answer text. */
+  answerKind?: QuestionAnswerKind;
+  /** Exact submitted option keys, present only for an explicit structured selection. */
+  selectedOptionKeys?: string[];
   createdAt: string;                // ISO 8601
   answeredAt?: string;              // ISO 8601
 }

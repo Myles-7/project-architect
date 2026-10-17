@@ -32,6 +32,7 @@ import type {
   ConflictItem,
   RiskItem,
   AgentRunTrace,
+  DiscoveryExecutionPhase,
 } from '@project-architect/contracts';
 import { ErrorCode } from '@project-architect/contracts';
 
@@ -95,6 +96,10 @@ export class AIOrchestrator {
 
   getProvider(): AIProvider {
     return this.provider;
+  }
+
+  getContextManager(): ContextManager {
+    return this.contextManager;
   }
 
   /**
@@ -500,12 +505,14 @@ export class AIOrchestrator {
   async commitState(
     projectPath: string,
     payload: IntegratedDiscoveryTurnPayload,
-    expectedRevision: number
+    expectedRevision: number,
+    allowRebase = false
   ): Promise<ProjectSnapshot> {
     return await this.stateEngine.applyIntegratedDiscoveryTurn(
       projectPath,
       payload,
-      expectedRevision
+      expectedRevision,
+      allowRebase
     );
   }
 
@@ -536,7 +543,8 @@ export class AIOrchestrator {
     projectPath: string,
     request: Omit<RunDiscoveryTurnRequest, 'projectId'>,
     explicitMode?: AgentMode,
-    abortSignal?: AbortSignal
+    abortSignal?: AbortSignal,
+    options?: { allowRebase?: boolean; onPhaseChange?: (phase: DiscoveryExecutionPhase) => void }
   ): Promise<RunDiscoveryTurnResponse & { activeMode?: AgentMode; runTrace?: AgentRunTrace }> {
     const startedAt = new Date().toISOString();
     let snapshot = await this.stateEngine.getSnapshot(projectPath);
@@ -563,19 +571,28 @@ export class AIOrchestrator {
     const runtimeProfile = this.runtimeRegistry.getProfile(activeMode);
 
     // Step 2: Context Profile
+    options?.onPhaseChange?.('context_assembly');
     const { contextText, checklistHints } = await this.buildContext(activeMode, snapshot, request, projectPath);
 
     // Step 3: Provider Execution (Single Call with specialized prompt & schema)
+    options?.onPhaseChange?.('provider_inference');
     const result = await this.executeAgentMode(activeMode, contextText, abortSignal);
 
     // Step 4: Validation
     const discoveryOutput = this.validateOutput(result);
 
     // Step 5: Policy Application
+    options?.onPhaseChange?.('gap_detection');
     const payload = this.applyPolicy(snapshot, discoveryOutput, checklistHints);
 
     // Step 6: State Commit
-    const updatedSnapshot = await this.commitState(projectPath, payload, expectedRevision);
+    options?.onPhaseChange?.('state_commit');
+    const updatedSnapshot = await this.commitState(
+      projectPath,
+      payload,
+      expectedRevision,
+      options?.allowRebase ?? false
+    );
 
     // Step 7: Workflow Trace Save
     const completedAt = new Date().toISOString();
@@ -628,7 +645,8 @@ export class AIOrchestrator {
    */
   async compileDocuments(
     projectPath: string,
-    expectedRevision?: number
+    expectedRevision?: number,
+    options?: { customRules?: string[]; customNotes?: string; isDraft?: boolean }
   ): Promise<CompileDocumentsResult> {
     const snapshot = await this.stateEngine.getSnapshot(projectPath);
     if (expectedRevision !== undefined) {
@@ -644,14 +662,15 @@ export class AIOrchestrator {
     const targetExpectedRev = expectedRevision ?? snapshot.metadata.stateRevision;
     const nextRevision = snapshot.metadata.stateRevision + 1;
     const compiler = new DocumentCompiler(this.storage);
-    const result = await compiler.compile(projectPath, snapshot, nextRevision, false);
+    const result = await compiler.compile(projectPath, snapshot, nextRevision, false, options);
 
     // Atomically commit documents state, write rendered files, and update stage
     await this.stateEngine.completeDocumentCompilation(
       projectPath,
       result.manifest,
       result.renderedFiles,
-      targetExpectedRev
+      targetExpectedRev,
+      options
     );
 
     return result;

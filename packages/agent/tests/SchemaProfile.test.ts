@@ -31,10 +31,16 @@ describe('Schema Profile System Unit Tests (Phase 3.5.2)', () => {
       const parsed = JSON.parse(content);
       expect(parsed.$schema).toBeDefined();
       expect(parsed.properties).toBeDefined();
-      expect(parsed.properties.confirmed).toBeDefined();
-      expect(parsed.properties.candidates).toBeDefined();
+      expect(parsed.title).toBe('B3 Planning task result');
+      expect(parsed.properties.summary).toBeDefined();
+      expect(parsed.properties.groups).toBeDefined();
       expect(parsed.properties.questions).toBeDefined();
-      expect(parsed.properties.gaps).toBeDefined();
+      expect(parsed.properties.evidence).toBeDefined();
+      expect(parsed.properties.blockers).toBeDefined();
+      expect(parsed.properties.followUp).toBeDefined();
+      expect(parsed.properties.clarification).toBeDefined();
+      expect(parsed.properties.confirmed).toBeUndefined();
+      expect(parsed.properties.candidates).toBeUndefined();
     }
   });
 

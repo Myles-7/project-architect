@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "reviewKind": "independent frozen final artifact content review",
+  "reviewedAt": "2026-10-05T02:19:16.6430497Z",
+  "control": "flash-materials-final-20261005-04",
+  "verdict": "needs-targeted-revision",
+  "contentPassed": false,
+  "runtimeCompleted": true,
+  "coreAutomatedApproval": true,
+  "humanApproval": "pending",
+  "targetApplicationImplemented": false,
+  "targetBrowserImePerformanceTests": "unexecuted",
+  "providerInvokedByIndependentReviewer": false,
+  "applicationSourceModifiedByIndependentReviewer": false,
+  "blockers": [
+    {
+      "id": "R7-B1",
+      "priority": "P2",
+      "title": "Preserved module API increments generation before the transaction commit point",
+      "blockId": "blk-tech-module",
+      "source": "quality-reviewed-r7-development-package/TECHNICAL_GUIDE.md:81",
+      "conflictingSource": "quality-reviewed-r7-development-package/TECHNICAL_GUIDE.md:162",
+      "counterexample": "At bornGeneration=G, module recipe increments global inputGeneration to G+1 before node creation/copy/replace can fail, while interface transaction requires generation=G until complete success",
+      "evidenceKind": "normative contract conflict; no target application reproduction claimed"
+    },
+    {
+      "id": "R7-B2",
+      "priority": "P2",
+      "title": "Explicit AppController initialization contract removed",
+      "blockId": "blk-tech-interface",
+      "source": "quality-reviewed-r7-development-package/TECHNICAL_GUIDE.md:162",
+      "priorSource": "quality-reviewed-r6-development-package/TECHNICAL_GUIDE.md:174",
+      "preservedModuleSource": "quality-reviewed-r7-development-package/TECHNICAL_GUIDE.md:92",
+      "counterexample": "R7 omits AppController.init(elements: {displayElement, initialInputNode, errorContainer, resetButton}) and leaves the readonly fallback container source and initialization/binding order without an equivalent explicit contract",
+      "evidenceKind": "full baseline-to-candidate interface review; no demand for full application implementation"
+    }
+  ],
+  "classificationCorrection": {
+    "previousUnrelatedCount": 19,
+    "correctedUnrelatedCount": 18,
+    "relatedClosureCount": 12,
+    "newlyRecognizedRelatedId": "blk-tech-module",
+    "reason": "This module directly defines ResetController.handleReset order and is related to the transaction change",
+    "oldFrozenReportsModified": false,
+    "correctedScope": {
+      "relatedIds": [
+        "blk-feat-reset",
+        "blk-flow-reset",
+        "blk-page-main-layout",
+        "blk-acc-reset",
+        "blk-tech-data-model",
+        "blk-tech-interface",
+        "blk-tech-error",
+        "blk-deliv-task-reset-workflow",
+        "blk-deliv-task-error-handling",
+        "blk-deliv-acc-full-e2e",
+        "blk-deliv-val-standalone-runtime",
+        "blk-tech-module"
+      ],
+      "trulyUnrelatedIds": [
+        "blk-prod-target",
+        "blk-prod-problem",
+        "blk-prod-non-goals",
+        "blk-deliv-task-layout-styling",
+        "blk-deliv-acc-security-edge",
+        "blk-tech-stack",
+        "blk-tech-deployment",
+        "blk-deliv-task-package",
+        "blk-deliv-acc-package",
+        "blk-deliv-val-security-xss-audit",
+        "blk-deliv-val-perf-benchmark",
+        "blk-prod-scope",
+        "blk-prod-outcomes",
+        "blk-feat-input-display",
+        "blk-flow-input-display",
+        "blk-acc-input-display",
+        "blk-deliv-spec-deployment",
+        "blk-deliv-task-input-workflow"
+      ],
+      "trulyUnrelatedPreserved": true
+    }
+  },
+  "verification": {
+    "kind": "independent completed frozen control structure and compiler projection audit",
+    "controlStatus": "completed",
+    "completedAt": "2026-10-05T02:08:31.2Z",
+    "runtimeStatus": "reviewable",
+    "runtimeTasks": [
+      {
+        "id": "task-23e266df-242f-40e8-a4bb-74e752e04167",
+        "kind": "design",
+        "status": "completed"
+      },
+      {
+        "id": "task-7eeef8a4-133f-4406-9395-f62667f49e17",
+        "kind": "research",
+        "status": "completed"
+      },
+      {
+        "id": "task-93943ee4-d87b-4f7d-b94d-a9fccc124b17",
+        "kind": "integration",
+        "status": "completed"
+      },
+      {
+        "id": "task-4e64baa1-794b-4b05-915b-d7aa11cb98f3",
+        "kind": "review",
+        "status": "completed"
+      },
+      {
+        "id": "task-80401cc3-e009-42af-8ce9-8e0d954bdbf0",
+        "kind": "validation",
+        "status": "completed"
+      },
+      {
+        "id": "task-06eb8f1d-dbf4-4adf-b0ec-42b81ce23cd3",
+        "kind": "revision",
+        "status": "completed"
+      },
+      {
+        "id": "task-9f4dba79-3366-482f-b88c-7a76df921d61",
+        "kind": "review",
+        "status": "completed"
+      }
+    ],
+    "newProviderCalls": 7,
+    "approvalIdentities": [
+      "API automated acceptance; not human review"
+    ],
+    "humanApproval": "pending",
+    "blocks": {
+      "before": 30,
+      "after": 30,
+      "stableIds": true,
+      "changedIds": [
+        "blk-feat-reset",
+        "blk-flow-reset",
+        "blk-page-main-layout",
+        "blk-acc-reset",
+        "blk-tech-data-model",
+        "blk-tech-interface",
+        "blk-tech-error",
+        "blk-deliv-task-reset-workflow",
+        "blk-deliv-task-error-handling",
+        "blk-deliv-acc-full-e2e",
+        "blk-deliv-val-standalone-runtime"
+      ],
+      "unchangedIds": [
+        "blk-prod-target",
+        "blk-prod-problem",
+        "blk-prod-non-goals",
+        "blk-deliv-task-layout-styling",
+        "blk-deliv-acc-security-edge",
+        "blk-tech-stack",
+        "blk-tech-deployment",
+        "blk-deliv-task-package",
+        "blk-deliv-acc-package",
+        "blk-deliv-val-security-xss-audit",
+        "blk-deliv-val-perf-benchmark",
+        "blk-prod-scope",
+        "blk-prod-outcomes",
+        "blk-feat-input-display",
+        "blk-flow-input-display",
+        "blk-acc-input-display",
+        "blk-deliv-spec-deployment",
+        "blk-deliv-task-input-workflow",
+        "blk-tech-module"
+      ],
+      "outsideAllowedScope": [],
+      "proposalIds": [
+        "blk-feat-reset",
+        "blk-flow-reset",
+        "blk-page-main-layout",
+        "blk-acc-reset",
+        "blk-tech-data-model",
+        "blk-tech-interface",
+        "blk-tech-error",
+        "blk-deliv-task-reset-workflow",
+        "blk-deliv-task-error-handling",
+        "blk-deliv-acc-full-e2e",
+        "blk-deliv-val-standalone-runtime"
+      ]
+    },
+    "correctedScope": {
+      "relatedIds": [
+        "blk-feat-reset",
+        "blk-flow-reset",
+        "blk-page-main-layout",
+        "blk-acc-reset",
+        "blk-tech-data-model",
+        "blk-tech-interface",
+        "blk-tech-error",
+        "blk-deliv-task-reset-workflow",
+        "blk-deliv-task-error-handling",
+        "blk-deliv-acc-full-e2e",
+        "blk-deliv-val-standalone-runtime",
+        "blk-tech-module"
+      ],
+      "trulyUnrelatedIds": [
+        "blk-prod-target",
+        "blk-prod-problem",
+        "blk-prod-non-goals",
+        "blk-deliv-task-layout-styling",
+        "blk-deliv-acc-security-edge",
+        "blk-tech-stack",
+        "blk-tech-deployment",
+        "blk-deliv-task-package",
+        "blk-deliv-acc-package",
+        "blk-deliv-val-security-xss-audit",
+        "blk-deliv-val-perf-benchmark",
+        "blk-prod-scope",
+        "blk-prod-outcomes",
+        "blk-feat-input-display",
+        "blk-flow-input-display",
+        "blk-acc-input-display",
+        "blk-deliv-spec-deployment",
+        "blk-deliv-task-input-workflow"
+      ],
+      "trulyUnrelatedPreserved": true
+    },
+    "evidence": {
+      "before": 38,
+      "after": 42,
+      "preserved": 38,
+      "missingOrChangedEvidence": []
+    },
+    "reviewer": {
+      "taskId": "task-9f4dba79-3366-482f-b88c-7a76df921d61",
+      "approvedUnchangedCount": 19,
+      "overrideCount": 11,
+      "assembledCount": 30,
+      "historicalBaselineCount": 11,
+      "candidateMismatches": [],
+      "historicalBaselineMismatches": [],
+      "providerBlockers": [],
+      "providerResultHash": "a93d76ff82c14bf9773a66ba52c5da41bef594b0fc45bef9ac6d5e6d74a94216"
+    },
+    "package": {
+      "name": "quality-reviewed-r7-development-package",
+      "sourceRevision": 44,
+      "revision": 45,
+      "fileChecks": [
+        {
+          "name": "START_HERE.md",
+          "sha256": "2c07b02a19ee73b9d430102b185b0dbb62e4732572ecad9349ce5daf4e5b449f",
+          "actualSha256": "2c07b02a19ee73b9d430102b185b0dbb62e4732572ecad9349ce5daf4e5b449f",
+          "matches": true
+        },
+        {
+          "name": "PROJECT.md",
+          "sha256": "0a7e28e873a9a70dd8f50177c2cc835a9c5c0f98aa966c23a7016c0461d7c7e6",
+          "actualSha256": "0a7e28e873a9a70dd8f50177c2cc835a9c5c0f98aa966c23a7016c0461d7c7e6",
+          "matches": true
+        },
+        {
+          "name": "PRODUCT.md",
+          "sha256": "18bdb9fed878bd7e63c83e9c6e663396c405c113a877ce5db01f7da03c79cf59",
+          "actualSha256": "18bdb9fed878bd7e63c83e9c6e663396c405c113a877ce5db01f7da03c79cf59",
+          "matches": true
+        },
+        {
+          "name": "USER_FLOWS.md",
+          "sha256": "40994cf97e905b1dbe3c4bf38c5d39356cc6f7c6cb032818797fac1b02a80dd0",
+          "actualSha256": "40994cf97e905b1dbe3c4bf38c5d39356cc6f7c6cb032818797fac1b02a80dd0",
+          "matches": true
+        },
+        {
+          "name": "UX_UI_SPEC.md",
+          "sha256": "8dd9ffb170f1f011a835e0bd007d5c23258c8b77ed7a1ba1b393d725d455ade9",
+          "actualSha256": "8dd9ffb170f1f011a835e0bd007d5c23258c8b77ed7a1ba1b393d725d455ade9",
+          "matches": true
+        },
+        {
+          "name": "TECHNICAL_GUIDE.md",
+          "sha256": "2c349fd4e21fbdf73cd9332667151d5c9b0988bc3e6f98ab0817ceee21c95b4c",
+          "actualSha256": "2c349fd4e21fbdf73cd9332667151d5c9b0988bc3e6f98ab0817ceee21c95b4c",
+          "matches": true
+        },
+        {
+          "name": "DEVELOPMENT_PLAN.md",
+          "sha256": "16c525b01043c051d38a7ba9f7b966682dcf1e960a76bd8284860cb3e1e73951",
+          "actualSha256": "16c525b01043c051d38a7ba9f7b966682dcf1e960a76bd8284860cb3e1e73951",
+          "matches": true
+        },
+        {
+          "name": "ACCEPTANCE.md",
+          "sha256": "2eb70a1b455c86a07aea6600fefeed40df8fceef66cdec06b51fda354fca47dd",
+          "actualSha256": "2eb70a1b455c86a07aea6600fefeed40df8fceef66cdec06b51fda354fca47dd",
+          "matches": true
+        },
+        {
+          "name": "AGENTS.md",
+          "sha256": "bae5e416bf39c956089d619f267d11ad3d36d3f2bfd1faf4f84d750380de9351",
+          "actualSha256": "bae5e416bf39c956089d619f267d11ad3d36d3f2bfd1faf4f84d750380de9351",
+          "matches": true
+        },
+        {
+          "name": "tasks.json",
+          "sha256": "f3b08db5500a25b7ce145b2127f74f7d2e6b7012901cbac4ebe0dde8fd568474",
+          "actualSha256": "f3b08db5500a25b7ce145b2127f74f7d2e6b7012901cbac4ebe0dde8fd568474",
+          "matches": true
+        }
+      ],
+      "zipSha256": "ee67a46f5f66b02bac6e930cb004afb08aec7949bc0d7404100cf858e5b8453d",
+      "zipMatchesManifest": true,
+      "missingBlockBodies": []
+    },
+    "tasks": {
+      "count": 8,
+      "ids": [
+        "blk-deliv-task-layout-styling",
+        "blk-deliv-task-input-workflow",
+        "blk-deliv-task-reset-workflow",
+        "blk-deliv-task-error-handling",
+        "blk-deliv-task-package",
+        "blk-deliv-val-security-xss-audit",
+        "blk-deliv-val-standalone-runtime",
+        "blk-deliv-val-perf-benchmark"
+      ],
+      "dangling": [],
+      "cycles": [],
+      "taskFieldMismatches": [],
+      "edgeChanges": []
+    },
+    "illustrativeCode": {
+      "markers": [
+        {
+          "lines": 28,
+          "nonExecutableMarker": true
+        }
+      ],
+      "declaredNonExecutable": true,
+      "stillDeclaresFullExecutableTemplate": false
+    },
+    "frozenHashes": {
+      "manifest.json": "92ef831b81c0b132eddf30d353d2c30c7ae47dc1d738cf8d1895b6b991131120",
+      "final-snapshot.json": "51d43e83bc0da47448f52b26f57d3c1a396804b06a2a26fae9a5e5cafb61eac5",
+      "pre-quality-feedback-snapshot.json": "0cde4952589c24b372b15f4a46931ff4be57231d6141d01c2e6e774dcb56e2d1",
+      "feedback-run-c4b3c93d-c8f4-45f9-9233-3b60120ec026.json": "9eeee4b7d6512798d32ace776721a7497eac3a9554236dc6825ac2ec744d1134",
+      "feedback-run-c4b3c93d-c8f4-45f9-9233-3b60120ec026-proposal.json": "4514914e4b9c520707590e4fe9d99ec641385aa1a320c0f26bcdf8f4a263b490"
+    }
+  },
+  "illustrationAudit": {
+    "kind": "partial non-executable illustration audit with explicit fixture dependencies; no target app or native browser/IME/performance test",
+    "sourceSnapshotSha256": "51d43e83bc0da47448f52b26f57d3c1a396804b06a2a26fae9a5e5cafb61eac5",
+    "checks": {
+      "r6B1ReplacementRemoved": true,
+      "r6B2AllDraftsForwarded": true,
+      "severeRawForwardedWithoutChange": true
+    },
+    "normativeConflicts": {
+      "moduleResetSequence": "     * handleReset(): void（调用 DebounceScheduler.cancel()，递增 inputGeneration，创建全新 input 节点并通过持久配置复制策略完整保留 5 类持久配置，重置 value 与瞬态错误，调用 bindInputNode 绑定新闭包并执行 replaceWith 物理替换，更新 activeInputNode，复位展示区为占位符，清除错误提示并回焦）。",
+      "interfaceResetSequence": "     * handleReset(): void（执行两阶段清空状态事务：快照捕获 -> 内存预制新节点并复制 5 类持久属性 -> 取消防抖 -> replaceWith 物理替换 -> 占位呈现与错误清理 -> focus 聚焦 -> 原子提交递增代际；任何阶段抛错立即触发 rollback）；",
+      "preservedModuleHasEarlyIncrement": true,
+      "finalInterfaceHasAppInitSignature": false
+    },
+    "scope": "Explicit fixture dependencies evaluate only the 28-line non-executable illustration. No complete target app, native browser, actual timing, layout, focus, clipboard or IME execution is claimed."
+  },
+  "report": "INDEPENDENT_CONTENT_REVIEW_R7_20261005.md",
+  "audits": [
+    "review-r7-structure.mjs",
+    "review-r7-structure-results.json",
+    "review-r7-rollback-illustration.mjs",
+    "review-r7-rollback-illustration-results.json"
+  ],
+  "revisionFeedback": "../quality-feedback-materials-round8.txt",
+  "currentPromptBoundary": "This control used the frozen startup build; later generic prompt updates are not attributed to these calls."
+}

@@ -62,7 +62,7 @@ describe('AIOrchestrator & Agent Layer Tests', () => {
       questions: [{
         id: 'q-user', issueRef: 'gap:gap-user', importance: 'high', question: 'Who is the first user?',
         reason: 'The first workflow depends on it.', recommendation: 'Start narrow.',
-        recommendationReason: 'A narrow MVP is testable.', options: [], allowFreeInput: true, status: 'shown', createdAt: '',
+        recommendationReason: 'A narrow MVP is testable.', decisionKey:'target_user:primary', options: [{key:'independent',label:'Independent developers',approach:'Serve independent developers',impact:'Focus on individual workflows'}], allowFreeInput: true, status: 'shown', createdAt: '',
       }],
       autoAssumptions: [], newCandidates: [], newAssumptions: [], newConflicts: [], newRisks: [],
     }, created.snapshot.metadata.stateRevision);

@@ -1,0 +1,2064 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "independent-content-review",
+  "reviewer": "/root/core_review",
+  "status": "blocked",
+  "checkedAt": "2026-10-05T00:06:55.657Z",
+  "controlPath": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01",
+  "reportPath": "D:/桌面/项目构思/docs/validation/MATERIALS_R4_CORE_INDEPENDENT_REVIEW.md",
+  "latestPackagePath": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package",
+  "runId": "run-167084dd-7b42-4c3b-a43c-0fae51d1040a",
+  "sourceRevision": 32,
+  "publishedRevision": 33,
+  "basisHash": "d7d6052422f208b3042fa76c6347a9cc436abc3e1c1985ef56fc0f377f5ce8e2",
+  "authorization": {
+    "readOnlyInputs": true,
+    "allowedOutputs": [
+      "D:/桌面/项目构思/docs/validation/MATERIALS_R4_CORE_INDEPENDENT_REVIEW.md",
+      "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/independent-content-review.json"
+    ],
+    "sourceChanges": false,
+    "artifactChanges": false,
+    "providerCalls": 0,
+    "builds": 0,
+    "approvals": 0,
+    "commits": 0
+  },
+  "structuralChecks": {
+    "status": "passed",
+    "latestLineage": true,
+    "allTenFileHashesMatch": true,
+    "zipHashMatch": true,
+    "sourceAndPublishedBlueprintIdentical": true,
+    "taskSpecFieldsMatchSource": true,
+    "taskIdsAndOrderPreserved": true,
+    "taskExecutionDagEdgesPreserved": true
+  },
+  "historyChecks": {
+    "status": "passed",
+    "baselineRevision": 28,
+    "baselineEvidenceCount": 29,
+    "currentEvidenceCount": 33,
+    "historicalEvidenceRawBytesPreserved": true,
+    "blockIdsPreserved": true,
+    "unchangedCompleteBlocks": [
+      "blk-prod-target",
+      "blk-prod-problem",
+      "blk-prod-non-goals",
+      "blk-deliv-task-layout-styling",
+      "blk-deliv-acc-security-edge",
+      "blk-deliv-task-error-handling",
+      "blk-tech-stack",
+      "blk-tech-deployment",
+      "blk-deliv-task-package",
+      "blk-deliv-acc-package",
+      "blk-deliv-val-security-xss-audit",
+      "blk-deliv-val-perf-benchmark"
+    ],
+    "performanceOutcomeParagraphExact": true,
+    "performanceTaskUnchanged": true
+  },
+  "blockerCount": 3,
+  "blockers": [
+    {
+      "id": "R4-B1",
+      "severity": "blocking",
+      "title": "对重定向到新节点的原生事件作出无法由现有守卫成立的保证",
+      "sourceReferences": [
+        {
+          "blockId": "blk-deliv-val-standalone-runtime",
+          "field": "task.failureBehavior"
+        }
+      ],
+      "artifactReferences": [
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/ACCEPTANCE.md",
+          "line": 321
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/DEVELOPMENT_PLAN.md",
+          "line": 245
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/tasks.json",
+          "line": 295
+        }
+      ],
+      "offendingClaim": "若旧原生 compositionend 被重定向派发到新活跃节点，闭包守卫会因 generation 判定丢弃，并保障新节点不被污染；另称此行为极其罕见。",
+      "reasoning": "事件若到达新节点的监听器，event.currentTarget===newNode、newNode===activeInputNode、bornGeneration===inputGeneration 和节点在当前页面四项均为真。新闭包不携带旧原生会话身份，因此代际守卫无法识别此事件来自旧会话。对仍到达旧节点/旧闭包的回调隔离成立，但不能外推到重定向到新监听器的事件。",
+      "verbatimSyntheticProbe": "retargeted-end-to-new-node-is-not-rejected-by-generation",
+      "observations": {
+        "before": {
+          "epoch": 3,
+          "pending": false
+        },
+        "afterSyntheticEndOnNewNode": {
+          "epoch": 5,
+          "pending": true
+        },
+        "afterNoncomposingInput": {
+          "epoch": 7,
+          "pending": true
+        }
+      },
+      "scope": "这是对书面保证的合成反例。没有复现或证明真实浏览器会重定向旧原生事件；原生浏览器/IME 行为仍为 unexecuted。",
+      "requestedRevision": [
+        "删除 generation 能识别并丢弃重定向到新监听器的旧原生事件之保证，以及没有来源支持的“极其罕见”频率判断。",
+        "明确静态/合成通过仅覆盖旧节点闭包回调与已捕获定时器；重定向、原生会话终止、实际焦点与辅助技术结果继续标记 unexecuted。",
+        "保留 Chrome/Edge/Firefox 与 macOS Safari 原生测试矩阵、浏览器版本及输入法日志、失败后按实测修订并回归的策略；不要编造普通 InputEvent 自带旧会话身份、自动通过或永久隔离解锁流程。",
+        "同步 source task.failureBehavior 与 DEVELOPMENT_PLAN/ACCEPTANCE/tasks.json 等真实投影。"
+      ]
+    },
+    {
+      "id": "R4-B2",
+      "severity": "blocking",
+      "title": "承诺完整的伪代码仍有未声明装配依赖与接口列表不一致",
+      "sourceReferences": [
+        {
+          "blockId": "blk-tech-interface",
+          "field": "content"
+        },
+        {
+          "blockId": "blk-tech-module",
+          "field": "content"
+        }
+      ],
+      "artifactReferences": [
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+          "line": 108,
+          "endLine": 310
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+          "line": 261,
+          "endLine": 269
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+          "line": 298,
+          "endLine": 304
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+          "line": 56
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+          "line": 237
+        }
+      ],
+      "missingDependencies": [
+        "FeedbackBanner",
+        "displayElement",
+        "errorContainer"
+      ],
+      "observations": {
+        "browserGlobalsOnlyError": "ReferenceError: FeedbackBanner is not defined",
+        "errorRecoveryReferencesSameUndeclaredBanner": true,
+        "advertisedInputMethods": [
+          "getInputText()",
+          "setInputText(val)"
+        ],
+        "returnedInputMethods": [
+          "init",
+          "bindInputNode",
+          "replaceInputNode",
+          "getActiveInputNode",
+          "focusInput"
+        ]
+      },
+      "reasoning": "代码块没有定义这三个应用依赖，也没有具体声明注入/装配契约。架构描述提到 AppController 获取引用和 FeedbackBanner 的职责，但没有提供引用声明、装配调用或 banner 签名契约。只提供浏览器 DOM/定时器全局与初始 input 后执行原样完整代码，有效输入的 timer 到期即因未声明 FeedbackBanner 失败，catch 继续引用同一缺失对象。getInputText/setInputText 的公开说明也未出现在实际 returned API。",
+      "verbatimSyntheticProbe": "complete-code-with-browser-globals-only",
+      "scope": "这证明当前承诺的完整、内部自洽实现契约不足；目标应用未开发，不能称为目标应用已发生的运行时故障。其余九项 guard probes 显式提供的 Banner/ref 宿主桩不能使该完整接口检查通过。",
+      "requestedRevision": [
+        "为 displayElement/errorContainer 提供明确声明、DOM 装配来源及初始化调用，定义或明确注入 FeedbackBanner 的方法签名、输入错误清除/呈现与全局异常呈现契约。",
+        "使完整伪代码中所有应用引用都可追踪到定义或具体装配契约，并确保正常路径与异常恢复路径具备所声明依赖。",
+        "实现并定义 getInputText/setInputText 的真实用途，或同步公开方法列表移除不存在的方法；不要保留互相矛盾的接口说明。",
+        "保持真实节点闭包守卫、per-node 合成状态、accepted snapshot、scheduler epoch 的已正确逻辑；不要求在材料 review 中实现目标应用。"
+      ]
+    },
+    {
+      "id": "R4-B3",
+      "severity": "blocking",
+      "title": "全部属性与可访问配置保留的要求和实际白名单复制冲突",
+      "sourceReferences": [
+        {
+          "blockId": "blk-flow-reset",
+          "field": "content"
+        },
+        {
+          "blockId": "blk-acc-reset",
+          "field": "content (Scenario 5)"
+        },
+        {
+          "blockId": "blk-deliv-acc-full-e2e",
+          "field": "content (Scenario 11)"
+        },
+        {
+          "blockId": "blk-deliv-task-reset-workflow",
+          "field": "task.normalBehavior / task.completionCriteria"
+        }
+      ],
+      "artifactReferences": [
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+          "line": 206,
+          "endLine": 213
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/USER_FLOWS.md",
+          "line": 44
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/ACCEPTANCE.md",
+          "line": 235
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/ACCEPTANCE.md",
+          "line": 296
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/DEVELOPMENT_PLAN.md",
+          "line": 123
+        },
+        {
+          "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/DEVELOPMENT_PLAN.md",
+          "line": 137
+        }
+      ],
+      "copiedAttributes": [
+        "type (hardcoded text)",
+        "id",
+        "name",
+        "className",
+        "placeholder",
+        "aria-label (fallback 项目名输入)"
+      ],
+      "lostInSyntheticFixture": [
+        "aria-describedby=project-name-help",
+        "aria-required=true",
+        "tabindex=0",
+        "style=width:20rem",
+        "data-test=project-name"
+      ],
+      "reasoning": "replaceInputNode 仅复制列出的少数属性；USER_FLOWS 却称复制全部 DOM 属性与无障碍配置，验收要求原有无障碍属性和几何样式完全一致。原样替换逻辑会丢失其未列出的持久属性，因此无法满足普遍的属性保留契约。",
+      "verbatimSyntheticProbe": "replacement-attributes-and-focus",
+      "scope": "合成 DOM fixture 证明五个持久属性丢失，原 id/name/class/placeholder/aria-label 和新节点 focus 保留。未执行真实布局测量或屏幕阅读器测试；没有声称观察到物理布局跳动。",
+      "requestedRevision": [
+        "给出安全且明确的持久 DOM 属性复制或克隆策略，覆盖 label 关联、ARIA、tabindex、持久 style/data 配置；将运行时 value、错误状态/高亮及不应继承的瞬态状态独立重置。",
+        "让完整伪代码、reset flow、page、task 所有相关字段和 acceptance 的保留要求一致，不通过缩减已要求的无障碍/样式保留范围消除问题。",
+        "增加具体持久属性前后断言；真实焦点、辅助技术及物理布局继续留给 unexecuted 原生验证任务。"
+      ]
+    }
+  ],
+  "verificationBoundaries": {
+    "completeVerbatimFenceExecuted": true,
+    "guardProbesUseExplicitHostScaffolding": true,
+    "syntheticProbeCounts": {
+      "passed": 9,
+      "counterexample": 2,
+      "blocked": 1
+    },
+    "nativeBrowser": "unexecuted",
+    "nativeImeRetargeting": "unexecuted",
+    "nativeSessionTermination": "unexecuted",
+    "platformMatrix": "unexecuted",
+    "physicalLayout": "unexecuted",
+    "assistiveTechnology": "unexecuted",
+    "performance": "unexecuted",
+    "noTargetApplicationRuntimeBugClaim": true,
+    "officialSourceAndInputRecordPassedIsNotApplicationExecution": true
+  },
+  "r5ConsolidatedRepairList": [
+    {
+      "blockerId": "R4-B1",
+      "text": "删除 generation 能识别并丢弃重定向到新监听器的旧原生事件之保证，以及没有来源支持的“极其罕见”频率判断。"
+    },
+    {
+      "blockerId": "R4-B1",
+      "text": "明确静态/合成通过仅覆盖旧节点闭包回调与已捕获定时器；重定向、原生会话终止、实际焦点与辅助技术结果继续标记 unexecuted。"
+    },
+    {
+      "blockerId": "R4-B1",
+      "text": "保留 Chrome/Edge/Firefox 与 macOS Safari 原生测试矩阵、浏览器版本及输入法日志、失败后按实测修订并回归的策略；不要编造普通 InputEvent 自带旧会话身份、自动通过或永久隔离解锁流程。"
+    },
+    {
+      "blockerId": "R4-B1",
+      "text": "同步 source task.failureBehavior 与 DEVELOPMENT_PLAN/ACCEPTANCE/tasks.json 等真实投影。"
+    },
+    {
+      "blockerId": "R4-B2",
+      "text": "为 displayElement/errorContainer 提供明确声明、DOM 装配来源及初始化调用，定义或明确注入 FeedbackBanner 的方法签名、输入错误清除/呈现与全局异常呈现契约。"
+    },
+    {
+      "blockerId": "R4-B2",
+      "text": "使完整伪代码中所有应用引用都可追踪到定义或具体装配契约，并确保正常路径与异常恢复路径具备所声明依赖。"
+    },
+    {
+      "blockerId": "R4-B2",
+      "text": "实现并定义 getInputText/setInputText 的真实用途，或同步公开方法列表移除不存在的方法；不要保留互相矛盾的接口说明。"
+    },
+    {
+      "blockerId": "R4-B2",
+      "text": "保持真实节点闭包守卫、per-node 合成状态、accepted snapshot、scheduler epoch 的已正确逻辑；不要求在材料 review 中实现目标应用。"
+    },
+    {
+      "blockerId": "R4-B3",
+      "text": "给出安全且明确的持久 DOM 属性复制或克隆策略，覆盖 label 关联、ARIA、tabindex、持久 style/data 配置；将运行时 value、错误状态/高亮及不应继承的瞬态状态独立重置。"
+    },
+    {
+      "blockerId": "R4-B3",
+      "text": "让完整伪代码、reset flow、page、task 所有相关字段和 acceptance 的保留要求一致，不通过缩减已要求的无障碍/样式保留范围消除问题。"
+    },
+    {
+      "blockerId": "R4-B3",
+      "text": "增加具体持久属性前后断言；真实焦点、辅助技术及物理布局继续留给 unexecuted 原生验证任务。"
+    }
+  ],
+  "hashProof": {
+    "checkedAt": "2026-10-04T23:56:25.286Z",
+    "controlStatus": "completed",
+    "lineage": {
+      "previousControl": "flash-materials-quality-20261005-06",
+      "latestSuffix": "quality-reviewed-r4",
+      "sourceRevision": 32,
+      "publishedRevision": 33,
+      "finalRevision": 33,
+      "basisHash": "d7d6052422f208b3042fa76c6347a9cc436abc3e1c1985ef56fc0f377f5ce8e2",
+      "packageManifestMatchesLatest": true,
+      "sourceBlueprintSha256": "c6e977767f1757bd65442cd8b0ebfca0c103c9f56185020bf943184a2e9a99df",
+      "publishedBlueprintSha256": "c6e977767f1757bd65442cd8b0ebfca0c103c9f56185020bf943184a2e9a99df",
+      "finalBlueprintMatchesSource": true,
+      "declaredZipSha256": "380f1afbb5c71d9acd75644cce4f81031028b9cfd98ca4b9b2f2d8d54457b789",
+      "actualZipSha256": "380f1afbb5c71d9acd75644cce4f81031028b9cfd98ca4b9b2f2d8d54457b789"
+    },
+    "files": [
+      {
+        "name": "START_HERE.md",
+        "declared": "87f0c78745af40fca1579676eea62eac2f6be74a35b1b6b8231b985c9deedfb9",
+        "actual": "87f0c78745af40fca1579676eea62eac2f6be74a35b1b6b8231b985c9deedfb9",
+        "matches": true
+      },
+      {
+        "name": "PROJECT.md",
+        "declared": "fa118818883923dd80902caf2dbcd72a1355f0c25972e02568d7e1f1d20f57cf",
+        "actual": "fa118818883923dd80902caf2dbcd72a1355f0c25972e02568d7e1f1d20f57cf",
+        "matches": true
+      },
+      {
+        "name": "PRODUCT.md",
+        "declared": "0c55af47aa0fa0dd6ac8291b1819fd2ddc2af2124f7f31d40e0eb5dd5431ddb0",
+        "actual": "0c55af47aa0fa0dd6ac8291b1819fd2ddc2af2124f7f31d40e0eb5dd5431ddb0",
+        "matches": true
+      },
+      {
+        "name": "USER_FLOWS.md",
+        "declared": "b8d3a65df37426663b18e303d025377b9b35d2cac2f45ccf0475975f1c123fae",
+        "actual": "b8d3a65df37426663b18e303d025377b9b35d2cac2f45ccf0475975f1c123fae",
+        "matches": true
+      },
+      {
+        "name": "UX_UI_SPEC.md",
+        "declared": "ba7e0fc1f5d04089c95f8f74bd5e9b67761cc39e9a16cbb480bf39c899aa89ff",
+        "actual": "ba7e0fc1f5d04089c95f8f74bd5e9b67761cc39e9a16cbb480bf39c899aa89ff",
+        "matches": true
+      },
+      {
+        "name": "TECHNICAL_GUIDE.md",
+        "declared": "f1238ae401d0a6a2b51e811a2bf2e787edd35741989b8da89bac788a7b9a838b",
+        "actual": "f1238ae401d0a6a2b51e811a2bf2e787edd35741989b8da89bac788a7b9a838b",
+        "matches": true
+      },
+      {
+        "name": "DEVELOPMENT_PLAN.md",
+        "declared": "4442fbaf46d6c82157e30df3746d2f814e5388ddc8a2fe4eafde0fe1c0e16be8",
+        "actual": "4442fbaf46d6c82157e30df3746d2f814e5388ddc8a2fe4eafde0fe1c0e16be8",
+        "matches": true
+      },
+      {
+        "name": "ACCEPTANCE.md",
+        "declared": "2c14e7ece60e5d85932a325dad13acc458c3edc51db8e2045bafed6323d48996",
+        "actual": "2c14e7ece60e5d85932a325dad13acc458c3edc51db8e2045bafed6323d48996",
+        "matches": true
+      },
+      {
+        "name": "AGENTS.md",
+        "declared": "0d1a28c19c1a1050e532b9a06a5fae072d7566e8948d0ef55011e2ce72cdc455",
+        "actual": "0d1a28c19c1a1050e532b9a06a5fae072d7566e8948d0ef55011e2ce72cdc455",
+        "matches": true
+      },
+      {
+        "name": "tasks.json",
+        "declared": "633e25f6896789609981c9bb64f3519c7e532c4b17af804fbebb885b2c9979ef",
+        "actual": "633e25f6896789609981c9bb64f3519c7e532c4b17af804fbebb885b2c9979ef",
+        "matches": true
+      }
+    ],
+    "history": {
+      "baselineSourceRevision": 28,
+      "blockCounts": {
+        "old": 30,
+        "current": 30
+      },
+      "unchangedBlockCount": 12,
+      "addedBlockIds": [],
+      "removedBlockIds": [],
+      "blocks": [
+        {
+          "id": "blk-prod-target",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "00218e8b8fb925f425f4c5c69242c8c86af0889907ea96e3d017b00a6699f6b3",
+          "newRawSha256": "00218e8b8fb925f425f4c5c69242c8c86af0889907ea96e3d017b00a6699f6b3",
+          "changedFields": []
+        },
+        {
+          "id": "blk-prod-problem",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "5ec80e656c91ea5770582bc414724f54aacc485a1041cbc1800f0bd7fcff71bc",
+          "newRawSha256": "5ec80e656c91ea5770582bc414724f54aacc485a1041cbc1800f0bd7fcff71bc",
+          "changedFields": []
+        },
+        {
+          "id": "blk-prod-non-goals",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "e609d7f4daa63e949963f4df1d34e85961538116ee5d06cc6c687d2ba03f2b0b",
+          "newRawSha256": "e609d7f4daa63e949963f4df1d34e85961538116ee5d06cc6c687d2ba03f2b0b",
+          "changedFields": []
+        },
+        {
+          "id": "blk-prod-scope",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "7312247f9b4c5dd12774e0906bd31788edc2e4add35569fdb8d49edf253c7d6f",
+          "newRawSha256": "44291a5e6356e9f74b84a626c9981b9cdb1bf0b430e41821d5d76ab79d253e06",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-task-layout-styling",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "f74445be3c74b274754dd7e605b6dc355c9fe8b555d54b748fc374b6c90b09c4",
+          "newRawSha256": "f74445be3c74b274754dd7e605b6dc355c9fe8b555d54b748fc374b6c90b09c4",
+          "changedFields": []
+        },
+        {
+          "id": "blk-acc-reset",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "7b03d0bdc2add18d69a51fcc472239fd664c193a857b43594d5792802865919f",
+          "newRawSha256": "082c73c52b9a7563dbd867c684e7a425d18862ebbd1350dff0eb2df1273ca226",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-acc-security-edge",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "a30d492683b67ec93fe4e674c1c2c2e753c6518b5218a3f54dc41092584982c2",
+          "newRawSha256": "a30d492683b67ec93fe4e674c1c2c2e753c6518b5218a3f54dc41092584982c2",
+          "changedFields": []
+        },
+        {
+          "id": "blk-deliv-val-standalone-runtime",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "bd4ad77d28221c75d708028ba73fa63cb91aa0401f3e15c85715e988a1a81fa6",
+          "newRawSha256": "38b65bf7010a9467a7e231a1eb1421201f879d9114a8af289c4e3afbb9f82c3e",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "requirementIds",
+            "task",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-task-error-handling",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "4c5d32902434f6ab0a84a056995013eccf7ef9b1fb02292cacb799013c7380cc",
+          "newRawSha256": "4c5d32902434f6ab0a84a056995013eccf7ef9b1fb02292cacb799013c7380cc",
+          "changedFields": []
+        },
+        {
+          "id": "blk-tech-stack",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "df1ca5436228aa79dae8a7daa2b0c862bc20774066f286b538b3eccb9ad033bc",
+          "newRawSha256": "df1ca5436228aa79dae8a7daa2b0c862bc20774066f286b538b3eccb9ad033bc",
+          "changedFields": []
+        },
+        {
+          "id": "blk-tech-deployment",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "d6a2dd36c48ec124468456794129e034eff3166e53cbd849d5fb4bedd5bac4d4",
+          "newRawSha256": "d6a2dd36c48ec124468456794129e034eff3166e53cbd849d5fb4bedd5bac4d4",
+          "changedFields": []
+        },
+        {
+          "id": "blk-deliv-spec-deployment",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "4f7f45f3fcde76a3faaf860d4573e167550ff1be11c04c638a283842e7fa4e1c",
+          "newRawSha256": "cf850924ed9e93899ed3af33de1816d62087953492032ebc003beafc70ac1caf",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-task-package",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "9a333bffed449a11c93d75165a28c675b1b463923fa1e9b0ac39f8587a6763cf",
+          "newRawSha256": "9a333bffed449a11c93d75165a28c675b1b463923fa1e9b0ac39f8587a6763cf",
+          "changedFields": []
+        },
+        {
+          "id": "blk-deliv-acc-package",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "6d985b053a3286a4eb76c4c983da7a5f12195ed6fbd68fcb1307a9ffee493ab8",
+          "newRawSha256": "6d985b053a3286a4eb76c4c983da7a5f12195ed6fbd68fcb1307a9ffee493ab8",
+          "changedFields": []
+        },
+        {
+          "id": "blk-deliv-val-security-xss-audit",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "128e53f07f09d9dbdccbcce6480d81311da4e5257c81b339e5af2d66baaa22a8",
+          "newRawSha256": "128e53f07f09d9dbdccbcce6480d81311da4e5257c81b339e5af2d66baaa22a8",
+          "changedFields": []
+        },
+        {
+          "id": "blk-feat-input-display",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "e86c21f478b07448a6ceccc5aaca72150e0a8b51fb3b4795adc40e259cdb459a",
+          "newRawSha256": "454e3679b4e32edffdad7d336a3a5b5a58b3669dc3374cb8cd1fb28bce27a5b4",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-flow-input-display",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "80fbc4332756a116e3b2b393ff50d630e224e053901031939f330f1c84192faa",
+          "newRawSha256": "d82a402580bed6a41a2d0efc8cda7dda566808aff4f3f4f8ad22db011e6d5ad7",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-feat-reset",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "ea350566fa21f477cc6da532fe811595167496d527d6c7c6874da8e89549b718",
+          "newRawSha256": "34efcc9f55b9dfa7ccf91745bf612275a231181244a77a596523966adac69b62",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-flow-reset",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "f54a938241167d9f5f5f0bba084dcbb42fc5e7e00daa0876873e3f62611139cc",
+          "newRawSha256": "03ac87b39d34c874a971088eaa98f06dbdde98bdec6349dbf8e2ce796240767f",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-page-main-layout",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "f871497396e46fe9366c19d57040ca1975e949eb9ba2982eb75bd06aeb0eae0c",
+          "newRawSha256": "c5328130477f741eeac7bace0dea0fc8ecee881e87a918864ec82a353e7093b1",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-tech-module",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "dadf097e5b56a7c701fea18c3fad95468893e7273b385f24fda63aca1e2351e6",
+          "newRawSha256": "37f563c8e02fd9b9be0b569c974644999a94c46f40a5275c52901a5a4d02567c",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-tech-data-model",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "6dbf4c77bfc2cc88782b7bad31e80d6a811d7916a96af8433fac6a158a6962ed",
+          "newRawSha256": "b03295e9f38cc4ed06eaa094e9ca4f225e37e0e8ff244ced127238cffaf87d1d",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-tech-interface",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "9449e1cfe8ae249e27244d4f08f38583f67365dc14c74128c283b0bb7b96af13",
+          "newRawSha256": "b2aab3d677581fadcfd9b006989d9a0c40269fb633a308b3195dc2da0bcf3964",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-tech-error",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "ec4306b3196d65fe6c55fffcbdee3aa5ed499950cc1485ba4258ebb489d55829",
+          "newRawSha256": "463f21002e85eaf092f2f233639a69554925a4db3c5b2961706e7a59e7884273",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-acc-input-display",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "25fc0cdb19e8ee4acedb5a5defe397334e3c433ca239fbbbfafde5ffa4972f57",
+          "newRawSha256": "afb5e2d27247ae664011cc4905d1abb2b7e2360eabd124e8e17daad71c2c9ee0",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-task-input-workflow",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "9f91855591184ca1e69d7cbfdda3bdd1244c9a8cd1d5720e87b3f7b18f56d610",
+          "newRawSha256": "6c4b80535fd432510f0176e4eca6dc57066337bed04b050676f545963c5beacb",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "task",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-task-reset-workflow",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "61d3ae46e63ab2ba64b81a2305407cebebf429e16d68c8fb5014d58c9d947276",
+          "newRawSha256": "eb902cf07b2be4b0ed81abd7eb0ed46b2bd5d178a6f5f9a0d24e1ec69fd9bcbf",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "task",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-acc-full-e2e",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "d4fb77352b92d354d47b8480545cc0834dc2c7f3d069b2ec0b4839d598e8f033",
+          "newRawSha256": "4c7be38b055732f8cea1cca694fe36add1af9bf65cfb2a8546f1e97d0dfa9851",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "requirementIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-prod-outcomes",
+          "present": true,
+          "canonicalEqual": false,
+          "rawEqual": false,
+          "oldRawSha256": "391fe697c8d1731584afcecd339efddd57ee86e37bcdbef77be43bfe845ab3e4",
+          "newRawSha256": "763af4c52733669f0d9771c029a41a00e00b8a4e29e54bdfd7049c588365f06d",
+          "changedFields": [
+            "content",
+            "evidenceIds",
+            "title",
+            "approvedBy",
+            "approvedAt"
+          ]
+        },
+        {
+          "id": "blk-deliv-val-perf-benchmark",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "e085123efdea308765a43738927da0ce1ee9278280d87249c3538dcc98269a29",
+          "newRawSha256": "e085123efdea308765a43738927da0ce1ee9278280d87249c3538dcc98269a29",
+          "changedFields": []
+        }
+      ],
+      "evidenceCounts": {
+        "old": 29,
+        "current": 33
+      },
+      "oldEvidenceAllExact": true,
+      "evidence": [
+        {
+          "id": "answer-dec-09b0c6bd-21ae-4e5e-8c2b-8e2893cd4c0d",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "7a4696973e89fc3b8143ac6c7960a7ec9cb4fa45ff49b6dfac7f3c7026565866",
+          "newRawSha256": "7a4696973e89fc3b8143ac6c7960a7ec9cb4fa45ff49b6dfac7f3c7026565866"
+        },
+        {
+          "id": "evidence-27ebc57b-491d-46f1-bdb3-33df17720f9f",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "8c8f9439e8ac93070da4aa58d86106ad3b8dfdf4f89630d72b33bab19d22cea0",
+          "newRawSha256": "8c8f9439e8ac93070da4aa58d86106ad3b8dfdf4f89630d72b33bab19d22cea0"
+        },
+        {
+          "id": "evidence-89fe01db-82bb-475e-9d76-5a379bda0e07",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "9d8bc5837cdb41993fd8abec82ededee1a6f1488b8c4c92cc3eff32ef701e64b",
+          "newRawSha256": "9d8bc5837cdb41993fd8abec82ededee1a6f1488b8c4c92cc3eff32ef701e64b"
+        },
+        {
+          "id": "evidence-mdn-textcontent-xss-safety",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "6a1c0047d5bf492aee0eb599fb5a3187c283fb1184fd4a0cf656904b1fa49daf",
+          "newRawSha256": "6a1c0047d5bf492aee0eb599fb5a3187c283fb1184fd4a0cf656904b1fa49daf"
+        },
+        {
+          "id": "evidence-mdn-event-prevent-default",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "cf6b5b374b7c751ae3b5fa8bbce4f003b8afbf6e8bbb2f2d545996a16ac538f2",
+          "newRawSha256": "cf6b5b374b7c751ae3b5fa8bbce4f003b8afbf6e8bbb2f2d545996a16ac538f2"
+        },
+        {
+          "id": "evidence-mdn-node-textcontent-official",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "a0c3781bf1c11915390c8b439d98cbbadbe06ac7cf1044b95a448d18907d7ac1",
+          "newRawSha256": "a0c3781bf1c11915390c8b439d98cbbadbe06ac7cf1044b95a448d18907d7ac1"
+        },
+        {
+          "id": "evidence-mdn-htmlinputelement",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "1cbec34511641c5d58b01d180fb2d3a7d63b23dac342851abfa51a014474ac23",
+          "newRawSha256": "1cbec34511641c5d58b01d180fb2d3a7d63b23dac342851abfa51a014474ac23"
+        },
+        {
+          "id": "evidence-mdn-keyboardevent-key",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "e4cb452312d87369a22e86ad4a60acf1c55d11550a956b28abea4ebbf3fc1be8",
+          "newRawSha256": "e4cb452312d87369a22e86ad4a60acf1c55d11550a956b28abea4ebbf3fc1be8"
+        },
+        {
+          "id": "evidence-mdn-css-flexbox",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "cf3d0bebcf866f8bbdd14f630d085aea8e630c39db8a98a7ec5e68b474202bf6",
+          "newRawSha256": "cf3d0bebcf866f8bbdd14f630d085aea8e630c39db8a98a7ec5e68b474202bf6"
+        },
+        {
+          "id": "evidence-mdn-document-queryselector",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "5cb4fdf6197d494ced7a8e00749a749f67421a4c89ff6427e4f1b02c782a4bc8",
+          "newRawSha256": "5cb4fdf6197d494ced7a8e00749a749f67421a4c89ff6427e4f1b02c782a4bc8"
+        },
+        {
+          "id": "evidence-exp-docker-env-unavailable",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "0ce4d4d6fefbf6da8d9fb2d665f7223a9ec1cb83a9e7d28e89e38b103c6c4028",
+          "newRawSha256": "0ce4d4d6fefbf6da8d9fb2d665f7223a9ec1cb83a9e7d28e89e38b103c6c4028"
+        },
+        {
+          "id": "evidence-320443a6-461c-4976-9039-908598ac05f0",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "88335b3d1f13e1583198b5bbdf15b1f34acb5ae09cc0a07aa293e1422c8684bf",
+          "newRawSha256": "88335b3d1f13e1583198b5bbdf15b1f34acb5ae09cc0a07aa293e1422c8684bf"
+        },
+        {
+          "id": "evidence-docker-env-prep-delivery",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "3ab557c23a35a4606ba56eda56035ef50d395cda3f26d91f7b72dc0d2b9c7e99",
+          "newRawSha256": "3ab557c23a35a4606ba56eda56035ef50d395cda3f26d91f7b72dc0d2b9c7e99"
+        },
+        {
+          "id": "answer-dec-d722eb63-aa8e-41e8-8ff7-b9698d96b5f0",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "527a7b3d4d32990e562da3ac65d451569ff8fb809299e2d1d7a05b494da1fe23",
+          "newRawSha256": "527a7b3d4d32990e562da3ac65d451569ff8fb809299e2d1d7a05b494da1fe23"
+        },
+        {
+          "id": "evidence-15da1e6d-9c13-49f1-a146-f94eb1d8e564",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "b11c32ccf2dba854a7835b2a6918d494602fb9f27838f5aaa4483ba668172129",
+          "newRawSha256": "b11c32ccf2dba854a7835b2a6918d494602fb9f27838f5aaa4483ba668172129"
+        },
+        {
+          "id": "evidence-7cca7dfc-39e6-47cf-8cc6-3f7ccb9f622e",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "c964d583df9e40cb35467f343f745dc115c160ebad36f5eb9f860a2bc92f8733",
+          "newRawSha256": "c964d583df9e40cb35467f343f745dc115c160ebad36f5eb9f860a2bc92f8733"
+        },
+        {
+          "id": "evidence-dea1091c-52e5-4841-bdfe-a040b152fc88",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "98d2ba40f8fc5357706a65398e7dd9b7f266507738b4090cc58af0da3075f7c8",
+          "newRawSha256": "98d2ba40f8fc5357706a65398e7dd9b7f266507738b4090cc58af0da3075f7c8"
+        },
+        {
+          "id": "evidence-0fe0ac78-3369-4003-b087-b746e015ce63",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "f6744a5db57dded45738cf59bf30eb2d434ba17c606376c86ed305aeca7ed949",
+          "newRawSha256": "f6744a5db57dded45738cf59bf30eb2d434ba17c606376c86ed305aeca7ed949"
+        },
+        {
+          "id": "evidence-ef42cfd2-ccf5-4af7-bf6b-dc20586786a8",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "c9ff5f8142b074560d568157102e74a7dc51f2eb3323b4068ca251a16bcb93e9",
+          "newRawSha256": "c9ff5f8142b074560d568157102e74a7dc51f2eb3323b4068ca251a16bcb93e9"
+        },
+        {
+          "id": "evidence-d686fe73-a405-4933-a3a6-7da164ea5c01",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "5ab9ed7d9748f37a7bd2f2a8a158b84c6fd76da702efa1b8d9ca11cf9860e776",
+          "newRawSha256": "5ab9ed7d9748f37a7bd2f2a8a158b84c6fd76da702efa1b8d9ca11cf9860e776"
+        },
+        {
+          "id": "evidence-7a463cf7-74f1-4627-b9b3-24784ae3a9bc",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "b4661904c0cb05488a476cfd0e1c3caf60e04c0563540d6e6e53938baa79eed2",
+          "newRawSha256": "b4661904c0cb05488a476cfd0e1c3caf60e04c0563540d6e6e53938baa79eed2"
+        },
+        {
+          "id": "evidence-a2a11c7f-8620-4074-85d7-e1fd95310612",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "61eda2bdc0a68bc75352c367b45b10680911033ad0609819dee3e6193fe99578",
+          "newRawSha256": "61eda2bdc0a68bc75352c367b45b10680911033ad0609819dee3e6193fe99578"
+        },
+        {
+          "id": "evidence-7ec331d7-1d2e-415d-abc5-fecbed731559",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "4b7d38ca45ed7392f96d4f826e41154016e70959d743812ad5fbda4ad9459fa8",
+          "newRawSha256": "4b7d38ca45ed7392f96d4f826e41154016e70959d743812ad5fbda4ad9459fa8"
+        },
+        {
+          "id": "evidence-dab40954-74e0-4d24-bb31-1064f5dd626f",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "db6e2ce648fdfb5daa67d8ce7732dd5e60f8a259a82bdc10280f3dd6294a7474",
+          "newRawSha256": "db6e2ce648fdfb5daa67d8ce7732dd5e60f8a259a82bdc10280f3dd6294a7474"
+        },
+        {
+          "id": "evidence-python-http-server-port-official",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "97559a564a7987f2bc5bfff5c33ca2ae0c39205ab02ffabb095ba3a3e655730d",
+          "newRawSha256": "97559a564a7987f2bc5bfff5c33ca2ae0c39205ab02ffabb095ba3a3e655730d"
+        },
+        {
+          "id": "evidence-nodejs-process-exit-official",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "ea2b1ccd50d839dbfc8003955a65be608d86f6b2cb192c79a5db68e6690db3cf",
+          "newRawSha256": "ea2b1ccd50d839dbfc8003955a65be608d86f6b2cb192c79a5db68e6690db3cf"
+        },
+        {
+          "id": "evidence-mdn-xss-definition-boundary",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "a33942824a78fd31af92c288fcc4aeb45fb4236ea7d8fcdc2e2916675f883afe",
+          "newRawSha256": "a33942824a78fd31af92c288fcc4aeb45fb4236ea7d8fcdc2e2916675f883afe"
+        },
+        {
+          "id": "evidence-mdn-ime-compositionstart-session",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "1f8565ec2e2ee89297fedc9d36a6543fe81c6cf5beb466c27508c30eeb069f0f",
+          "newRawSha256": "1f8565ec2e2ee89297fedc9d36a6543fe81c6cf5beb466c27508c30eeb069f0f"
+        },
+        {
+          "id": "evidence-e925f9c6-bafa-4a0e-bc35-de2a031a6cc9",
+          "present": true,
+          "canonicalEqual": true,
+          "rawEqual": true,
+          "oldRawSha256": "5e36484aea2ff2a6697c1709cd3378ae2230fc29397eef75b4abe90becabb913",
+          "newRawSha256": "5e36484aea2ff2a6697c1709cd3378ae2230fc29397eef75b4abe90becabb913"
+        }
+      ],
+      "newEvidence": [
+        {
+          "applicability": "用于清空操作时替换输入节点（replaceWith / replaceChild），实现节点代际闭包隔离，使旧节点的迟到事件被隔离丢弃，不污染新输入节点。",
+          "content": "MDN 官方规范指出：Element.replaceWith() 方法用一组 Node 对象或字符串替换父节点子列表中的此 Element。该方法自 2018 年起已在主流现代桌面浏览器全面支持，适用于清空时安全替换活跃输入框 DOM 节点。",
+          "hash": "2aae27198a28d84070b24d4428e06c1ac390eef3a6417a64dba20d4907da2ee8",
+          "id": "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+          "kind": "official-source",
+          "location": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith",
+          "obtainedAt": "2026-10-04T23:41:10.156Z",
+          "outcome": "passed",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+        },
+        {
+          "applicability": "自动质量验收反馈：关于输入节点生命周期与定时器隔离契约的修订要求，采用清空时替换输入节点与节点代际闭包隔离方案。",
+          "content": "本轮是自动质量验收反馈，不是真人新增需求，也不是人工批准。只针对 flash-materials-quality-20261005-06 的 sourceRevision28 / quality-reviewed-r3 最新真实蓝图，旧证据和旧包保留。原生目标应用尚未开发；本轮只有导出契约的静态/合成反例，不能称浏览器实测。现在仅输入节点生命周期/定时器隔离契约仍阻断。请在待批准方案中采用明确的“清空时替换输入节点＋节点代际闭包隔离”作为最小修订建议，AI完成普通实现细节。",
+          "hash": "d3e69bb333a4112e32f50bf8a964a2b91959779df5b7eb3907c130386d4b2e88",
+          "id": "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+          "kind": "user",
+          "location": "materials/inputs/58d9b19d-41b2-4b33-9b82-848c086d1399",
+          "obtainedAt": "2026-10-04T23:41:22.473Z",
+          "outcome": "passed",
+          "source": "input:58d9b19d-41b2-4b33-9b82-848c086d1399"
+        },
+        {
+          "applicability": "用于事件处理前核验事件监听器绑定的真实节点与当前活跃节点一致性。核对 event.currentTarget 与 node === activeInputNode，确保仅处理直接绑定在当前活跃输入节点上的事件，丢弃已替换作废旧节点的冒泡或尾随事件。",
+          "content": "The currentTarget read-only property of the Event interface identifies the element to which the event handler has been attached.",
+          "hash": "659cef39146b234aaffd6211e8541383f6c351a197f1434b79fd28a423b928e3",
+          "id": "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+          "kind": "official-source",
+          "location": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget",
+          "obtainedAt": "2026-10-04T23:41:23.175Z",
+          "outcome": "passed",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget"
+        },
+        {
+          "applicability": "用于核验事件所属输入节点是否仍在文档树中。清空操作通过 replaceWith() 移出旧节点后，旧节点的 isConnected 变为 false，事件守卫检查 node.isConnected 若为 false 则直接丢弃事件，避免非挂载节点操作界面状态。",
+          "content": "The read-only isConnected property of the Node interface returns a boolean indicating whether the node is connected (directly or indirectly) to a Document object.",
+          "hash": "efc23d018757062e345938aca4cfdaaf3ad73cf4ecc99e7a0767cc3e0afb55a5",
+          "id": "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+          "kind": "official-source",
+          "location": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected",
+          "obtainedAt": "2026-10-04T23:41:31.567Z",
+          "outcome": "passed",
+          "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected"
+        }
+      ],
+      "inherited": [
+        {
+          "name": "blueprint.json",
+          "originalSha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14",
+          "copiedSha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14",
+          "equal": true
+        },
+        {
+          "name": "planning.json",
+          "originalSha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc",
+          "copiedSha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc",
+          "equal": true
+        },
+        {
+          "name": "decisions.json",
+          "originalSha256": "287e349f5bb4bc4cd37f2fbde3904c0103f1ea5295c9bf491140c5909426034f",
+          "copiedSha256": "287e349f5bb4bc4cd37f2fbde3904c0103f1ea5295c9bf491140c5909426034f",
+          "equal": true
+        },
+        {
+          "name": "metadata.json",
+          "originalSha256": "6582d67c26ff9840e8f29be9a51c1bad85cf3dd334a746fe845afc034ee9d93a",
+          "copiedSha256": "6582d67c26ff9840e8f29be9a51c1bad85cf3dd334a746fe845afc034ee9d93a",
+          "equal": true
+        }
+      ]
+    },
+    "sourceFiles": [
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-quality-20261005-06\\project-records\\state\\revisions\\28\\blueprint.json",
+        "sha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14"
+      },
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-quality-20261005-06\\project-records\\state\\revisions\\28\\planning.json",
+        "sha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc"
+      },
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-final-20261004-01\\project-records\\state\\revisions\\32\\blueprint.json",
+        "sha256": "c6e977767f1757bd65442cd8b0ebfca0c103c9f56185020bf943184a2e9a99df"
+      },
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-final-20261004-01\\project-records\\state\\revisions\\32\\planning.json",
+        "sha256": "24bba93caae6a0bcb324d297c6cf37dae719d62744d78319d66763015d71f52e"
+      }
+    ]
+  },
+  "taskProof": {
+    "revision": 32,
+    "taskCount": 8,
+    "allSpecFieldsExact": true,
+    "taskProjection": [
+      {
+        "id": "blk-deliv-task-layout-styling",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-task-error-handling",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-task-package",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-val-security-xss-audit",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "environment",
+            "equal": true
+          },
+          {
+            "key": "evidenceRequired",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "onFailure",
+            "equal": true
+          },
+          {
+            "key": "passCriteria",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "steps",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-val-perf-benchmark",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "environment",
+            "equal": true
+          },
+          {
+            "key": "evidenceRequired",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "onFailure",
+            "equal": true
+          },
+          {
+            "key": "passCriteria",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "steps",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-task-input-workflow",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-task-reset-workflow",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      },
+      {
+        "id": "blk-deliv-val-standalone-runtime",
+        "present": true,
+        "specFields": [
+          {
+            "key": "assumptions",
+            "equal": true
+          },
+          {
+            "key": "completionCriteria",
+            "equal": true
+          },
+          {
+            "key": "environment",
+            "equal": true
+          },
+          {
+            "key": "evidenceRequired",
+            "equal": true
+          },
+          {
+            "key": "exclusions",
+            "equal": true
+          },
+          {
+            "key": "failureBehavior",
+            "equal": true
+          },
+          {
+            "key": "goal",
+            "equal": true
+          },
+          {
+            "key": "modules",
+            "equal": true
+          },
+          {
+            "key": "normalBehavior",
+            "equal": true
+          },
+          {
+            "key": "onFailure",
+            "equal": true
+          },
+          {
+            "key": "passCriteria",
+            "equal": true
+          },
+          {
+            "key": "scope",
+            "equal": true
+          },
+          {
+            "key": "steps",
+            "equal": true
+          },
+          {
+            "key": "verification",
+            "equal": true
+          }
+        ],
+        "contentRetainedInDevelopmentPlan": true
+      }
+    ],
+    "taskIdsPreserved": true,
+    "dagExact": false,
+    "performanceOutcomeParagraphExact": true,
+    "newValidationEvidenceKinds": [
+      {
+        "id": "evidence-6f045d0d-928d-4f66-8427-b7f62c91ae8a",
+        "kind": "official-source",
+        "outcome": "passed",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/API/Element/replaceWith"
+      },
+      {
+        "id": "evidence-1e3fc8ef-8a1e-404f-a931-72f46fd0d8ed",
+        "kind": "user",
+        "outcome": "passed",
+        "source": "input:58d9b19d-41b2-4b33-9b82-848c086d1399"
+      },
+      {
+        "id": "evidence-8978eaa8-d822-4c9c-a5c5-c60e914c2a91",
+        "kind": "official-source",
+        "outcome": "passed",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget"
+      },
+      {
+        "id": "evidence-f7c8f543-aa2f-4d11-bcf6-eb506e933aba",
+        "kind": "official-source",
+        "outcome": "passed",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected"
+      }
+    ],
+    "dagAudit": {
+      "taskIdsAndOrderExact": true,
+      "taskDependsOnExact": true,
+      "taskBlueprintDependsOnExact": true,
+      "blueprintReferenceIdsAndOrderExact": true,
+      "blueprintReferenceDependsOnExact": true,
+      "requirementMappingDifferences": [
+        {
+          "kind": "task",
+          "id": "blk-deliv-val-standalone-runtime",
+          "before": [
+            "blk-deliv-spec-deployment",
+            "blk-tech-deployment"
+          ],
+          "after": [
+            "blk-tech-deployment",
+            "blk-tech-interface"
+          ]
+        },
+        {
+          "kind": "blueprintReference",
+          "id": "blk-deliv-acc-full-e2e",
+          "before": [
+            "blk-feat-input-display",
+            "blk-feat-reset",
+            "blk-tech-error"
+          ],
+          "after": [
+            "blk-feat-input-display",
+            "blk-feat-reset",
+            "blk-deliv-spec-deployment"
+          ]
+        }
+      ],
+      "assessment": "The combined prior dagExact comparison includes requirementIds and is false. Every execution dependency and blueprint dependency edge is exactly retained. The two requirement mappings are recorded separately; no additional DAG blocker is inferred."
+    }
+  },
+  "verbatimVmProof": {
+    "checkedAt": "2026-10-04T23:58:29.640Z",
+    "method": "Verbatim complete exported JavaScript block executed in node:vm, without rewriting any handler, scheduler, reset or renderer. Browser DOM/timer APIs are a synthetic host. Guard-only probes explicitly supply the otherwise undeclared FeedbackBanner and DOM refs as harness dependencies; that does not repair or pass the complete interface contract.",
+    "sourceBlockId": "blk-tech-interface",
+    "sourceCodeSha256": "f8fa176b504e798a2955e7d20887b2845f1ce3002f1e4e555b8a2d273b1edcf8",
+    "exportedCodeSha256": "f8fa176b504e798a2955e7d20887b2845f1ce3002f1e4e555b8a2d273b1edcf8",
+    "exportedCodeEqualsBlueprint": true,
+    "applicationAlgorithmChanged": false,
+    "nativeBrowserVerification": "unexecuted",
+    "probes": [
+      {
+        "id": "complete-code-with-browser-globals-only",
+        "status": "blocked",
+        "error": "ReferenceError: FeedbackBanner is not defined",
+        "missingApplicationReferences": [
+          "FeedbackBanner",
+          "displayElement",
+          "errorContainer"
+        ],
+        "sourceCodeChanged": false
+      },
+      {
+        "id": "old-node-end-and-input-after-clear",
+        "status": "passed",
+        "observed": {
+          "generation": 2,
+          "epoch": 2,
+          "pending": false,
+          "activeValue": "",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        }
+      },
+      {
+        "id": "new-input-then-old-node-end",
+        "status": "passed",
+        "before": {
+          "generation": 2,
+          "epoch": 4,
+          "pending": true,
+          "activeValue": "Brand-New",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "afterOld": {
+          "generation": 2,
+          "epoch": 4,
+          "pending": true,
+          "activeValue": "Brand-New",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "final": {
+          "generation": 2,
+          "epoch": 4,
+          "pending": false,
+          "activeValue": "Brand-New",
+          "display": "Brand-New",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        }
+      },
+      {
+        "id": "new-composition-then-old-node-end",
+        "status": "passed",
+        "before": {
+          "generation": 2,
+          "epoch": 3,
+          "pending": false,
+          "activeValue": "",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "during": {
+          "generation": 2,
+          "epoch": 3,
+          "pending": false,
+          "activeValue": "xin",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "final": {
+          "generation": 2,
+          "epoch": 5,
+          "pending": false,
+          "activeValue": "新项目",
+          "display": "新项目",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        }
+      },
+      {
+        "id": "already-queued-old-timer-clear-and-new-input",
+        "status": "passed",
+        "before": {
+          "generation": 2,
+          "epoch": 5,
+          "pending": true,
+          "activeValue": "New-Draft",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "afterOld": {
+          "generation": 2,
+          "epoch": 5,
+          "pending": true,
+          "activeValue": "New-Draft",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "final": {
+          "generation": 2,
+          "epoch": 5,
+          "pending": false,
+          "activeValue": "New-Draft",
+          "display": "New-Draft",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        }
+      },
+      {
+        "id": "replacement-schedule-and-captured-draft",
+        "status": "passed",
+        "afterOld": {
+          "generation": 1,
+          "epoch": 4,
+          "pending": true,
+          "activeValue": "Unaccepted-DOM-Write",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": true
+        },
+        "final": {
+          "generation": 1,
+          "epoch": 4,
+          "pending": false,
+          "activeValue": "Unaccepted-DOM-Write",
+          "display": "Accepted-Snapshot",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": true
+        }
+      },
+      {
+        "id": "compositionstart-invalidates-already-queued-timer",
+        "status": "passed",
+        "during": {
+          "generation": 1,
+          "epoch": 3,
+          "pending": false,
+          "activeValue": "Pre-composition",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": true
+        },
+        "final": {
+          "generation": 1,
+          "epoch": 5,
+          "pending": false,
+          "activeValue": "中文项目",
+          "display": "中文项目",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": true
+        }
+      },
+      {
+        "id": "new-node-typing-paste-without-unlock-key",
+        "status": "passed",
+        "afterTyping": {
+          "generation": 2,
+          "epoch": 3,
+          "pending": false,
+          "activeValue": "Typed",
+          "display": "Typed",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "final": {
+          "generation": 2,
+          "epoch": 5,
+          "pending": false,
+          "activeValue": "Pasted",
+          "display": "Pasted",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        }
+      },
+      {
+        "id": "wrong-currentTarget-and-detached-current-node",
+        "status": "passed",
+        "wrongTarget": {
+          "generation": 1,
+          "epoch": 0,
+          "pending": false,
+          "activeValue": "Wrong-Target",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": true
+        },
+        "detached": {
+          "generation": 1,
+          "epoch": 0,
+          "pending": false,
+          "activeValue": "Wrong-Target",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": false
+        }
+      },
+      {
+        "id": "pure-spaces-retained-and-old-result-cleared",
+        "status": "passed",
+        "observed": {
+          "generation": 1,
+          "epoch": 4,
+          "pending": false,
+          "activeValue": "   ",
+          "display": "【等待输入核对】",
+          "errors": [
+            "项目名不能为空，请输入有效字符"
+          ],
+          "globalErrors": [],
+          "focusedActive": false,
+          "connected": true
+        }
+      },
+      {
+        "id": "retargeted-end-to-new-node-is-not-rejected-by-generation",
+        "status": "counterexample",
+        "before": {
+          "generation": 2,
+          "epoch": 3,
+          "pending": false,
+          "activeValue": "New-Composition",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "afterEnd": {
+          "generation": 2,
+          "epoch": 5,
+          "pending": true,
+          "activeValue": "New-Composition",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "afterInput": {
+          "generation": 2,
+          "epoch": 7,
+          "pending": true,
+          "activeValue": "New-Still-Composing",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "nativeBrowserVerification": "unexecuted",
+        "meaning": "Synthetic dispatch to the new node satisfies all four guards; it does not prove that a real browser performs this retargeting."
+      },
+      {
+        "id": "replacement-attributes-and-focus",
+        "status": "counterexample",
+        "before": {
+          "id": "project-name-input",
+          "name": "projectName",
+          "class": "project-input",
+          "placeholder": "请输入待核对的项目名",
+          "aria-label": "项目名输入",
+          "aria-describedby": "project-name-help",
+          "aria-required": "true",
+          "tabindex": "0",
+          "style": "width:20rem",
+          "data-test": "project-name"
+        },
+        "after": {
+          "id": "project-name-input",
+          "name": "projectName",
+          "class": "project-input",
+          "placeholder": "请输入待核对的项目名",
+          "aria-label": "项目名输入"
+        },
+        "lostOrChangedAttributes": [
+          "aria-describedby",
+          "aria-required",
+          "tabindex",
+          "style",
+          "data-test"
+        ],
+        "observed": {
+          "generation": 2,
+          "epoch": 1,
+          "pending": false,
+          "activeValue": "",
+          "display": "【等待输入核对】",
+          "errors": [],
+          "globalErrors": [],
+          "focusedActive": true,
+          "connected": true
+        },
+        "physicalLayoutAndAssistiveTechnologyVerification": "unexecuted"
+      }
+    ]
+  },
+  "invarianceProof": {
+    "checkedAt": "2026-10-05T00:06:55.657Z",
+    "allMatch": true,
+    "files": [
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-quality-20261005-06\\project-records\\state\\revisions\\28\\blueprint.json",
+        "sha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14",
+        "currentSha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14",
+        "matches": true
+      },
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-quality-20261005-06\\project-records\\state\\revisions\\28\\planning.json",
+        "sha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc",
+        "currentSha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc",
+        "matches": true
+      },
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-final-20261004-01\\project-records\\state\\revisions\\32\\blueprint.json",
+        "sha256": "c6e977767f1757bd65442cd8b0ebfca0c103c9f56185020bf943184a2e9a99df",
+        "currentSha256": "c6e977767f1757bd65442cd8b0ebfca0c103c9f56185020bf943184a2e9a99df",
+        "matches": true
+      },
+      {
+        "file": "D:\\桌面\\项目构思\\docs\\validation\\agy-2026-10-04\\real-integration\\flash-materials-final-20261004-01\\project-records\\state\\revisions\\32\\planning.json",
+        "sha256": "24bba93caae6a0bcb324d297c6cf37dae719d62744d78319d66763015d71f52e",
+        "currentSha256": "24bba93caae6a0bcb324d297c6cf37dae719d62744d78319d66763015d71f52e",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/project-records/state/revisions/28/blueprint.json",
+        "sha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14",
+        "currentSha256": "474fe3a578c2f569a410a2c0651ff173f1b2d9e4ce273e909a3313a4a1331f14",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/project-records/state/revisions/28/planning.json",
+        "sha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc",
+        "currentSha256": "8c0768a5c5becc1cbb24e4edcf5c853e28d5aefad8845fb8e33602c07f23d0cc",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/project-records/state/revisions/28/decisions.json",
+        "sha256": "287e349f5bb4bc4cd37f2fbde3904c0103f1ea5295c9bf491140c5909426034f",
+        "currentSha256": "287e349f5bb4bc4cd37f2fbde3904c0103f1ea5295c9bf491140c5909426034f",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/project-records/state/revisions/28/metadata.json",
+        "sha256": "6582d67c26ff9840e8f29be9a51c1bad85cf3dd334a746fe845afc034ee9d93a",
+        "currentSha256": "6582d67c26ff9840e8f29be9a51c1bad85cf3dd334a746fe845afc034ee9d93a",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/START_HERE.md",
+        "sha256": "87f0c78745af40fca1579676eea62eac2f6be74a35b1b6b8231b985c9deedfb9",
+        "currentSha256": "87f0c78745af40fca1579676eea62eac2f6be74a35b1b6b8231b985c9deedfb9",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/PROJECT.md",
+        "sha256": "fa118818883923dd80902caf2dbcd72a1355f0c25972e02568d7e1f1d20f57cf",
+        "currentSha256": "fa118818883923dd80902caf2dbcd72a1355f0c25972e02568d7e1f1d20f57cf",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/PRODUCT.md",
+        "sha256": "0c55af47aa0fa0dd6ac8291b1819fd2ddc2af2124f7f31d40e0eb5dd5431ddb0",
+        "currentSha256": "0c55af47aa0fa0dd6ac8291b1819fd2ddc2af2124f7f31d40e0eb5dd5431ddb0",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/USER_FLOWS.md",
+        "sha256": "b8d3a65df37426663b18e303d025377b9b35d2cac2f45ccf0475975f1c123fae",
+        "currentSha256": "b8d3a65df37426663b18e303d025377b9b35d2cac2f45ccf0475975f1c123fae",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/UX_UI_SPEC.md",
+        "sha256": "ba7e0fc1f5d04089c95f8f74bd5e9b67761cc39e9a16cbb480bf39c899aa89ff",
+        "currentSha256": "ba7e0fc1f5d04089c95f8f74bd5e9b67761cc39e9a16cbb480bf39c899aa89ff",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/TECHNICAL_GUIDE.md",
+        "sha256": "f1238ae401d0a6a2b51e811a2bf2e787edd35741989b8da89bac788a7b9a838b",
+        "currentSha256": "f1238ae401d0a6a2b51e811a2bf2e787edd35741989b8da89bac788a7b9a838b",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/DEVELOPMENT_PLAN.md",
+        "sha256": "4442fbaf46d6c82157e30df3746d2f814e5388ddc8a2fe4eafde0fe1c0e16be8",
+        "currentSha256": "4442fbaf46d6c82157e30df3746d2f814e5388ddc8a2fe4eafde0fe1c0e16be8",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/ACCEPTANCE.md",
+        "sha256": "2c14e7ece60e5d85932a325dad13acc458c3edc51db8e2045bafed6323d48996",
+        "currentSha256": "2c14e7ece60e5d85932a325dad13acc458c3edc51db8e2045bafed6323d48996",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/AGENTS.md",
+        "sha256": "0d1a28c19c1a1050e532b9a06a5fae072d7566e8948d0ef55011e2ce72cdc455",
+        "currentSha256": "0d1a28c19c1a1050e532b9a06a5fae072d7566e8948d0ef55011e2ce72cdc455",
+        "matches": true
+      },
+      {
+        "file": "D:/桌面/项目构思/docs/validation/agy-2026-10-04/real-integration/flash-materials-final-20261004-01/quality-reviewed-r4-development-package/tasks.json",
+        "sha256": "633e25f6896789609981c9bb64f3519c7e532c4b17af804fbebb885b2c9979ef",
+        "currentSha256": "633e25f6896789609981c9bb64f3519c7e532c4b17af804fbebb885b2c9979ef",
+        "matches": true
+      }
+    ]
+  }
+}
+
